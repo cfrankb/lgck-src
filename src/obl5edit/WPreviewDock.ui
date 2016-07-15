@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CWPreviewDock</class>
+ <widget class="QDockWidget" name="CWPreviewDock">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>318</width>
+    <height>259</height>
+   </rect>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="obl5edit.qrc">
+    <normaloff>:/images/icon64.png</normaloff>:/images/icon64.png</iconset>
+  </property>
+  <property name="windowTitle">
+   <string>DockWidget</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="CWPreview" name="graphicsView"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CWPreview</class>
+   <extends>QGraphicsView</extends>
+   <header>WPreview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="obl5edit.qrc"/>
+ </resources>
+ <connections/>
+</ui>

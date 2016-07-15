@@ -1,0 +1,90 @@
+TODO
+
+[ ] I have to say, the biggest hinderence so far has been
+    the lack of the select tool
+
+[ ] I Find it rather annoying that the sprite sheet has
+    to be a multiple of 8
+
+[x] Save
+    [X] add extension
+    [X] png save -> export wizard
+
+[ ] Export options
+
+[x] Copy,cut, paste
+
+[x] Save & restore settings
+    [x] save tool,pencolor, etc.
+    [x] save OpenFile filter
+    [x] save default imageSize (width, height)
+    [x] save alpha pref
+    [x] windows, toolbar, toolbox and view states
+
+[x] Grid-free editview pixel must be full square
+    (e.g. remove all spacing between pixels when grid is turned off)
+
+[x] transparency dropdown (alpha)
+
+[ ] accept drag & drop into the ImageView
+
+[ ] liveview/static views features
+    [x] Zoom
+    [ ] change background colors
+    [x] animated preview
+
+[ ] color palette
+    [ ] save/load
+    [ ] recently used colors
+    [x] favorite colors
+
+[x] ability to apply menu functions to all Images
+
+[x] shortcut keys for all tools and menu actions
+    [x] ability to change them
+    [x] improve the ui for Shortcut editor
+
+[ ] Tools
+    [x] Tool Circle (buggy)
+    [ ] Tool Select
+    [ ] Tool Map (LGCK Builder only feature)
+
+[ ] sprite strips (max columns)
+
+[ ] 3 display/edit modes:
+    [x] normal : very classic, pixels are blended on a classic chessboard pattern so their alpha is evident.
+    [x] color-only : shows only internal color, and painting affect only color components (RGB)
+    [x] alpha-only : shows only the alpha channel, as greyscale (black=fully transparent, white=fully opaque).
+        Painting affect only the alpha channel, so it's easy to opacify or transparify anything, using any painting tool and brush size. This mode is great to check that opaque shapes are really opaque.
+    [x] tiled view
+        [ ] zoom
+        [ ] draw-on
+
+[ ] effects
+    [ ] brigtens
+    [ ] darkens
+
+BUGS:
+[ ] Tiled View mode doesn't work correctly when viewport is
+    smaller than the image or between 1 and 2 in sizes.
+
+[x] colorpicker bug: doesn't get the latest color when picked
+    from triangle.
+
+[x] pick a color doesn't work (possible windows bug?)
+    not a bug
+
+[x] unsupported png files will crash the editor
+
+[ ] circle tool is buggy
+
+[x] Firstly, if you look at the "File" tab, you have it so that it
+    is "FIle"
+
+[ ] Also, the rubber icon, when you use it looks weird, as if the image
+    hasn't been put in proparly.
+
+[x] under some circonstances deleting a frame causes the animated
+    view to not get updated
+
+    
