@@ -1,0 +1,33 @@
+===== Class Global =====
+==== Members ====
+
+
+==== Global:getInt (lua/tba)====
+  * __in__ **string name**\\
+  * __out__ **int **\\
+
+
+
+
+==== Global:getString (lua/tba)====
+  * __in__ **string value**\\
+  * __out__ **string **\\
+
+
+
+
+==== Global:setInt (lua/tba)====
+  * __in__ **string name**\\
+  * __in__ **int value**\\
+  * __out__ ** void **\\
+
+
+
+
+==== Global:setString (lua/tba)====
+  * __in__ **string name**\\
+  * __in__ **string value**\\
+  * __out__ ** void **\\
+
+
+

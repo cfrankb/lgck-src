@@ -1,0 +1,225 @@
+#!/usr/bin/python
+'''
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2016  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
+# http://stackoverflow.com/questions/2568067/using-gcc-mingw-to-compile-opengl-on-windows
+
+import json
+import glob
+import argparse
+import os
+import binascii
+import subprocess
+
+def chunks(l, n):
+    """ Yield successive n-sized chunks from l.
+    """
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
+
+class CMakeU():
+    def __init__(self):
+        self.data = {}
+        self.lines = []
+
+    def scanfile(self,fpath, deps):
+        sfile = open(fpath, 'r')
+        for line in sfile:
+            if line[:10] == '#include "':
+                fname = line.split('"')[1]
+                base = os.path.splitext(fname)[0]
+                src = base + '.cpp'
+                if not os.path.exists(src):
+                    src = os.path.join(os.path.dirname(fpath), os.path.basename(src))
+                if not os.path.exists(src):
+                    if self.args.verbose:
+                        print "warning: can't find %s" % src
+                    continue
+                if os.path.basename(base) not in self.data['exclude'] and src not in deps:
+                    deps.append(src)
+        sfile.close()
+
+    def write_batchfile(self):
+        objs = []
+        objd = []
+        #src = []
+        #for fname in self.data['sources']:
+        #    if '*' in fname:
+        #        for fname in glob.glob(fname):
+        #            src.append(fname)
+        #    else:
+        #        src.append(fname)
+        src = self.get_source()
+        cmds = []
+        cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data['win32']['paths']]) + \
+            ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data['win32']['flags']]) 
+        for fname in src:
+            base = os.path.splitext(fname)[0]
+            objn = base + '.o';
+            if objn[:3] == '../':
+                objn = objn[3:]
+            objn = self.data['obj_dir'] + '/' + objn
+            objp = os.path.dirname(objn)
+            if not objp in objd:
+                objd.append(objp)
+            objs.append(objn)
+            cmds.append(r'g++ -c %s %s -o %s' % (cflags, fname, objn))
+            cmds.append(r'@if %errorlevel% neq 0 goto err')
+        tfile = open(self.data['win32']['output'], 'w')
+        for objp in objd:
+            tfile.write('mkdir %s\n' % objp.replace('/', '\\'))
+        for cmd in cmds:
+            tfile.write(cmd + '\n')
+        cflags = ' '.join(["{flag}".format(flag=flag) for flag in self.data['win32']['flags']]) + \
+            ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']]) 
+        libs = ' '.join(['-{lib}'.format(lib=lib) for lib in self.data['win32']['libs']])
+        objs = ' '.join([obj for obj in objs])
+        tfile.write('g++ %s %s %s -o %s\n' % (cflags, objs, libs, self.data['target']))
+        tfile.write(r'@if %errorlevel% neq 0 goto err')
+        tfile.write('\n')
+        tfile.write('goto out\n')
+        tfile.write(':err\n')
+        tfile.write('@echo fatal error\n')
+        tfile.write(':out\n')
+        tfile.close()
+
+    def get_source(self):
+        src = []
+        for fname in self.data['sources']:
+            if '*' in fname:
+                for fname in glob.glob(fname):
+                    src.append(fname)
+            else:
+                src.append(fname)
+        return src
+
+    def write_makefile(self):
+        deps = []
+        self.tdeps = {}
+        objs = []
+        src = self.get_source()
+        if self.args.verbose:
+            print ' \\\n'.join('{x}'.format(x=x) for x in src)
+        objd = []
+        for fname in src:
+            deps = [fname]
+            # print fname
+            base = os.path.splitext(fname)[0]
+            hname = base + '.h'
+            if os.path.exists(hname):
+                self.scanfile(hname,deps)
+            self.scanfile(fname,deps)
+            objn = base + '.o';
+            if objn[:3] == '../':
+                objn = objn[3:]
+            objn = '$(ODIR)/' + objn
+            objp = os.path.dirname(objn)
+            if not objp in objd:
+                objd.append(objp)
+            self.tdeps[objn] = (deps,fname)
+            objs.append(objn)
+        cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data['linux']['paths']]) + \
+            ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data['linux']['flags']]) + \
+            ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']]) 
+        tfile = open(self.data['linux']['output'], 'w')
+        tfile.write("TARGET=%s\n" % self.data['target'])
+        tfile.write('CC=%s\n' % self.data['cxx'])
+        tfile.write('ODIR=%s\n' % self.data['obj_dir'])
+        tfile.write('CFLAGS=%s\n' % cflags)
+        tfile.write('OBJ=%s\n' % ' '.join([obj for obj in objs]))
+        tfile.write('LIBS=%s\n'% ' '.join(['-l{lib}'.format(lib=lib) for lib in self.data['linux']['libs']]))
+        tfile.write('\nall: $(TARGET)\n\n');
+        objs = self.tdeps.items()
+        objs.sort()
+        for k, v in objs:
+            tfile.write('%s: %s\n' % (k, ' '.join([fname for fname in v[0]])))
+            tfile.write('\tmkdir -p ' + ' '.join([c for c in objd]) + '\n')
+            tfile.write('\t$(CC) -c -o $@ %s $(CFLAGS)\n\n' % v[1]) # $<
+        tfile.write('$(TARGET): $(OBJ)\n')
+        tfile.write('\tmkdir -p ' + ' '.join([c for c in objd]) + '\n')
+        tfile.write('\t$(CC) -o $@ $^ $(CFLAGS) $(LIBS)\n\n')
+        tfile.write('clean:\n')
+        tfile.write('\trm -rf $(ODIR)')
+        tfile.close()
+        if 'build' in self.data['linux']:
+            print("TODO: implement this")
+            '''out = [
+                '#!/bin/bash',
+                'cur=`pwd`',
+                'make {0} $1 $2 $3'.format(self.data['linux']['output']),
+                'cd "$pwd"'
+            ]
+            with open(self.data['linux']['build'],'w') as t:
+                t.write('\n'.join(out))
+            subprocess.check_call(["chmod", "+x", self.data['linux']['build']])'''
+
+    def write_res(self):
+        CHUNK_SIZE = 32
+        out_file = self.data['res']['out']
+        odir = os.path.dirname(out_file)
+        subprocess.check_call(["mkdir", "-p", odir])
+        base = self.data['res']['base']
+        tfile = open(out_file, 'w')
+        tfile.write('#include "FileWrap.h"\n\n');
+        i = 0
+        for fname in self.data['res']['file_list']:
+            sfile = open(base + fname, 'r')
+            data = sfile.read()
+            sfile.close()
+            tfile.write('const unsigned char file_%d[]={\n' % i)
+            for line in chunks(binascii.b2a_hex(data), CHUNK_SIZE):
+                tfile.write('    ' + ','.join(['0x'+ch for ch in chunks(line, 2)]))
+                if len(line) == CHUNK_SIZE:
+                    tfile.write(',')
+                tfile.write('\n')
+            tfile.write('};\n\n')
+            i = i + 1
+        tfile.write('void %s()\n{\n' % self.data['res']['name']);
+        i = 0
+        for fname in self.data['res']['file_list']:
+            tfile.write('    CFileWrap::addFile(":/%s", (const char*)file_%d, sizeof(file_%d));\n' % (fname, i, i))
+            i = i + 1
+        tfile.write('}\n')
+        tfile.close()
+
+    def main(self):
+        parser = argparse.ArgumentParser(description='MakeFile utility for LGCK Builder')
+        parser.add_argument('file', default='make.json', help='The json file to parse (make.json)')
+        parser.add_argument('--res', dest='res', action='store_true', help= "rebuild res file")
+        parser.add_argument('-v', dest='verbose', action='store_true', help= "verbose")
+        self.args = parser.parse_args()
+        try:
+            f = open(self.args.file, 'r') 
+            raw = f.read() 
+            f.close()
+        except:
+            print "can't open %s" % args.file
+            exit(-1)
+        self.data = json.loads(raw)
+        if self.args.res:
+            if 'res' in self.data:
+                self.write_res()
+            else:
+                print("missing res section")
+        if 'linux' in self.data:
+            self.write_makefile()
+        if 'win32' in self.data:
+            self.write_batchfile()
+
+cmakeu = CMakeU()
+cmakeu.main();

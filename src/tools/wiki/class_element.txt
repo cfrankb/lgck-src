@@ -1,0 +1,109 @@
+===== Class Element =====
+==== Description ====
+Elements are visual components on layers other than main. They can be manipulated by  programming through the Element class at runtime. Used in concert with Layer, this functionality provided a powerful way of controlling the paralax scrolling and other multi-layer game visual effects.
+
+
+==== Members ====
+  * **int** x\\
+  * **int** y\\
+  * **bool** show\\
+  * **int** imageSet\\
+  * **int** imageNo\\
+  * **int** id\\
+
+
+==== Element:hide (lua/untested)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Hide this element.
+
+
+
+
+==== Element:move (lua/untested)====
+  * __in__ **int aim**\\
+  * __out__ **bool **\\
+=== Description ===
+
+Move this element to the direction of the given `aim`. This will change the position by eight pixel in one of following direction. These constants cannot be combined.
+
+<code lua>
+UP
+DOWN
+LEFT
+RIGHT
+</code>
+
+
+
+
+==== Element:moveBy====
+  * __in__ **int tx**\\
+  * __in__ **int ty**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Move the element by translation. The new position is the result of `x = x + tx` and `y = y + ty`. 
+
+<code lua>
+local layer = getLayer( "fw");
+
+for i=1, layer:getSize()  do
+
+  local t = rand () % 8;
+
+  local e = layer:getElement( i - 1);
+  if (e.y > BUFFERHEI) then
+    e:moveTo(rand() % BUFFERLEN, (rand() % BUFFERHEI) - BUFFERHEI);
+  else
+     if (t == 0) then
+       e:moveBy(1, 0);
+     end
+
+     if (t == 7) then
+        e:moveBy(-1, 0);
+     end
+
+     e:moveBy(0, 4);
+  end
+
+end
+</code>
+
+
+
+
+==== Element:moveTo====
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Move this element to a new position.
+
+<code lua>
+e:moveTo(100, 100)
+</code>
+
+
+
+
+==== Element:setImage (lua/untested)====
+  * __in__ **int imageSet**\\
+  * __in__ **int imageNo**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Change the image assigned to a given element.
+
+
+
+
+==== Element:show (lua/untested)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+

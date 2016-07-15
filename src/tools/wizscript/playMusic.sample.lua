@@ -1,0 +1,2 @@
+openStream("music.ogg");
+playStream();

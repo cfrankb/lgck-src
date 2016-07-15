@@ -1,0 +1,67 @@
+{
+    "target": "sdl/lgck-runtime",
+    "cxx": "g++",
+    "linux": {
+        "output" : "makefile",
+        "paths" : [
+            ".",
+            "../shared",
+            "/usr/include",
+            "/usr/include/freetype2"
+        ],
+        "libs" : [
+            "z",
+            "m",
+            "pthread",
+            "lua5.2",
+            "ftgl",
+            "SDL2",
+            "SDL2_mixer",
+            "X11"
+        ],
+        "flags" : ["-m64", "-std=c++0x", "-O3", "-fPIE", "-Wall"]
+    },
+    "win32": {
+        "output" : "make.bat",
+        "paths" : [
+            "../shared",
+            "../../redist/headers",
+            "../../redist/headers/freetype2"
+        ],
+        "libs" : [
+            "L../../redist/lib",
+            "lz",
+            "lm",
+            "llua52",
+            "lftgl",
+            "lSDL2",
+            "lSDL2_mixer",
+            "lopengl32",
+            "lglu32",
+            "lfreeglut"
+        ],
+        "flags" : ["-std=gnu++11", "-O3", "-Wall"]
+    },
+    "sources": [
+        "sdl/main.cpp",
+        "../shared/*.cpp",
+        "../shared/implementers/sdl/*.cpp",
+        "../shared/inputs/*.cpp",
+        "../shared/inputs/sdl/*.cpp",
+        "shared/lgck_res.cpp"
+    ],
+    "exclude": ["stdafx", "zlib", "vlamits3"],
+    "obj_dir": "target/sdl",
+    "declare" : [],
+    "res": {
+        "out": "shared/lgck_res.cpp",
+        "name": "add_lgck_res",
+        "base": "../lgck-builder/",
+        "file_list" : [
+            "images/points.obl5",
+            "res/DejaVuSans.ttf",
+            "scripts/common.lua",
+            "scripts/functions.lua"
+        ]
+    }
+}

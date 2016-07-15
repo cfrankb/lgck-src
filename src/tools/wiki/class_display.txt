@@ -1,0 +1,231 @@
+===== Class Display =====
+==== Description ====
+Displays are overlays on top of the game screen. These can be scores, lives, points or other messages to be passed on to the player during the game.
+
+default displays are
+
+<code lua>
+timeLeft
+score
+debug
+pause
+</code>
+
+These can be customized using lua scripting.
+==== Members ====
+  * **int** id\\
+
+
+==== Display:enableShadows====
+  * __in__ **bool toggle**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Enable the shadow under this display. Only applies to text only. If `toggle` is set to true the shadows are displayed otherwise they're not. You can use other methods to redefine how the shadows are shown.
+
+<code lua>
+local display = getDisplayByName("message");
+display:enableShadows(true);
+</code>
+
+
+
+
+==== Display:expire (lua/untested)====
+  * __in__ **int time**\\
+  * __out__ ** void **\\
+=== Description ===
+
+another alias from Display:setExpireTime()
+
+
+
+
+==== Display:hide====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Hide this display.
+
+example
+<code lua>
+local display = getDisplayByName("timeLeft");
+display:hide();
+</code>
+
+
+
+
+==== Display:move====
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __out__ ** void **\\
+=== Description ===
+
+this is another alias from Display:setXY
+
+
+
+
+==== Display:remove====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== Display:setAlpha====
+  * __in__ **int alpha**\\
+  * __out__ ** void **\\
+
+
+
+
+==== Display:setColor====
+  * __in__ **int r**\\
+  * __in__ **int g**\\
+  * __in__ **int b **\\
+  * __in__ **int a**\\
+  * __out__ ** void **\\
+=== Description ===
+
+This function changes the color of the text contained in the display.
+
+<code lua>
+local score = getDisplayByName("score");
+score:setColor(0xff, 0xff, 0xff, 0x80);
+score:setFontSize(24);
+</code>
+
+
+
+
+==== Display:setContent====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+same as setText
+
+
+
+
+==== Display:setExpireTime (lua/untested)====
+  * __in__ **int time**\\
+  * __out__ ** void **\\
+
+
+
+
+==== Display:setFontSize====
+  * __in__ **int pxSize**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Change the font size of a given text display.
+
+<code lua>
+local display = getDisplayByName("message");
+display:setFontSize(20);
+</code>
+
+
+
+
+==== Display:setShadowColor====
+  * __in__ **int red**\\
+  * __in__ **int green**\\
+  * __in__ **int blue**\\
+  * __in__ **int alpha**\\
+  * __out__ ** void **\\
+=== Description ===
+
+set the color of the shadow under the text in the display. works for text-only display and ony if shadows have been enabled.
+
+<code lua>
+display:setShadowColor(255, 32, 32, 255);
+</code>
+
+
+
+
+==== Display:setShadowOffset====
+  * __in__ **int tx**\\
+  * __in__ **int ty**\\
+  * __out__ ** void **\\
+=== Description ===
+
+changes the relative position of the shadow under the text. works only in text-only display and only if the shadow was enabled (see. enableShadow(...).
+
+<code lua>
+display:setShadowOffset(1,1);
+</code>
+
+
+
+
+==== Display:setSize====
+  * __in__ **int pxSize**\\
+  * __out__ ** void **\\
+=== Description ===
+
+This is an alias Display:setFontSize().
+
+<code lua>
+display:setSize(40);
+</code>
+
+
+
+
+==== Display:setText====
+  * __in__ **string text**\\
+  * __out__ ** void **\\
+
+
+
+
+==== Display:setType (lua/untested)====
+  * __in__ **int displayType**\\
+  * __out__ ** void **\\
+
+
+
+
+==== Display:setXY====
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __out__ ** void **\\
+=== Description ===
+
+This is just an alias for :move.
+
+
+
+
+==== Display:show====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Show this display.
+
+example
+<code lua>
+local display = getDisplayByName("timeLeft");
+display:show();
+</code>
+
+
+
+
+==== Display:sizeText====
+  * __in__ **string text***\\
+  * __out__ **int size**\\
+=== Description ===
+
+Returns the text size inside a display. The text is optional. If omitted, it will be taken from the display itself.
+
+
+

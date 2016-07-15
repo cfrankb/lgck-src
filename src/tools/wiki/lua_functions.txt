@@ -1,0 +1,3092 @@
+===== Functions =====
+==== activateSprite (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Activate this sprite.  Inactive sprite do not consume their handlers until they are activated. Activation can be automatic or manual via scripting using this function.
+
+<code lua>
+activateSprite(self)
+</code>
+
+
+
+
+==== addDisplay====
+  * __in__ **string name**\\
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __in__ **int type**\\
+  * __out__ **Display **\\
+=== Description ===
+
+similar to addDisplayC excepts that it returns a Display obj
+
+after adding a new Display object also remember to set it visible using the Display:setVisible method.
+
+<code lua>
+    DISPLAY_TIME_LEFT   
+    displays the timeLeft counter
+    
+    DISPLAY_MESSAGE
+    displays a text message
+     
+    DISPLAY_SCORE       
+    displays the user score
+
+    DISPLAY_LIVES      
+    display available lives
+    
+    DISPLAY_HP         
+    display the hp counter 
+
+    DISPLAY_DEBUG	
+    displays the debug console
+</code>
+
+when a game is run there are already several displays defined. you may modify these displays using getDisplay() with the appropriate name string.
+
+example
+
+<code lua>
+local displayId;
+
+displayId = findDisplay("timeLeft");
+debug("timeLeft id: " .. displayId);
+
+displayId = findDisplay("score");
+debug("score id: " .. displayId);
+
+local timeLeft = getDisplayByName("timeLeft");
+timeLeft:setColor(0xff, 0xff, 0, 0x80);
+timeLeft:move(SCREENLEN - 100, 0);
+timeLeft:setFontSize(50);
+
+local score = getDisplayByName("score");
+score:setColor(0xff, 0xff, 0xff, 0x80);
+score:setFontSize(24);
+
+local t = addDisplay("test", 64, 64, DISPLAY_MESSAGE);
+t:setText("this is a test\nSonia and the Pumpkins");
+t:show();
+</code>
+
+
+
+
+==== addDisplayC====
+  * __in__ **string name**\\
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __in__ **int type**\\
+  * __out__ **int **\\
+=== Description ===
+
+create a new display elements using ``name``, x, y, and type. 
+
+you can use any of the DISPLAY_XXXX constants for ``type``.
+
+<code lua>
+  DISPLAY_TIME_LEFT 
+  DISPLAY_MESSAGE   
+  DISPLAY_SCORE     
+  DISPLAY_LIVES     
+  DISPLAY_HP        
+</code>
+
+after adding a new display also remember to set it visible
+using the displaySetVisible function.
+
+
+<code lua>
+-- create a display of an image 
+-- using the frame set 'ANNIE.OBL'
+-- 0 is first image
+
+local id = addDisplayC( "petImage", 60, 60, DISPLAY_IMAGE);
+displaySetImage ( id, IMAGES_ANNIE_OBL  , 0 );
+displaySetVisible ( id, true );
+</code>
+
+see addDisplay for more sample usages.
+
+
+
+
+==== addElement====
+  * __in__ **int layerId**\\
+  * __in__ **int imageSet**\\
+  * __in__ **int imageNo**\\
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __in__ **bool show***\\
+  * __out__ **int elementId**\\
+=== Description ===
+
+This function is used to add an element to a background or foreground layer. If you want to add a sprite to the main the layer use the appropriate sprite function.
+
+
+
+
+==== addLayer (lua/untested)====
+  * __in__ **string name**\\
+  * __in__ **int type**\\
+  * __in__ **int hSpeed***\\
+  * __in__ **int vSpeed***\\
+  * __out__ **Layer **\\
+=== Description ===
+
+see addLayerC
+
+
+
+
+==== addLayerC (cpp/untested)====
+  * __in__ **String name**\\
+  * __in__ **int type**\\
+  * __in__ **int hSpeed***\\
+  * __in__ **int vSpeed***\\
+  * __out__ **int layerId**\\
+=== Description ===
+
+valid types
+
+<code lua>
+    LAYER_BK             
+    LAYER_FW            
+</code>
+
+valid speeds
+
+<code lua>
+        SPEED_NOSCROLL,
+        SPEED_WHOLE,
+        SPEED_1_2,
+        SPEED_1_4,
+        SPEED_1_8,
+        SPEED_1_16,
+        SPEED_1_32
+</code>
+
+
+
+
+==== addSprite====
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __in__ **int imageSet**\\
+  * __in__ **int imageNo**\\
+  * __in__ **int aim**\\
+  * __in__ **int objectType**\\
+  * __in__ **int imageSet***\\
+  * __in__ **int imageNo***\\
+  * __out__ **Sprite **\\
+=== Description ===
+
+note:  modifying variables inside of sprite doesn't change the object on screen only your own local copy. to alter the sprite, use the build-in methods. see getSprite for more details
+
+
+
+
+==== addSpriteC====
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __in__ **int aim**\\
+  * __in__ **int objectType**\\
+  * __in__ **int imageSet***\\
+  * __in__ **int imageNo***\\
+  * __out__ **int objId**\\
+=== Description ===
+
+although it might not make any real difference but performance wise addSpriteC is probably faster that addSprite (if you don't need the extra overhead).
+
+
+
+
+==== addToHP====
+  * __in__ **int hitPoints**\\
+  * __out__ **int **\\
+=== Description ===
+
+negative values will be substracted. if the modication causes the player to fall under 0 hp. the player dies. therefor onDeath will also be called
+
+addToHP will check for over bound value. if the player goes over maxHP, the value will be adjusted automatically
+
+this function will also update the hp counter on screen
+
+
+
+
+==== addToInventory====
+  * __in__ **int objectType**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Add an object to the inventory of the player.
+
+
+
+
+==== addToScore====
+  * __in__ **int points**\\
+  * __out__ **int current score**\\
+=== Description ===
+
+add points to the player's score. this the function to use if you want to bypass the autogenerated point that fly to the top of the screen.
+
+also note that if the value is negative, it will get deducted from the total no test is performed to check for negative scores or overflow
+
+
+
+
+==== alert====
+  * __in__ **string text**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Create a standard message box with an okay button to display the text. Works just like the alert() function in javascript.
+
+<code lua>
+alert("welcome home");
+</code>
+
+
+
+
+==== AND====
+  * __in__ **int a**\\
+  * __in__ **int b**\\
+  * __out__ **int **\\
+
+
+
+
+==== attackPlayer====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+
+
+
+
+==== callGameEvent (cpp/?)====
+  * __in__ **int eventId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+<code lua>
+    EG_INIT_GAME        = 0;
+    EG_PREPARE_LEVEL    = 1;
+    EG_COMPLETE_LEVEL   = 2;
+    EG_DEATH            = 3;
+    EG_GOAL_COLLECTED   = 4;
+    EG_GOAL_KILLED      = 5;
+</code>
+
+
+
+
+==== callLvEvent====
+  * __in__ **int event**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Call a level event. Valid values are the following.
+
+<code lua>
+    EL_CREATE
+    EL_DRAW 
+    EL_RESTART
+    EL_GOAL_COLLECTED
+    EL_LEVEL_COMPLETED
+    EL_TIMEOUT 		
+    EL_KEY_PRESSED
+    EL_KEY_UP 	
+    EL_GOAL_KILLED   
+    EL_HANDLER   
+</code>
+
+
+
+
+==== callObjEvent====
+  * __in__ **int objId**\\
+  * __in__ **int event**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Call an event handler. ObjId is the sprite to receive the event as you can see in the example below.
+
+<code lua>
+local id = getPlayerC();
+Debug:printf("player_id: %x", id);
+callObjEvent(id, EO_DEATH);
+</code>
+
+Event can be any of the following constants.
+
+<code lua>
+    EO_SPAWN   
+    EO_ACTIVATE
+    EO_DEATH	
+    EO_HURT	    
+    EO_TOUCH	
+    EO_TRIGGER
+    EO_HANDLER
+    EO_SPLAT	
+    EO_HIT_TEST
+    EO_ZKEY	
+    EO_AUTO	
+    EO_JUMP
+    EO_FALL	
+    EO_LAND	
+    EO_LEAP	
+    EO_MOVE	
+    EO_FIRE	
+</code>
+
+
+
+
+==== callTrigger====
+  * __in__ **int key**\\
+  * __out__ ** void **\\
+
+
+
+
+==== canFall====
+  * __in__ **int objId**\\
+  * __out__ **bool **\\
+=== Description ===
+
+return true if the object identified by objId can fall. This is reflected by the current rules on the level.
+
+<code lua>
+if (canFall ( self )) then
+  debug ("I'm falling !!!");
+end
+</code>
+
+
+
+
+==== canMove====
+  * __in__ **int objId**\\
+  * __in__ **int aim**\\
+  * __out__ **bool **\\
+
+
+
+
+==== changeTo====
+  * __in__ **int objId**\\
+  * __in__ **int objType**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Change the sprite to another object based on objType.
+
+
+
+
+==== clearDisplay====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Remove all the visual displays on screen. This includes the score, timeLeft, health and debug, etc.
+
+<code lua>
+clearDisplay();
+</code>
+
+
+
+
+==== clearKeys (cpp/untested)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Clear the states for all the keys.
+
+
+
+
+==== clearSprite====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Clear a sprite and mark the entry for garbage collection.
+
+
+
+
+==== copySprite====
+  * __in__ **Sprite src**\\
+  * __out__ **Sprite newSprite**\\
+=== Description ===
+
+Take the source sprite and create a new copy. Return an instance of the Sprite wrapper object.
+
+CAUTION: using this function inside an handler such as OnSpawn can cause an infinite loop which will crash the engine.
+
+
+
+
+==== copySpriteC====
+  * __in__ **int objId**\\
+  * __out__ **int newObjId**\\
+=== Description ===
+
+copy a sprite and create a new instance. This function returns the ObjId handle if succesful or -1 on failure.
+
+CAUTION: using this function inside an handler such as OnSpawn can cause an infinite loop which will crash the engine.
+
+
+
+
+==== counter_add (?)====
+  * __in__ **string name**\\
+  * __in__ **int variance**\\
+  * __out__ **int new_value**\\
+
+
+
+
+==== counter_dec (cpp/?)====
+  * __in__ **string name**\\
+  * __out__ **int new_counter_value**\\
+
+
+
+
+==== counter_inc (cpp/?)====
+  * __in__ **string name**\\
+  * __out__ **int new_counter_value**\\
+
+
+
+
+==== counters_get====
+  * __in__ **string name **\\
+  * __out__ **int **\\
+=== Description ===
+
+Return the value of a counter.
+
+
+
+
+==== counters_set====
+  * __in__ **string name**\\
+  * __in__ **int value**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the value of a counter
+
+
+
+
+==== countGoals====
+  * __in__ ** void **\\
+  * __out__ **int **\\
+=== Description ===
+
+<code lua>
+debug("++goals: " .. countGoals());
+</code>
+
+
+
+
+==== debug====
+  * __in__ **string **\\
+  * __out__ ** void **\\
+=== Description ===
+
+send a text string to the debug console.
+
+
+
+
+==== debugClear====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+clear the debug log
+
+
+
+
+==== decTimeLeft (?)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== display_sizeText====
+  * __in__ **int displayId**\\
+  * __in__ **string text***\\
+  * __out__ **int size**\\
+=== Description ===
+
+Returns the size of the string if not empty otherwise return the size of the text contained in the display.
+
+
+
+
+==== displayEnableShadows====
+  * __in__ **int displayId**\\
+  * __in__ **bool shadow**\\
+  * __out__ ** void **\\
+=== Description ===
+
+enable shadows under a display. work with text-only displays.
+
+example
+
+<code lua>
+local id = addDisplayC("goalCount", 258, 0, DISPLAY_MESSAGE);
+displaySetText(id, "XX");
+displaySetVisible ( id, true );
+displayEnableShadows( id, true );
+</code>
+
+
+
+
+==== displaySetAlpha====
+  * __in__ **int displayId**\\
+  * __in__ **int alpha**\\
+  * __out__ ** void **\\
+
+
+
+
+==== displaySetColor====
+  * __in__ **int displayId**\\
+  * __in__ **int red**\\
+  * __in__ **int green**\\
+  * __in__ **int blue**\\
+  * __in__ **int alpha**\\
+  * __out__ ** void **\\
+
+
+
+
+==== displaySetExpireTime (cpp/tba)====
+  * __in__ **int displayId**\\
+  * __in__ **int time**\\
+  * __out__ ** void **\\
+
+
+
+
+==== displaySetFontSize====
+  * __in__ **int displayId**\\
+  * __in__ **int pxSize**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Change the pixel size of the text inside a display. This applies to text display only. See example below.
+
+<code lua>
+local id = addDisplayC("goalCount", 258, 0, DISPLAY_MESSAGE);
+displaySetText(id, "XX");
+displaySetVisible ( id, true );
+displayEnableShadows( id, true );
+displaySetShadowOffset(id, 2, 2);
+displaySetFontSize(id, 14);
+</code>
+
+
+
+
+==== displaySetImage====
+  * __in__ **int displayId**\\
+  * __in__ **int imageSet**\\
+  * __in__ **int imageNo**\\
+  * __out__ **void **\\
+=== Description ===
+
+Assign an image to a display designated by displayId.
+
+imageSet is set from the gameDB. Use the IMAGES_XXXX constants.
+imageNo are zero based index (from the first image, #0). 
+
+Note that each display can only accomodate one thing. If you assign an image to display that originally contained text. That text will be gone.
+
+
+
+
+==== displaySetShadowColor====
+  * __in__ **int displayId**\\
+  * __in__ **int red**\\
+  * __in__ **int green**\\
+  * __in__ **int blue**\\
+  * __in__ **int alpha**\\
+  * __out__ ** void **\\
+=== Description ===
+
+changes the color of the shadow cast by a display. works only with text displays where the shadow is enabled.
+
+<code lua>
+local id = addDisplayC("lives", 188, 0, DISPLAY_LIVES);
+displaySetVisible ( id, true );
+displayEnableShadows( id, true );
+displaySetShadowOffset(id, 2,2);
+displaySetShadowColor(id, 200, 200, 240, 128);
+</code>
+
+
+
+
+==== displaySetShadowOffset====
+  * __in__ **int displayId**\\
+  * __in__ **int tx**\\
+  * __in__ **int ty**\\
+  * __out__ ** void **\\
+=== Description ===
+
+change the offset of the shadow from the text. this works soley for text-only displays.
+
+<code lua>
+local id = addDisplayC("lives", 188, 0, DISPLAY_LIVES);
+displaySetVisible ( id, true );
+displayEnableShadows( id, true );
+displaySetShadowOffset(id, 2,2);
+</code>
+
+
+
+
+==== displaySetText====
+  * __in__ **int displayId**\\
+  * __in__ **string text**\\
+  * __out__ ** void **\\
+=== Description ===
+
+change the text displayed inside a text display.
+
+example
+<code lua>
+local id = findDisplay("goalCount");
+-- local goals = sprintf( "%.2d", countGoals() );
+local goals = sprintf("%.2d", getGoalLeft());
+displaySetText( id, goals ) ;
+</code>
+
+
+
+
+==== displaySetType (cpp/untested)====
+  * __in__ **int displayId**\\
+  * __in__ **int type**\\
+  * __out__ ** void **\\
+
+
+
+
+==== displaySetVisible====
+  * __in__ **int displayId**\\
+  * __in__ **bool visible**\\
+  * __out__ ** void **\\
+
+
+
+
+==== displaySetXY====
+  * __in__ **int displayId**\\
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __out__ ** void **\\
+=== Description ===
+
+change the position of a given display. x and y are absolute position given in pixels.
+
+example
+
+<code lua>
+local id = addDisplayC( "playerIcon", 60, 60, DISPLAY_IMAGE);
+displaySetXY(id, 0, 128);
+displaySetImage ( id, OBJECT_PLAYERS   ,  4 );
+displaySetVisible ( id, true );
+</code>
+
+
+
+
+==== element_move (cpp/untested)====
+  * __in__ **int layerId**\\
+  * __in__ **int elementId**\\
+  * __in__ **int aim**\\
+  * __out__ **bool **\\
+=== Description ===
+
+This function moves this element to a given aim. Valid values for aim are the following
+
+<code lua>
+UP
+DOWN
+LEFT
+RIGHT
+</code>
+
+return true if succesful
+
+
+
+
+==== element_moveBy====
+  * __in__ **int layerId**\\
+  * __in__ **int elementId**\\
+  * __in__ **int tx**\\
+  * __in__ **int ty**\\
+  * __out__ **bool **\\
+
+
+
+
+==== element_moveTo====
+  * __in__ **int layerId**\\
+  * __in__ **int elementId**\\
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __out__ **bool **\\
+
+
+
+
+==== element_setImage (cpp/untested)====
+  * __in__ **int layerId**\\
+  * __in__ **int elementId**\\
+  * __in__ **int imageSet**\\
+  * __in__ **int imageNo**\\
+  * __out__ **bool **\\
+=== Description ===
+
+Change the image associated with a layer element.
+
+
+
+
+==== element_setVisible (cpp/untested)====
+  * __in__ **int layerId**\\
+  * __in__ **int elementId**\\
+  * __in__ **bool show**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set a given element to hidden or shown. If show is true the object is set to visible otherwise, it is hidden.
+
+
+
+
+==== findDisplay====
+  * __in__ **string name**\\
+  * __out__ **int displayId**\\
+=== Description ===
+
+findDisplay returns a displayId for an existing display.
+
+These can be system display or an a user defined one. (see example)
+
+example:
+
+<code lua>
+-- find a previously created display
+-- and update it
+
+local id = findDisplay("goalCount");
+local goals = sprintf( "%.2d", countGoals() );
+displaySetText( id, goals ) ;
+</code>
+
+
+
+
+==== findSprite====
+  * __in__ **int class**\\
+  * __in__ **int origin***\\
+  * __out__ **int objId**\\
+=== Description ===
+
+Find the first sprite from origin which match the given class. Origin can be omitted, in which, it is assumed to be index 0.
+
+Returns the objId if a match is found or otherwise -1.
+
+<code lua>
+local id = findSprte( CLASS_PLAYER_OBJECT );
+</code>
+
+
+
+
+==== frameSet_getSize (cpp/?)====
+  * __in__ **int frameSet**\\
+  * __out__ **int size**\\
+=== Description ===
+
+Get the number of images inside a frameset.
+
+
+
+
+==== freezeSprite====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the freeze flag to on. This will cause the sprite to stop moving. Engine class and animation handlers will honor this flag.
+
+It is your responsability to support this flag in custom handlers of your own making.
+
+
+
+
+==== getBkColor====
+  * __in__ ** void **\\
+  * __out__ **int red**\\
+  * __out__ **int green**\\
+  * __out__ **int blue**\\
+=== Description ===
+
+returns three integer values for each individual components such as red, green and blue of the current level's background color. This is just an alias for getBkColorC()
+
+<code lua>
+local bkColor = getBkColor();
+Debug:printf("red: %u; green: %u; blue: %u", bkColor.red, bkColor.green, bkColor.blue);
+</code>
+
+
+
+
+==== getBkColorC====
+  * __in__ ** void **\\
+  * __out__ **int red**\\
+  * __out__ **int green**\\
+  * __out__ **int blue**\\
+=== Description ===
+
+Get the background color for the current level. Return the color as individual components as shown in the out list.
+
+<code lua>
+local red;
+local green;
+local blue;
+red, green, blue = getBkColorC();
+
+Debug:printf("red: %u; green: %u; blue: %u", red, green, blue);
+</code>
+
+
+
+
+==== getClosureEvent (cpp/?)====
+  * __in__ ** void **\\
+  * __out__ **int **\\
+
+
+
+
+==== getClosureTime (cpp/?)====
+  * __in__ ** void **\\
+  * __out__ **int **\\
+
+
+
+
+==== getDisplayById====
+  * __in__ **int displayId**\\
+  * __out__ **Display **\\
+
+
+
+
+==== getDisplayByName====
+  * __in__ **string displayName**\\
+  * __out__ **Display **\\
+=== Description ===
+
+Create a lua Display object matching the engine display of the provided name.
+
+
+
+
+==== getExtra====
+  * __in__ **int objId**\\
+  * __out__ **Extra **\\
+=== Description ===
+
+see getExtraC()
+
+
+
+
+==== getExtraC====
+  * __in__ **int objId**\\
+  * __out__ **array **\\
+=== Description ===
+
+Returns an array containing the sprite's extra data.
+
+You can access this information via the following indexes.
+
+<code lua>
+    EXTRA_ORGPROTO
+    EXTRA_ORGX
+    EXTRA_ORGY
+    EXTRA_HP
+    EXTRA_OLDAIM1
+    EXTRA_OLDAIM2
+    EXTRA_FALLHEIGHT
+    EXTRA_LIVES
+    EXTRA_ACTIVE
+    EXTRA_BULLETCOUNT
+    EXTRA_OWNER
+    EXTRA_FLAGS
+    EXTRA_PATHDIR
+    EXTRA_PATHPTR
+    EXTRA_ANIMSEQ
+    EXTRA_ANIMPTR
+    EXTRA_ANIMSPEED
+    EXTRA_DEATHINDICATOR
+</code>
+
+
+
+
+==== getExtraUID====
+  * __in__ **int objId**\\
+  * __out__ **int uid**\\
+=== Description ===
+
+Returns extraData uid for a given sprite.
+
+
+
+
+==== getGoalLeft====
+  * __in__ ** void **\\
+  * __out__ **int goalLeft**\\
+=== Description ===
+
+Return the number of items marked as a goals on the left. This uses a precompiled value. In contrast, countGoals() will do make a new count.
+
+example:
+
+<code lua>
+local id = findDisplay("goalCount");
+-- countGoals requires more computation
+-- local goals = sprintf( "%.2d", countGoals() );
+local goals = sprintf("%.2d", getGoalLeft());
+displaySetText( id, goals ) ;
+</code>
+
+
+
+
+==== getHitTest====
+  * __in__ **int objId**\\
+  * __in__ **int aim**\\
+  * __out__ **HitTest **\\
+=== Description ===
+
+Takes an objId and returns a HitTest object.
+
+see getHitTestC() for detais and HitTest class for details.
+
+
+
+
+==== getHitTestC====
+  * __in__ **int objId**\\
+  * __in__ **int aim**\\
+  * __out__ **array bk**\\
+  * __out__ **array fw**\\
+  * __out__ **array ac**\\
+  * __out__ **int flags**\\
+  * __out__ **bool player**\\
+=== Description ===
+
+Performs a hit test for a given object (sprite) and return the result. This raw data straight from the game engine. Of course if you are looking at this function it's because you are into writing ai and advances engine extension so you ought to expect a bit of complexity.
+
+The objId is generally the "self" variable you would get from the object handler. Although, it could also be obtained with something else like findSprite().
+
+Possible values for aim are UP, DOWN, LEFT, RIGHT and HERE, These values cannot be combined.
+
+<code lua>
+local bk, fw, ac, flags, player = getHitTestC( self,  UP  );
+</code>
+
+The results of this function can be a bit confusing. For starters, "flags" can be a combination of any of the following. 
+
+<code lua>
+    FLAG_NONE		   
+    FLAG_METAL		   
+    FLAG_NOSOUND       
+    FLAG_WATER	
+    FLAG_DEATH	
+    FLAG_HIT		    
+    FLAG_TELEPORT       
+</code>
+
+bk is an array of classes.
+
+fw is an array of classes and objId. There value are in pair starting at index 1.
+
+ac is an array of classes and objId. There value are in pair starting at index 1.
+
+<code lua>
+for i=1, #fw, 2 do
+  local class = fw[i] ;
+  local objId = fw[i + 1];
+  -- do something else ....   
+end
+
+for i=1, #ac, 2 do
+  local class = ac[i] ;
+  local objId = ac[i + 1];
+  -- do something else ....   
+end
+</code>
+
+player is boolean that indicate whether or not the player is there.
+
+
+
+
+==== getHP====
+  * __in__ ** void **\\
+  * __out__ **int player hp**\\
+=== Description ===
+
+Get the player's Hit Point count.
+
+example:
+
+<code lua>
+setHP(500);
+Debug:printf("hp:  %d", getHP());
+</code>
+
+
+
+
+==== getImage====
+  * __in__ **int objId**\\
+  * __out__ **int imageSet**\\
+  * __out__ **int ImageNo**\\
+=== Description ===
+
+Return the imageSet and imageNo for a given sprite
+
+<code lua>
+local imageSet;
+local imageNo;
+imageSet, imageNo = getImage(selt);
+</code>
+
+
+
+
+==== getImageSize====
+  * __in__ **int imageSet**\\
+  * __in__ **int imageNo**\\
+  * __out__ **int length**\\
+  * __out__ **int height**\\
+=== Description ===
+
+Returns the image length and height in pixels for an image designated by the imageSet  / imageNo pair.
+
+<code lua>
+local s = getSprite(self);
+local sx, sy = getImageSize(s.imageSet, s.imageNo);
+if s.y + sy >= BUFFERHEI then
+  s:setState(STATE_DEAD);
+  s:hide();
+end
+</code>
+
+
+
+
+==== getLastKey====
+  * __in__ ** void **\\
+  * __out__ **int keyCode**\\
+=== Description ===
+
+Get the last key pressed. Use this in keyUP and keyPressed events to know which key was pressed.
+
+<code lua>
+
+-- this would be called inside the keyPressed 
+-- or keyUp handler
+
+local keyCode = getLastKey();
+if keyCode == KEY_SPACE then
+   setBkColor(rand(), rand(), rand());
+else
+   Debug:printf("last key: %d", keyCode);
+end
+</code>
+
+
+
+
+==== getLayer====
+  * __in__ **string name**\\
+  * __out__ **Layer **\\
+=== Description ===
+
+Returns the layer object matching the name provided. Use this function for background or foreground layer. This will not work with the main layer.
+
+<code lua>
+local layer = getLayer( "fw");
+local element = layer:addElement(IMAGES_WHITEBALL_PNG, 0, 100, 100, true);
+</code>
+
+
+
+
+==== getLayerC====
+  * __in__ **String name**\\
+  * __out__ **int layerId**\\
+=== Description ===
+
+return the layerId matching name or -1 if not found.
+
+<code lua>
+Debug:printf("layer fw is :%d", getLayerC ( "fw"));
+</code>
+
+
+
+
+==== getLevelGoal====
+  * __in__ ** void **\\
+  * __out__ **int levelGoal**\\
+=== Description ===
+
+The goal can be any of following values. (please note that they cannot be combined)
+
+<code lua>
+        GOAL_ONLY               
+        GOAL_UP                
+        GOAL_DOWN         
+        GOAL_LEFT            
+        GOAL_RIGHT         
+        GOAL_NO_COMPLETE        
+</code>
+
+GOAL_ONLY: when all goal marked objects are collected (removed)
+
+GOAL_UP: when all goal marked objects are collected and player reaches the top of level (LODERUNNER)
+
+GOAL_DOWN: when all goal marked objects are collected and player reaches the bottom of level.
+
+GOAL_LEFT: when all goal marked objects are collected and player reaches the most left position.
+
+GOAL_DOWN: when all goal marked objects are collected and player reaches the most right position .
+
+GOAL_NO_COMPLETE : this requires that the level be declared completed via EndLevel function as to automatic completion is checked.
+
+<code lua>
+Debug:printf("level goal: %d", getLevelGoal());
+</code>
+
+
+
+
+==== getLookUp====
+  * __in__ ** void **\\
+  * __out__ **bool **\\
+=== Description ===
+
+this function returns true if lookup is enabled. otherwise it returns false.
+
+
+
+
+==== getObjClass====
+  * __in__ **int objId**\\
+  * __out__ **int classId**\\
+=== Description ===
+
+Return the class of a given object. The classId is one of the predefined constants CLASS_XXXXX.
+
+
+
+
+==== getObjName====
+  * __in__ **int objId**\\
+  * __out__ **string name**\\
+=== Description ===
+
+Returns a string containg the object name. (null terminated string, max 31 characters)
+
+<code lua>
+Debug:printf("player picked up a %s", getObjName(self));
+</code>
+
+
+
+
+==== getObjType====
+  * __in__ **int objId**\\
+  * __out__ **int objType**\\
+=== Description ===
+
+Get the object type for a given object ( e.g. instance ). 
+
+these values can be corrolated with the OBJECT_XXXX constants defined by LGCK for your game.
+
+example:
+
+<code lua>
+debug("type: " .. getObjType( self ));
+debug("name:" .. getObjName( self ));
+</code>
+
+
+
+
+==== getPlayer====
+  * __in__ ** void **\\
+  * __out__ **Sprite **\\
+=== Description ===
+
+Get a Sprite object that contains the information about the player. Returns a wrapper with the desired data.
+
+<code lua>
+local player = getPlayer();
+Debug:printf("player id= %d; name: %s", player.id, player.name);
+</code>
+
+
+
+
+==== getPlayerC====
+  * __in__ ** void **\\
+  * __out__ **int objId**\\
+=== Description ===
+
+returns the objId of the player. 
+
+<code lua>
+local id = getPlayerC();
+Debug:printf("player_id: %x", id);
+</code>
+
+
+
+
+==== getProto====
+  * __in__ **int objType**\\
+  * __out__ **Proto **\\
+=== Description ===
+
+Get the information about a given objType. Return a Proto object containing the data requested.
+
+
+
+
+==== getProtoC====
+  * __in__ **int objType**\\
+  * __out__ **array proto**\\
+=== Description ===
+
+Get the proto information for a given objType. Returns an array with the data requested.
+
+
+
+
+==== getScore====
+  * __in__ ** void **\\
+  * __out__ **int current score**\\
+=== Description ===
+
+Returns the player' score.
+
+<code lua>
+debug( "score:" .. getScore());
+</code>
+
+
+
+
+==== getScreenSize (cpp/?)====
+  * __in__ ** void **\\
+  * __out__ **int len**\\
+  * __out__ **int hei**\\
+=== Description ===
+
+Returns a tuple containing the screen size (opengl context).
+
+
+
+
+==== getSkill====
+  * __in__ ** void **\\
+  * __out__ **int skill**\\
+=== Description ===
+
+Get the skill level for the current game. 
+
+The value retuned is one of the following.
+
+<code lua>
+SKILL_NORMAL	    
+SKILL_NIGHTMARE	    
+SKILL_HELL	
+SKILL_INSANE	    
+</code>
+
+example
+<code lua>
+if getSkill() == SKILL_NORMAL then
+  debug("=>normal difficulty");
+  setTickScale(1000 / 80);
+  addToHP(50);
+end
+</code>
+
+
+
+
+==== getSprite====
+  * __in__ **int objId**\\
+  * __out__ **Sprite **\\
+=== Description ===
+
+similar to getSpriteVars except that it will return the data inside as an object for easier management.
+
+one thing to remember though is that modify individual fields of ``sprite`` will not alter the sprite. only your copy.
+
+to make changes, you must call base methods such as s:setAim(). see example
+
+<code lua>
+  local s = getSprite(self);
+
+  debug("this is my detail:");
+  debug("x = " .. s.x);
+  debug("y = " .. s.y);
+
+  local aim = s.aim;
+
+  s:unMap();
+
+  if s:canFall () then
+    s:move( DOWN )  ;
+  else
+    if ticks % 5 == 0 then   
+
+      if s:isPlayerThere(aim) then
+	  s:attackPlayer();
+      end
+
+      if aim < LEFT or aim > RIGHT then
+	aim = LEFT
+      end
+
+      if s:canMove(aim) then
+	s:move(aim);
+	if s:canFall() then
+	  aim = XOR(aim, 1);
+	  s:move(aim);
+	end 
+      else
+	  aim = XOR( aim, 1);      
+      end
+
+      s:setAim ( aim );
+
+    end 
+  end
+
+  s:map();
+</code>
+
+
+
+
+==== getSpriteCount====
+  * __in__ ** void **\\
+  * __out__ **int spriteCount**\\
+=== Description ===
+
+returns the number of sprites in the mainLayer.
+
+
+
+
+==== getSpriteVars====
+  * __in__ **int objId**\\
+  * __out__ **int x**\\
+  * __out__ **int y**\\
+  * __out__ **int aim**\\
+  * __out__ **int objectType**\\
+  * __out__ **int imageSetId**\\
+  * __out__ **int imageNo**\\
+  * __out__ **int triggerFlag**\\
+  * __out__ **int stateFlag**\\
+  * __out__ **int actionMask**\\
+=== Description ===
+
+* triggerFlag bit mask
+    01, 02, 04, 08, 10  TRIGGER_KEYS		= 0x1f
+    20               	TRIGGER_GOAL		= 0x20
+    40               	TRIGGER_FROZEN		= 0x40
+    80               	TRIGGER_HIDDEN		= 0x80
+
+  to get the triggerKey out of triggerFlag use `AND (triggerFlag, TRIGGER_KEYS)`.
+
+  goal, frozen and hidden can be access using the TRIGGER_xxxx method above
+  see common.lua for the definitions.
+
+  this is stuff for advanced users
+
+  * stateFlag
+  
+  use STATE_XXXX constants
+
+<code lua>
+local x;
+local y;
+local aim;
+x , y, aim = getSpriteVars( self );
+</code>
+
+
+
+
+==== getTicks====
+  * __in__ ** void **\\
+  * __out__ **int ticks**\\
+=== Description ===
+
+ticks are the internal unit for relative speed comparison within the engine.
+
+the number of ticks per seconds is directly related to the tick scale.
+
+the best way to deal with ticks is time splicing
+
+example
+
+<code lua>
+local ticks = getTicks();
+if ticks % 5 == 0 then
+  -- this will be executed 20% of the time
+  -- or 1 in every 5 cycles
+end
+</code>
+
+
+
+
+==== getTickScale====
+  * __in__ ** void **\\
+  * __out__ **int tickScale**\\
+=== Description ===
+
+The tickScale is the number of times per second that the engine main loop is executed. see setTickScale for details
+
+
+
+
+==== getTime====
+  * __in__ ** void **\\
+  * __out__ **int time elapsed**\\
+=== Description ===
+
+Returns the time elapsed in miliseconds since the engine was started. Depening on the content this could be the level or the whole game.
+
+1000 = 1 second in real time
+
+<code lua>
+Debug:printf("%d", getTime() );
+</code>
+
+
+
+
+==== getTriggerKey====
+  * __in__ **int objId**\\
+  * __out__ **int triggerKey**\\
+
+
+
+
+==== getVersion====
+  * __in__ ** void **\\
+  * __out__ **int lgck_version**\\
+=== Description ===
+
+This function returns the version of lgck currently powering up the game engine.
+
+<code lua>
+Debug:printf("version: %8.8x", getVersion());
+</code>
+
+
+
+
+==== getWrapFlag====
+  * __in__ ** void **\\
+  * __out__ **int wrapFlag**\\
+=== Description ===
+
+Returns the wrap arround state for the current level.
+
+Valid values are a combination of the following.
+
+<code lua>
+        WRAP_UP                 
+        WRAP_DOWN          
+        WRAP_LEFT             
+        WRAP_RIGHT          
+</code>
+
+<code lua>
+local wrapFlag = getWrapFlag();
+Debug:printf("wrapFlag: %d", wrapFlag);
+</code>
+
+You can test for individual directions using the binary AND operator.
+
+<code lua>
+AND (wrapFlag, WRAP_UP)
+</code>
+
+
+
+
+==== hasGravity====
+  * __in__ ** void **\\
+  * __out__ **bool gravity**\\
+=== Description ===
+
+return true if gravity is enabled on this level.
+
+<code lua>
+if (hasGravity()) then 
+   debug("this level has gravity");
+else
+   debug("this level doesn't have gravity"); 
+end
+</code>
+
+
+
+
+==== hasItem (cpp/untested)====
+  * __in__ **int objType**\\
+  * __out__ **bool result**\\
+=== Description ===
+
+Return true if the objType is part of the player's inventory.
+
+
+
+
+==== hideSprite====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the hidden flag on this sprite. This will cause the engine to not display this given sprite/object. All system based classes will also ignore this sprite until it becomes visible again.
+
+
+
+
+==== isDead====
+  * __in__ **int objId**\\
+  * __out__ **bool **\\
+=== Description ===
+
+returns true if the sprite is dead.
+
+<code lua>
+if isDead(self) then
+   Debug:printf("This sprite is dead");
+end
+</code>
+
+
+
+
+==== isHidden (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ **bool **\\
+=== Description ===
+
+Return true if this object is hidden. Please note that this doesn't apply to system invisible objects which are not considered hidden in the strict sense of the word here.
+
+
+
+
+==== isMonster (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ **bool **\\
+=== Description ===
+
+returns true if the object is a monster.
+
+
+
+
+==== isPlayerThere====
+  * __in__ **int objId**\\
+  * __in__ **int aim**\\
+  * __out__ **bool **\\
+
+
+
+
+==== isVisible====
+  * __in__ **int objId**\\
+  * __out__ **bool **\\
+
+
+
+
+==== killPlayer====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== killSprite====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Don't try this inside the sprite's own event handler!!!
+Don't use this on a player object. Use killPlayer() or player:setState( STATE_DEAD ) instead as this will not have the desired effect.
+
+
+
+
+==== land (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+The land() method is called by the engine whenever a sprite has landed (following a fall). The usefulness of this method is debatable at runtime. However, it is made available should be it prove useful in custom handlers/ai where this functionality might have a purpose. (e.g. if you are creating a custom monster whereas the engine will not handle these details for you)
+
+
+
+
+==== layer_clear====
+  * __in__ **int layerId**\\
+  * __out__ **bool result**\\
+=== Description ===
+
+Clear the layer designed by layer id. This function will return true if succesful.
+
+<code lua>
+local id = getLayerC("fw");
+if layer_clear( id ) then
+  Debug:printf("layer was cleared");
+end
+</code>
+
+
+
+
+==== layer_getElement====
+  * __in__ **int layerId**\\
+  * __in__ **int elementId**\\
+  * __out__ **int imageSet**\\
+  * __out__ **int ImageNo**\\
+  * __out__ **int x**\\
+  * __out__ **int y**\\
+  * __out__ **bool show**\\
+
+
+
+
+==== layer_getSize====
+  * __in__ **int layerId**\\
+  * __out__ **int size**\\
+=== Description ===
+
+This function returns the object/sprite count on the layer identified by layerId. You can get the layerId with getLayerC().
+
+<code lua>
+local id = getLayerC ( "fw");
+Debug:printf("layer size: %d", layer_getSize( id ));
+</code>
+
+
+
+
+==== mapSprite====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+
+
+
+
+==== markSpriteAsGoal====
+  * __in__ **int objId **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the sprite to be a goal for the level to be completed.
+
+
+
+
+==== MAX (cpp/untested)====
+  * __in__ **int value1**\\
+  * __in__ **int value2**\\
+  * __out__ **int **\\
+=== Description ===
+
+return the largest of the two integers being passed to it.
+
+
+
+
+==== MIN (cpp/untested)====
+  * __in__ **int value1**\\
+  * __in__ **int value2**\\
+  * __out__ **int **\\
+=== Description ===
+
+return the smallest  value of the two integers.
+
+
+
+
+==== moveSprite====
+  * __in__ **int objId**\\
+  * __in__ **int aim**\\
+  * __out__ ** void **\\
+=== Description ===
+
+aim is one of the UP, DOWN, LEFT and RIGHT constants
+
+you generally check to see of the object can move in a given direction using 
+canMove()
+
+
+
+
+==== moveSprite====
+  * __in__ **int objId**\\
+  * __in__ **int tx**\\
+  * __in__ **int ty**\\
+  * __out__ ** void **\\
+=== Description ===
+
+you generally check to see of the object can move in a given direction using canMove()
+
+this second version also allows you to control the translation from current position. if you want defined where to position it then use moveSpriteTo().
+
+
+
+
+==== moveSpriteBy====
+  * __in__ **int objId**\\
+  * __in__ **int tx**\\
+  * __in__ **int tx**\\
+  * __out__ ** void **\\
+=== Description ===
+
+you generally check to see of the object can move in a given direction using 
+canMove()
+
+this allows you to control the translation from current position. if you want defined where to position it then use moveSpriteTo().
+
+
+
+
+==== moveSpriteTo====
+  * __in__ **int objId**\\
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __out__ ** void **\\
+=== Description ===
+
+note: prior to moving, animating, killing or deleting a sprite you should first
+use unMapSprite(). if you wish to still use it you will also  need to use 
+mapSprite after the transformation.
+
+Please ensure that x and y coordonates are multiples of 8 and within the 
+game world. You can do that with the bitwise operator AND (x, 0xfff8).
+
+
+
+
+==== nextTick (?)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== openStream (cpp/untested)====
+  * __in__ **string soundFile**\\
+  * __out__ **bool **\\
+=== Description ===
+
+Open a sound file for streaming. If the soundFile was opened succesfully, this function will return true. Your next step is to call playStream() to play the file. 
+
+<code lua>
+openStream("level01.ogg");
+</code>
+
+
+
+
+==== OR====
+  * __in__ **int a**\\
+  * __in__ **int b**\\
+  * __out__ **int binary or (a , b)**\\
+
+
+
+
+==== pause====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+pause the game. equivalent to pressing F4
+
+
+
+
+==== playSound====
+  * __in__ **string sound**...\\
+  * __out__ ** void **\\
+=== Description ===
+
+Loads a sound resource from the current lgckdb database and plays it. The name of the sound is case sensitive so please be sure to have exact same spelling.
+
+This function can accept multiple inputs. 
+
+<code lua>
+  playSound("OUCH");
+  playSound("OUCH", "JUMP");
+</code>
+
+
+
+
+==== playStream (cpp/untested)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Play an opened stream. You must first use openStream() to ready the stream to be played.
+
+
+
+
+==== rand====
+  * __in__ ** void **\\
+  * __out__ **int **\\
+=== Description ===
+
+returns a random value.
+
+
+
+
+==== removeDisplayById (cpp/untested)====
+  * __in__ **int displayId**\\
+  * __out__ ** void **\\
+
+
+
+
+==== removeDisplayByName (lua/untested)====
+  * __in__ **string name**\\
+  * __out__ ** void **\\
+
+
+
+
+==== removeFromInventory (cpp/untested)====
+  * __in__ **int objType**\\
+  * __out__ ** void **\\
+
+
+
+
+==== resetInventory (cpp/untested)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== setAim====
+  * __in__ **int objId**\\
+  * __in__ **int aim**\\
+  * __out__ ** void **\\
+
+
+
+
+==== setBkColor====
+  * __in__ **int red**\\
+  * __in__ **int green**\\
+  * __in__ **int blue**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the background color for the current level from the red, green and blue components of the provided as three integer values (max 255, 255, 255 is pure white). This is just an alias for the now depreciated setBkColorC function.
+
+<code lua>
+setBkColor(128, 40, 64);
+</code>
+
+
+
+
+==== setBkColorC====
+  * __in__ **int red**\\
+  * __in__ **int green**\\
+  * __in__ **int blue**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the background color for a given level.
+
+<code lua>
+-- set the background color at random
+setBkColorC(rand() % 256, rand() % 256, rand() % 256);
+</code>
+
+
+
+
+==== setBorderColor====
+  * __in__ **int red**\\
+  * __in__ **int green**\\
+  * __in__ **int blue**\\
+  * __out__ ** void **\\
+=== Description ===
+
+set border color.
+
+<code lua>
+setBorderColor(rand(),rand(),rand());
+</code>
+
+
+
+
+==== setEndLevel====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== setHP====
+  * __in__ **int hitPoints**\\
+  * __out__ **int the player's new hp count**\\
+=== Description ===
+
+Set the player's Hit Point count;
+
+example:
+
+<code lua>
+setHP(500);
+Debug:printf("hp:  %d", getHP());
+</code>
+
+
+
+
+==== setImage====
+  * __in__ **int objId**\\
+  * __in__ **int imageSet**\\
+  * __in__ **int imageNo**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Change the image for a given sprite.
+
+The example below shows best practice. Alternative methods include tryAnimation().
+
+<code lua>
+local imageSet;
+local imageNo;
+imageSet, imageNo = getImage(selt);
+setImage(self, imageSet, XOR(imageNo, 1));
+</code>
+
+
+
+
+==== setKey (cpp/untested)====
+  * __in__ **int keyCode**\\
+  * __in__ **bool set**\\
+  * __out__ ** void **\\
+=== Description ===
+
+If set is true this key is considered pressed otherwise it is considered not pressed.
+
+
+
+
+==== setLevelGoal====
+  * __in__ **int goal**\\
+  * __out__ ** void **\\
+=== Description ===
+
+The goal can be any of following values. (please note that they cannot be combined)
+
+<code lua>
+GOAL_ONLY               
+GOAL_UP                
+GOAL_DOWN         
+GOAL_LEFT            
+GOAL_RIGHT         
+GOAL_NO_COMPLETE        
+</code>
+
+GOAL_ONLY: when all goal marked objects are collected
+
+GOAL_UP: when all goal marked objects are collected and player reaches the top of level (LODERUNNER)
+
+GOAL_DOWN: when all goal marked objects are collected and player reaches the bottom of level.
+
+GOAL_LEFT: when all goal marked objects are collected and player reaches the most left position.
+
+GOAL_DOWN: when all goal marked objects are collected and player reaches the most right position .
+
+GOAL_NO_COMPLETE : this requires that the level be declared completed via EndLevel function as to automatic completion is checked.
+
+<code lua>
+-- prevent this level from being completed automatically
+setLevelGoal(GOAL_NO_COMPLETE);
+</code>
+
+
+
+
+==== setLookup====
+  * __in__ **bool lookup**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Enables or disables lookup.
+
+
+
+
+==== setNextSecond (?)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== setSpeed====
+  * __in__ **int speed**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the game speed. The default value is 90. The maximum value is 200.
+
+The speed is calculated as follow. 1000 / speed = number of cycles per second.
+
+Each cycle is a tick. This is the base unit for everything in the game itself.
+
+Also setTickScale()
+
+
+
+
+==== setState====
+  * __in__ **int objId**\\
+  * __in__ **int stateFlag**\\
+  * __in__ **bool flip**\\
+  * __out__ **int stateFlag**\\
+=== Description ===
+
+Change the state flags for a given sprite.
+
+if flip is true the bits are set on otherwise they are cleared.
+
+State flag is a combination of the following:
+
+<code lua>
+    STATE_FALL		
+    STATE_DEAD	
+    STATE_HIT		    
+    STATE_JUMP	
+    STATE_BEGINNING    
+    STATE_FIRING       
+    STATE_LOOKUP       
+</code>
+
+returns the newly modified stateFlag.
+
+
+
+
+==== setTickScale====
+  * __in__ **int tickScale**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Change the level tick scale. This makes the game go faster or slower.
+
+Tick scale is calculate : 1000 / TickRate
+
+TickRate is the number of times per second that the main loop is executed.
+
+See example:
+
+<code lua>
+-- in this example the tick rate is 95
+-- which is very fast !!!
+
+if SKILL == SKILL_INSANE then
+  debug("=>insane difficulty");
+  setTickScale(1000 / 95);
+  addToHP(-20);
+end
+</code>
+
+
+
+
+==== setTriggerKey====
+  * __in__ **int objId**\\
+  * __in__ **int key**\\
+  * __out__ ** void **\\
+=== Description ===
+
+changes the trigger key of a given obj. if set to zero, this will clear the trigger key
+entirely. values will be binary AND with 0x1f to ensure they are within limit. Valid trigger keys are between 1 and 31.
+
+
+
+
+==== setWrapFlag====
+  * __in__ **int wrapFlag**\\
+  * __out__ ** void **\\
+=== Description ===
+
+This function modifies the behavior defined for the level. 
+
+Wrap allows object to move from one edge of the map to the other.
+
+A popular example of this is the classic PACMAN.
+
+wrapFlag can be a combination of the following value.
+
+<code lua>
+WRAP_UP             
+WRAP_DOWN      
+WRAP_LEFT         
+WRAP_RIGHT      
+</code>
+
+<code lua>
+-- allow wrapping only at the the top of the screen
+setWrapFlag( WRAP_UP );
+-- check the flag to see that change was made
+local wrapFlag = getWrapFlag();
+Debug:printf("A wrapFlag: %d", wrapFlag);
+</code>
+
+
+
+
+==== showConsole====
+  * __in__ **bool show**\\
+  * __out__ ** void **\\
+=== Description ===
+
+examples
+
+<code lua>
+showConsole ( true )
+showConsole ( false )
+</code>
+
+
+
+
+==== showSprite====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+show the current sprite. This reverses the hideSprite() function. If the sprite is already visible this will not have any effect on it.
+
+
+
+
+==== spawn (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Spawn is called upon during the creation of a new sprite to initialize the member variables. It's usefulness at runtime is debatable. However, it is available should there be a need for it.
+
+
+
+
+==== sprintf====
+  * __in__ **string format**\\
+  * __out__ **string **\\
+=== Description ===
+
+This function formats a text string. Works exactly like it's C counterpart. 
+
+<code lua>
+local s = sprintf("My name is %s", "Frank");
+-- print the result to the debug console
+Debug:printf(s);
+
+local s = sprintf("1 + 1 = %d", 2);
+-- print the result to the debug console
+Debug:printf(s);
+</code>
+
+
+
+
+==== sprite_addItem (?)====
+  * __in__ **int objId**\\
+  * __in__ **int protoId**\\
+  * __in__ **int count**\\
+  * __out__ ** void **\\
+
+
+
+
+==== sprite_childCount (cpp/untested)====
+  * __in__ **int spriteId**\\
+  * __out__ **int childCount**\\
+=== Description ===
+
+Count the number of children sprites. There are typically bullets.
+
+
+
+
+==== sprite_frameCount====
+  * __in__ **int objid**\\
+  * __out__ **int number_of_frames**\\
+=== Description ===
+
+Get the frame count for a given sprite. This is based on the current frameset associated with this sprite.
+
+
+
+
+==== sprite_get (cpp/?)====
+  * __in__ **int objId**\\
+  * __in__ **string name**\\
+  * __out__ **int value**\\
+
+
+
+
+==== sprite_getHeight (cpp/untested)====
+  * __in__ **int sprite_id**\\
+  * __out__ **int height**\\
+=== Description ===
+
+Get the sprite heigth.
+
+
+
+
+==== sprite_getHP (?)====
+  * __in__ **int objId**\\
+  * __out__ **int hp**\\
+=== Description ===
+
+Get the sprite HP
+
+
+
+
+==== sprite_getString (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ **string **\\
+=== Description ===
+
+Get the custom hint/description associated with a given sprite.
+
+
+
+
+==== sprite_getWidth (cpp/untested)====
+  * __in__ **int sprite_id **\\
+  * __out__ **int width**\\
+=== Description ===
+
+Get the sprite width (pixels).
+
+
+
+
+==== sprite_hasItem (?)====
+  * __in__ **int objId**\\
+  * __in__ **int protoId**\\
+  * __out__ **bool hasItem**\\
+
+
+
+
+==== sprite_isActive (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ **bool active**\\
+=== Description ===
+
+Return the active state of a given sprite. (bool: true, false)
+
+
+
+
+==== sprite_isFrozen (?)====
+  * __in__ **int objId**\\
+  * __out__ **bool frozen**\\
+=== Description ===
+
+returns true if the sprite is frozen.
+
+
+
+
+==== sprite_isGoal (?)====
+  * __in__ **int objId**\\
+  * __out__ **bool goal**\\
+=== Description ===
+
+returns true if the sprite is marked as a goal.
+
+
+
+
+==== sprite_isPlayer (cpp/untested)====
+  * __in__ **int objId**\\
+  * __out__ **bool **\\
+=== Description ===
+
+Tests if the sprite is a player object. Returns true if sprite is of player class.
+
+
+
+
+==== sprite_removeItem (?)====
+  * __in__ **int objId**\\
+  * __in__ **int protoId**\\
+  * __out__ ** void **\\
+
+
+
+
+==== sprite_resetInventory (?)====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+
+
+
+
+==== sprite_set (cpp/?)====
+  * __in__ **int objId**\\
+  * __in__ **string name**\\
+  * __in__ **int value**\\
+  * __out__ ** void **\\
+
+
+
+
+==== sprite_setHP (cpp/untested)====
+  * __in__ **int hp**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the sprite hit points
+
+
+
+
+==== sprite_setOwner (cpp/untested)====
+  * __in__ **int objId**\\
+  * __in__ **int ownerid**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the owner of this sprite
+
+
+
+
+==== sprite_togglePathPlayback (cpp/?)====
+  * __in__ **int objId**\\
+  * __in__ **bool enable**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Toggle playback of custom path.
+
+
+
+
+==== ss_animate====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal. Used by the engine to animate all sprites.
+
+
+
+
+==== ss_autoCenter====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal
+
+
+
+
+==== ss_clear (cpp/?)====
+  * __in__ **int red**\\
+  * __in__ **int green**\\
+  * __in__ **int blue**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Clear the screen with a given color.
+
+
+
+
+==== ss_clearKeys====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Internal. Clear keyboard map.
+
+
+
+
+==== ss_doManage====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal. Used by the engine to manage all sprite interactions in the game context.
+
+
+
+
+==== ss_drawText====
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __in__ **string text**\\
+  * __in__ **int fontid**\\
+  * __in__ **int fontSize**\\
+  * __in__ **int rgba**\\
+  * __in__ **int shadowOffset***\\
+  * __in__ **int shadowColor***\\
+  * __out__ ** void **\\
+=== Description ===
+
+Draw text on the screen at x,y. Memory arrangement of the rgba color is 0xAABBGGRR. This function must be executed within the onDraw function otherwise it will have no effect.
+
+<code lua>
+ss_drawText(100, 50, "This is a test", 0, 20, 0xa0ee20cc, 2, 0xffffffff);
+</code>
+
+
+
+
+==== ss_getNextTick====
+  * __in__ ** void **\\
+  * __out__ **int **\\
+=== Description ===
+
+Returns time in milliseconds of the next engine tick.
+
+
+
+
+==== ss_getPause====
+  * __in__ ** void **\\
+  * __out__ **bool **\\
+=== Description ===
+
+This function returns true if the game is paused,
+
+
+
+
+==== ss_manageAuto====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal
+
+
+
+
+==== ss_manageKeyEvents====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal
+
+
+
+
+==== ss_managePlayer====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal.
+
+
+
+
+==== ss_manageTasks====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal
+
+
+
+
+==== ss_paint====
+  * __in__ **int x1**\\
+  * __in__ **int y1**\\
+  * __in__ **int x2**\\
+  * __in__ **int y2**\\
+  * __in__ **unsigned int rgba**\\
+  * __in__ **bool fill**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Draw a rectangle of a given color. If fill is set the rectangle is full otherwise it will be hollow. Memory arrangement of the rgba color is 0xAABBGGRR. This function must be executed within the onDraw function otherwise it will have no effect.
+
+<code lua>
+ss_paint(0,0,40,40, 0xaa00aa90, TRUE);
+</code>
+
+
+
+
+==== ss_paintImage (cpp/?)====
+  * __in__ **int x**\\
+  * __in__ **int y**\\
+  * __in__ **int frameSet**\\
+  * __in__ **int frameNo**\\
+  * __out__ ** void **\\
+=== Description ===
+
+internal. Draw an image on screen at x,y.
+
+
+
+
+==== ss_setNextTick====
+  * __in__ **int time**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Set the time in milliseconds for the next engine tick.
+
+
+
+
+==== stopAnimation====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Stop the current animation sequence. This is also breaks repeating animations.
+
+<code lua>
+stopAnimation(self);
+</code>
+
+
+
+
+==== stopStream====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+Stop a playing sound/music stream
+
+<code lua>
+stopStream();
+</code>
+
+
+
+
+==== strv_get====
+  * __in__ **string key**\\
+  * __out__ **string val**\\
+
+
+
+
+==== strv_set====
+  * __in__ **string key**\\
+  * __in__ **string val**\\
+  * __out__ ** void **\\
+
+
+
+
+==== testFlags====
+  * __in__ **int objId**\\
+  * __in__ **int mask**\\
+  * __out__ **bool true if bitwise matched**\\
+=== Description ===
+
+note: currently this function only works with the player object
+      flags are outlined as const FLAG_xxxxx
+
+you must supply both args or the function will return false
+and spit out a warning on the debug console
+  
+<code lua>
+  local sound = "";
+  if not testFlags(self,  FLAG_NOSOUND)  then
+    if  testFlags(self , FLAG_METAL)   then
+	  sound = "METAL";
+    else
+      if ticks % 12 == 0 then
+	  sound = "WALK2";
+      else
+	  sound = "WALK";
+      end
+    end
+    playSound( sound );
+  end
+</code>
+
+The mask can be a combination of any of the following. Although, generally speaking you want to include only one.
+
+<code lua>
+    FLAG_NONE		   
+    FLAG_METAL		   
+    FLAG_NOSOUND       
+    FLAG_WATER	
+    FLAG_DEATH	
+    FLAG_HIT		    
+    FLAG_TELEPORT       
+</code>
+
+
+
+
+==== testJoyState====
+  * __in__ **int mask**\\
+  * __out__ **bool true if bitwise matched, otherwise false**\\
+=== Description ===
+
+note: currently this function only works with the player object
+
+  states are outlined as const JOY_xxxxx
+
+<code lua>
+  if (ticks % 5 == 0) and testJoyState( JOY_FIRE ) then
+    local x;
+    local y;
+    local aim;
+  
+    x , y, aim = getSpriteVars( self );
+
+    if testJoyState( JOY_LEFT ) then 
+      aim = LEFT;
+      x = x - 8;
+      y = y + 8;
+    elseif testJoyState( JOY_RIGHT ) then
+      aim = RIGHT;
+      x = x + 32;
+      y = y + 8;
+    elseif testJoyState( JOY_UP ) then
+      aim = UP;
+      x = x + 8;
+      y = y - 8;
+    elseif testJoyState( JOY_DOWN ) then
+      aim = DOWN;
+      x = x + 8;
+      y = y + 32;
+    end 
+
+    local bullet = addSprite (
+      x, 
+      y, 
+      aim,					-- UP, DOWN, LEFT, RIGHT
+    OBJECT_BULLET_LITTLE_STAR__PLY_		-- put the object type 
+    );
+
+    playSound("pow.ogg");
+  end
+</code>
+
+
+
+
+==== testKey (cpp/untested)====
+  * __in__ **int keyCode**\\
+  * __out__ **bool **\\
+=== Description ===
+
+The keyCode can be any of the following values. This fucntion returns true if the key is pressed. Other values may have unpredictable results.
+
+<code lua>
+   KEY_A                = 0x61;
+    KEY_B                = 0x62;
+    KEY_C                = 0x63;
+    KEY_D                = 0x64;
+    KEY_E                = 0x65;
+    KEY_F                = 0x66;
+    KEY_G                = 0x67;
+    KEY_H                = 0x68;
+    KEY_I                = 0x69;
+    KEY_J                = 0x6a;
+    KEY_K                = 0x6b;
+    KEY_L                = 0x6c;
+    KEY_M                = 0x6d;
+    KEY_N                = 0x6e;
+    KEY_O                = 0x6f;
+    KEY_P                = 0x70;
+    KEY_Q                = 0x71;
+    KEY_R                = 0x72;
+    KEY_S                = 0x73;
+    KEY_T                = 0x74;
+    KEY_U                = 0x75;
+    KEY_V                = 0x76;
+    KEY_W                = 0x77;
+    KEY_X                = 0x78;
+    KEY_Y                = 0x79;
+    KEY_Z                = 0x7a;
+    KEY_0                = 0x30;
+    KEY_1                = 0x31;
+    KEY_2                = 0x32;
+    KEY_3                = 0x33;
+    KEY_4                = 0x34;
+    KEY_5                = 0x35;
+    KEY_6                = 0x36;
+    KEY_7                = 0x37;
+    KEY_8                = 0x38;
+    KEY_9                = 0x39;
+    KEY_F1               = 0x131;
+    KEY_F2               = 0x132;
+    KEY_F3               = 0x133;
+    KEY_F4               = 0x134;
+    KEY_F5               = 0x135;
+    KEY_F6               = 0x136;
+    KEY_F7               = 0x137;
+    KEY_F8               = 0x138;
+    KEY_F9               = 0x139;
+    KEY_ESCAPE           = 0x100;
+    KEY_CTRL             = 0x101;
+    KEY_SHIFT            = 0x102;
+    KEY_ALT              = 0x103;
+    KEY_MENU             = 0x109;
+    KEY_LBRACKET         = 0x10a;
+    KEY_RBRACKET         = 0x10b;
+    KEY_SEMICOLON        = 0x10c;
+    KEY_COMA             = 0x10d;
+    KEY_PERIOD           = 0x10e;
+    KEY_QUOTE            = 0x10f;
+    KEY_SLASH            = 0x110;
+    KEY_BACKSLASH        = 0x111;
+    KEY_TILDE            = 0x112;
+    KEY_EQUAL            = 0x113;
+    KEY_MINUS            = 0x114;
+    KEY_SPACE            = 0x115;
+    KEY_RETURN           = 0x116;
+    KEY_BACKSPACE        = 0x117;
+    KEY_TAB              = 0x118;
+    KEY_PAGEUP           = 0x119;
+    KEY_PAGEDOWN         = 0x11a;
+    KEY_END              = 0x11b;
+    KEY_HOME             = 0x11c;
+    KEY_INSERT           = 0x11d;
+    KEY_DELETE           = 0x11e;
+    KEY_PLUS             = 0x11f;
+    KEY_MINUS            = 0x120;
+    KEY_MULTIPLY         = 0x121;
+    KEY_DIVIDE           = 0x122;
+    KEY_LEFT             = 0x123;
+    KEY_RIGHT            = 0x124;
+    KEY_UP               = 0x125;
+    KEY_DOWN             = 0x126;
+    KEY_PAUSE            = 0x140;    
+</code>
+
+
+
+
+==== ticks====
+  * __in__ ** void **\\
+  * __out__ **int ticks**\\
+=== Description ===
+
+This is just an alias. see getTicks() for details.
+
+
+
+
+==== triggerHitState====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Trigger the hit state for a given object. This is usually called when the object is "hurt". 
+
+ObjId is the sprite id. 
+
+No return value.
+
+
+
+
+==== triggerPlayerHitState====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== tryAnimation====
+  * __in__ **int objId**\\
+  * __in__ **int animSeq**\\
+  * __out__ **bool **\\
+=== Description ===
+
+This plays a designated animation sequence for a given objectId. If you are using this function inside an event handle, the objectId is often the `self` variable which points to the object being handled.
+
+The animation sequence is one of the following values. In order to use this animation, the target object must have corresponding images attached to it.
+
+<code lua>
+AS_DEFAULT 
+AS_IDLE       
+AS_CUSTOM1    
+AS_CUSTOM2    
+AS_STAND        
+AS_STAND_UP
+AS_STAND_DOWN  
+AS_STAND_LEFT  
+AS_STAND_RIGHT  
+AS_MOVE       
+AS_MOVE_UP     
+AS_MOVE_DOWN    
+AS_MOVE_LEFT    
+AS_MOVE_RIGHT  
+AS_JUMP         
+AS_JUMP_UP 
+AS_JUMP_DOWN  
+AS_JUMP_LEFT   
+AS_JUMP_RIGHT  
+AS_HURT        
+AS_HURT_UP      
+AS_HURT_DOWN 
+AS_HURT_LEFT    
+AS_HURT_RIGHT 
+AS_ATTACK      
+AS_ATTACK_UP    
+AS_ATTACK_DOWN  
+AS_ATTACK_LEFT 
+AS_ATTACK_RIGHT 
+AS_RUN          
+AS_RUN_UP     
+AS_RUN_DOWN    
+AS_RUN_LEFT     
+AS_RUN_RIGHT   
+AS_DEAD        
+AS_DEAD_UP      
+AS_DEAD_DOWN    
+AS_DEAD_LEFT   
+AS_DEAD_RIGHT  
+</code>
+
+This function returns true if succesful or false if the animSeq value is out of bound or the object has no animation sequence defined which match the animSeq value.
+
+<code lua>
+if tryAnimation(self,  AS_DEAD_UP) then
+   debug("animation worked!!! :D");
+end
+</code>
+
+
+
+
+==== tryPath====
+  * __in__ **int objId**\\
+  * __in__ **int pathDir**\\
+  * __in__ **int aim***\\
+  * __out__ **bool **\\
+=== Description ===
+
+Have the designated object try a path. The pathDir can be any of the following constants.
+
+<code lua>
+        PS_DEFAULT     
+        PS_IDLE        
+        PS_CUSTOM1      
+        PS_CUSTOM2    
+        PS_ATTACK      
+        PS_ATTACK_UP 
+        PS_ATTACK_DOWN 
+        PS_ATTACK_LEFT 
+        PS_ATTACK_RIGHT
+        PS_JUMP        
+        PS_JUMP_UP
+        PS_JUMP_DOWN    
+        PS_JUMP_LEFT  
+        PS_JUMP_RIGHT  
+        PS_JUMP_UP_LEFT 
+        PS_JUMP_UP_RIGHT
+        PS_JUMP_DN_LEFT
+        PS_JUMP_DN_RIGHT
+        PS_MOVE       
+        PS_MOVE_UP
+        PS_MOVE_DOWN  
+        PS_MOVE_LEFT  
+        PS_MOVE_RIGHT  
+        PS_MOVE_UP_LEFT
+        PS_MOVE_UP_RIGHT
+        PS_MOVE_DN_LEFT 
+        PS_MOVE_DN_RIGHT
+</code>
+
+Aim can be either UP, DOWN, LEFT or RIGHT.  If aim is not provided, INVALID is assumed.
+
+Return true if the path defined. This function is similar to tryAnimation().  It only works with the player at the moment.
+
+<code lua>
+local id = getPlayerC();
+Debug:printf("player_id: %x", id);
+tryPath(id, PS_JUMP_LEFT);
+</code>
+
+
+
+
+==== unFreezeSprite====
+  * __in__ **int objId**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Reverse the effect of freezeSprite. reactivative it.
+
+another way of doing this is through the Sprite interface.
+
+<code lua>
+activateSprite(self);
+
+-- is equivalent to
+
+local sprite;
+sprite = getSprite(self);
+sprite:activate();
+</code>
+
+
+
+
+==== unMapSprite====
+  * __in__ **int objId**...\\
+  * __out__ ** void **\\
+=== Description ===
+
+unMapSprite is required before making any changes to a sprite's position, visibility or attributes.  not doing so will result in very nasty and hard to track bugs.
+
+
+
+
+==== updateHP (cpp/?)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== updateJoyState (cpp/?)====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+
+
+
+
+==== warpTo====
+  * __in__ **string uuid**\\
+  * __out__ ** void **\\
+=== Description ===
+
+Warp to a different level. This function accepts the level's UUID or zero based index as input.
+
+<code lua>
+
+warpTo(2)
+
+warpTo("50d1-42c5-0112-e964")
+
+</code>
+
+
+
+
+==== XOR====
+  * __in__ **int a**\\
+  * __in__ **int b**\\
+  * __out__ **int binary eXclusive OR (a , b)**\\
+=== Description ===
+
+<code lua>
+
+  XOR (1, 7)  -- expected resut:  6
+
+  -- explanation
+  1 = 1000
+  7 = 1110
+    XOR
+  6 = 0110
+
+  XOR (2, 3)  -- expected resut: 1
+
+  -- explanation
+  2 = 0100
+  3 = 1100
+    XOR
+  1 = 1000
+
+  etc.
+
+</code>
+
+
+

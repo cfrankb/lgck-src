@@ -1,0 +1,73 @@
+{
+    "target": "glut/lgck-runtime",
+    "cxx": "g++",
+    "linux": {
+        "output" : "makefile",
+        "paths" : [
+            ".",
+            "../shared",
+            "/usr/include",
+            "/usr/include/freetype2"
+        ],
+        "libs" : [
+            "z",
+            "m",
+            "pthread",
+            "lua5.2",
+            "ftgl",
+            "SDL2",
+            "SDL2_mixer",
+            "GL",
+            "X11",
+            "GLU",
+            "glut"
+        ],
+        "flags" : ["-m64", "-std=c++0x", "-O3", "-fPIE", "-Wall"],
+        "build" : "build.sh"
+    },
+    "win32": {
+        "output" : "make.bat",
+        "paths" : [
+            "../shared",
+            "../../redist/headers",
+            "../../redist/headers/freetype2"
+        ],
+        "libs" : [
+            "L../../redist/lib",
+            "lz",
+            "lm",
+            "llua52",
+            "lftgl",
+            "lSDL2",
+            "lSDL2_mixer",
+            "lopengl32",
+            "lglu32",
+            "lfreeglut"
+        ],
+        "flags" : ["-std=gnu++11", "-O3", "-Wall"]
+    },
+    "sources": [
+        "glut/main.cpp",
+        "../shared/*.cpp",
+        "../shared/implementers/*opengl.cpp",
+        "../shared/implementers/sn_sdl.cpp",
+        "../shared/implementers/mu_sdl.cpp",
+        "../shared/inputs/*.cpp",
+        "../shared/inputs/glut/*.cpp",
+        "shared/lgck_res.cpp"
+    ],
+    "exclude": ["stdafx", "zlib", "vlamits3"],
+    "obj_dir": "target/glut",
+    "declare" : [],
+    "res": {
+        "out": "shared/lgck_res.cpp",
+        "name": "add_lgck_res",
+        "base": "../lgck-builder/",
+        "file_list" : [
+            "images/points.obl5",
+            "res/DejaVuSans.ttf",
+            "scripts/common.lua",
+            "scripts/functions.lua"
+        ]
+    }
+}

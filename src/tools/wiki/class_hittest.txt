@@ -1,0 +1,30 @@
+===== Class HitTest =====
+==== Description ====
+The HitTest class contains the results of the hit test performed by getHitTest(). That information is a bit mangled so this class provides a wrapper to make it easier to work with.
+
+bkCount is just a count of the number of entries in the bkClass array. The same information can be had using the pound operator (e.g. #bkClass). The same can be said for fwCount and acCount. 
+
+fwEntry and acEntry are arrays of objIds. They represent sprites. 
+
+If you wanted more information on any of them you could use the Sprite object wrapper.
+
+<code lua>
+local ht = getHitTest(self, UP);
+local sprite = getSprite ( ht.fwEntry [ i ]  );
+</code>
+
+
+
+
+==== Members ====
+  * **int** bkCount\\
+  * **array** bkClass\\
+  * **int** fwCount\\
+  * **array** fwClass\\
+  * **array** fwEntry\\
+  * **int** acCount\\
+  * **array** acClass\\
+  * **array** acEntry\\
+  * **int** flags\\
+  * **bool** player\\
+

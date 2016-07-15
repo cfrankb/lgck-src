@@ -1,0 +1,162 @@
+{
+    "Add To Score": {
+        "fname":"addToScore",
+        "type":"N",
+        "descr":"Add points to the player."
+    },
+    "Call Game Event": {
+        "fname":"callGameEvent",
+        "type":"N",
+        "descr":"Trigger a game event."
+    },
+    "Change Sprite to another sprite": {
+        "fname":"changeTo",
+        "type":"S",
+        "descr":"Change the current sprite into a diffent one. While any combination is valid, some restrictions may affect the workability of the game flow."
+    },
+    "Clear Screen": {
+        "fname":"ss_clear",
+        "type":"D",
+        "descr":"Clear the whole screen and paint the background with the provided color."
+    },
+    "Draw Image": {
+        "fname":"drawImage",
+        "type":"D",
+        "descr":"Draw an image on the screen."
+    },
+    "Draw Rectangle": {
+        "fname":"drawRect",
+        "type":"D",
+        "descr":"Draw a rectangle on the screen."
+    },
+    "Draw Text": {
+        "fname":"drawText",
+        "type":"D",
+        "descr":"Draw text on the screen."
+    },
+    "Get Counter": {
+        "fname":"counters_get",
+        "type":"N",
+        "descr":""
+    },
+    "Get Frame Count from this Sprite": {
+        "fname":"sprite_frameCount",
+        "type":"S",
+        "descr":"Count the number of frames for this Sprite."
+    },
+    "Get Frame Count in a FrameSet": {
+        "fname":"frameSet_getSize",
+        "type":"N",
+        "descr":"Get the number of frame in FrameSet."
+    },
+    "Get Screen Size": {
+        "fname":"getScreenSize",
+        "type":"N",
+        "descr":"Get the window width and height. "
+    },
+    "Get Sprite Property": {
+        "fname":"spriteGet",
+        "type":"S",
+        "descr":""
+    },
+    "Get text Width": {
+        "fname":"sizeText",
+        "type":"N",
+        "descr":""
+    },
+    "Get variable": {
+        "fname":"getVar",
+        "type":"N",
+        "descr":""
+    },
+    "Kill this sprite": {
+        "fname":"killSprite",
+        "type":"S",
+        "descr":""
+    },
+    "Play Music": {
+        "fname":"playMusic",
+        "type":"N",
+        "descr":"Play a streaming music file. The path is relative to your lgckdb file."
+    },
+    "Play Sound": {
+        "fname":"playSound",
+        "type":"S",
+        "descr":"Play a sound file. Replace This sound has to be stored inside the database. Lookup under \"sounds\" tab."
+    },
+    "Set Background Color": {
+        "fname":"setBkColor",
+        "type":"N",
+        "descr":"Set the level background color."
+    },
+    "Set Border Color": {
+        "fname":"setBorderColor",
+        "type":"N",
+        "descr":"Set the level border color."
+    },
+    "Set Counter": {
+        "fname":"counters_set",
+        "type":"N",
+        "descr":""
+    },
+    "Set Sprite Property": {
+        "fname":"spriteSet",
+        "type":"S",
+        "descr":""
+    },
+    "Set variable": {
+        "fname":"setVar",
+        "type":"N",
+        "descr":""
+    },
+    "Stop Music": {
+        "fname":"stopMusic",
+        "type":"N",
+        "descr":""
+    },
+    "Unmark as goal": {
+        "fname":"sprite_unMarkAsGoal",
+        "type":"S",
+        "descr":"A sprite can be marked as goal toward completing the level. You can flip off this flag."
+    },
+    "Show This Sprite":{
+        "fname":"sprite_show",
+        "type":"S",
+        "descr":"Show the sprite. Make it visible."
+    },
+    "Hide This Sprite":{
+        "fname":"sprite_hide",
+        "type":"S",
+        "descr":"Hide sorite. Mark this sprite as invisible."
+    },
+    "Add Sprite":{
+        "fname":"add_sprite",
+        "type":"N",
+        "descr":"Add a new sprite."
+    },
+    "Fire Bullet":{
+        "fname":"sprite_fireBullet",
+        "type":"S",
+        "descr":"Fire a bullet from the current aim of this sprite."
+    },
+    "Sprite Fall Into The Abyss": {
+        "fname":"sprite_fallAbyss",
+        "type":"S",
+        "descr":"This is a template for handling falling off the screen. This should be added to the `OnLanding` event"
+    },
+    "Sprite Fall (for varying heights)": {
+        "fname":"sprite_fall",
+        "type":"S",
+        "descr":"This is a template for handling fall from various heights. This should added to the `OnFall` event."
+    },
+    "Kill Player": {
+        "fname":"sprite_killPlayer",
+        "type":"S",
+        "descr":"Kill the player."
+    },
+    "Breakable brick/bridge": {
+        "fname":"breakable",
+        "type":"S",
+        "descr":"Create a breakable brick/bridge. This should be added to the `OnHandler` event."
+    }
+}

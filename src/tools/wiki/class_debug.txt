@@ -1,0 +1,70 @@
+===== Class Debug =====
+==== Description ====
+This class provides wrapper for common debugging functions. It helps finding bugs by allowing direct manipulation of the debug console.
+
+<code lua>
+Debug:printf("The result of 1 + 1 = %d", 1 + 1);
+</code>
+
+==== Members ====
+
+
+==== Debug:clear====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+clear the debug console.
+
+<code lua>
+Debug:clear();
+</code>
+
+THIS FUNCTION IS UNSTABLE.
+
+
+
+
+==== Debug:hide====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+hide the debug console.
+
+example:
+
+<code lua>
+Debug:hide();
+</code>
+
+
+
+
+==== Debug:printf====
+  * __in__ **string fmt**\\
+  * __out__ **string **\\
+=== Description ===
+
+works just like the regular C printf excepts that all text strings go to the debug console.
+
+<code lua>
+Debug:printf("1 + 1 = %d", 2);
+</code>
+
+
+
+
+==== Debug:show====
+  * __in__ ** void **\\
+  * __out__ ** void **\\
+=== Description ===
+
+show the debug console.
+
+<code lua>
+Debug:show();
+</code>
+
+
+

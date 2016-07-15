@@ -1,0 +1,28 @@
+===== Class Extra =====
+==== Description ====
+Extra provides a wrap for the sprite runtime information which is used by the engine to manage it.
+
+<code lua>
+local extra = getExtra(self);
+</code>
+==== Members ====
+  * **int** objId\\
+  * **int** orgProto\\
+  * **int** orgX\\
+  * **int** orgY\\
+  * **int** hp\\
+  * **int** oldAim1\\
+  * **int** oldAim2\\
+  * **int** fallHeight\\
+  * **int** lives\\
+  * **int** active\\
+  * **int** bulletCount\\
+  * **int** owner\\
+  * **int** flags\\
+  * **int** pathDir\\
+  * **int** pathPtr\\
+  * **int** animSeq\\
+  * **int** animPtr\\
+  * **int** animSpeed\\
+  * **int** deathIndicator\\
+
