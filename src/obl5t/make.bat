@@ -1,0 +1,1 @@
+g++ -O3 -DMAKE_WIN32 main.cpp ..\shared\FileWrap.cpp ..\shared\Frame.cpp ..\shared\FrameSet.cpp ..\shared\DotArray.cpp ..\shared\PngMagic.cpp  -I..\..\redist\headers\zlib -L..\..\redist\lib -lmingw32 -lz -o obl5t
