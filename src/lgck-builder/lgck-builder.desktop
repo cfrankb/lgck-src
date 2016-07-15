@@ -1,0 +1,30 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=LGCK Builder
+Name[de]=LGCK Builder
+Name[en_GB]=LGCK Builder
+Name[es]=LGCK Builder
+Name[fr]=LGCK Builder
+Name[nds]=LGCK Builder
+Name[pt]=LGCK Builder
+Name[pt_BR]=LGCK Builder
+Name[sv]=LGCK Builder
+Name[uk]=LGCK Builder
+Name[x-test]=xxLGCK Builderrxx
+GenericName=Game Construction Kit
+GenericName[de]=Game Construction Kit
+GenericName[en_GB]=Game Construction Kit
+GenericName[es]=Game Construction Kit
+GenericName[fr]=Game Construction Kit
+GenericName[nds]=Game Construction Kit
+GenericName[pt]=Game Construction Kit
+GenericName[pt_BR]=Game Construction Kit
+GenericName[sv]=Game Construction Kit
+GenericName[uk]=Game Construction Kit
+GenericName[x-test]=xxGame Construction Kitxx
+Exec=lgck-builder
+Icon=lgck_builder
+Type=Application
+Categories=Qt;KDE;Development;IDE;
+Terminal=false
+ 

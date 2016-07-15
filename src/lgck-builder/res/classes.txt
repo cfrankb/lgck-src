@@ -1,0 +1,72 @@
+# background classes
+00 Background decoration,0
+00 ~Ignored entirely by the engine. They mostly serves as non-moving backdrop elements (e.g. trees, grass, etc.)
+01 Antigravity,0
+01 ~Prevent objects from falling in gravity afflicted levels. This is similar to `Metal ladders` but without the sound.
+#02 Water,0
+#02 ~currently not implemented.
+03 Metal Ladder,0
+03 ~This is variation of `Antigravity` which plays a metal sound when walked across.
+0a Solid down only,1
+0a ~Prevent moving down only. This allows the player to jump through these objects from underneath.
+0b Revert to background,1
+0b ~Used to assign a background attribute to a map location. Mostly used to patch other background class object such as `solid` brick walls.
+#0c Trailers - trail,1
+#0c ~currently not implemented
+0d Immediately deadly,0
+0d ~Player object immediately die when they come into contact with this.
+0e Solid Background,0
+0e ~Think of this as walls, bricks and non-moving platforms.
+0f Stop,1
+0f ~Prevent monsters from voluntarily moving through. It has no effect on gravity.
+
+# foreground classes
+10 Animated thing,0
+10 ~Non-moving object which cycles through all the assigned frames. This is mostly for decorations.
+11 Pickup Trigger,0
+11 ~When touched by the player will automatically trigger other objects with same trigger tag, defined as recipients.
+12 Inventory Item,0
+12 ~These objects can be collected and used as secret buddy for doors etc. ex. Keys
+13 Open to owner,0
+13 ~This object will deny anyone except the owner of their secret buddy object. (see features)
+14 Teleportation pad,0
+14 ~Moves the player to another location on the same level. This place is designated through a `teleportation destination` which shares the same trigger key.
+15 Teleportation destination,0
+15 ~This is where the teleportation pad leads to. The two must have matching trigger keys.
+16 Z-Key Switch,0
+16 ~Object will flip recipient objects with the same trigger key by hiding/showing them. 
+1d Animate Once,0
+1d ~Similar to animated things only it goes through the animation sequence once and then dies. 
+1e Solid animated,0
+1e ~Similar to animated things, except that it also acts as a solid objects. can be used for wall and such.
+1f Player Object,0
+1f ~designate the player on a given level. any level must include at least one object of this class
+
+# monsters
+20 Generic Monster,0
+20 ~This monster can move up, down, left and right. The algorithm is a modified path find.
+21 User Defined Monster,0
+21 ~This is a user programmable `Generic Monster`. 
+22 Drone UP/DOWN,0
+22 ~This monster can only move up/down. 
+23 Drone LEFT/RIGHT,0
+23 ~This monster can only move left/right. 
+24 Random Attacker
+24 ~Appears at random along the world borders. Moves in a straight line until it attacks.
+#24 Drop Down Stone,0
+#25 Bouncing Block,0
+#26 Mover,0
+27 Vampire Plant Solid,0
+27 ~Non-moving monster. Cause damages to nearby players.
+#28 Boulder,0
+2c Whacker UP/DOWN,0
+2c ~Similar to Platform but doesn't carry the player. Platforms and Whackers can also crush players.
+2d Whacker LEFT/RIGHT,0
+2d ~Similar to Platform but doesn't carry the player. Platforms and Whackers can also crush players.
+2e Platform UP/DOWN,0
+2e ~Platform such a lifts, or move blocks, which can carry player up and down. Platforms and Whackers can also crush players.
+2f Platform LEFT/RIGHT,0
+2f ~Platform such a lifts, or move blocks, which can carry player left and right. Platforms and Whackers can also crush players.
+#30 Generic Monster v3,0
+40 Player Bullet,0
+41 Creature Bullet,0

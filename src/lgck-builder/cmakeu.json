@@ -1,0 +1,61 @@
+{
+    "project": "lgck_builder",
+    "cmake_minimum_required": "VERSION 2.6",
+    "include" : ["FindFreetype"],
+    "find_package" : [
+        "PkgConfig REQUIRED",
+        "Qt5Widgets REQUIRED",
+        "Qt5Core REQUIRED",
+        "Qt5OpenGL REQUIRED",
+        "Qt5Network REQUIRED",
+        "PNG REQUIRED",
+        "OpenGL REQUIRED",
+        "Freetype REQUIRED"
+    ],
+    "include_directories": [
+        "${FREETYPE_INCLUDE_DIRS}",
+        "${Qt5Widgets_INCLUDE_DIRS}",
+        "${Qt5Networks_INCLUDE_DIRS}",
+        "${Qt5OpenGL_INCLUDE_DIRS}",
+        "${QT_INCLUDES}",
+        "${CMAKE_CURRENT_BINARY_DIR}",
+        "../shared",
+        "./"
+    ],
+    "add_definitions" : ["${QT_DEFINITIONS}", "-DUSE_QFILE=1"],
+    "set" : { 
+        "CMAKE_CXX_FLAGS" : ["\"${CMAKE_CXX_FLAGS} -std=c++0x -O3 -fPIE\""],
+        "CMAKE_INCLUDE_CURRENT_DIR": ["ON"],
+        "CMAKE_AUTOMOC": ["ON"],
+        "lgckb_SRCS" : [
+            "*.cpp",
+            "../shared/*.cpp",
+            "../shared/implementers/*.cpp",
+            "../shared/inputs/*.cpp",
+            "../shared/inputs/qt/*.cpp"
+        ],
+        "lgckb_ui_files": ["*.ui"],
+        "lgckb_MOC_HEADERS" : ["*.h:Q_OBJECT"],
+        "lgckb_RCS" : ["lgck-builder.qrc"]
+    },
+    "QT5_AUTOMOC" : "${lgckb_SRCS}",
+    "QT5_WRAP_UI" : "lgckb_SRCS ${lgckb_ui_files}",
+    "QT5_WRAP_CPP" : "lgckb_MOC_OUTFILES ${lgckb_MOC_HEADERS}",
+    "QT5_ADD_RESOURCES" : "lgckb_RC_SRCS ${lgckb_RCS}",
+    "qt5_use_modules" : "app Core Gui Widgets OpenGL",
+    "add_executable" : "lgck-builder ${lgckb_SRCS} ${lgckb_MOC_OUTFILES} ${lgckb_MOC_HEADERS} ${lgckb_RC_SRCS}",
+    "target_link_libraries" : "lgck-builder Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} z ftgl SDL SDL_mixer lua5.1 png qt5scintilla2",
+    "__elements" : ["project", 
+        "cmake_minimum_required",
+        "include",
+        "find_package", 
+        "include_directories", 
+        "add_definitions", 
+        "set",
+        "QT5_WRAP_UI",
+        "QT5_ADD_RESOURCES",
+        "add_executable",
+        "target_link_libraries"
+    ],
+    "__output": "CMakeLists.txt"
+} 

@@ -1,0 +1,76 @@
+#include "thread_updater.h"
+#include <qdebug.h>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QUrl>
+#include <QUrlQuery>
+#include "../shared/qtgui/cheat.h"
+
+// http://karanbalkar.com/2014/02/sending-a-http-request-using-qt-5-framework/
+void CThreadUpdater::run()
+{
+    qDebug("starting...");
+    sendRequest();
+}
+
+void CThreadUpdater::setUrl(const QString &url)
+{
+    m_url = url;
+}
+
+void CThreadUpdater::sendRequest()
+{
+    //const char *link = "http://cfrankb.fb/lgck/api/chkv.php?ver=00.06.00.06";
+    // create custom temporary event loop on stack
+    QEventLoop eventLoop;
+
+    qDebug() << "URL:" << m_url;
+
+    // "quit()" the event-loop, when the network request "finished()"
+    QNetworkAccessManager mgr;
+    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+    QUrl url = QUrl( m_url );
+    // the HTTP request
+    QNetworkRequest req( url );
+    QNetworkReply *reply = mgr.get(req);
+    eventLoop.exec(); // blocks stack until "finished()" has been called
+
+
+
+    QString result;
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        result = reply->readAll();
+        qDebug() << "Success" <<reply->readAll();
+        delete reply;
+    }
+    else {
+        //failure
+        result = reply->readAll();
+        qDebug() << "Failure" <<reply->errorString();
+        delete reply;
+    }
+
+    if (result.indexOf("result: all okay\n") != -1) {
+        QRegExp exp = QRegExp("download: [a-zA-z0-9:\\._/]+");
+        QString dwUrl = "";
+        if (exp.indexIn(result)!=-1) {
+            QStringList list = exp.capturedTexts();
+            dwUrl = list[0].mid(strlen("download: "));
+            //qDebug() << "download url:" << dwUrl;
+        }
+        exp = QRegExp("version: [0-9a-z\\.]+");
+        QString dwVersion = "";
+        if (exp.indexIn(result)!=-1) {
+            QStringList list = exp.capturedTexts();
+            dwVersion = list[0].mid(strlen("version: "));
+            //qDebug() << "download version:" << dwVersion;
+        }
+        if (!dwUrl.isEmpty()) {
+            emit newVersion(dwUrl, dwVersion);
+        }
+    }
+}
