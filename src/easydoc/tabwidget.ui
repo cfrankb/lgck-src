@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TabWidget</class>
+ <widget class="QTabWidget" name="TabWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>TabWidget</string>
+  </property>
+  <property name="currentIndex">
+   <number>0</number>
+  </property>
+  <widget class="QWidget" name="tab_2">
+   <attribute name="title">
+    <string>Functions</string>
+   </attribute>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTreeWidget" name="treeFn">
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>true</bool>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="uniformRowHeights">
+       <bool>true</bool>
+      </property>
+      <property name="sortingEnabled">
+       <bool>false</bool>
+      </property>
+      <property name="headerHidden">
+       <bool>true</bool>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>150</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>21</height>
+       </size>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <widget class="QToolButton" name="btnDelete">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>0</y>
+         <width>25</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Delete Function</string>
+       </property>
+       <property name="text">
+        <string>Delete Function</string>
+       </property>
+       <property name="icon">
+        <iconset resource="easyDoc.qrc">
+         <normaloff>:/images/minus.png</normaloff>:/images/minus.png</iconset>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="btnAdd">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>25</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Add New Function</string>
+       </property>
+       <property name="text">
+        <string>Add Function</string>
+       </property>
+       <property name="icon">
+        <iconset resource="easyDoc.qrc">
+         <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="tab">
+   <attribute name="title">
+    <string>Classes</string>
+   </attribute>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QTreeWidget" name="treeClass">
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>true</bool>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="uniformRowHeights">
+       <bool>true</bool>
+      </property>
+      <property name="sortingEnabled">
+       <bool>false</bool>
+      </property>
+      <property name="headerHidden">
+       <bool>true</bool>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>150</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>21</height>
+       </size>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <widget class="QToolButton" name="btnAddClass">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>25</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Add New Class</string>
+       </property>
+       <property name="text">
+        <string>Add Class</string>
+       </property>
+       <property name="icon">
+        <iconset resource="easyDoc.qrc">
+         <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="btnDeleteClass">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>0</y>
+         <width>25</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Delete Class</string>
+       </property>
+       <property name="text">
+        <string>Delete Class</string>
+       </property>
+       <property name="icon">
+        <iconset resource="easyDoc.qrc">
+         <normaloff>:/images/minus.png</normaloff>:/images/minus.png</iconset>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="tab_3">
+   <attribute name="title">
+    <string>Sections</string>
+   </attribute>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <widget class="QTreeWidget" name="treeSection">
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>true</bool>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="uniformRowHeights">
+       <bool>true</bool>
+      </property>
+      <property name="sortingEnabled">
+       <bool>false</bool>
+      </property>
+      <property name="headerHidden">
+       <bool>true</bool>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>150</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>21</height>
+       </size>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <widget class="QToolButton" name="btnAddSection">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>25</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Add New Section</string>
+       </property>
+       <property name="text">
+        <string>Add Section</string>
+       </property>
+       <property name="icon">
+        <iconset resource="easyDoc.qrc">
+         <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="btnDeleteSection">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>0</y>
+         <width>25</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Delete Section</string>
+       </property>
+       <property name="text">
+        <string>Delete Section</string>
+       </property>
+       <property name="icon">
+        <iconset resource="easyDoc.qrc">
+         <normaloff>:/images/minus.png</normaloff>:/images/minus.png</iconset>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="easyDoc.qrc"/>
+ </resources>
+ <connections/>
+</ui>

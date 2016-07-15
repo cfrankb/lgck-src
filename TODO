@@ -1,0 +1,315 @@
+TODO/WISHLIST
+
+world maps
+----------
+
+[ ] WorldManager
+    add
+    edit
+    delete
+    get_level()
+    delete_level()
+[ ] world maps
+    [ ] levels
+
+levels
+------
+
+[X] customs strings for each sprite instance
+[x] time to closure (e.g. how long to wait before closing a level)
+[x] jumpAllowed (handled via path seq)
+[x] music filename
+[x] difficulty levels: easy, medium, hard, insane
+[x] level end_condition (after the last goal is collected)
+      [x] wrap arround
+      [x] fire trigger
+[x] activation policy (all, when visible, never)
+    asleep, awake
+    [x] inactive by default
+        activate auto, userdef
+    [ ] make auto smarter
+[ ] `opentop` policy 
+     [x] add  `opentop` as a property
+     [ ] honor `opentop` policy inside the code
+[ ] levelStack / levelcache
+[ ] levels
+	[ ] inherit player
+	[ ] continuity
+	[ ] reset hp
+	[ ] force def. sprite ???
+	[x] waypoints
+
+[x] waypoint trigger
+    [x] level snapshot
+[ ] waypoint location (object placeholder)
+
+[ ] music repeat
+
+[ ] Scroll Mode 
+    - auto/platform, 
+    - action/continued (UP, DOWN, LEFT, RIGHT)
+    - none  
+
+[ ] level wiz
+	[ ] setup global speed settings that override level settings (scripting)
+
+[x] Events 
+    [x] EL_HANDLER (lua)
+    [x] EL_TIMEOUT (lua)
+    [x] EL_RESTART (C++)
+
+sprites
+-------
+
+[x] touchList (hit test)
+[x] LUA: hitTest()
+[x] max fall implemented at objLevel
+[x] fall speed at objLevel
+[x] sprite 
+      [x] obl imageSet
+      [x] properties
+[x] block aim: UP, DOWN, LEFT and RIGHT 
+  (similar to solid aim down but more flexible)
+[ ] death
+  [x] rebirth at 
+  [x] death / origin
+  [x] health bonus
+  [x] waypoints
+  [x] disable changeTo at death
+  [ ] honor the state_dead flag
+  [ ] lives bonus (as in extra life)
+  [ ] coin bonus
+
+[ ] idle time counter for objects
+
+[x] powerlevel
+
+  [x] direct collision
+      monster.plv < player.plv = monster die
+      monster.plv == player.plv = player hurt
+      monster.plv > player.plv = player die
+
+  [x] fall on monster
+      monster.plv < player.plv = monster die
+      monster.plv == player.plv = monster die
+      monster.plv == player.plv + 1 = monster die
+      monster.plv > player.plv + 1 = player die
+
+[ ] objectPath
+  [ ] multiple paths
+  [x] default path
+  [ ] path name	
+  [ ] activatePath
+  [x] pathPtr
+  [ ] scriptEvent w/i path
+  [ ] make'em sticky
+  [ ] share them between sprites
+  [x] edit'em as raw hexstrings
+  [ ] dynamic paths
+
+[ ] timer and OnTimer event()
+  (probably going to be Task related)
+
+[ ] rebirth animation seq
+[x] dynamic runtime attributs
+[ ] engine group sprites into sheets
+[ ] per sprite color/alpha mod (SDL_SetTextureColorMod)
+
+player
+------
+
+[ ] powerup chain
+	bonus1 => bonus2
+	playerobj1 => playerobj2
+
+[ ] player bullet
+  [x] proto
+  [x] fire rate / freq / max bullets (actives)
+  [x] damage to monsters or enemy bullets
+  [ ] ammo left or unlimited
+  [ ] powerlevel
+
+[ ] improved jump code
+[ ] jump grace period
+[ ] control fall?
+[ ] control jump/rebound
+[ ] flex: move left/right while jumping
+[ ] smoother jumps
+
+[ ] lives: start, max
+[ ] hp: start	max
+[ ] death: reset hp, reset level
+    [ ] set by game
+    [ ] set by level
+    [ ] set by sprite
+[ ] selectPlayer
+[ ] water/oxygen 
+[ ] improved lookup;w/lookup delay
+[ ] make lookup a level property (yes,no, auto)
+[ ] damage
+
+[ ] death
+  [ ] rebirth at death
+  [ ] rebirth at origin
+  [ ] rebirth at waypoint
+
+engine
+------
+[x] smoother camera panning 
+[x] dynamically change game speed (scripting)
+[x] music support
+[x] monster/object activation (always, active on display, never)
+    (might become Awake, Asleep)
+[ ] hint messages like info bubbles, or message orb in cosmo / hocus pocus
+[ ] bounce object class e.g. trampoline ?
+[ ] particle effects
+[ ] ui for custom display
+[ ] improved inventory system
+    [x] inventory for player
+    [ ] inventory for monster
+        [ ] pickup
+        [ ] drop
+[x] counters
+[ ] object action tab ???
+[ ] setLevelViewSize()
+[ ] custom object maps
+[ ] merge Proto, ImageSet and Object into `Sprite`
+[ ] extended music support
+[ ] JOYSTICK support
+[ ] Decor engine (e.g. like a weather engine).
+[ ] slide tiles
+[ ] follow object
+     [ ] follow player
+     [ ] follow any sprite (customizable through scripting)
+[ ] tasks
+    [x] for rebirths
+    [ ] and removing displays
+    [ ] and other script events
+  
+editor
+[x] multiple selections
+[x] multiple copy/delete
+[x] copy, cut and paste in LevelView
+[x] resize the editor area
+[x] gameEditor: track currentLevel
+[x] add code to the move layers 
+[x] add imageSplitter to image import option
+[x] add new Sprite wizard 
+    (we're part of the way there)
+    [x] bullet tab for player (script generated)
+[ ] undo/redo
+[ ] enable/disable difficulty levels at gameSettings
+[x] add scrollbars to the LevelView
+[ ] add frameSet editor
+    
+Toolbox
+[x] layer combobox to show the various layer on a level
+[x] context menu for levels
+[x] context menu for sounds
+[ ] context menu for events
+[x] toolbox for sprites, levels, events and sounds 
+  (we're getting there...)
+     [x] sprites
+     [x] levels
+     [x] events
+     [x] sounds
+[ ] drag & drop for levels
+
+Game 
+[ ] add debugger
+    [ ] with sourceview
+
+Script Wizard
+-------------
+
+[x] action: playSound()
+[x] action: fireBullet
+[x] action: kill player
+[x] action: changeto
+[x] action: fall into the abyss
+[x] action: add sprite
+[x] action: hideSprite
+[x] action: showSprite
+
+[ ] expression builder
+
+scriptings
+---------
+
+[x] LUA: setLevelGoal()
+[x] LUA: getLevelGoal()
+[x] LUA: onPickup()
+[ ] LUA: OnTimer()
+[ ] LUA: createTimer()
+[x] LUA: onClickLeft(), onClickLeft()
+[ ] LUA: onDoubleClick, onMouseMove()
+[ ] LUA: onEnter/onLeave (to use id and seeduid)
+[ ] LUA: onPlayback()
+[ ] LUA: onWayPoint()
+[ ] LUA: onFocus/onLoseFocus
+[ ] LUA: OnMusicStop
+
+Overide:
+[ ] LUA: canMove
+[ ] LUA: canFall
+[ ] LUA: canPush
+[ ] LUA: attackSprite
+[ ] LUA evaluate(objid, aim)
+[ ] sprite methods
+  [ ] attacked ( int attackerId );
+  [ ] killed
+  [ ] hit
+
+animation
+---------
+
+[x] animationSeq
+[x] animation: fall, dead left, dead right
+[ ] stop all object animation and used death animation before killSprite()
+[x] z-key animations
+
+bugs
+----
+
+Fresh bugs
+[ ] BUG 3520076: sprites with empty parts causing problems for gravity code
+[ ] BUG 3520092: player fall through platform bad -- object mapping code bug
+[ ] BUG: resizing the pane view during 'test level' causes a resize
+[ ] BUG: teleport won't activate when player is on top of level     
+[ ] BUG: debug console not always working (debug console obsolete)
+[ ] BUG: debug.clear causing crash
+[ ] BUG: moving a selection in the editor doesn't move all items at the same pace
+[x] BUG: skill property doesn't seem to work -- investigate
+[ ] BUG: edit event pane not save when test game is trigged
+[ ] BUG: when restoring to a way point, state of displays not restored
+[ ] BUG: when restoring to a way point, end of level trigger not firing (after being triggered)
+
+Bug fixed
+[x] BUG: player leaves the view
+[x] BUG: layer UI not updated correctly in editor
+[x] BUG: animation doesn't switch to UP while default animation running (loop)
+[x] BUG: player hurt animation not running
+[x] BUG: deadly background class no longer working
+[x] BUG: UI for animation (add, duplicate and delete) showing wrong tooltips
+[x] BUG: changing imageSet whereas animation seq are define leads to issues
+         (this is a correct behavior)
+[x] BUG: player can be hurt after being killed
+[x] BUG: mysterious crash condition when paired with some applications (FATAL)
+[x] BUG: windows - player animation is fu*ked on any seq other than default.
+[x] BUG: animate once - wrong frameset 
+[?] BUG: a monster repeating animation prevents 'death sequence'
+[x] BUG: bullet =+ damage to target code not fully implemented
+[x] BUG: player sprite disapears from view when killed (animSeq bug)
+[x] BUG: hitTest logic not working
+[x] BUG: open border policy causing problem
+[x] BUG: png import code
+[x] BUG: png decoder has problems with some palette PNG 
+[x] BUG: deleting a proto doesn't remove currItem
+[x] BUG: remnant of sprite from a different skill level
+[X] BUG: platform moving player code bad -- object mapping code bug
+[x] BUG: new ImageSet not mapped at all (until reload)
+[x] BUG: droping a sprite while there is no level results in a crash
+[x] BUG: layer element count is wrong for FW/BK layers
+[x] BUG: on wrap arround screen, screen viewport moves unexpectely
+[x] BUG: Jump sequence run animation seq based on interim aim unexpectelly
+[x] BUG 3520091: player.onHandler not called

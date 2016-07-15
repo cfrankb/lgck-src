@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/minus.png</file>
+        <file>images/plus.png</file>
+        <file>images/active.png</file>
+        <file>images/blue.png</file>
+        <file>images/cyan.png</file>
+        <file>images/grey.png</file>
+        <file>images/red.png</file>
+        <file>images/yellow.png</file>
+        <file>images/green.png</file>
+        <file>images/lua.png</file>
+        <file>images/cpp.png</file>
+        <file>images/na.png</file>
+        <file>res/gpl.txt</file>
+        <file>images/mplus.png</file>
+    </qresource>
+</RCC>

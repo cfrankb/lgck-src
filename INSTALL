@@ -1,0 +1,175 @@
+﻿*** compiling LGCK Builder
+
+Known Issues
+------------
+
+Menu bar missing in qt5 on gnome3, Fix available here:
+https://bugs.launchpad.net/ubuntu/+source/appmenu-qt5/+bug/1307619
+
+
+1.0 Dependancies
+----------------
+
+Please make certain that you have all the necessary libraries 
+installed on your system. Depending on your OS you may need one or 
+more of the following. Contact us to report problems.
+
+build dependencies:
+
+    debhelper (>= 9),
+    qtbase5-dev,
+    qtbase5-dev-tools,
+    qt5-qmake,
+    libqt5opengl5-dev,
+    zlib1g-dev,
+    libqt5scintilla2-dev,
+    liblua5.2-dev,
+    libftgl-dev,
+    libsdl2-dev,
+    libsdl2-mixer-dev,
+    freeglut3-dev
+
+runtime dependencies:
+
+    libqt5gui5,
+    libqt5widgets5,
+    libqt5core5a,
+    libqt5opengl5,
+    zlib1g,
+    libqt5scintilla2-11,
+    lua5.2,
+    libftgl2,
+    libsdl2-2.0-0,
+    libsdl2-mixer-2.0-0,
+    freeglut3
+
+
+optional:
+    python 2/3 (optional)
+
+1.1 Getting the source for the offical source repository
+---------------------------------------------------------
+
+git clone https://gitlab.com/lgck/lgck-builder.git
+
+
+1.2 Prepare your machine by installing the build environement
+------------------------------------------------------------
+
+(this assumes you are running Debian 8, Ubuntu 14.02 or one of
+the variants, other desktop might require some tweaking.)
+
+You need elevant priviledge which you can using either
+  su root
+  sudo << cmd >>
+    e.g.    sudo apt-get install ... ...
+
+apt-get install qtbase5-dev qtbase5-dev-tools qt5-qmake libqt5opengl5-dev zlib1g-dev libqt5scintilla2-dev liblua5.2-dev
+apt-get install libftgl-dev libsdl2-dev libsdl2-mixer-dev freeglut3-dev cmake g++
+
+
+1.3 Prepare your machine by installing the runtime environement
+------------------------------------------------------------
+
+(this assumes you are running Debian 8, Ubuntu 14.02 or one of
+the variants, other desktop might require some tweaking.)
+
+You need elevant priviledge which you can using either
+  su root
+  sudo << cmd >>
+    e.g.     sudo apt-get install ... ...
+
+apt-get install libqt5gui5 libqt5widgets5  libqt5core5a libqt5opengl5, zlib1g libqt5scintilla2-11
+aot-get install lua5.2 libftgl2 libsdl2-2.0-0 libsdl2-mixer-2.0-0 freeglut3
+
+
+2.0 Compile and Install from source (KDE)
+-----------------------------------------
+
+You shoudn't be using a root account at this. A regular user is needed
+to run the following commands.
+
+1a) Refresh the CMakeLists.txt by running the python script.
+
+cd src/lgck-builder/
+python ../tools/cmakeu.py cmakeu.json
+
+2) To compile from source, you'll also need CMake. 
+
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX='/usr/bin' && make
+
+3a) You can install the binary using the following step
+  su root
+  make install 
+
+3b) or 
+  sudo make install
+
+The resulting executive file is call: lgck-builder
+(if everything worked fine, it should be copied in the bin folder)
+
+
+2.0.1 for a release
+-------------------
+
+cmake .. -DCMAKE_INSTALL_PREFIX='/usr/bin' -DCMAKE_BUILD_TYPE=Release
+
+
+2.0.2 if you want full debug
+----------------------
+
+cmake .. -DCMAKE_INSTALL_PREFIX='/usr/bin' -DCMAKE_BUILD_TYPE=debugfull
+
+
+2.0.3 more information
+----------------------
+
+http://techbase.kde.org/Development/CMake/Addons_for_KDE
+
+2.2 Compiling for other Linux and Windows
+-----------------------------------------
+
+a. Users also have the option to build lgck-builder/lgck-builder.pro 
+with qtCreator. (if you are unsure what to download, just get
+the full `Qt SDK` for your platform)
+
+http://qt.nokia.com/downloads
+
+b. Alternatively, they can run qmake at the command prompt.
+
+cd src/lgck-builder/
+qmake lgck-builder.pro
+    (or /usr/lib/x86_64-linux-gnu/qt5/bin/qmake lgck-builder.pro)
+make
+
+
+
+Unix / Mac
+----------
+
++It's important to get qt libraries that match the ones that your distribution
++was compiled against otherwise you may run into issues.
+
+
+3.0 Testing 
+-----------
+
+If you need a game database to hack, you can use some of these
+
+http://sourceforge.net/projects/lgck/files/Demo%20Games/
+
+
+4.0 License
+-----------
+
+This release of LGCK Builder is open source under the GPL 3.
+
+See techdocs/licenses/license.txt
+
+
+5.0 Feedback 
+------------
+
+If you have questions, comments or suggestions,
+you can contact us at lgckbuilder @ yahoo.ca

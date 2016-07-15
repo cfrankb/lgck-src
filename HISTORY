@@ -1,0 +1,274 @@
+HISTORY OF LGCK BUILDER
+
+*** 0.6.0.6
+
+- ENGINE: replaced scene list w/ ptr 
+- ENGINE: new events: Level.onHandler, Level.onGoalKilled
+- ENGINE: added borderColor, introBkColor, introTextColor
+- ENGINE: added experimental barebone runtimes (opengl, SDL, SFML)
+- ENGINE: new game events: onPickup(), onSaveGame(), onLoadGame()
+- ENGINE: new game events: onRestartLevel(), onNotifyClosure()
+- ENGINE: new sprite event: EO_NOTIFYCLOSURE
+- ENGINE: new level event: EL_NOTIFYCLOSURE
+- ENGINE: custom scrolling layers (see layer_setOffset)
+- ENGINE: tied EL_RESTART event with snapshot_reload
+- ENGINE: replaced FTGL w/ lgck's own font rendering code
+- ENGINE: added colorMod (primary light source)
+- EDITOR: added scriptWizard
+- EDITOR: autoupdater to check for new versions
+- EDITOR: edit raw path (sprite)
+- EDITOR: GUI to resize font size in the editor pane
+- EDITOR: SpriteWiz waypoint added
+- EDITOR: added Edit Images pop-menu item for sprites
+- EDITOR: testLevel nows allows to play a full game
+- LUA: updateJoyState()
+- LUA: callGameEvent(), sprite_unmarkAsGoal()
+- LUA: sprite:get(), sprite_set()
+- LUA: sprite:get()/set() can access EXTRA_XXXX values directly
+- LUA: sprite:hitTest()
+- LUA: display_sizeText(), Display:sizeText()
+- LUA: ss_drawText(), ss_paint(), ss_paintImage(), ss_clear()
+- LUA: Counters:inc(), Counters:dec(), Counters:add()
+- LUA: warpTo(), strv_get(), strv_set(), strv_del()
+- LUA: snapshot_take(), snapshot_reload()
+- LUA: layer_setOffsetX(), layer_setOffsetY()
+- LUA: SHL(), SHR(), ss_notifyClosure()
+- BUG FIX: When more than 10 Displays active, only the last one is displayed
+- BUG FIX: random crash when sprite is added to main layer
+
+*** 0.6.0.5
+
+- ENGINE: customs strings for each sprite instance
+- EDITOR: migrated to qt5
+- EDITOR: GUI to change default frame per sprite
+- EDITOR: toolbox playSound() menu item
+- EDITOR: customizable shortcuts for LGCK Builder
+- EDITOR: GUI for toolbars (main, level, layer)
+- EDITOR: GUI for path creation
+- ENGINE: custom paths for each sprite
+- ENGINE: up to four fwClass sprites can share the same map location
+- ENGINE: hidden inventory item flag
+- ENGINE: reimplemented the collision map w/ std::unordered_map
+- ENGINE: interfaces w/ implementers: Graphic, Sound and Music
+- ENGINE: replaced SFML::Graphics w/ OpenGL
+- ENGINE: replaced SFML::Music w/ SDL::Music
+- ENGINE: replaced SFML::Sound w/ SDL
+- ENGINE: added Counters (that can be accessed via scripting)
+- ENGINE: significantly improved level load time
+- ENGINE: added events: Game:onGoalKilled and Level:onGoalKilled
+- ENGINE: added Level UUID
+- ENGINE: improved center on screen during action
+- LUA: sprite:frameCount(), frameSet_getSize
+- LUA: Sprite:getString(), Sprite:isFrozen(), Sprite:isGoal()
+- LUA: Counters:get(), Counters:set()
+- BUG FIX: layer element count is wrong for FW/BK layers
+- BUG FIX: on wrap arround screens, viewport moves unexpectely
+- BUG FIX: clearALL button now behaves as expected
+- BUG FIX: keyDown msg continued infinitely when focus was lost
+
+*** 0.6.0.4
+
+- ENGINE: layers can be moved by position
+- EDITOR: importImage can now splice images
+- EDITOR: importImageWiz added
+- EDITOR: added gamewiz first version
+- EDITOR: added copy, cut, paste and delete to levelView
+- EDITOR: spritewiz added playerbullet template
+- LUA: added Sprite:width(), Sprite:height() 
+- LUA: added Sprite:childCount(), Sprite:setOwner()
+- ENGINE: player.onHandler called in managePlayer()
+- ENGINE: added sprite activation policy (auto, userdef)
+- BUG FIX: spritewiz now properly displays image size (mask: 9999x9999)
+- TOOLS: included is the new OBL5EDIT sprite editor to replace OBL4EDIT
+- TOOLS: OBL5t updated to support new OBL5 format
+
+*** 0.6.0.3
+
+- EDITOR: edit pan can be resized
+- BUG FIX: animations weren't cleared when sprite was deleted
+
+*** 0.6.0.2
+
+- ENGINE: antigravity flag extends to monsters
+- ENGINE: added solidity concept (overide)
+- EDITOR: added `sound tab` to SpriteWizard
+- ENGINE: added multiselection
+- BUG FIX: Spelling error, "Brint to front" (reported by Tim)
+- BUG FIX: Menu not updated when sprite dragged (reported by Tim)
+- BUG FIX: WINXP crash when sprite was dropped on empty pane (reported by Tim)
+- BUG FIX: next button greyed out in SpriteWiz
+
+*** 0.6.0.1a
+
+- BUG FIX: crash cause by bad sprite mapping
+- BUG FIX: crash when no player object was present
+
+*** 0.6.0.1
+
+- ENGINE: fixed CPath array so it can grow
+- ENGINE: added seed uid for all sprites
+- ENGINE: added Game:OnCompleteLevel
+- EDITOR: implemented continuity (test game)
+- BUG FIX: fixed a few mapping bugs introduced in 0.5.0.7
+- BUG FIX: icon incorrect modified in SpriteList
+- EDITOR: SpriteWizard updated with many new pages
+- ENGINE: added antigravity flag for all fwClass objects
+- ENGINE: added automatic goal flag
+- BUG FIX: misaligned sprites on grid
+- ENGINE: nosplat flag extended to objects
+- ENGINE: implemented monster/object rebirth
+- BUG FIX: deleting the last and only level resulted in a crash (fixed)
+
+*** 0.6.0.0
+
+- LUA: MIN(), MAX(), testKey(), setKey()
+- LUA: getLastKey(), clearKeys()
+- ENGINE: new Event: level.onKeyPressed 
+- ENGINE: new Event: level.onKeyUp
+- ENGINE: improved qt keyReflector
+- EDITOR: source editor w/ word completion and colored syntax
+- EDITOR: sprite event dialog replaced with inline editor
+- BUG FIX: fixed an error in obl5t (frameSet.cpp)
+
+*** 0.5.0.9
+
+- GUI: added a new toolbox to drag&drop sprites on the level
+- GUI: added popup menu to spriteBox
+- GUI: added popup menu to LevelView
+- GUI: added checkmarks to sprite event combo
+- BUG FIX: png transparency bug in obl5t
+- BUG FIX: unMap bug w/ random attacker
+- ENGINE: OBL5 format moved to version 0x501
+- TOOLS: obl5t merged now uses the shared libraries
+
+*** 0.5.0.8a
+
+- LUA: added clearSprite(), openStream(), playStream(), stopStream()
+- BUG FIX: gui menu item next/prev level not enabled/disabled correctly
+- EDITOR: during import now asks about transparency when the image has none set
+- EDITOR: changing imagetSet for an object remove all animation sequences
+- EDITOR: create imageSet button added to objectProp sheet
+- CODE: began early work on KDE conversion phase
+- TOOLS: easyDoc got a facelift today. Most dialogs now resize correctly
+
+*** 0.5.0.8
+
+- ENGINE: added CMusic class to handle streaming music (ogg)
+- ENGINE: more reorganization of the code
+- ENGINE: added closureTime, closureEvent
+- ENGINE: added Level property : music
+- BUG FIX: windows-setup now uses static build (ati issue on win7)
+
+*** 0.5.0.7
+
+- ENGINE: Created CActor which replaces CLevelEntry at runtime.
+- ENGINE: reorganized the code to be more OO-like
+- ENGINE: added NO_SPLAT flag to prevent player from crushing monsters
+- ENGINE: added properties `max active bullets`, `fire rate`
+- ENGINE: improved the collision detection code
+- ENGINE: maxFall property now applies to monster
+- ENGINE: bullet to monster attack now do damage
+- LUA: added isHidden(), isDead(), land(), triggerHitState() 
+- LUA: added isMonster(), getPlayerC(), getPlayer()
+- LUA: added tryPath(), stopAnimation(), callObjEvent(), killSprite(), spawn()
+- EDITOR: added menu items: view source, edit object 
+- EDITOR: new shortcuts F9 and SHIFT-F9 (edit local, edit object)
+
+*** 0.5.0.6
+
+- GUI: added status text to all implemented menu items
+- LUA: added setImage(), getImage(), Sprite:SetImage()
+- LUA: added setState(), findSprite(), alert()
+- LUA: added getExtra(), getExtraC(), getExtraUID()
+- LUA: added triggerPlayerHitState()
+- LUA: added hitTest(), hitTestC()
+- LUA: added Extra class to provide access to sprites runtime data (readonly)
+- ENGINE: onZKEY event called for player object when Z-KEY is pressed
+- ENGINE: ZKeyTrigger class no longer changes the image of the source object
+- ENGINE: noChangeAtDeath flag to preserve sprite corpses
+- ENGINE: three jump modes available (VLA3, GIANA and MIXED)
+   VLA3: is the engine default; you need to press JUMP + AIM
+   GIANA: press UP to jump and move LEFT/RIGHT 
+   MIXED: press JUMP and move LEFT/RIGHT 
+- BUG FIX: hitTest logic not working in some cases
+
+*** 0.5.0.5 
+
+- GUI: added pause/restart/debug menu items.
+- GUI: added splash screen
+- BUG FIX: exiting the game from the menu corrupts the imageSets
+- BUG FIX: UI for animation (add, duplicate and delete) showing wrong tooltips
+- BUG FIX: a monster repeating animation prevents 'death sequence'
+- BUG FIX: player sprite disapears from view when killed (animSeq bug)
+- ENGINE: maxFall now an object property (player only atm)
+- ENGINE: added game.prepareLevel() event
+- ENGINE: added object.mouseClickLeft and object.mouseClickRight events
+- DEMOS: updated the demos
+
+*** 0.5.0.4a 
+
+- GUI: new icons curtosy of Ronnie Edwards 
+- BUG FIX: player hurt animation not running
+- BUG FIX: animation doesn't switch to UP while default animation running (loop)  
+- BUG FIX: skill level not initialized properly through gui (editor)
+- BUG FIX: layer UI not updated correctly in editor
+- BUG FIX: class_immediatly_deadly not working
+- BUG FIX: player can be hurt after being killed
+- BUG FIX: player leaves the viewport
+- BUF FIX: mysterious crash condition reported by model76 (windows only)
+- LUA: Inventory Class 
+- LUA: addToInventory(), removeFromInventory(), hasItem() and resetInventory()
+- LUA: getSkill() (alias for SKILL)
+- ENGINE: fallSpeed now an object property
+- CODE: reorganized some files to speed up compilation time
+
+*** 0.5.0.4 
+
+- ENGINE: added custom animation sequences for all objects
+- ENGINE: per player object jump paths  
+- LUA: tryAnimation()
+- LUA: setBkColor, setBkColorC
+- LUA: getBkColor, getBkColorC
+- LUA: setLookUp, getLookUp
+- LUA: setLevelGoal, getLevelGoal
+- LUA: getTicks(), ticks()
+- LUA: getSpriteCount()
+- LUA: newColor
+- LUA: copySpriteC, copySprite
+- etc.
+- DEMOS: updated the demos to use the latest features
+
+*** 0.5.0.3
+
+- BUG FIX: an application crash when an imageSet is added to a fresh database.
+
+*** 0.5.0.2
+
+- ENGINE: implemented optional lookup/lookdn
+- ENGINE: added new scroll ratio 1/2 and 1/4
+- ENGINE: per level game speed (1-200)
+- ENGINE: systemClass demoted to ObjectInvisibleTag (systemInvisible)
+- ENGINE: added foreground layers and support scripting functions
+- LUA: setWrapFlag()
+- LUA: getWrapFlag()
+- LUA: hasGravity()
+- LUA: new Layer and Element class 
+- TOOLS: include a copy of obl5t
+- TOOLS: include a copy of EasyDoc 
+
+*** 0.5.0.1a
+
+- implemented wrap around  
+- fixed monster ai in gravity free mode
+
+*** 0.5.0.1
+
+- ENGINE: parallax scrolling support 
+- ENGINE: inventory system 
+- ENGINE: scripting event model for objects
+- ENGINE: customizable overlay displays (scores, time left, lives etc.)
+
+*** 0.5.0.0
+
+- ENGINE: ported the MFC code to qt (first open source release)
+
