@@ -18,6 +18,7 @@ DEFINES += USE_QFILE=1
 win32:DEFINES += MAKE_WIN32
 win32:LIBS += -L../../redist/lib
 LIBS += -lz
+QMAKE_CXXFLAGS      += -std=c++0x -O3
 
 SOURCES += mainwindow.cpp \
     main.cpp\
