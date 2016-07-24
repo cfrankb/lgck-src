@@ -23,6 +23,7 @@
 CWSpriteList::CWSpriteList(QWidget *parent)
     : QTreeWidget(parent)
 {
+    m_drag = true;
 } 
 
 void CWSpriteList::mousePressEvent(QMouseEvent *event)
@@ -35,7 +36,7 @@ void CWSpriteList::mousePressEvent(QMouseEvent *event)
 
 void CWSpriteList::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->buttons() & Qt::LeftButton) {
+    if ((event->buttons() & Qt::LeftButton) && m_drag) {
           int distance = (event->pos() - m_startPos).manhattanLength();
           if (distance >= QApplication::startDragDistance()) {
 
@@ -68,4 +69,9 @@ void CWSpriteList::mouseMoveEvent(QMouseEvent *event)
 void CWSpriteList::contextMenuEvent(QContextMenuEvent* event)
 {
     Q_UNUSED(event);
+}
+
+void CWSpriteList::enableDrag(bool b)
+{
+    m_drag = b;
 }

@@ -55,6 +55,7 @@
 #include "DlgObject.h"
 #include "DlgFrameSet.h"
 #include "DlgTestLevel.h"
+#include "DlgExportSprite.h"
 #include "WSpriteList.h"
 #include "WEditEvents.h"
 #include "WizFrameSet.h"
@@ -1631,7 +1632,9 @@ void MainWindow::on_actionRestart_triggered()
 
 void MainWindow::on_actionExport_Sprite_triggered()
 {
-    warningMessage("Not implemented yet!");
+    //warningMessage("Not implemented yet!");
+    CDlgExportSprite dlg(this,&m_doc);
+    dlg.exec();
 }
 
 void MainWindow::on_actionView_Source_triggered()

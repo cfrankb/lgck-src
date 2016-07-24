@@ -36,12 +36,14 @@ public:
  
 public:
     CWSpriteList(QWidget *parent = 0);
+    void enableDrag(bool b);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);    
     void contextMenuEvent(QContextMenuEvent* event);
     QPoint m_startPos;
+    bool m_drag;
     
 };
  

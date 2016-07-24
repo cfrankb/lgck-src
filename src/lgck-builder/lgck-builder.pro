@@ -68,6 +68,7 @@ SOURCES +=  mainwindow.cpp \
     WAnimation.cpp \
     WHotKey.cpp \
     Pixel.cpp \
+    WFileSave.cpp \
     ../shared/SndArray.cpp \
     ../shared/Settings.cpp \
     ../shared/ProtoArray.cpp \
@@ -119,7 +120,9 @@ SOURCES +=  mainwindow.cpp \
     thread_updater.cpp \
     ../shared/Snapshot.cpp \
     ../shared/FileMem.cpp \
-    WizFont.cpp
+    OBL5File.cpp \
+    WizFont.cpp \
+    DlgExportSprite.cpp
 
 HEADERS  +=  mainwindow.h \
     LevelView.h \
@@ -219,7 +222,10 @@ HEADERS  +=  mainwindow.h \
     ../shared/IFile.h \
     ../shared/Font.h \
     ../shared/implementers/opengl/glhelper.h \
-    WizFont.h
+    WFileSave.h \
+    OBL5File.h \
+    WizFont.h \
+    DlgExportSprite.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \
@@ -244,5 +250,6 @@ FORMS  += mainwindow.ui \
     WizFrameSet.ui \
     WizGame.ui \
     WizScript.ui \
-    WizFont.ui
+    WizFont.ui \
+    DlgExportSprite.ui
 

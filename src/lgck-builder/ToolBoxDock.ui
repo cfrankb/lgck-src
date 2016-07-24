@@ -12,8 +12,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>151</width>
-    <height>208</height>
+    <width>155</width>
+    <height>211</height>
    </size>
   </property>
   <property name="font">
@@ -41,7 +41,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_sprites">
        <attribute name="title">

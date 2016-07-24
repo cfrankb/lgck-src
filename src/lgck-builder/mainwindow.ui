@@ -680,7 +680,7 @@
   </action>
   <action name="actionExport_Sprite">
    <property name="text">
-    <string>Export Sprite</string>
+    <string>Export Sprites</string>
    </property>
   </action>
   <action name="actionView_Source">
