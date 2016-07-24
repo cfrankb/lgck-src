@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="easyDoc.qrc">
+   <iconset resource="easydoc.qrc">
     <normaloff>:/images/active.png</normaloff>:/images/active.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget"/>
@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>409</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Help">
@@ -43,6 +43,12 @@
      </property>
      <addaction name="actionNothing_yet"/>
     </widget>
+    <widget class="QMenu" name="menu_Import">
+     <property name="title">
+      <string>&amp;Import...</string>
+     </property>
+     <addaction name="actionGameLua"/>
+    </widget>
     <widget class="QMenu" name="menu_Export">
      <property name="title">
       <string>&amp;Export...</string>
@@ -57,11 +63,20 @@
     <addaction name="separator"/>
     <addaction name="action_save"/>
     <addaction name="actionSave_as"/>
+    <addaction name="separator"/>
     <addaction name="menu_Export"/>
+    <addaction name="menu_Import"/>
     <addaction name="separator"/>
     <addaction name="action_quit"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionSave_HTML"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuOptions"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -102,6 +117,11 @@
     <string>nothing yet</string>
    </property>
   </action>
+  <action name="actionGameLua">
+   <property name="text">
+    <string>GameLua.h</string>
+   </property>
+  </action>
   <action name="actionSave_as">
    <property name="text">
     <string>Save &amp;As...</string>
@@ -115,11 +135,6 @@
   <action name="actionHTML">
    <property name="text">
     <string>HTML</string>
-   </property>
-  </action>
-  <action name="actionEWiki">
-   <property name="text">
-    <string>eWiki</string>
    </property>
   </action>
   <action name="actionFunctionList">
@@ -140,10 +155,18 @@
     <string>Ctrl+W</string>
    </property>
   </action>
+  <action name="actionSave_HTML">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save HTML</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="easyDoc.qrc"/>
+  <include location="easydoc.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -122,6 +122,8 @@ void CDatabase::dump(CFileWrap & file)
             "   div.fnFinal {font-size: 9pt; color:blue; font-weight: bold; border-left-width:thin; border-top-width:thin; border-style:solid;  xbackground-color:yellow; xborder-color: black }\r\n"\
             "   div.code {border-left-width:thin; xmargin-top:1em; border-style:solid; border:2px dotted black;background:#eee; padding-left:20px; padding-bottom:20px; padding-top:10px; }\r\n"\
             "   pre.pageBody {width : 540px; font-size:12px;}\n" \
+            "   span.typeany {font-weight: bold; font-style:italic; color:blue}\n" \
+            "   span.typevoid {font-weight: bold; font-style:italic; color:black}\n" \
             "  </style>\r\n";
     if (header) {
         file += " </head>\r\n";
@@ -213,3 +215,76 @@ void CDatabase::importText(CFileWrap & file)
     delete [] buf;
 }
 */
+
+void CDatabase::importGameLua(const char *cdata)
+{
+    char *data = new char[strlen(cdata)+1];
+    strcpy(data, cdata);
+    char *p = data;
+    while (*p) {
+        char *pe = strstr(p, "\n");
+        if (pe) {
+            *pe = 0;
+        }
+        char *t = strstr(p, "alias");
+        if (t && *p != '#') {
+            char *pp = strstr(t, "\"");
+            char *alias_name = NULL;
+            char *fn_name = NULL;
+            if (pp) {
+              t = strstr(++pp, "\"");
+              if (t) {
+                  *t = 0;
+                  alias_name = pp;
+                  t = strstr(++t, ",");
+                  if (t) {
+                      ++t;
+                      while (*t == ' ') ++t;
+                      fn_name = t;
+                      while (isalnum(*t) || *t=='_') ++t;
+                      *t = 0;
+                  }
+              }
+            }
+            if (alias_name && fn_name) {
+                int iAlias = m_functions.find(alias_name);
+                int iFn = m_functions.find(fn_name);
+                if (iAlias != -1 && iFn == -1) {
+                    qDebug("alias %s >> %s", alias_name, fn_name);
+                    //qDebug("aaa3");
+                    CFunction fn;
+                    fn.copy(m_functions[alias_name]);
+                    //qDebug("aaa2 %d", iAlias);
+                    m_functions.removeAt(iAlias);
+                    // add function (renamed)
+                    //qDebug("aaa1");
+                    fn.name = fn_name;
+                    //qDebug("aaa4");
+                    fn.m_alias.append(alias_name);
+                    //qDebug("aaa5");
+                    m_functions.add(fn, true);
+                    //qDebug("aaa7");
+                    // add alias
+                    /*
+                    fn.m_alias.clear();
+                    fn.desc = QString("This is an alias for %1.").arg(fn_name);
+                    fn.example = "";
+                    m_functions.add(fn, true);*/
+                } else if (iFn != -1 ) {
+                    qDebug("fn %s add alias %s", fn_name, alias_name);
+                    CFunction & fn = m_functions[fn_name];
+                    if (!fn.m_alias.contains(alias_name)) {
+                        fn.m_alias.append(alias_name);
+                    }
+                } else {
+                    qDebug("EXCEPTION fn %s add alias %s", fn_name, alias_name);
+                }
+            }
+        }
+        // next line
+        if (pe){
+            p = ++pe;
+        }
+    }
+    delete []data;
+}

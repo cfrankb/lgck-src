@@ -17,6 +17,8 @@
 */
 
 #include "Class.h"
+#include "Params.h"
+#include <QStringList>
 
 CClass::CClass()
 {

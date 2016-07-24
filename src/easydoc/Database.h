@@ -49,6 +49,7 @@ public:
     void exportList(CFileWrap & file);
     void exportText(CFileWrap & file);
     void exportWiki(const QString &path);
+    void importGameLua(const char *cdata);
 
     void setFileName(const QString fileName);
     QString getFileName();
@@ -63,8 +64,7 @@ public:
 protected:
 
     enum {
-//        VERSION = 0x0003
-       VERSION = 0x0004
+        VERSION = 0x0005
     };
 
     static char m_signature[];

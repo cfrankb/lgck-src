@@ -51,6 +51,8 @@ private slots:
     void on_btnDelete_IN_clicked();
     void on_btnAdd_IN_clicked();
     void on_treeIn_doubleClicked(QModelIndex index);
+    void on_btnAdd_Alias_clicked();
+    void on_btnDelete_Alias_clicked();
 };
 
 #endif // DLGFUNCTION_H

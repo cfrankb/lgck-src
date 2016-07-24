@@ -25,7 +25,7 @@ CFunctions::CFunctions()
 {
     m_fnMax = GROWBY;
     m_fnCount = 0;
-    m_functions = new CFunction [ m_fnMax];
+    m_functions = new CFunction [m_fnMax];
 }
 
 CFunctions::~CFunctions()
@@ -85,7 +85,6 @@ int CFunctions::insertAt(int i, CFunction & fn)
         for (int i=0; i < m_fnCount; ++i) {
             t [ i ] = m_functions [ i ];
         }
-
         delete [] m_functions;
         m_functions = t;
     }
@@ -102,8 +101,8 @@ int CFunctions::insertAt(int i, CFunction & fn)
 
 void CFunctions::removeAt(int i)
 {
-    for (; i < m_fnCount - 1; ++i) {
-        m_functions[i] = m_functions[i + 1];
+    for (int j=i; j < m_fnCount - 1; ++j) {
+        m_functions[j] = m_functions[j + 1];
     }
     --m_fnCount;
 }
@@ -117,35 +116,9 @@ bool CFunctions::write(CFileWrap & file)
 {
     file << m_fnCount;
     for (int i=0; i < m_fnCount; ++i) {
-
         CFunction & fn = m_functions[i];
-
-        file << fn.name.trimmed();
-        file << fn.desc.trimmed();
-        file << fn.example.trimmed();
-
-        file << fn.In().getSize();//.pCountIn;
-        for (int j=0; j < fn.In().getSize(); ++j) {
-            Param & p = fn.In()[j];
-            file << p.name.trimmed();
-            file << p.type.trimmed();
-            file << p.desc.trimmed();
-            file << p.flags;
-        }
-
-        file << fn.Out().getSize();//fn.pCountOut;
-        for (int j=0; j < fn.Out().getSize(); ++j) {
-            Param & p = fn.Out()[j];
-            file << p.name.trimmed();
-            file << p.type.trimmed();
-            file << p.desc.trimmed();
-            file << p.flags;
-        }
-
-        file << fn.state;
-        file << fn.lang;
+        fn.write(file);
     }
-
     return true;
 }
 
@@ -155,71 +128,19 @@ bool CFunctions::read(CFileWrap & file, int version)
     int count;
     file >> count;
     for (int i=0; i < count; ++i) {
-
         CFunction fn;
-
-        file >> fn.name;
-        file >> fn.desc;
-        file >> fn.example;
-        int size;
-        file >> size;// fn.pCountIn;
-
-        fn.In().forget();
-        for (int j=0; j < size; ++j) {
-//            Param & p = fn.paramsIn[j];
-            Param p; // = fn.paramsIn[j];
-            file >> p.name;
-            file >> p.type;
-            file >> p.desc;
-            if (version > 1) {
-                file >> p.flags;
-            } else {
-                p.flags = 0;
-            }
-
-            fn.In().add(p);
-        }
-
-        file >> size; //fn.pCountOut;
-        fn.Out().forget();
-        for (int j=0; j < size; ++j) {
-//            Param & p = fn.paramsOut[j];
-            Param p;// = fn.paramsOut[j];
-            file >> p.name;
-            file >> p.type;
-            file >> p.desc;
-            if (version > 1) {
-                file >> p.flags;
-            } else {
-                p.flags = 0;
-            }
-
-            fn.Out().add(p);
-        }
-
-        if (version > 0) {
-            file >> fn.state ;
-            file >> fn.lang;
-        } else {
-            fn.state = 0;
-            fn.lang = 0;
-        }
-
+        fn.read(file, version);
         add(fn, false);
     }
-
     return true;
 }
 
 CFunctions & CFunctions::operator = (CFunctions & src)
 {
-    qDebug("eh\n");
     m_fnCount = 0;
-
     for (int i = 0; i < src.getSize(); ++i) {
         add(src[i], false);
     }
-
     return *this;
 }
 
@@ -263,7 +184,8 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
         }
 
         QString hdr;
-        hdr.sprintf("%c%s %s%s(", states[fn.state], q2c(ret), q2c(prefix), q2c(fn.name));
+//        hdr.sprintf("%c%s %s%s(", states[fn.state], q2c(ret), q2c(prefix), q2c(fn.name));
+        hdr.sprintf("%c %s%s()\n", states[fn.state], q2c(prefix), q2c(fn.name));
 
         QString paramsIn;
         QString expIn;
@@ -292,16 +214,17 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
                 s += "...";
             }
 
+            /*
             if (param.flags & CFunction::FLAG_OPTIONAL) {
                 hdr += QString("[ %1 ]").arg(s);
             } else {
                 hdr += s;
-            }
+            }*/
 
             //fn.pCountIn
-            if (j < fn.In().getSize() - 1) {
-                hdr += ", ";
-            }
+//            if (j < fn.In().getSize() - 1) {
+          //      hdr += ", ";
+  //          }
 
             // IN
 
@@ -313,7 +236,8 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
                     paramsIn += "       ";
                 }
 
-                paramsIn += QString ("[[ %1 ]] %2%3\n").arg(param.type).arg(param.name).arg(o);
+//                paramsIn += QString ("[[ %1 ]] %2%3\n").arg(param.type).arg(param.name).arg(o);
+                paramsIn += QString ("<span class=\"typeany\">%1</span> %2%3\n").arg(param.type).arg(param.name).arg(o);
 
                 QString s;
                 s.sprintf("   %-16s%s\n", q2c(param.name), q2c(param.desc));
@@ -324,17 +248,16 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
             }
         }
 
-        hdr += QString(") [%1]\n\n").arg(langs[fn.lang]);
+       // hdr += QString(") [%1]\n\n").arg(langs[fn.lang]);
 
         if ( paramsIn.isEmpty() ) {
-            paramsIn = "  IN:  na\n";
+            paramsIn = "  IN:  void\n";
         }
 
         QString paramsOut;
         QString expOut;
         bool hasExpOut = false;
 
-        //fn.pCountOut
         for (int j = 0; j < fn.Out().getSize(); ++j) {
 
             Param & param  = fn.Out()[j];
@@ -347,8 +270,7 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
                     paramsOut += "       ";
                 }
 
-                paramsOut += QString ("[[ %1 ]] %2\n").arg(param.type).arg(param.name);
-
+                paramsOut += QString ("<span class=\"typeany\">%1</span> %2\n").arg(param.type).arg(param.name);
                 QString s;
                 s.sprintf("   %-16s%s\n", q2c(param.type), q2c(param.desc));
                 expOut += s;
@@ -359,15 +281,15 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
         }
 
         if ( paramsOut.isEmpty() ) {
-            paramsOut = "  OUT: na\n";
+            paramsOut = "  OUT: void\n";
         }
 
+        file += QString("<a name=\"%1%2\"></a>").arg(prefix).arg(fn.name);
         file &= hdr;
         file &= paramsIn;
         file &= "\n";
 
         file &= paramsOut;
-        //file += "\n";
 
         if (hasExpIn) {
             file &= "\n\n";
@@ -392,34 +314,25 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
         if (i != getSize() -1) {
             file &= "\n\n\n\n";
         }
-    }
 
+        if (fn.m_alias.count()) {
+            file &= "+++alias:\n";
+            QListIterator<QString> itr (fn.m_alias);
+            while (itr.hasNext()) {
+                QString alias = itr.next();
+                if (find(alias)!=-1) {
+                    file += QString("&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"#%1%2\">%1%2</a><br>\n").arg(prefix).arg(alias);
+                } else {
+                    file += QString("&nbsp;&nbsp;&nbsp;&nbsp;%1<br>\n").arg(alias);
+                }
+            }
+            file &= "\n";
+        }
+    }
     file &= "\n";
 }
 
-CFunction & CFunction::operator = (CFunction & s)
-{
-    name = s.name;
-    state = s.state;
-    lang = s.lang;
-    desc = s.desc;
-    example = s.example;
-
-    In().forget();
-    Out().forget();
-
-    for (int i=0; i < s.In().getSize(); ++i) {
-        In().add(s.In()[i]);
-    }
-
-    for (int i=0; i < s.Out().getSize(); ++i) {
-        Out().add(s.Out()[i]);
-    }
-
-    return *this;
-}
-
-void CFunction::copy (CFunction & s)
+void CFunction::copy(CFunction & s)
 {
     *this = s;
 }
@@ -510,7 +423,6 @@ void CFunctions::exportText(CFileWrap & file, QString prefix)
     }
     file += "\n";
 }
-
 
 void CFunctions::exportWiki(CFileWrap & file, QString prefix)
 {
@@ -608,7 +520,6 @@ void CFunctions::exportWiki(CFileWrap & file, QString prefix)
     file += "\n";
 }
 
-
 void CFunctions::exportListWiki(CFileWrap & file, QString prefix)
 {
     for (int i = 0; i < getSize(); ++i) {
@@ -658,4 +569,58 @@ void CFunctions::exportListWiki(CFileWrap & file, QString prefix)
         }
     }
     file += "\n";
+}
+
+static CFunction fnTmp;
+CFunction &CFunctions::operator [](const QString & name)
+{
+    int i = find(name);
+    if (i != -1) {
+        return m_functions[i];
+    } else {
+        return fnTmp;
+    }
+}
+
+int CFunctions::find(const QString & name)
+{
+    for (int i = 0; i < getSize(); ++i) {
+        if (m_functions[i].name==name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void CFunction::read(CFileWrap & file, int version)
+{
+    file >> name;
+    file >> desc;
+    file >> example;
+    In().read(file, version);
+    Out().read(file, version);
+    if (version > 0) {
+        file >> state ;
+        file >> lang;
+    } else {
+        state = 0;
+        lang = 0;
+    }
+    if (version > 4) {
+        file >> m_alias;
+    } else {
+        m_alias.clear();
+    }
+}
+
+void CFunction::write(CFileWrap & file)
+{
+    file << name.trimmed();
+    file << desc.trimmed();
+    file << example.trimmed();
+    In().write(file);
+    Out().write(file);
+    file << state;
+    file << lang;
+    file << m_alias;
 }

@@ -1,6 +1,6 @@
 /*
     easyDoc - documentation utility for LGCK Builder
-    Copyright (C) 2009, 2010  Francois Blanchette
+    Copyright (C) 2009, 2016  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,14 +31,15 @@ char MainWindow::m_fileFilter[] = "easyDoc (*.edoc)";
 char MainWindow::m_appName[] = "easyDoc";
 char MainWindow::m_author[] = "cfrankb";
 
+static QString g_fileNameHTML;
+
 MainWindow::MainWindow(QWidget *parent)
     : MainWindowParent(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     updateTitle();
     initFileMenu();
-
+    restoreSettings();
     m_tabs = new TabWidget(this);
     m_tabs->init(&m_doc);
     setCentralWidget(m_tabs);
@@ -84,13 +85,10 @@ void MainWindow::open(const QString & fileNameNew)
 
         if (!fileName.isEmpty()) {
             QString oldFileName = m_doc.getFileName();
-
             m_doc.setFileName(fileName);
-
             if (!m_doc.read())  {
                 warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
                 m_doc.setFileName(oldFileName);
-
                 // update fileList
                 QSettings settings(m_author, m_appName);
                 QStringList files = settings.value("recentFileList").toStringList();
@@ -120,6 +118,26 @@ bool MainWindow::save()
         warningMessage(tr("Can't write file"));
         m_doc.setFileName(oldFileName);
         return false;
+    }
+
+    if (m_saveHTML) {
+        CFileWrap file;
+        QString fileName = m_doc.getFileName();
+        const char EDOC[] = ".edoc";
+        if (fileName.endsWith(EDOC)) {
+            fileName = fileName.mid(0, fileName.length() - strlen(EDOC));
+        }
+        const char HTML[] = ".html";
+        if (!fileName.endsWith(HTML)) {
+            fileName += HTML;
+        }
+        if (file.open(fileName, QIODevice::WriteOnly)) {
+            m_doc.dump(file);
+            file.close();
+        }  else {
+            // write error
+            warningMessage( QString(tr("can't write to %1")).arg(fileName) );
+        }
     }
 
     updateRecentFileActions();
@@ -223,12 +241,10 @@ void MainWindow::openRecentFile()
     }
 }
 
-
 void MainWindow::on_action_open_triggered()
 {
     open("");
 }
-
 
 void MainWindow::on_action_save_triggered()
 {
@@ -244,25 +260,21 @@ void MainWindow::on_actionSave_as_triggered()
 
 void MainWindow::on_actionHTML_triggered()
 {
-    const char fileFilter[] = "html documents (*.htm)";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(fileFilter));
+    const char fileFilter[] = "html documents (*.html)";
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), g_fileNameHTML, tr(fileFilter));
     if (!fileName.isEmpty()) {
         CFileWrap file;
+        if (!fileName.endsWith(".html")) {
+            fileName += ".html";
+        }
         if (file.open(fileName, QIODevice::WriteOnly)) {
-
             m_doc.dump(file);
-
             file.close();
         }  else {
             // write error
             warningMessage( QString(tr("can't write to %1")).arg(fileName) );
         }
     }
-}
-
-void MainWindow::on_actionEWiki_triggered()
-{
-
 }
 
 void MainWindow::on_action_About_triggered()
@@ -288,15 +300,18 @@ void MainWindow::on_actionFunctionList_triggered()
     const char fileFilter[] = "text files (*.txt)";
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(fileFilter));
     if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".txt")) {
+            fileName += ".txt";
+        }
         CFileWrap file;
         if (file.open(fileName, QIODevice::WriteOnly)) {
-            //m_doc.dump(file);
             m_doc.exportList(file);
             file.close();
         }  else {
             // write error
             warningMessage( QString(tr("can't write to %1")).arg(fileName) );
         }
+        g_fileNameHTML = fileName;
     }
 }
 
@@ -305,6 +320,9 @@ void MainWindow::on_actionPlain_Text_triggered()
     const char fileFilter[] = "text files (*.edocx)";
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(fileFilter));
     if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".edocx")) {
+            fileName += ".edocx";
+        }
         CFileWrap file;
         if (file.open(fileName, QIODevice::WriteOnly)) {
             m_doc.exportText(file);
@@ -320,7 +338,7 @@ void MainWindow::on_actionWiki_triggered()
 {
     QSettings settings(m_author, m_appName);
     QString folder = settings.value("wikiFolder", "").toString();
-    folder = QFileDialog::getExistingDirectory(this, "Export...", folder);
+    folder = QFileDialog::getExistingDirectory(this, "Export folder...", folder);
     if (!folder.isEmpty()) {
         m_doc.exportWiki(folder+"/");
         settings.setValue("wikiFolder", folder);
@@ -334,4 +352,40 @@ void MainWindow::exportWiki(const char *path)
         folder += "/";
     }
     m_doc.exportWiki(folder);
+}
+
+void MainWindow::on_actionGameLua_triggered()
+{
+    const char fileFilter[] = "GameLua.h (GameLua.h)";
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import..."), "", tr(fileFilter));
+    if (!fileName.isEmpty()) {
+        CFileWrap file;
+        if (file.open(fileName, QIODevice::ReadOnly)) {
+            int size = file.getSize();
+            char *buf = new char[size+1];
+            buf[size]=0;
+            file.read(buf, size);
+            file.close();
+            m_doc.importGameLua(buf);
+            delete [] buf;
+            m_tabs->init(&m_doc);
+        }  else {
+            // read error
+            warningMessage( QString(tr("can't read %1")).arg(fileName) );
+        }
+    }
+}
+
+void MainWindow::on_actionSave_HTML_triggered(bool checked)
+{
+    m_saveHTML = checked;
+    QSettings settings(m_author, m_appName);
+    settings.setValue("saveHTML", m_saveHTML);
+}
+
+void MainWindow::restoreSettings()
+{
+    QSettings settings(m_author, m_appName);
+    m_saveHTML = settings.value("saveHTML", false).toBool();
+    ui->actionSave_HTML->setChecked(m_saveHTML);
 }

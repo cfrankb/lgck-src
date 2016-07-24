@@ -39,6 +39,9 @@ public:
     CFileWrap & operator += (QString str);
     CFileWrap & operator += (const char *);
 
+    CFileWrap & operator >> (QStringList & list);
+    CFileWrap & operator << (const QStringList & list);
+
     bool open(const QString,  QIODevice::OpenMode mode=QIODevice::ReadOnly);
     int read(void *buf, int size) { return file.read( (char*) buf, size); }
     int write(const void *buf, int size) { return file.write( (char*) buf, size); }

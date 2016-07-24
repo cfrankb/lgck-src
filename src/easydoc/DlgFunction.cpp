@@ -21,6 +21,7 @@
 #include "ui_DlgFunction.h"
 #include "DlgParam.h"
 #include <QMessageBox>
+#include <QInputDialog>
 
 CDlgFunction::CDlgFunction(QWidget *parent) :
     QDialog(parent),
@@ -123,6 +124,12 @@ void CDlgFunction::load(CFunction *fn)
     m_ui->cbState->setCurrentIndex( fn->state );
     m_ui->cbLang->setCurrentIndex( fn->lang );
 
+    QListIterator<QString> itr (fn->m_alias);
+    while (itr.hasNext()) {
+        QString current = itr.next();
+        m_ui->listAlias->addItem(current);
+    }
+
 }
 
 void CDlgFunction::save(CFunction *fn)
@@ -131,6 +138,11 @@ void CDlgFunction::save(CFunction *fn)
     fn->name = m_ui->eName->text().trimmed();
     fn->state = m_ui->cbState->currentIndex();
     fn->lang = m_ui->cbLang->currentIndex();
+    fn->m_alias.clear();
+    for(int i = 0; i < m_ui->listAlias->count(); ++i) {
+        QListWidgetItem* item = m_ui->listAlias->item(i);
+        fn->m_alias.append(item->text());
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -226,5 +238,24 @@ void CDlgFunction::on_btnDelete_OUT_clicked()
             QAbstractItemModel * model =  m_ui->treeOut->model();
             model->removeRow( index.row() );
         }
+    }
+}
+
+void CDlgFunction::on_btnAdd_Alias_clicked()
+{
+    QString str = QInputDialog::getText(this,tr("alias"), tr("function"));
+    if (!str.isEmpty()) {
+        m_ui->listAlias->addItem(str);
+        //m_fn->m_alias.append(str);
+    }
+}
+
+void CDlgFunction::on_btnDelete_Alias_clicked()
+{
+    QModelIndex index = m_ui->listAlias->currentIndex();
+    if (index.row() != -1) {
+        //m_fn->m_alias.removeAt(index.row());
+        QListWidgetItem * item = m_ui->listAlias->takeItem(index.row());
+        delete item;
     }
 }

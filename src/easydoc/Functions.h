@@ -20,32 +20,38 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-//#include "FileWrap.h"
-//#include "struct.h"
-
 class CFileWrap;
-class CParams;
-
 #include "Params.h"
 
 class CFunction
 {
 public:
-    CFunction() {};
-    CFunction(const CFunction & s);
-    ~CFunction() {};
+    CFunction() {}
+    /*CFunction(CFunction & s) {
+        name = s.name;
+        state = s.state;
+        lang = s.lang;
+        desc = s.desc;
+        example = s.example;
+        m_alias = s.m_alias;
+        paramsIn = s.In();
+        paramsOut = s.Out();
+    }*/
+    ~CFunction() {}
 
-    CFunction & operator = (CFunction & s);
+    //CFunction & operator = (CFunction & s);
     void copy(CFunction & s);
-
     CParams & In() { return paramsIn; }
-    CParams & Out() { return paramsOut; }
+    CParams & Out()  { return paramsOut; }
+    void read(CFileWrap & file, int version);
+    void write(CFileWrap & file);
 
     QString name;
     int state;
     int lang;
     QString desc;
     QString example;
+    QStringList m_alias;
 
     enum {
         FLAG_OPTIONAL = 1,
@@ -65,11 +71,13 @@ public:
     ~CFunctions();
 
     CFunction & operator [] (int i);
+    CFunction & operator [] (const QString & name);
     CFunctions & operator = (CFunctions & src);
     int getSize() const {
         return m_fnCount;
     }
 
+    int find(const QString & name);
     int add(CFunction & fn, bool sorted);
     int insertAt(int i, CFunction & fn);
     void removeAt(int i);
