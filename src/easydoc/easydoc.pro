@@ -26,7 +26,6 @@ SOURCES += Class.cpp \
     Sections.cpp \
     tabwidget.cpp \ 
     DlgSource.cpp \
-    EdocParser.cpp \
     helper.cpp
 
 HEADERS += Class.h \
@@ -44,7 +43,6 @@ HEADERS += Class.h \
     Sections.h \
     tabwidget.h \ 
     DlgSource.h \
-    EdocParser.h \
     helper.h
 
 FORMS += mainwindow.ui \
