@@ -169,19 +169,12 @@ void TabWidget::format (QTreeWidgetItem * item, CFunction & fn)
     item->setText(2, fn.name);
 }
 
-void TabWidget::initFn(CFunction & fn)
-{
-    fn.In().forget();
-    fn.Out().forget();
-    fn.state = 0;
-    fn.lang = 0;
-}
+
 
 void TabWidget::on_btnAdd_clicked()
 {
     CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
     CFunction fn;
-    initFn(fn);
     d->load(&fn);
     d->setWindowTitle(tr("new function"));
 

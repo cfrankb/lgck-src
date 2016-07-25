@@ -317,21 +317,6 @@ void MainWindow::on_actionFunctionList_triggered()
 
 void MainWindow::on_actionPlain_Text_triggered()
 {
-    const char fileFilter[] = "text files (*.edocx)";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(fileFilter));
-    if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(".edocx")) {
-            fileName += ".edocx";
-        }
-        CFileWrap file;
-        if (file.open(fileName, QIODevice::WriteOnly)) {
-            m_doc.exportText(file);
-            file.close();
-        }  else {
-            // write error
-            warningMessage( QString(tr("can't write to %1")).arg(fileName) );
-        }
-    }
 }
 
 void MainWindow::on_actionWiki_triggered()

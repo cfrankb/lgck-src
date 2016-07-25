@@ -26,25 +26,20 @@ class CFileWrap;
 class CFunction
 {
 public:
-    CFunction() {}
-    /*CFunction(CFunction & s) {
-        name = s.name;
-        state = s.state;
-        lang = s.lang;
-        desc = s.desc;
-        example = s.example;
-        m_alias = s.m_alias;
-        paramsIn = s.In();
-        paramsOut = s.Out();
-    }*/
+    CFunction() {
+        init();
+    }
     ~CFunction() {}
-
-    //CFunction & operator = (CFunction & s);
     void copy(CFunction & s);
-    CParams & In() { return paramsIn; }
-    CParams & Out()  { return paramsOut; }
+    CParams & In(int i) {
+        return paramsIn[i];
+    }
+    CParams & Out()  {
+        return paramsOut;
+    }
     void read(CFileWrap & file, int version);
     void write(CFileWrap & file);
+    void init();
 
     QString name;
     int state;
@@ -52,14 +47,20 @@ public:
     QString desc;
     QString example;
     QStringList m_alias;
+    int m_inCount;
+    void removeInSet(int i);
+    int InSetCount() {
+        return m_inCount;
+    }
 
     enum {
         FLAG_OPTIONAL = 1,
-        FLAG_MORE     = 2
+        FLAG_MORE     = 2,
+        MAX_IN_COUNT  = 4
     };
 
 protected:
-    CParams paramsIn;
+    CParams paramsIn[4];
     CParams paramsOut;
 };
 
@@ -87,7 +88,7 @@ public:
     bool read(CFileWrap & file, int version);
     void dump(CFileWrap & file, QString prefix="");
     void exportList(CFileWrap & file, QString prefix="");
-    void exportText(CFileWrap & file, QString prefix="");
+    //void exportText(CFileWrap & file, QString prefix="");
     void exportWiki(CFileWrap & file, QString prefix="");
     void exportListWiki(CFileWrap & file, QString prefix);
 

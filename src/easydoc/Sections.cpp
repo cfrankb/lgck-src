@@ -17,9 +17,7 @@
 */
 
 #include "stdafx.h"
-//#include "struct.h"
 #include "Functions.h"
-//#include "class.h"
 #include "Sections.h"
 
 CSections::CSections()
@@ -89,22 +87,13 @@ void CSections::dump(CFileWrap & file)
 
 void CSections::removeAt(int i)
 {
-    //Section *t = m_sections[i];
     for (; i < m_sCount - 1 ; ++i) {
         m_sections[i] = m_sections[i + 1];
     }
-
-    //qDebug("max: %d i=%d=\n", m_cCount, i);
-    //m_classes[i] = NULL;
-
     --m_sCount;
-    //m_sections [ m_sCount ] = NULL; // set extra record to null
-
-//    return t;
 }
 
 void CSections::removeAll()
 {
     m_sCount = 0;
 }
-

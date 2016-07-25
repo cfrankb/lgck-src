@@ -29,6 +29,7 @@ CDlgFunction::CDlgFunction(QWidget *parent) :
 {
     m_ui->setupUi(this);
     m_fn = NULL;
+    m_inSet = 0;
 }
 
 CDlgFunction::~CDlgFunction()
@@ -51,7 +52,6 @@ void CDlgFunction::changeEvent(QEvent *e)
 const QString CDlgFunction::formatParam(Param & param)
 {
     QString s;
-
     char o[2];
     o[0] = 0;
     o[1] = 0;
@@ -68,7 +68,6 @@ const QString CDlgFunction::formatParam(Param & param)
     if (param.flags & CFunction::FLAG_MORE) {
         s += "...";
     }
-
     return s + o;
 }
 
@@ -78,22 +77,19 @@ void CDlgFunction::load(CFunction *fn)
     m_ui->eComment->setPlainText(fn->desc);
     m_ui->eName->setText(fn->name);
 
+    // IN
     m_ui->treeIn->setColumnCount(2);
     m_ui->treeIn->setEditTriggers(0);
     m_ui->treeIn->setWordWrap(false);
     m_ui->treeIn->setRootIsDecorated(false);
+    updateInTree();
+    updateInSetCombo();
 
-    for (int i = 0; i < fn->In().getSize(); ++i) {
-        QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        item->setText(0, formatParam(fn->In()[i]));
-        m_ui->treeIn->addTopLevelItem(item);
-    }
-
+    // OUT
     m_ui->treeOut->setColumnCount(2);
     m_ui->treeOut->setEditTriggers(0);
     m_ui->treeOut->setWordWrap(false);
     m_ui->treeOut->setRootIsDecorated(false);
-
     for (int i = 0; i < fn->Out().getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         item->setText(0, formatParam(fn->Out()[i]));
@@ -120,16 +116,13 @@ void CDlgFunction::load(CFunction *fn)
     for (unsigned int i = 0; i < sizeof(lang_list) / sizeof(QString); ++i) {
         m_ui->cbLang->addItem(lang_list[i]);
     }
-
     m_ui->cbState->setCurrentIndex( fn->state );
     m_ui->cbLang->setCurrentIndex( fn->lang );
-
     QListIterator<QString> itr (fn->m_alias);
     while (itr.hasNext()) {
         QString current = itr.next();
         m_ui->listAlias->addItem(current);
     }
-
 }
 
 void CDlgFunction::save(CFunction *fn)
@@ -152,11 +145,12 @@ void CDlgFunction::on_treeIn_doubleClicked(QModelIndex index)
 {
     CDlgParam *d = new CDlgParam ( (QWidget*) parent() );
     d->setWindowTitle(tr("edit IN param"));
-    d->load(& m_fn->In()[index.row()]);
+    int j = m_inSet;
+    d->load(& m_fn->In(j)[index.row()]);
     if (d->exec() == QDialog::Accepted) {
-        d->save(& m_fn->In()[index.row()]);
+        d->save(& m_fn->In(j)[index.row()]);
         QTreeWidgetItem * item = m_ui->treeIn->topLevelItem( index.row() );
-        item->setText(0, formatParam(m_fn->In()[index.row()]));
+        item->setText(0, formatParam(m_fn->In(j)[index.row()]));
     }
 
     delete d;
@@ -165,15 +159,15 @@ void CDlgFunction::on_treeIn_doubleClicked(QModelIndex index)
 void CDlgFunction::on_btnAdd_IN_clicked()
 {
     Param param;
-
     CDlgParam *d = new CDlgParam ( (QWidget*) parent() );
     d->setWindowTitle(tr("add new IN param"));
     if (d->exec() == QDialog::Accepted) {
         d->save(&param);
-        m_fn->In().add(param);
-        int i = m_fn->In().getSize() - 1;
+        int j = m_inSet;
+        m_fn->In(j).add(param);
+        int i = m_fn->In(j).getSize() - 1;
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        item->setText(0, formatParam(m_fn->In()[i]));
+        item->setText(0, formatParam(m_fn->In(j)[i]));
         m_ui->treeIn->addTopLevelItem(item);
     }
 
@@ -186,8 +180,9 @@ void CDlgFunction::on_btnDelete_IN_clicked()
     if (index.row() != -1) {
         QMessageBox::StandardButton ret = QMessageBox::warning(this, "",  tr("Delete the current param?"),
                                                                QMessageBox::Ok | QMessageBox::Cancel);
+        int j = m_inSet;
         if (ret == QMessageBox::Ok) {
-            m_fn->In().removeAt(index.row());
+            m_fn->In(j).removeAt(index.row());
             QAbstractItemModel * model =  m_ui->treeIn->model();
             model->removeRow( index.row() );
         }
@@ -207,14 +202,12 @@ void CDlgFunction::on_treeOut_doubleClicked(QModelIndex index)
         QTreeWidgetItem * item = m_ui->treeOut->topLevelItem( index.row() );
         item->setText(0, formatParam(m_fn->Out()[index.row()]));
     }
-
     delete d;
 }
 
 void CDlgFunction::on_btnAdd_OUT_clicked()
 {
     Param param;
-
     CDlgParam *d = new CDlgParam ( (QWidget*) parent() );
     d->setWindowTitle(tr("add new OUT param"));
     if (d->exec() == QDialog::Accepted) {
@@ -225,6 +218,7 @@ void CDlgFunction::on_btnAdd_OUT_clicked()
         item->setText(0, formatParam(m_fn->Out()[i]));
         m_ui->treeOut->addTopLevelItem(item);
     }
+    delete d;
 }
 
 void CDlgFunction::on_btnDelete_OUT_clicked()
@@ -245,8 +239,7 @@ void CDlgFunction::on_btnAdd_Alias_clicked()
 {
     QString str = QInputDialog::getText(this,tr("alias"), tr("function"));
     if (!str.isEmpty()) {
-        m_ui->listAlias->addItem(str);
-        //m_fn->m_alias.append(str);
+        m_ui->listAlias->addItem(str.trimmed());
     }
 }
 
@@ -254,8 +247,67 @@ void CDlgFunction::on_btnDelete_Alias_clicked()
 {
     QModelIndex index = m_ui->listAlias->currentIndex();
     if (index.row() != -1) {
-        //m_fn->m_alias.removeAt(index.row());
         QListWidgetItem * item = m_ui->listAlias->takeItem(index.row());
         delete item;
     }
+}
+
+void CDlgFunction::on_cbInSet_currentIndexChanged(int index)
+{
+    qDebug("on_cbInSet_currentIndexChanged");
+    m_inSet = std::max(index,0);
+    updateInTree();
+}
+
+void CDlgFunction::on_btnAdd_IN_SET_clicked()
+{
+    if (m_ui->cbInSet->count() < CFunction::MAX_IN_COUNT) {
+        m_inSet = m_ui->cbInSet->count();
+        ++m_fn->m_inCount;
+        m_ui->cbInSet->addItem(QString("set %1").arg(m_fn->m_inCount));
+        m_ui->cbInSet->setCurrentIndex(m_inSet);
+        updateInTree();
+    }
+}
+
+void CDlgFunction::on_btnDelete_IN_SET_clicked()
+{
+    if (m_ui->cbInSet->count() > 1) {
+        // TODO remove InParams(x)
+        m_fn->removeInSet(m_inSet);
+        if (m_inSet == m_ui->cbInSet->count() -1) {
+            --m_inSet;
+        }
+        updateInSetCombo();
+        updateInTree();
+        m_ui->cbInSet->setCurrentIndex(m_inSet);
+    }
+}
+
+void CDlgFunction::updateInSetCombo()
+{
+    qDebug("updateInSetCombo()");
+    m_ui->cbInSet->clear();
+    for (int i=0; i < m_fn->m_inCount; ++i) {
+        QString str = QString("set %1").arg(i+1);
+        m_ui->cbInSet->addItem(str);
+    }
+}
+
+void CDlgFunction::updateInTree()
+{
+    qDebug("updateInTree() in");
+    // clear tree
+    int count = m_ui->treeIn->model()->rowCount();
+    m_ui->treeIn->model()->removeRows(0, count);
+    // grow new leafs
+    int j = m_inSet;
+    qDebug("m_inSet: %d", m_inSet);
+    for (int i = 0; i < m_fn->In(j).getSize(); ++i) {
+        qDebug("%d",i);
+        QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        item->setText(0, formatParam(m_fn->In(j)[i]));
+        m_ui->treeIn->addTopLevelItem(item);
+    }
+    qDebug("updateInTree() out");
 }

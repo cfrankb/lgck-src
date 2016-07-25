@@ -42,7 +42,7 @@ protected:
     void changeEvent(QEvent *e);
     CDatabase *m_db;
     void format (QTreeWidgetItem * item, CFunction & fn);
-    void initFn (CFunction & fn);
+  //  void initFn (CFunction & fn);
 
     enum {
         ICON_BLUE,

@@ -185,7 +185,7 @@ void CDlgClass::format (QTreeWidgetItem * item, Param & var)
 
 void CDlgClass::initFn(CFunction & fn)
 {
-    fn.In().forget();
+    fn.In(0).forget();
     fn.Out().forget();
     fn.state = 0;
     fn.lang = 0;
@@ -195,7 +195,7 @@ void CDlgClass::on_btnAdd_clicked()
 {
     CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
     CFunction fn;
-    initFn(fn);
+    //initFn(fn);
     d->load(&fn);
     d->setWindowTitle(tr("new method"));
 

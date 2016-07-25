@@ -42,23 +42,18 @@ bool CDatabase::read()
         file.read( buf, 9 );
         if (memcmp(buf, "EASYDOC!", 8)==0) {
             file.seek(8);
-            int version = VERSION;
+            int version = 0;
             file >> version;
-            if (version <= VERSION) {
+            if (version <= getVersion()) {
                 m_functions.read(file, version);
                 m_classes.read(file, version);
                 m_sections.read(file, version);
                 result = true;
             } else {
-                m_lastError = QString("unknown version %1").arg(version);
+                m_lastError = QString("unknown version: %1").arg(version);
             }
         } else {
-            if (memcmp(buf, "@@easydoc", 9)==0) {
-                file.seek(0);
-                //importText(file);
-            } else {
-                m_lastError = QString("wrong signature");
-            }
+            m_lastError = QString("wrong signature");
         }
         file.close();
 
@@ -81,7 +76,7 @@ bool CDatabase::write()
     CFileWrap file;
     if (file.open(m_fileName, QIODevice::WriteOnly)) {
         file += m_signature;
-        int version = VERSION;
+        int version = getVersion();
         file << version;        
         m_functions.write(file);
         m_classes.write(file);
@@ -130,7 +125,6 @@ void CDatabase::dump(CFileWrap & file)
 
         file += " <body>\r\n" ;
     }
-//    file += "  <pre style=\"width : 540px; font-size:12px;\">\r\n";
     file += "  <pre class=pageBody>\r\n";
 
     m_sections.dump(file);
@@ -151,13 +145,6 @@ void CDatabase::exportList(CFileWrap & file)
     m_functions.exportList(file);
 }
 
-void CDatabase::exportText(CFileWrap & file)
-{
-    file += "@@easydoc\n\n";
-    m_classes.exportText(file);
-    m_functions.exportText(file);
-}
-
 void CDatabase::exportWiki(const QString & path)
 {
     m_classes.exportWiki(path, &m_functions);
@@ -168,53 +155,6 @@ void CDatabase::exportWiki(const QString & path)
     m_functions.exportWiki(file, "");
     file.close();
 }
-
-/*
-void CDatabase::importText(CFileWrap & file)
-{
-    const char edoc_head [] = "@@easydoc";
-
-    enum {
-        ED_NONE,
-        ED_HEAD,
-        ED_CLASS,
-        ED_FUNCTION
-    };
-
-    int size = file.getSize();
-    char *buf = new char[size+1];
-    buf[size]=0;
-    file.seek(0);
-    file.read(buf,size);
-    file.close();
-    char *p = buf;
-    int line = 1;
-    int w = ED_NONE;
-    while (*p) {
-        char *n = strstr(p, '\n');
-        char *r = strstr(p, '\r');
-        char **pp = !n || !r ? std::max(n, r) : std::min(n, r);
-        if (pp) {
-            if (pp[0] == '\r' && pp[1] =='\n') {
-                *pp = 0;
-                ++pp;
-            }
-            *pp = 0;
-            ++pp;
-        }
-
-        if (*p) {
-            memcmp(p, edoc_head, strlen(edoc_head))
-        }
-
-        // next line
-        ++line;
-        p = pp;
-    }
-
-    delete [] buf;
-}
-*/
 
 void CDatabase::importGameLua(const char *cdata)
 {
@@ -251,19 +191,13 @@ void CDatabase::importGameLua(const char *cdata)
                 int iFn = m_functions.find(fn_name);
                 if (iAlias != -1 && iFn == -1) {
                     qDebug("alias %s >> %s", alias_name, fn_name);
-                    //qDebug("aaa3");
                     CFunction fn;
                     fn.copy(m_functions[alias_name]);
-                    //qDebug("aaa2 %d", iAlias);
                     m_functions.removeAt(iAlias);
                     // add function (renamed)
-                    //qDebug("aaa1");
                     fn.name = fn_name;
-                    //qDebug("aaa4");
                     fn.m_alias.append(alias_name);
-                    //qDebug("aaa5");
                     m_functions.add(fn, true);
-                    //qDebug("aaa7");
                     // add alias
                     /*
                     fn.m_alias.clear();
@@ -287,4 +221,9 @@ void CDatabase::importGameLua(const char *cdata)
         }
     }
     delete []data;
+}
+
+int CDatabase::getVersion()
+{
+    return 0x0006;
 }

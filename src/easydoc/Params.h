@@ -13,7 +13,6 @@ public:
 
     Param & operator = (Param & s)
     {
-        //qDebug("^^^^^^^");
         name = s.name;
         type = s.type;
         desc = s.desc;
@@ -47,7 +46,6 @@ protected:
     enum {
        MAX_PARAMS = 32
     };
-
     int m_size;
     int m_max;
     Param *m_params;

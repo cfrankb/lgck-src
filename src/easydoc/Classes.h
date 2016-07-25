@@ -44,7 +44,6 @@ public:
     void dump(CFileWrap & file);
     void exportList(CFileWrap & file);
     void exportWiki(const QString & path, CFunctions *fct);
-    void exportText(CFileWrap & file);
     void debug(CFileWrap & file);
     void removeAll();
 
