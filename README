@@ -1,16 +1,21 @@
 LGCK Builder comes in three packages
 
-1) The source package (11xxxx_lgck.zip) which contains just the code and build
+1) The source package which contains just the code and build
    instructions.
 
    This can be compiled on any platform providing that all the necessary 
    dependancies are met. This is explained in BUILD.txt
+   
+   https://github.com/cfrankb/lgck-src/
 
-2) The demo package which contains games to showcase the engine 
-   (11xxxx_lgckdemos.zip)
+2) The assets, demos and other resouces 
+   https://github.com/cfrankb/lgck-data/
+   https://sourceforge.net/projects/lgck/files/Resources/
 
 3) The windows installer for users that want to run it on windows (or wine. 
    works very well under wine too) (lgck-setup.exe)
+
+   https://sourceforge.net/projects/lgck/files/
 
    This the best way to test LGCK for the first time even on Linux. Granted
    that applications running under wine are slower than native linux applications
