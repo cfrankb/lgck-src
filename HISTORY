@@ -1,5 +1,10 @@
 HISTORY OF LGCK BUILDER
 
+*** 0.6.0.7
+
+- EDITOR: builder can export sprites (obl, png)
+- EASYDOC: introducted the concept of alias amd inprove the ui
+
 *** 0.6.0.6
 
 - ENGINE: replaced scene list w/ ptr 
