@@ -52,16 +52,5 @@
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
     "obj_dir": "target/sdl",
-    "declare" : [],
-    "res": {
-        "out": "shared/lgck_res.cpp",
-        "name": "add_lgck_res",
-        "base": "../lgck-builder/",
-        "file_list" : [
-            "images/points.obl5",
-            "res/DejaVuSans.ttf",
-            "scripts/common.lua",
-            "scripts/functions.lua"
-        ]
-    }
+    "declare" : []
 }

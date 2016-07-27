@@ -34,11 +34,11 @@
 #include "../shared/Level.h"
 #include "../shared/interfaces/IMusic.h"
 #include "../shared/interfaces/ISound.h"
-#include "../shared/implementers/dm_opengl.h"
-#include "../shared/implementers/gr_opengl.h"
-#include "../shared/implementers/im_opengl.h"
-#include "../shared/implementers/mu_sdl.h"
-#include "../shared/implementers/sn_sdl.h"
+//#include "../shared/implementers/opengl/dm_opengl.h"
+#include "../shared/implementers/opengl/gr_opengl.h"
+#include "../shared/implementers/opengl/im_opengl.h"
+#include "../shared/implementers/sdl/mu_sdl.h"
+#include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/inputs/glut/kt_glut.h"
 
 #define INIT_LEN 640
@@ -364,6 +364,12 @@ int main(int argc, char *argv[])
     glutInitWindowPosition( 20, 60 );
     glutInitWindowSize( len, hei );
     glutCreateWindow("LGCK Runtime");
+
+    if (!game.initFonts()) {
+        puts("giving up");
+        exit(EXIT_FAILURE);
+    }
+
 
     // Set up callback functions for key presses
     glutKeyboardFunc(keyPressed);			// Handles "normal" ascii symbols

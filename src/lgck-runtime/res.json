@@ -1,0 +1,11 @@
+{
+    "out": "shared/lgck_res.cpp",
+    "name": "add_lgck_res",
+    "base": "../lgck-builder/",
+    "file_list" : [
+        "images/points.obl5",
+        "res/Tuffy_bold.fnt",
+        "scripts/common.lua",
+        "scripts/functions.lua"
+    ]
+} 

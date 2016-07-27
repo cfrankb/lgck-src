@@ -178,6 +178,7 @@ int main( int argc, char* args[] )
     game.attach((IGraphics *) gm);    
     game.initSounds();
     game.initSettings();
+    game.initFonts();
     game.setLives(5);
     game.setHealth(32);
     g_skill = 0;

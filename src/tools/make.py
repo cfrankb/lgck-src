@@ -26,6 +26,8 @@ import os
 import binascii
 import subprocess
 
+EXIT_SUCCESS = 0
+EXIT_FAILURE = 1
 def chunks(l, n):
     """ Yield successive n-sized chunks from l.
     """
@@ -38,6 +40,7 @@ class CMakeU():
         self.lines = []
 
     def scanfile(self,fpath, deps):
+        print fpath
         sfile = open(fpath, 'r')
         for line in sfile:
             if line[:10] == '#include "':
@@ -117,13 +120,19 @@ class CMakeU():
             print ' \\\n'.join('{x}'.format(x=x) for x in src)
         objd = []
         for fname in src:
+            #print '@@@@@@',fname
             deps = [fname]
             # print fname
             base = os.path.splitext(fname)[0]
             hname = base + '.h'
             if os.path.exists(hname):
                 self.scanfile(hname,deps)
-            self.scanfile(fname,deps)
+            #print '*',fname
+            if os.path.exists(fname):
+                self.scanfile(fname,deps)
+            else:
+                print '*',fname
+                exit(EXIT_FAILURE)
             objn = base + '.o';
             if objn[:3] == '../':
                 objn = objn[3:]
@@ -169,15 +178,19 @@ class CMakeU():
             subprocess.check_call(["chmod", "+x", self.data['linux']['build']])'''
 
     def write_res(self):
+        with open('res.json') as s:
+            raw = s.read()
+        res = json.loads(raw)
+        print res
         CHUNK_SIZE = 32
-        out_file = self.data['res']['out']
+        out_file = res['out']
         odir = os.path.dirname(out_file)
         subprocess.check_call(["mkdir", "-p", odir])
-        base = self.data['res']['base']
+        base = res['base']
         tfile = open(out_file, 'w')
         tfile.write('#include "FileWrap.h"\n\n');
         i = 0
-        for fname in self.data['res']['file_list']:
+        for fname in res['file_list']:
             sfile = open(base + fname, 'r')
             data = sfile.read()
             sfile.close()
@@ -189,9 +202,9 @@ class CMakeU():
                 tfile.write('\n')
             tfile.write('};\n\n')
             i = i + 1
-        tfile.write('void %s()\n{\n' % self.data['res']['name']);
+        tfile.write('void {0}()\n{{\n'.format(res['name']));
         i = 0
-        for fname in self.data['res']['file_list']:
+        for fname in res['file_list']:
             tfile.write('    CFileWrap::addFile(":/%s", (const char*)file_%d, sizeof(file_%d));\n' % (fname, i, i))
             i = i + 1
         tfile.write('}\n')
