@@ -27,10 +27,11 @@ const char *opengl_msg(unsigned int code){
 }
 
 static unsigned int __ERR__;
-/*#define GLDEBUG() __ERR__ = glGetError(); if (__ERR__ != GL_NO_ERROR) { \
-    //qDebug("Opengl error: %s in %s line %d", \
-      //  opengl_msg(__ERR__), __FILE__, __LINE__); \
-  //  }*/
-
+/*
+#define GLDEBUG() __ERR__ = glGetError(); if (__ERR__ != GL_NO_ERROR) { \
+    qDebug("Opengl error: %s in %s line %d", \
+        opengl_msg(__ERR__), __FILE__, __LINE__); \
+    }
+*/
 #define GLDEBUG() (1==1);
 #endif // GLHELPER_H

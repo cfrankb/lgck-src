@@ -2193,10 +2193,7 @@ void CGame::remap()
 bool CGame::initFonts()
 {
     qDebug("initFont()");
-
-    const char *fontName = ":res/Tuffy_bold.fnt";
-    //const char *fontName = "shared/Arial Black.fnt";
-//    const char *fontName = "shared/DejaVu Sans Mono.fnt";
+    const char *fontName = ":/res/Tuffy_bold.fnt";
     CFileWrap file;
     if (file.open(fontName)) {
         m_font = new CFont;
