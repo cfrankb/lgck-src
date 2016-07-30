@@ -6,15 +6,13 @@
         "paths" : [
             ".",
             "../shared",
-            "/usr/include",
-            "/usr/include/freetype2"
+            "/usr/include"
         ],
         "libs" : [
             "z",
             "m",
             "pthread",
             "lua5.2",
-            "ftgl",
             "SDL2",
             "SDL2_mixer",
             "sfml-graphics",
@@ -28,20 +26,21 @@
         "output" : "make.bat",
         "paths" : [
             "../shared",
-            "../../redist/headers",
-            "../../redist/headers/freetype2"
+            "../../../redist/include"
         ],
         "libs" : [
-            "L../../redist/lib",
+            "L../../../redist/lib",
+            "L../../../redist/lib/sdl2-204",
+            "L../../../redist/lib/sfml",
             "lz",
             "lm",
             "llua52",
-            "lftgl",
             "lSDL2",
             "lSDL2_mixer",
-            "lopengl32",
-            "lglu32",
-            "lfreeglut"
+            "lsfml-main",
+            "lsfml-graphics",
+            "lsfml-window",
+            "lsfml-system"
         ],
         "flags" : ["-std=gnu++11", "-O3", "-Wall"]
     },
@@ -56,16 +55,5 @@
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
     "obj_dir": "target/sfml",
-    "declare" : [],
-    "res": {
-        "out": "shared/lgck_res.cpp",
-        "name": "add_lgck_res",
-        "base": "../lgck-builder/",
-        "file_list" : [
-            "images/points.obl5",
-            "res/DejaVuSans.ttf",
-            "scripts/common.lua",
-            "scripts/functions.lua"
-        ]
-    }
+    "declare" : []
 }

@@ -6,15 +6,13 @@
         "paths" : [
             ".",
             "../shared",
-            "/usr/include",
-            "/usr/include/freetype2"
+            "/usr/include"
         ],
         "libs" : [
             "z",
             "m",
             "pthread",
             "lua5.2",
-            "ftgl",
             "SDL2",
             "SDL2_mixer",
             "X11"
@@ -25,20 +23,18 @@
         "output" : "make.bat",
         "paths" : [
             "../shared",
-            "../../redist/headers",
-            "../../redist/headers/freetype2"
+            "../../../redist/include"
         ],
         "libs" : [
-            "L../../redist/lib",
+            "L../../../redist/lib/sdl2-204",
+            "L../../../redist/lib",
             "lz",
             "lm",
             "llua52",
-            "lftgl",
+            "lmingw32",
+            "lSDL2main",
             "lSDL2",
-            "lSDL2_mixer",
-            "lopengl32",
-            "lglu32",
-            "lfreeglut"
+            "lSDL2_mixer"
         ],
         "flags" : ["-std=gnu++11", "-O3", "-Wall"]
     },

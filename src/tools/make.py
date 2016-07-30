@@ -25,6 +25,7 @@ import argparse
 import os
 import binascii
 import subprocess
+import platform
 
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
@@ -69,6 +70,9 @@ class CMakeU():
         #        src.append(fname)
         src = self.get_source()
         cmds = []
+        cmds.append('if %1.==link. goto link')
+        cmds.append('if %1.==clean. goto clean')
+        cmds.append('windres lgck.rc -O coff -o shared\lgck.res')
         cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data['win32']['paths']]) + \
             ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data['win32']['flags']]) 
         for fname in src:
@@ -92,9 +96,14 @@ class CMakeU():
             ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']]) 
         libs = ' '.join(['-{lib}'.format(lib=lib) for lib in self.data['win32']['libs']])
         objs = ' '.join([obj for obj in objs])
-        tfile.write('g++ %s %s %s -o %s\n' % (cflags, objs, libs, self.data['target']))
+        tfile.write(':link\n')
+        tfile.write('g++ %s %s shared\lgck.res %s -o %s\n' % (cflags, objs, libs, self.data['target']))
         tfile.write(r'@if %errorlevel% neq 0 goto err')
         tfile.write('\n')
+        tfile.write('goto out\n')
+        tfile.write(':clean\n')
+        for objp in objd:
+            tfile.write('deltree %s\n' % objp.replace('/', '\\'))
         tfile.write('goto out\n')
         tfile.write(':err\n')
         tfile.write('@echo fatal error\n')
@@ -120,14 +129,11 @@ class CMakeU():
             print ' \\\n'.join('{x}'.format(x=x) for x in src)
         objd = []
         for fname in src:
-            #print '@@@@@@',fname
             deps = [fname]
-            # print fname
             base = os.path.splitext(fname)[0]
             hname = base + '.h'
             if os.path.exists(hname):
                 self.scanfile(hname,deps)
-            #print '*',fname
             if os.path.exists(fname):
                 self.scanfile(fname,deps)
             else:
@@ -185,7 +191,12 @@ class CMakeU():
         CHUNK_SIZE = 32
         out_file = res['out']
         odir = os.path.dirname(out_file)
-        subprocess.check_call(["mkdir", "-p", odir])
+        print odir
+        if not os.path.exists(odir):
+            if platform.system()=='Windows':
+                subprocess.check_call(["mkdir", odir.replace('/', '\\')])
+            else:
+                subprocess.check_call(["mkdir", "-p", odir])
         base = res['base']
         tfile = open(out_file, 'w')
         tfile.write('#include "FileWrap.h"\n\n');
@@ -221,14 +232,11 @@ class CMakeU():
             raw = f.read() 
             f.close()
         except:
-            print "can't open %s" % args.file
+            print "can't open %s" % self.args.file
             exit(-1)
         self.data = json.loads(raw)
         if self.args.res:
-            if 'res' in self.data:
-                self.write_res()
-            else:
-                print("missing res section")
+            self.write_res()
         if 'linux' in self.data:
             self.write_makefile()
         if 'win32' in self.data:

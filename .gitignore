@@ -10,7 +10,9 @@ obl5t/obl5t
 */obj/
 */build/
 *.autosave
-lgck-runtime/lgck-runtime
+src/lgck-runtime/sfml/lgck-runtime
+src/lgck-runtime/sdl/lgck-runtime
+src/lgck-runtime/glut/lgck-runtime
 build/*
 *.o
 bin/*
@@ -18,3 +20,7 @@ bin/*
 */obj/*
 */bak/*
 */bak
+src/easydoc/bak/*
+src/obl5t/testcase/*
+src/lgck-runtime/make.bat
+src/lgck-runtime/makefile
