@@ -12,16 +12,13 @@
 #include "../shared/Level.h"
 #include "../shared/interfaces/IMusic.h"
 #include "../shared/interfaces/ISound.h"
-//#include "../shared/implementers/dm_sdl.h"
 #include "../shared/implementers/sdl/gr_sdl.h"
 #include "../shared/implementers/sdl/im_sdl.h"
 #include "../shared/implementers/sdl/mu_sdl.h"
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/inputs/sdl/kt_sdl.h"
 #include "../shared/GameEvents.h"
-
-#define EXIT_FAILURE 1
-#define EXIT_SUCCESS 0
+#include "../shared/runtime.h"
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
@@ -30,9 +27,6 @@ const int SCREEN_HEIGHT = 480;
 CGame *g_game;
 int g_currLevel = 0;
 int g_skill = 0;
-
-//int g_state;
-//unsigned long long g_timeTo;
 
 // extern functions
 void add_lgck_res();
@@ -150,7 +144,7 @@ void runGame()
         }
         unfoldEvents();
     }
-   // exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
 
 int main( int argc, char* args[] )
@@ -158,17 +152,16 @@ int main( int argc, char* args[] )
     CGame game;
     g_game = & game;
     add_lgck_res();
-    if (argc < 2) {
-        game.setFileName(" ../../data/vla3demo241.lgckdb");
-    } else {
-        game.setFileName(args[1]);
+    ARGS out;
+    if (!parseCmdLine(argc, args, out)){
+        return EXIT_FAILURE;
     }
+    game.setFileName(out.filename.c_str());
     printf("reading data...\n");
     if (!game.read()) {
         printf("failed to read gamedata:%s [%s]\n", game.getFileName(), game.getLastError());
         return EXIT_FAILURE;
     }
-
     CSndSDL *sn = new CSndSDL();
     game.attach((ISound*)sn);
     CMusicSDL *mu = new CMusicSDL();
@@ -181,9 +174,9 @@ int main( int argc, char* args[] )
     game.initFonts();
     game.setLives(5);
     game.setHealth(32);
-    g_skill = 0;
+    g_skill = std::min(out.skill,3);
     srand(static_cast<unsigned int>(time(NULL)));
-    g_currLevel = rand() % game.getSize();
+    g_currLevel = std::min(out.level != -1 ? out.level : rand() % game.getSize(), game.getSize()-1);
     g_game->setLevel(g_currLevel);
     g_game->setEngineState(CGame::ES_INTRO);
     g_game->callGameEvent(CGameEvents::EG_INIT_GAME);
@@ -191,6 +184,5 @@ int main( int argc, char* args[] )
     game.attach((IGraphics*)NULL);
     game.attach((IMusic*)NULL);
     game.attach((ISound*)NULL);
-	return 0;
-} 
-    
+    return EXIT_SUCCESS;
+}

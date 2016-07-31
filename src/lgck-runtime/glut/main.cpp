@@ -34,16 +34,15 @@
 #include "../shared/Level.h"
 #include "../shared/interfaces/IMusic.h"
 #include "../shared/interfaces/ISound.h"
-//#include "../shared/implementers/opengl/dm_opengl.h"
 #include "../shared/implementers/opengl/gr_opengl.h"
 #include "../shared/implementers/opengl/im_opengl.h"
 #include "../shared/implementers/sdl/mu_sdl.h"
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/inputs/glut/kt_glut.h"
+#include "../shared/runtime.h"
 
 #define INIT_LEN 640
 #define INIT_HEI 480
-#define INTRO_MS 1500
 CGame *g_game;
 int g_currLevel = 0;
 int g_skill = 0;
@@ -265,70 +264,14 @@ int main(int argc, char *argv[])
 {
     int len = INIT_LEN;
     int hei = INIT_HEI;
-    int c;
-    int errflg = 0;
-    int vflag = 0;
-    char *sLevel = NULL;
-    char sSkill[] = "0";
-    char *p;
-    extern char *optarg;
-    extern int optind, optopt;
-    while ((c = getopt(argc, argv, ":hvl:s:d:")) != -1) {
-        switch(c) {
-        case 'v':
-            if (vflag)
-                errflg++;
-            else
-                vflag++;
-            break;
-        case 'l':
-            sLevel = optarg;
-            break;
-        case 's':
-            *sSkill = *optarg;
-            if (atoi(sSkill)<0 || atoi(sSkill)>3) {
-                fprintf(stderr, "Option -%c must be between 0 and 3.\n", c);
-                errflg++;
-            }
-            break;
-        case 'd':
-            len = atoi(optarg);
-            p = strstr(optarg, "x");
-            if (p) {
-                hei = atoi(p + 1);
-            }
-            break;
-        case ':':
-            fprintf(stderr, "Option -%c requires an operand\n", optopt);
-            errflg++;
-            break;
-        case '?':
-            fprintf(stderr, "Unrecognized option: -%c\n", optopt);
-        case 'h':
-            errflg++; 
-        }
-        if (errflg) {
-            break;
-        }
-    }
-    if (errflg) {
-        fprintf(stderr, "usage: %s [options] [name.lgckdb]\n", argv[0]);
-        fprintf(stderr, "-s skill       skill level 0 - 3\n");
-        fprintf(stderr, "-l start       start level 1...\n");
-        fprintf(stderr, "-d 9999x9999   window size\n");
-        fprintf(stderr, "-h             help screen\n\n");
-        exit(EXIT_FAILURE);
-    } 
-
     CGame game;
     g_game = & game;
     add_lgck_res();
-    if (optind < argc) { 
-        game.setFileName(argv[optind]);
-    } else {
-        game.setFileName("../demos/vla3demo239.lgckdb");
+    ARGS out;
+    if (!parseCmdLine(argc, argv, out)){
+        return EXIT_FAILURE;
     }
-
+    game.setFileName(out.filename.c_str());
     printf("reading data...\n");
     if (!game.read()) {
         printf("failed to read gamedata:%s\n", game.getFileName());
@@ -347,16 +290,10 @@ int main(int argc, char *argv[])
     printf("initSettings() done\n");
     game.setLives(5);
     game.setHealth(32);
-    g_skill = std::max(atoi(sSkill),0) % 4;
+    g_skill = std::min(out.skill,3);
     srand(static_cast<unsigned int>(time(NULL)));
-    if (sLevel){
-        g_currLevel = std::max((atoi(sLevel) - 1),0) % game.getSize();
-    } else {
-        g_currLevel = rand() % game.getSize();
-    }
-    
+    g_currLevel = std::min(out.level != -1 ? out.level : rand() % game.getSize(), game.getSize()-1);
     glutInit(&argc,argv);
-
     // The image is not animated so single buffering is OK. 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
@@ -364,12 +301,10 @@ int main(int argc, char *argv[])
     glutInitWindowPosition( 20, 60 );
     glutInitWindowSize( len, hei );
     glutCreateWindow("LGCK Runtime");
-
     if (!game.initFonts()) {
         puts("giving up");
         exit(EXIT_FAILURE);
     }
-
 
     // Set up callback functions for key presses
     glutKeyboardFunc(keyPressed);			// Handles "normal" ascii symbols

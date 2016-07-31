@@ -18,7 +18,6 @@
 #include "../shared/Level.h"
 #include "../shared/interfaces/IMusic.h"
 #include "../shared/interfaces/ISound.h"
-//#include "../shared/implementers/sfml/dm_sfml.h"
 #include "../shared/implementers/sfml/gr_sfml.h"
 #include "../shared/implementers/sfml/im_sfml.h"
 #include "../shared/implementers/sdl/mu_sdl.h"
@@ -27,9 +26,7 @@
 #include "../shared/GameEvents.h"
 #include "../shared/Snapshot.h"
 #include "../shared/DisplayManager.h"
-
-#define EXIT_FAILURE 1
-#define EXIT_SUCCESS 0
+#include "../shared/runtime.h"
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
@@ -179,27 +176,24 @@ void runGame(sf::RenderWindow *window)
         }
         unfoldEvents();
     }
-   // exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
 
 int main( int argc, char* args[] )
 {
     CGame game;
     g_game = & game;
-    char *lgckdb;
-    if (argc < 2) {
-        game.setFileName(" ../../data/vla3demo241.lgckdb");
-    } else {
-        game.setFileName(args[1]);
-    }
-    printf("file: %s\n", lgckdb);
     add_lgck_res();
+    ARGS out;
+    if (!parseCmdLine(argc, args, out)){
+        return EXIT_FAILURE;
+    }
+    game.setFileName(out.filename.c_str());
     printf("reading data...\n");
     if (!game.read()) {
         printf("failed to read gamedata:%s [%s]\n", game.getFileName(), game.getLastError());
         return EXIT_FAILURE;
     }
-
     CSndSDL *sn = new CSndSDL();
     game.attach((ISound*)sn);
     CMusicSDL *mu = new CMusicSDL();
@@ -212,15 +206,12 @@ int main( int argc, char* args[] )
     game.initFonts();
     game.setLives(5);
     game.setHealth(32);
-    g_skill = 0;
+    g_skill = std::min(out.skill,3);
     srand(static_cast<unsigned int>(time(NULL)));
-    g_currLevel = 8;//rand() % game.getSize();
+    g_currLevel = std::min(out.level != -1 ? out.level : rand() % game.getSize(), game.getSize()-1);
     g_game->setLevel(g_currLevel);
     g_game->setEngineState(CGame::ES_INTRO);
     g_game->callGameEvent(CGameEvents::EG_INIT_GAME);
     runGame(gm->window());
-    // bitmap font
 	return 0;
 } 
-
-
