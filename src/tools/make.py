@@ -198,11 +198,11 @@ class CMakeU():
             else:
                 subprocess.check_call(["mkdir", "-p", odir])
         base = res['base']
-        tfile = open(out_file, 'w')
+        tfile = open(out_file, 'wb')
         tfile.write('#include "FileWrap.h"\n\n');
         i = 0
         for fname in res['file_list']:
-            sfile = open(base + fname, 'r')
+            sfile = open(base + fname, 'rb')
             data = sfile.read()
             sfile.close()
             tfile.write('const unsigned char file_%d[]={\n' % i)
