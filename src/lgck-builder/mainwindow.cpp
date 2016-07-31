@@ -1081,6 +1081,7 @@ void MainWindow::on_actionTest_Level_triggered()
             m_doc.clearKeys();
             m_doc.setVitals(m_start_hp, m_lives, m_score);
             m_doc.setSkill(m_skill);
+            m_doc.initLua();
             m_runtimeExternal = dlg->isExternal();
             if (dlg->isExternal()){
             // http://stackoverflow.com/questions/19442400/qt-execute-external-program
@@ -1525,7 +1526,7 @@ void MainWindow::on_actionRuntime_Lua_triggered()
         CFileWrap file;
         if (file.open(q2c(fileName), "wb")) {
             std::string lua;
-            m_doc.runtimeLua(lua);
+            m_doc.generateRuntimeLua(lua);
             file += lua.c_str();
             file.close();
         }  else {
@@ -1656,7 +1657,7 @@ void MainWindow::on_actionExport_Sprite_triggered()
 void MainWindow::on_actionView_Source_triggered()
 {
     std::string lua;
-    m_doc.runtimeLua(lua);
+    m_doc.generateRuntimeLua(lua);
     CDlgSource dlg;   
     dlg.setText( lua.c_str() );
     dlg.setReadOnly();

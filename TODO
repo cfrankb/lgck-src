@@ -283,6 +283,8 @@ Fresh bugs
 [ ] BUG: edit event pane not save when test game is trigged
 [ ] BUG: when restoring to a way point, state of displays not restored
 [ ] BUG: when restoring to a way point, end of level trigger not firing (after being triggered)
+[ ] BUG: onGameInit gets called before the lua script is loaded
+[X] BUG: lua script not always regenerated after an event was modified
 
 Bug fixed
 [x] BUG: player leaves the view

@@ -286,6 +286,7 @@ int main(int argc, char *argv[])
     game.attach(gm->cache());
     game.attach((IGraphics *) gm);    
     game.initSounds();
+    game.initLua();
     game.initSettings();
     printf("initSettings() done\n");
     game.setLives(5);

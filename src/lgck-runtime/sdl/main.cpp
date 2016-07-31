@@ -172,6 +172,7 @@ int main( int argc, char* args[] )
     game.initSounds();
     game.initSettings();
     game.initFonts();
+    game.initLua();
     game.setLives(5);
     game.setHealth(32);
     g_skill = std::min(out.skill,3);

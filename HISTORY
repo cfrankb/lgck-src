@@ -4,7 +4,9 @@ HISTORY OF LGCK BUILDER
 
 - EDITOR: builder can export sprites (obl, png)
 - EDITOR: runtime integration the IDE
+- ENGINE: new level event: OnIntroDraw
 - EASYDOC: introducted the concept of alias amd inprove the ui
+- BUG FIX: lua script not always regenerated after an event was modified
 
 
 *** 0.6.0.6

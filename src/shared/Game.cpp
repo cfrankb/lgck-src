@@ -163,11 +163,6 @@ CLevel *CGame::getLayers()
     return m_layers;
 }
 
-void CGame::runtimeLua(std::string & s)
-{    
-    generateRuntimeLua(s);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // cpp interface
 
@@ -1612,44 +1607,42 @@ void CGame::generateRuntimeLua(std::string & s)
     }
 
     s += "\n";
-
-    s += std::string("-- EVENT PROCEDURES (OBJECTS)\n\n");
-
-    for (int n = 0; n < m_arrProto.getSize(); ++n) {
-        CObject & object = m_arrProto.getObject( n );
-        for (int j = 0; j < object.getEventCount(); ++j) {
-            const char* luaCode = object.getEvent(j);
-            if (luaCode[0]) {
-                int len = strlen(CProtoArray::getEventName(j)) + strlen(luaCode) + 128;
-                char tmp[len];
-                sprintf(tmp, "function event_obj_%d_%s (self, ticks)\n" \
-                                     "%s\n" \
-                                     "end\n\n", n, CProtoArray::getEventName(j), luaCode
-                        );
-                s += std::string(tmp);
-            }
-        }
-    }
-
     if (getSize()) {
-        s += std::string("-- EVENT PROCEDURES (LEVEL)\n\n");
-
-        CLevel & level = * ( m_arrLevels[var("level")] );
-        for (int i = 0; i< level.getEventCount(); ++i) {
-            if (level.getEvent(i)[0]) {
-                int len = strlen(level.getEventName(i)) + strlen(level.getEvent(i)) + 128;
-                char tmp[len];
-                sprintf(tmp, "function event_level_%s()\n" \
-                          "%s\n" \
-                          "end\n\n", level.getEventName(i), level.getEvent(i));
-
-                s += std::string(tmp);
+        for (int w=0; w < getSize(); ++w) {
+            sprintf(tmp,"-- EVENT PROCEDURES LEVEL %d (OBJECTS)\n\n", w+1);
+            s += std::string(tmp);
+            for (int n = 0; n < m_arrProto.getSize(); ++n) {
+                CObject & object = m_arrProto.getObject( n );
+                for (int j = 0; j < object.getEventCount(); ++j) {
+                    const char* luaCode = object.getEvent(j);
+                    if (luaCode[0]) {
+                        int len = strlen(CProtoArray::getEventName(j)) + strlen(luaCode) + 128;
+                        char tmp[len];
+                        sprintf(tmp, "function event_level_%d_obj_%d_%s (self, ticks)\n" \
+                                             "%s\n" \
+                                             "end\n\n", w+1, n, CProtoArray::getEventName(j), luaCode
+                                );
+                        s += std::string(tmp);
+                    }
+                }
+            }
+            sprintf(tmp,"\n\n-- EVENT PROCEDURES (LEVEL %d)\n\n", w+1);
+            s += std::string(tmp);
+            CLevel & level = *(m_arrLevels[w]);
+            for (int i = 0; i< level.getEventCount(); ++i) {
+                if (level.getEvent(i)[0]) {
+                    int len = strlen(level.getEventName(i)) + strlen(level.getEvent(i)) + 128;
+                    char tmp[len];
+                    sprintf(tmp, "function event_level_%d_%s()\n" \
+                            "%s\n" \
+                            "end\n\n", w+1, level.getEventName(i), level.getEvent(i));
+                    s += std::string(tmp);
+                }
             }
         }
     }
 
     s += std::string("-- EVENT PROCEDURES (GAME)\n\n");
-
     for (int i = 0; i< CGameEvents::getSize(); ++i) {
         if (m_events->getEvent(i)[0]) {
             int len = strlen(CGameEvents::getName(i)) + strlen(m_events->getEvent(i)) + 128;
@@ -1723,7 +1716,6 @@ bool CGame::readScript( const char *scriptName, std::string &out )
         m_lua.debug(tmp);
         qDebug(fmt2, tmp);
     }
-
     return result;
 }
 
@@ -1738,7 +1730,7 @@ void CGame::callLvEvent(int eventId)
     const char* luaCode = level.getEvent(eventId);
     if (luaCode[0]) {
         char fnName [255];
-        sprintf(fnName, "event_level_%s", CLevel::getEventName(eventId));
+        sprintf(fnName, "event_level_%d_%s", var("level") +1, CLevel::getEventName(eventId));
 
         /* the function name */
         lua_getglobal(m_lua.getState(), fnName);
@@ -1780,7 +1772,7 @@ void CGame::callObjEvent(int objId, int eventId)
         CScene & scene = *(m_sFW);
         CActor & entry = scene[objId];
         char fnName [255];
-        sprintf(fnName, "event_obj_%d_%s", entry.m_nProto, CProtoArray::getEventName(eventId));
+        sprintf(fnName, "event_level_%d_obj_%d_%s", var("level")+1, entry.m_nProto, CProtoArray::getEventName(eventId));
         // the function name
         lua_getglobal(m_lua.getState(), fnName);
         // the first argument

@@ -64,7 +64,6 @@ public:
     CMap & map();
     void removePointsOBL();
     void cacheImages();
-    void runtimeLua(std::string & s);
     static int getVersion();
     int testKey(int keyCode);
     void setKey(int keyCode, char value);

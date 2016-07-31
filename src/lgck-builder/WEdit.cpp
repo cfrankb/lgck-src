@@ -401,7 +401,7 @@ void CWEdit::setFontSize(int size)
     // conventionnaly, margin 0 is for line numbers
     setMarginsFont(*font);
     QFontMetrics fm = QFontMetrics(*font);
-    setMarginWidth(0, fm.width( "0000" ) + 5);
+    setMarginWidth(0, fm.width( "00000" ) + 5);
     setMarginLineNumbers(0, true);
     m_lexer->setFont(*font);
 }

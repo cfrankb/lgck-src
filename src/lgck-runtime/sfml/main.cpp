@@ -203,6 +203,7 @@ int main( int argc, char* args[] )
     game.attach((IGraphics *) gm);
     game.initSounds();
     game.initSettings();
+    game.initLua();
     game.initFonts();
     game.setLives(5);
     game.setHealth(32);
