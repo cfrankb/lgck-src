@@ -1967,6 +1967,7 @@ void CGame::updateScreen()
         }
         displays()->drawText(-1,-1,text, 0, 15,
                              CGame::bgr2rgb(strtol(level->getSetting("introTextColor"), NULL, 16)));
+        callLvEvent(CLevel::EL_INTRO_DRAW);
         break;
     default:
         graphics()->drawScreen();

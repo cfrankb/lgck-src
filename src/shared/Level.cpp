@@ -43,7 +43,8 @@ std::string CLevel::m_eventList[]={
     "onKeyUp",
     "onGoalKilled",
     "onHandler",
-    "onNotifyClosure"
+    "onNotifyClosure",
+    "onIntroDraw"
 };
 
 CSettings::SETTING CLevel::m_defaults[] =

@@ -123,7 +123,8 @@ public:
         EL_KEY_UP,
         EL_GOAL_KILLED,
         EL_HANDLER,
-        EL_NOTIFYCLOSURE
+        EL_NOTIFYCLOSURE,
+        EL_INTRO_DRAW
     };
 
     enum {
