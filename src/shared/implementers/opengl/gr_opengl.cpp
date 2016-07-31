@@ -382,7 +382,7 @@ void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color 
     unsigned int texture = font.textureId();
     ASSERT(texture);
 
-    GLDEBUG();
+    //GLDEBUG();
     glEnable(GL_TEXTURE_2D); GLDEBUG();
     glEnable (GL_BLEND); GLDEBUG();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
