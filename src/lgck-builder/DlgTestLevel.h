@@ -25,6 +25,8 @@ public:
     void setScore(int score);
     void setHP(int hp);
     void setContinue(bool bContinue);
+    bool isExternal();
+    void setExternal(bool external);
 
 private:
     Ui::CDlgTestLevel *ui;

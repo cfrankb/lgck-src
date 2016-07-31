@@ -93,3 +93,13 @@ void CDlgTestLevel::setContinue(bool c)
 {
     return ui->cContinue->setChecked(c);
 }
+
+bool CDlgTestLevel::isExternal()
+{
+    return ui->cExternal->isChecked();
+}
+
+void CDlgTestLevel::setExternal(bool external)
+{
+    ui->cExternal->setChecked(external);
+}

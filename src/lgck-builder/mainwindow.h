@@ -89,6 +89,9 @@ private:
     bool m_bUpdate;
     QString m_updateURL;
     CThreadUpdater *m_updater;
+    QString m_runtime;
+    QString m_runtimeArgs;
+    bool m_runtimeExternal;
     bool maybeSave();
     bool save();
     bool saveAs();
@@ -129,7 +132,9 @@ private:
     virtual void paintEvent ( QPaintEvent * event );
 
     void handleGameEvents();
-
+    void goExternalRuntime();
+    bool checkExecutible(const QString exec, QString & errMsg);
+    void showAppSettings(int tab);
 private slots:
     void on_actionRestart_triggered();
     void on_actionDebug_triggered();
@@ -219,7 +224,6 @@ private slots:
     void on_actionDecrease_Font_Size_triggered();
     void on_actionReset_Font_Size_triggered();
     void on_actionEdit_Images_triggered();
-
     void on_actionImport_Font_triggered();
 
 signals:

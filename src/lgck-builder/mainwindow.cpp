@@ -26,6 +26,7 @@
 #include <QDesktopServices>
 #include <QSplashScreen>
 #include <QToolBar>
+#include <QProcess>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -80,6 +81,7 @@ char MainWindow::m_author[] = "cfrankb";
 #define MAX_FONT_SIZE 50
 #define MIN_FONT_SIZE 10
 #define DEFAULT_FONT_SIZE MIN_FONT_SIZE
+#define RUNTIME_DEFAULT_ARGS "%1"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -1068,6 +1070,7 @@ void MainWindow::on_actionTest_Level_triggered()
         dlg->setScore(m_score);
         dlg->setLives(m_lives);
         dlg->setContinue(m_bContinue);
+        dlg->setExternal(m_runtimeExternal);
         if (dlg->exec()) {
             m_skill = dlg->getSkill();
             m_start_hp = dlg->getHP();
@@ -1078,14 +1081,19 @@ void MainWindow::on_actionTest_Level_triggered()
             m_doc.clearKeys();
             m_doc.setVitals(m_start_hp, m_lives, m_score);
             m_doc.setSkill(m_skill);
-            setViewMode(VM_GAME);
-            testLevel(true);
+            m_runtimeExternal = dlg->isExternal();
+            if (dlg->isExternal()){
+            // http://stackoverflow.com/questions/19442400/qt-execute-external-program
+                goExternalRuntime();
+            } else {
+                setViewMode(VM_GAME);
+                testLevel(true);
+            }
             // set the start level
             m_start_level = m_doc.m_nCurrLevel;
         }
         delete dlg;
     }
-
     m_lview->setFocus();
 }
 
@@ -1216,6 +1224,11 @@ void MainWindow::viewEvent()
 
 void MainWindow::on_actionConfigure_LGCK_Builder_triggered()
 {
+    showAppSettings(CDlgAppSettings::TAB_DEFAULT);
+}
+
+void MainWindow::showAppSettings(int tab)
+{
     CDlgAppSettings *d = new CDlgAppSettings(this);
     connect(d, SIGNAL(versionCheck()), this, SLOT(checkVersion()));
     QString s = QString(tr("%1 Settings").arg(m_appName));
@@ -1225,6 +1238,7 @@ void MainWindow::on_actionConfigure_LGCK_Builder_triggered()
     d->setGridSize(m_gridSize);
     d->setUpdater(m_bUpdate, m_updateURL);
     d->setFontSize(m_fontSize);
+    d->setCurrentTab(tab);
     qDebug("Font Size: %d", m_fontSize);
     QAction **actions = actionShortcuts();
     QStringList listActions;
@@ -1239,6 +1253,7 @@ void MainWindow::on_actionConfigure_LGCK_Builder_triggered()
     d->setHP(m_start_hp);
     d->setScore(m_score);
     d->setLives(m_lives);
+    d->setRuntime(m_runtime, m_runtimeArgs);
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
     if (d->exec() == QDialog::Accepted) {
@@ -1261,11 +1276,12 @@ void MainWindow::on_actionConfigure_LGCK_Builder_triggered()
         m_score = d->getScore();
         m_lives = d->getLives();
         m_fontSize = d->getFontSize();
+        d->getRuntime(m_runtime, m_runtimeArgs);
         emit fontSizeChanged(m_fontSize);
-        //m_editEvents->setFontSize();
     }
     delete d;
 }
+
 
 void MainWindow::showToolBox(bool show)
 {
@@ -2297,6 +2313,12 @@ void MainWindow::saveSettings()
         settings.beginGroup("Editor");
         settings.setValue("fontSize", m_fontSize);
         settings.endGroup();
+        // Runtime
+        settings.beginGroup("Runtime");
+        settings.setValue("path", m_runtime);
+        settings.setValue("args", m_runtimeArgs);
+        settings.setValue("external", m_runtimeExternal);
+        settings.endGroup();
         settings.sync();
     }
 }
@@ -2304,6 +2326,7 @@ void MainWindow::saveSettings()
 void MainWindow::reloadSettings()
 {
     QSettings settings(m_author, m_appName);
+    qDebug() << settings.fileName();
     // grid
     m_bShowGrid = settings.value("showGrid", true).toBool();
     emit gridVisible(m_bShowGrid);
@@ -2354,10 +2377,19 @@ void MainWindow::reloadSettings()
     m_bShowToolBox = settings.value("toolBox", true).toBool();
     showToolBox(m_bShowToolBox);
     settings.endGroup();
+
+    // Updater
     settings.beginGroup("Updater");
     m_bUpdate = settings.value("updater_check", true).toBool();
     m_updateURL = settings.value("updater_url", UPDATER_URL).toString();
     m_updateURL = UPDATER_URL;
+    settings.endGroup();
+
+    // Runtime
+    settings.beginGroup("Runtime");
+    m_runtime = settings.value("path", "").toString();
+    m_runtimeArgs = settings.value("args", CDlgAppSettings::defaultRuntimeArgs()).toString();
+    m_runtimeExternal = settings.value("external", false).toBool();
     settings.endGroup();
 
     settings.beginGroup("Editor");
@@ -2460,7 +2492,6 @@ void MainWindow::on_actionLayer_ToolBar_toggled(bool arg1)
 
 void MainWindow::closePath()
 {
-    //qDebug("closePath");
     if (m_doc.getSize()) {
         CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
         CLayer & layer = * level.getCurrentLayer();
@@ -2583,6 +2614,57 @@ void MainWindow::on_actionImport_Font_triggered()
 {
     CWizFont *wiz = new CWizFont( static_cast<QWidget*>(parent()) );
     if (wiz->exec()) {
+        // TODO: implement this
+    }
+}
 
+bool MainWindow::checkExecutible(const QString exec, QString & errMsg)
+{
+    if (exec.isEmpty()) {
+        errMsg = tr("The file path is empty.");
+        return false;
+    }
+    QFileInfo fi(exec);
+    if (!fi.exists()){
+        errMsg = tr("The executable doesn't exists");
+        return false;
+    }
+    if (!fi.isFile()) {
+        errMsg = tr("This is not a file");
+        return false;
+    }
+    if (!fi.isExecutable()) {
+        errMsg = tr("The file is not executable");
+        return false;
+    }
+    return true;
+}
+
+void MainWindow::goExternalRuntime()
+{
+    QString filename = m_doc.getFileName();
+    QStringList list;
+    QStringList tmp = m_runtimeArgs.split(" ", QString::SkipEmptyParts);
+    QListIterator<QString> itr(tmp);
+    while (itr.hasNext()) {
+        QString current = itr.next().trimmed();
+        if (!current.isEmpty()) {
+            current = current.replace("%1", filename)
+                    .replace("%2", QString::number(m_doc.m_nCurrLevel))
+                    .replace("%3", QString::number(m_skill));
+            list.append(current);
+        }
+    }
+    QDir d = QFileInfo(m_runtime).absoluteDir();
+    QString errMsg = "";
+    if (checkExecutible(m_runtime, errMsg)) {
+        bool result = QProcess::startDetached(m_runtime, list, d.absolutePath());
+        if (!result) {
+            errMsg = tr("Running external runtime failed");
+        }
+    }
+    if (!errMsg.isEmpty()){
+        warningMessage(errMsg);
+        showAppSettings(CDlgAppSettings::TAB_RUNTIME);
     }
 }

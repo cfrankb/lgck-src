@@ -3,7 +3,9 @@ HISTORY OF LGCK BUILDER
 *** 0.6.0.7
 
 - EDITOR: builder can export sprites (obl, png)
+- EDITOR: runtime integration the IDE
 - EASYDOC: introducted the concept of alias amd inprove the ui
+
 
 *** 0.6.0.6
 

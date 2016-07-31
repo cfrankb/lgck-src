@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>232</height>
+    <height>237</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -33,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>180</y>
+     <y>190</y>
      <width>221</width>
      <height>41</height>
     </rect>
@@ -152,8 +152,8 @@
   <widget class="QCheckBox" name="cInitGame">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>159</y>
+     <x>10</x>
+     <y>140</y>
      <width>93</width>
      <height>22</height>
     </rect>
@@ -173,6 +173,19 @@
    </property>
    <property name="text">
     <string>Continue until game over</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cExternal">
+   <property name="geometry">
+    <rect>
+     <x>128</x>
+     <y>158</y>
+     <width>181</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Run external process</string>
    </property>
   </widget>
  </widget>
