@@ -115,6 +115,7 @@ void CFont::read(IFile & file)
         file.read(&id, 1);
         file.read(&glyph, sizeof(glyph));
         m_glyphs[id] = glyph;
+        qDebug("%c x=%d y=%d\n",  id, glyph.x, glyph.y);
     }
     // props
     file.read(&size, 2);
@@ -126,8 +127,10 @@ void CFont::read(IFile & file)
         m_props[key]=val;
     }
     // pixels
-    m_pixels = new unsigned int[m_width*m_height];
+    int h = pow2roundup(m_height);
+    m_pixels = new unsigned int[m_width*h];
     file.read(m_pixels, m_width * m_height * sizeof(unsigned int));
+    m_height = h;
     qDebug("w:%d h:%d total:%d",m_width, m_height, m_width * m_height * sizeof(unsigned int));
     for (int i=0; i < m_width*m_height; ++i) {
 //        m_pixels[i]=0xff0000ff;
