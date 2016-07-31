@@ -286,6 +286,7 @@ public:
     int & counter(const char *s);
     unsigned long long & var(const char *s);
     long long & svar(const char *s);
+    unsigned int & var32(const char *s);
     void var_del(const char *s);
     std::string & strv(const char *s);
     void strv_del(const char *s);

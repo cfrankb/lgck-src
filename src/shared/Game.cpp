@@ -1726,11 +1726,12 @@ void CGame::exec(const char* luaCode)
 
 void CGame::callLvEvent(int eventId)
 {
-    CLevel & level = * (m_arrLevels [ var("level") ]);
+    unsigned int levelId = var32("level");
+    CLevel & level = * (m_arrLevels [ levelId ]);
     const char* luaCode = level.getEvent(eventId);
     if (luaCode[0]) {
         char fnName [255];
-        sprintf(fnName, "event_level_%d_%s", var("level") +1, CLevel::getEventName(eventId));
+        sprintf(fnName, "event_level_%d_%s", levelId + 1, CLevel::getEventName(eventId));
 
         /* the function name */
         lua_getglobal(m_lua.getState(), fnName);
@@ -1772,7 +1773,7 @@ void CGame::callObjEvent(int objId, int eventId)
         CScene & scene = *(m_sFW);
         CActor & entry = scene[objId];
         char fnName [255];
-        sprintf(fnName, "event_level_%d_obj_%d_%s", var("level")+1, entry.m_nProto, CProtoArray::getEventName(eventId));
+        sprintf(fnName, "event_level_%d_obj_%d_%s", var32("level") + 1, entry.m_nProto, CProtoArray::getEventName(eventId));
         // the function name
         lua_getglobal(m_lua.getState(), fnName);
         // the first argument
@@ -1900,6 +1901,12 @@ long long & CGame::svar(const char *s)
 {
     unsigned long long & t = m_vars[s];
     return *reinterpret_cast<long long *>(&t);
+}
+
+unsigned int & CGame::var32(const char *s)
+{
+    unsigned long long & t = m_vars[s];
+    return *reinterpret_cast<unsigned int *>(&t);
 }
 
 void CGame::setEngineState(unsigned int state)
