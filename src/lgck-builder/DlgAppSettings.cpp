@@ -69,7 +69,9 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     m_ui->cbFontSize->setCurrentIndex(0);
     m_ui->sArgsHelp->setText(tr("%1 lgckdb filename\n" \
                                 "%2 level\n" \
-                                "%3 skill"));
+                                "%3 skill\n" \
+                                "%4 width\n" \
+                                "%5 height"));
 }
 
 CDlgAppSettings::~CDlgAppSettings()
@@ -343,7 +345,8 @@ void CDlgAppSettings::on_btnRuntime_clicked()
 #else
     QString fileFilter = tr("Executables (lgck-runtime*)");
 #endif
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Runtime executable"), "", tr(q2c(fileFilter)));
+    QString fileName = m_ui->eRuntime->text();
+    fileName = QFileDialog::getOpenFileName(this, tr("Runtime executable"), fileName, tr(q2c(fileFilter)));
     if (!fileName.isEmpty()) {
         m_ui->eRuntime->setText(fileName);
     }
@@ -374,5 +377,5 @@ void CDlgAppSettings::setCurrentTab(int i)
 
 const char *CDlgAppSettings::defaultRuntimeArgs()
 {
-    return "%1 --level=%2 --skill=%3";
+    return "%1 --level=%2 --skill=%3 --size=%4x%5";
 }

@@ -198,7 +198,8 @@ int main( int argc, char* args[] )
     game.attach((ISound*)sn);
     CMusicSDL *mu = new CMusicSDL();
     game.attach((IMusic*)mu);
-    CGRSfml * gm = new CGRSfml(&game);
+    CGRSfml * gm = new CGRSfml();
+    gm->init(&game, out.width, out.height, "LGCK / SFML runtime");
     game.attach(gm->cache());
     game.attach((IGraphics *) gm);
     game.initSounds();

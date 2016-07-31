@@ -1071,12 +1071,16 @@ void MainWindow::on_actionTest_Level_triggered()
         dlg->setLives(m_lives);
         dlg->setContinue(m_bContinue);
         dlg->setExternal(m_runtimeExternal);
+        dlg->setRez(m_rez);
         if (dlg->exec()) {
             m_skill = dlg->getSkill();
             m_start_hp = dlg->getHP();
             m_score = dlg->getScore();
             m_lives = dlg->getLives();
             m_bContinue = dlg->getContinue();
+            m_rez = dlg->getRez();
+            m_rezH = dlg->getHeight();
+            m_rezW = dlg->getWidth();
             qDebug("skill: %d", m_skill);
             m_doc.clearKeys();
             m_doc.setVitals(m_start_hp, m_lives, m_score);
@@ -2319,6 +2323,7 @@ void MainWindow::saveSettings()
         settings.setValue("path", m_runtime);
         settings.setValue("args", m_runtimeArgs);
         settings.setValue("external", m_runtimeExternal);
+        settings.setValue("rez", m_rez);
         settings.endGroup();
         settings.sync();
     }
@@ -2391,6 +2396,7 @@ void MainWindow::reloadSettings()
     m_runtime = settings.value("path", "").toString();
     m_runtimeArgs = settings.value("args", CDlgAppSettings::defaultRuntimeArgs()).toString();
     m_runtimeExternal = settings.value("external", false).toBool();
+    m_rez = settings.value("rez", 0).toInt();
     settings.endGroup();
 
     settings.beginGroup("Editor");
@@ -2652,7 +2658,9 @@ void MainWindow::goExternalRuntime()
         if (!current.isEmpty()) {
             current = current.replace("%1", filename)
                     .replace("%2", QString::number(m_doc.m_nCurrLevel))
-                    .replace("%3", QString::number(m_skill));
+                    .replace("%3", QString::number(m_skill))
+                    .replace("%4", QString::number(m_rezW))
+                    .replace("%5", QString::number(m_rezH));
             list.append(current);
         }
     }

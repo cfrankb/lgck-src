@@ -41,8 +41,6 @@
 #include "../shared/inputs/glut/kt_glut.h"
 #include "../shared/runtime.h"
 
-#define INIT_LEN 640
-#define INIT_HEI 480
 CGame *g_game;
 int g_currLevel = 0;
 int g_skill = 0;
@@ -262,8 +260,6 @@ void specialKeyReleased(int key, int x, int y)
 
 int main(int argc, char *argv[])
 {
-    int len = INIT_LEN;
-    int hei = INIT_HEI;
     CGame game;
     g_game = & game;
     add_lgck_res();
@@ -300,8 +296,8 @@ int main(int argc, char *argv[])
 
     // Window position (from top corner), and size (width and hieght)
     glutInitWindowPosition( 20, 60 );
-    glutInitWindowSize( len, hei );
-    glutCreateWindow("LGCK Runtime");
+    glutInitWindowSize( out.width, out.height );
+    glutCreateWindow("LGCK Runtime / GLUT");
     if (!game.initFonts()) {
         puts("giving up");
         exit(EXIT_FAILURE);

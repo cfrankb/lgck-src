@@ -20,10 +20,6 @@
 #include "../shared/GameEvents.h"
 #include "../shared/runtime.h"
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
 CGame *g_game;
 int g_currLevel = 0;
 int g_skill = 0;
@@ -166,7 +162,8 @@ int main( int argc, char* args[] )
     game.attach((ISound*)sn);
     CMusicSDL *mu = new CMusicSDL();
     game.attach((IMusic*)mu);
-    CGRSdl * gm = new CGRSdl(&game);
+    CGRSdl * gm = new CGRSdl();
+    gm->init(&game, out.width, out.height, "LGCK / SDL runtime");
     game.attach(gm->cache());
     game.attach((IGraphics *) gm);    
     game.initSounds();

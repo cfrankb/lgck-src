@@ -35,16 +35,28 @@
 // http://students.cs.byu.edu/~bfish/glfontdl.php
 // http://stackoverflow.com/questions/8847899/opengl-how-to-draw-text-using-only-opengl-methods
 
-CGRSfml::CGRSfml(CGame *game)
+CGRSfml::CGRSfml()
 {
-    m_window = new sf::RenderWindow(sf::VideoMode(640, 480), "SFML works!");
+    m_game = NULL;
+}
+
+bool CGRSfml::init(CGame *game, int w, int h, const char *title)
+{
+    m_window = new sf::RenderWindow(sf::VideoMode(w, h), title);
     if (!m_window) {
         qDebug("sf::RenderWindow failed");
+        return false;
     }
     m_imageManager = new CIMSfml();
     m_game = game;
     m_displayManager = new CDisplayManager(game, m_imageManager, this);
-    game->updateGeometry(SCREEN_WIDTH, SCREEN_HEIGHT);
+    game->updateGeometry(w, h);
+    return true;
+}
+
+const char* CGRSfml::lastError()
+{
+    return m_lastError.c_str();
 }
 
 CGRSfml::~CGRSfml()

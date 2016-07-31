@@ -91,6 +91,9 @@ private:
     CThreadUpdater *m_updater;
     QString m_runtime;
     QString m_runtimeArgs;
+    int m_rez;
+    int m_rezW;
+    int m_rezH;
     bool m_runtimeExternal;
     bool maybeSave();
     bool save();

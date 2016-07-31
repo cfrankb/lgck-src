@@ -3,6 +3,18 @@
 
 #include "../shared/stdafx.h"
 
+CDlgTestLevel::REZ CDlgTestLevel::m_rez[] {
+    {640,480},
+    {800,600},
+    {1024,768},
+    {1152,864},
+    {1280,720},
+    {1280,800},
+    {1280,1024},
+    {1440,900},
+    {1920,1080}
+};
+
 CDlgTestLevel::CDlgTestLevel(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CDlgTestLevel)
@@ -30,6 +42,11 @@ CDlgTestLevel::CDlgTestLevel(QWidget *parent) :
 
     // TODO: make visible again when implemented
     ui->cInitGame->setVisible(false);
+
+    for (unsigned int i=0; i < sizeof(m_rez)/sizeof(REZ);++i){
+        ui->cbResolution->addItem(QString("%1 x %2").arg(m_rez[i].w).arg(m_rez[i].h));
+    }
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 CDlgTestLevel::~CDlgTestLevel()
@@ -103,3 +120,24 @@ void CDlgTestLevel::setExternal(bool external)
 {
     ui->cExternal->setChecked(external);
 }
+
+int CDlgTestLevel::getWidth()
+{
+    return m_rez[ui->cbResolution->currentIndex()].w;
+}
+
+int CDlgTestLevel::getHeight()
+{
+    return m_rez[ui->cbResolution->currentIndex()].h;
+}
+
+int CDlgTestLevel::getRez()
+{
+    return ui->cbResolution->currentIndex();
+}
+
+void CDlgTestLevel::setRez(int v)
+{
+    ui->cbResolution->setCurrentIndex(v);
+}
+
