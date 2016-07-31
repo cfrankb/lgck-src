@@ -76,7 +76,10 @@ void CFont::write(IFile & file)
         char key = kv.first;
         Glyph & glyph = kv.second;
         file.write(&key, 1);
-        file.write(&glyph, sizeof(Glyph));
+        file.write(&glyph.x, 2);
+        file.write(&glyph.y, 2);
+        file.write(&glyph.width, 2);
+        file.write(&glyph.height, 2);
     }
     // props
     size = m_props.size();
@@ -93,12 +96,13 @@ void CFont::read(IFile & file)
 {
     forget();
     char signature[8];
-    int version;
+    int version = 0;
     // header
     file.read(signature, 8);
     ASSERT(!memcmp(signature, m_signature,8));
     file.read(&version, 4);
     ASSERT(version==VERSION);
+    m_width = m_height = 0;
     file.read(&m_width, 2);
     file.read(&m_height, 2);
     file >> m_text;
@@ -113,9 +117,12 @@ void CFont::read(IFile & file)
         Glyph glyph;
         char id;
         file.read(&id, 1);
-        file.read(&glyph, sizeof(glyph));
+        memset(&glyph, 0, sizeof(glyph));
+        file.read(&glyph.x, 2);
+        file.read(&glyph.y, 2);
+        file.read(&glyph.width, 2);
+        file.read(&glyph.height, 2);
         m_glyphs[id] = glyph;
-        qDebug("%c x=%d y=%d\n",  id, glyph.x, glyph.y);
     }
     // props
     file.read(&size, 2);
@@ -131,7 +138,6 @@ void CFont::read(IFile & file)
     m_pixels = new unsigned int[m_width*h];
     file.read(m_pixels, m_width * m_height * sizeof(unsigned int));
     m_height = h;
-    qDebug("w:%d h:%d total:%d",m_width, m_height, m_width * m_height * sizeof(unsigned int));
     for (int i=0; i < m_width*m_height; ++i) {
 //        m_pixels[i]=0xff0000ff;
     }
