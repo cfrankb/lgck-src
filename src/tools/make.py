@@ -30,8 +30,6 @@ import platform
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 def chunks(l, n):
-    """ Yield successive n-sized chunks from l.
-    """
     for i in xrange(0, len(l), n):
         yield l[i:i+n]
 
@@ -61,13 +59,6 @@ class CMakeU():
     def write_batchfile(self):
         objs = []
         objd = []
-        #src = []
-        #for fname in self.data['sources']:
-        #    if '*' in fname:
-        #        for fname in glob.glob(fname):
-        #            src.append(fname)
-        #    else:
-        #        src.append(fname)
         src = self.get_source()
         cmds = []
         cmds.append('if %1.==link. goto link')
@@ -171,17 +162,6 @@ class CMakeU():
         tfile.write('clean:\n')
         tfile.write('\trm -rf $(ODIR)')
         tfile.close()
-        if 'build' in self.data['linux']:
-            print("TODO: implement this")
-            '''out = [
-                '#!/bin/bash',
-                'cur=`pwd`',
-                'make {0} $1 $2 $3'.format(self.data['linux']['output']),
-                'cd "$pwd"'
-            ]
-            with open(self.data['linux']['build'],'w') as t:
-                t.write('\n'.join(out))
-            subprocess.check_call(["chmod", "+x", self.data['linux']['build']])'''
 
     def write_res(self):
         with open('res.json') as s:
