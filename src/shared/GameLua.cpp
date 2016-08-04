@@ -78,18 +78,13 @@ CLuaVM CGame::m_lua;
 
 void CGame::initLua()
 {
+    qDebug("initLua");
     // registers functions
     for (int i = 0; exports[i].fnName; ++i) {
         m_lua.registerFn(exports[i].fnName, exports[i].fnAddr);
     }
-
     std::string s;
     generateRuntimeLua(s);
-    CFileWrap file;
-    if (file.open("../debug/runtime.lua", "wb")) {
-        file += s.c_str();
-        file.close();
-    }
     m_lua.exec(s.c_str());
 }
 
