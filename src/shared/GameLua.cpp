@@ -3497,6 +3497,21 @@ int snapshot_reload(lua_State *L)
     }
 }
 
+int snapshot_clear(lua_State *L)
+{
+    const char *fnName = "snapshot_clear";
+    int argc = lua_gettop(L);
+    if (argc != 0) {
+        CGame::error(fnName, 0);
+        return 0;
+    } else {
+        CGame & game = CGame::getGame();
+        game.snapshot().clear();
+        return 0;
+    }
+}
+
+
 int remap(lua_State *L)
 {
     const char *fnName = "remap";

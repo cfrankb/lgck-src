@@ -562,8 +562,20 @@ bool CGame::initLevel(int n)
 {
     setLevel(n);
     CLevel *s = m_arrLevels[n];
+
     // remove remnant task
     m_tasks->forget();
+
+    // reload snapshot
+    bool snapshotReloading = false;
+    if (m_snapshot->has_snapshot()) {
+        m_snapshot->reload(*this);
+        bool snapshotReloading = true;
+        // if this is a restart call the
+        // restart event.
+       // callLvEvent(CLevel::EL_RESTART);
+    }
+
     BUFFERLEN = s->getSettingInt("width");
     BUFFERHEI = s->getSettingInt("height");
     if (!BUFFERLEN || !BUFFERHEI) {
@@ -591,18 +603,19 @@ bool CGame::initLevel(int n)
     // init LuaVM
     initLua();
 
-    // Split the background from the sprites
-    m_sBK->forget();
-    m_sFW->forget();
-    splitLevel(s, m_sBK, m_sFW);
-    // copy the other layers here
-    m_layers->forget();
-    for (int i=0; i < s->getSize(); ++i) {
-        CLayer *layer = new CLayer();
-        *layer = (*s)[i];
-        m_layers->addLayer( layer );
+    if (!snapshotReloading) {
+        // Split the background from the sprites
+        m_sBK->forget();
+        m_sFW->forget();
+        splitLevel(s, m_sBK, m_sFW);
+        // copy the other layers here
+        m_layers->forget();
+        for (int i=0; i < s->getSize(); ++i) {
+            CLayer *layer = new CLayer();
+            *layer = (*s)[i];
+            m_layers->addLayer( layer );
+        }
     }
-
     svar("WarpTo") = INVALID;
 
     // Save the background rgb value for future use
@@ -615,14 +628,16 @@ bool CGame::initLevel(int n)
     var("colorMod") = strtol(s->getSetting("colorMod"), NULL, 16);
 
     // allocate the collision map
-    Size sx = CMap::size(BUFFERLEN, BUFFERHEI);
-    var("BUFFERLEN") = BUFFERLEN;
-    var("BUFFERHEI") = BUFFERHEI;
-    m_map->resize(sx.len, sx.hei);
+    if (!snapshotReloading) {
+        Size sx = CMap::size(BUFFERLEN, BUFFERHEI);
+        var("BUFFERLEN") = BUFFERLEN;
+        var("BUFFERHEI") = BUFFERHEI;
+        m_map->resize(sx.len, sx.hei);
 
-    // Map both background and forewardground objects
-    m_sBK->map();
-    m_sFW->map();
+        // Map both background and forewardground objects
+        m_sBK->map();
+        m_sFW->map();
+    }
 
     // Find the player object
     if ( (svar("playerEntry") = m_sFW->findPlayerEntry()) == -1) {
@@ -651,7 +666,9 @@ bool CGame::initLevel(int n)
         player.callEvent(CObject::EO_ACTIVATE);
         centerOnPlayer(player);
         player.setState(CHitData::STATE_HIT | CHitData::STATE_BEGINNING, true);
-        player.set(EXTRA_HP, 50);
+        if (!snapshotReloading) {
+            player.set(EXTRA_HP, 50);
+        }
         player.set(EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
     }
 
@@ -682,13 +699,6 @@ bool CGame::initLevel(int n)
     // reset hard Inventory table
     m_inventoryTable->reset(true);
     m_inventoryTable->addInventory("@player");
-    // reload snapshot
-    if (m_snapshot->has_snapshot()) {
-        m_snapshot->reload(*this);
-        // if this is a restart call the
-        // restart event.
-       // callLvEvent(CLevel::EL_RESTART);
-    }
 
     return true;
 }
