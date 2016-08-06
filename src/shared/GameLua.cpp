@@ -119,6 +119,28 @@ int ss_notifyClosure(lua_State *L)
     return 0;
 }
 
+int ss_notifyAll(lua_State *L)
+{
+    const char *fn = "ss_notifyAll";
+    int argc = lua_gettop(L);
+    if ( argc != 3 && argc != 1)  {
+        CGame::error(fn, 3);
+    }
+    if (argc != 1) {
+        int gameEventID = static_cast<int>(lua_tonumber(L, 1));
+        int levelEventID = static_cast<int>(lua_tonumber(L, 2));
+        int spriteEventID = static_cast<int>(lua_tonumber(L, 3));
+        CGame::getGame().callGameEvent(gameEventID);
+        CGame::getGame().callLvEvent(levelEventID);
+        CGame::getGame().scene().notifyAll(spriteEventID);
+    } else {
+        int spriteEventID = static_cast<int>(lua_tonumber(L, 1));
+        CGame::getGame().scene().notifyAll(spriteEventID);
+    }
+    return 0;
+}
+
+
 int countGoals(lua_State *L)
 {
     const char *fn = "countGoals";

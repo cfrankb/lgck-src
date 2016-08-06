@@ -249,13 +249,20 @@ int CScene::findBySeed(UINT32 seed)
 
 void CScene::notifyClosure()
 {
+    notifyAll(CObject::EO_NOTIFYCLOSURE);
+}
+
+void CScene::notifyAll(int eventId)
+{
     for (int i=0; i < m_size; ++i) {
         CActor & entry = *(m_actors[i]);
         if (entry.m_nProto > 0) {
-            entry.callEvent(CObject::EO_NOTIFYCLOSURE);\
+            entry.callEvent(eventId);
         }
     }
+
 }
+
 
 void CScene::manageAuto()
 {

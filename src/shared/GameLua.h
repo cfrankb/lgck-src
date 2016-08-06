@@ -233,6 +233,7 @@ luaFn ( ss_notifyClosure )
 luaFn ( SHR )
 luaFn ( SHL )
 luaFn ( snapshot_clear )
+luaFn ( ss_notifyAll )
 
 static FUNCTION exports [] = {
     fn ( SHR )
@@ -443,6 +444,7 @@ static FUNCTION exports [] = {
     fn ( warpTo )
     fn ( XOR )
     fn ( snapshot_clear )
+    fn ( ss_notifyAll )
     alias ( "activateSprite", sprite_activate )
     alias ( "addDisplayC", display_new )
     alias ( "addElement", element_new )
