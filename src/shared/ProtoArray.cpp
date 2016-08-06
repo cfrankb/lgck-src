@@ -751,7 +751,7 @@ void CProto::write(IFile &file)
     file.write(this, sizeof (CProto));
 }
 
-char* CProto::getName()
+char *CProto::getName()
 {
     return m_szName;
 }

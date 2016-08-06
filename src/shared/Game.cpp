@@ -1341,9 +1341,7 @@ void CGame::addToHP(int hp)
 
 void CGame::killPlayer(CActor &player)
 {
-    player.setState(CHitData::STATE_DEAD, true);
-    player.set(EXTRA_HP,0);
-    //player.m_hp = 0;
+    player.kill();
 }
 
 bool CGame::isPlatformClass(int classId)
@@ -1616,7 +1614,7 @@ void CGame::generateRuntimeLua(std::string & s)
         s += t;
     }
 
-    s += std::string("-- EVENT PROCEDURES OBJECTS)\n\n");
+    s += std::string("-- EVENT PROCEDURES (OBJECTS)\n\n");
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         CObject & object = m_arrProto.getObject( n );
         for (int j = 0; j < object.getEventCount(); ++j) {

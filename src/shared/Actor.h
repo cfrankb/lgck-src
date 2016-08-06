@@ -105,7 +105,9 @@ public:
     int & get(const char *name);
     void set(int i, int value);
     int & get(int i);
+    CProto & getProto();
     void togglePathPlayback(bool enable);
+    const char *getClassName();
 
     enum  {
         TAG_REBORN          = 0x0001,

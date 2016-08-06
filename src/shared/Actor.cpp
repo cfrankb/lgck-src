@@ -202,6 +202,11 @@ const CProto & CActor::proto()
     return m_game->m_arrProto[m_nProto];
 }
 
+CProto & CActor::getProto()
+{
+    return m_game->m_arrProto[m_nProto];
+}
+
 const CObject & CActor::object()
 {
     return m_game->m_arrProto.getObject(m_nProto);
@@ -245,8 +250,15 @@ void CActor::stopAnimation()
 
 void CActor::kill()
 {
+    if (m_nProto == CLASS_PLAYER_OBJECT) {
+        setState(CHitData::STATE_DEAD, true);
+        set(EXTRA_HP,0);
+        return;
+    }
+
     if (m_nProto < 0) {
         m_nProto = 0;
+        return;
     }
 
     bool is_a_goal = isGoal();
@@ -1715,6 +1727,7 @@ void CActor::togglePathPlayback(bool enable)
     if (enable) {
         m_playback |= CPathBlock::PB_PLAYBACK;
     } else {
+
         m_playback &= (-1 ^ CPathBlock::PB_PLAYBACK);
     }
 
@@ -1725,4 +1738,9 @@ void CActor::togglePathPlayback(bool enable)
         m_propi[EXTRA_PATHDIR] = CGame::INVALID;
         m_propi[EXTRA_PATHPTR] = 0;
     }
+}
+
+const char *CActor::getClassName()
+{
+    return m_game->m_className[proto().m_nClass].c_str();
 }
