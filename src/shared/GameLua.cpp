@@ -37,6 +37,7 @@
 #include "GameLua.h"
 #include "Display.h"
 #include "Snapshot.h"
+#include "vlamits3.h"
 #include "interfaces/IMusic.h"
 #include "interfaces/IDisplayManager.h"
 #include "interfaces/IGraphics.h"
@@ -463,7 +464,11 @@ int killPlayer(lua_State *)
     CGame & game = CGame::getGame();
     CScene & scene = game.scene();
     CActor & player = scene [ game.svar("playerEntry") ] ;
-    game.killPlayer( player );
+    if (player.proto().m_nClass == CLASS_PLAYER_OBJECT) {
+        game.killPlayer( player );
+    } else {
+        qDebug("kill player against none player object.");
+    }
     return 0;
 }
 

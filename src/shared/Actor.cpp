@@ -45,6 +45,7 @@ CGame *CActor::m_game = NULL;
 
 void CActor::read(IFile & file, int version)
 {
+    Q_UNUSED(version)
     int size = sizeof(CLevelEntry);
     int oldSize;
     file.read(&oldSize,sizeof(int));
@@ -250,19 +251,20 @@ void CActor::stopAnimation()
 
 void CActor::kill()
 {
-    if (m_nProto == CLASS_PLAYER_OBJECT) {
-        setState(CHitData::STATE_DEAD, true);
-        set(EXTRA_HP,0);
-        return;
-    }
 
     if (m_nProto < 0) {
         m_nProto = 0;
         return;
     }
 
-    bool is_a_goal = isGoal();
     const CProto & p = proto();
+    if (p.m_nClass == CLASS_PLAYER_OBJECT) {
+        setState(CHitData::STATE_DEAD, true);
+        set(EXTRA_HP,0);
+        return;
+    }
+
+    bool is_a_goal = isGoal();
     bool is_pickup = p.m_nClass == CLASS_PICKUP_TRIGGERS;
 
     const CProto & newproto =  m_game->m_arrProto[p.m_nChProto];
