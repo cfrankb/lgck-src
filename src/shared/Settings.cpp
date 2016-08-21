@@ -92,6 +92,7 @@ bool CSettings::parseSettings(const char *strText)
             }
 
             std::string param;
+            std::string tmp;
             std::string value;
             int valueInt = 0;
 
@@ -102,7 +103,8 @@ bool CSettings::parseSettings(const char *strText)
                     ++p;
                     while (*p == ' ') ++p;
                     if (*p == '~') ++p;
-                    value = p;//removeSlashes(QString(p));
+                    tmp = p;
+                    removeSlashes(tmp, value);
                     while (*p && isdigit(*p)) {
                         valueInt = 10 *valueInt + *p - '0';
                         ++p;
@@ -119,9 +121,7 @@ bool CSettings::parseSettings(const char *strText)
                 }
             }
 
-            //param = removeSlashes(buffer);
             param = buffer;
-//            qDebug("*param* %s\n", q2c(param));
             if (!param.empty()) {
                 if (m_bReplaceAll) {
                     add(param.c_str(), value.c_str());
@@ -129,16 +129,10 @@ bool CSettings::parseSettings(const char *strText)
                     int i;
                     for (i=0; m_settings[i].param.c_str()[0]; i++) {
                         if (m_settings[i].param == param) {
-  //                          qDebug("param:%s %s %d\n", q2c(param), q2c(value), valueInt);
-
                             m_settings[i].value = value;
                             m_settings[i].valueInt = valueInt;
                             break;
                         }
-                    }
-
-                    if (m_settings[i].param.empty()) {
-                        //qDebug ("unknown param: %s\n", q2c(param));
                     }
                 }
             }
@@ -151,69 +145,93 @@ bool CSettings::parseSettings(const char *strText)
     return true;
 }
 
+int CSettings::calculateCost(const std::string & s)
+{
+    int cost = s.length();
+    if (s[0]==' ') {
+        ++cost;
+    }
+    for (unsigned int i=0; i < s.length(); ++i) {
+        if (s[i]=='\\') {
+            ++cost;
+        }
+    }
+    return cost;
+}
+
 void CSettings::outputSettings(std::string &t)
 {
     if (m_settings) {
-        t = "" ;
+        int bufSize = 1024;
+        int curSize = 0;
+        char *buf = new char[bufSize];
+        buf[0]=0;
         for (int i=0; !m_settings[i].param.empty(); ++i) {
             if (m_settings[i].param[0] != '#') {
-                t += std::string(addSlashes(m_settings[i].param, true)) + " " + std::string(addSlashes(m_settings[i].value, false)) + "\n";
-
-                /*
-                if (m_settings[i].value[0] != ' ') {
-                    strText += QString("%1 %2\n").arg(m_settings[i].param).arg(m_settings[i].value);
-                } else {
-                    strText += QString("%1 ~%2\n").arg(m_settings[i].param).arg(m_settings[i].value);
-                }*/
+                int addIn = strlen(m_settings[i].param.c_str()) + 2 + calculateCost(m_settings[i].value);
+                if (curSize + addIn + 1 >= bufSize) {
+                    bufSize += 2048 + addIn;
+                    char *p = new char[bufSize];
+                    strcpy(p, buf);
+                    delete [] buf;
+                    buf = p;
+                }
+                strcat(buf, m_settings[i].param.c_str());
+                strcat(buf, " ");
+                addSlashes2(m_settings[i].value, buf + strlen(buf));
+                strcat(buf, "\n");
+                curSize += addIn;
             }
         }
+        t = buf;
+        delete [] buf;
     } else {
         t = "# Bad: source array is NULL\n";
     }
 }
 
-const char* CSettings::addSlashes(const std::string s, bool spaceToo)
+void CSettings::addSlashes2(const std::string & s, char *t)
 {
-    std::string t;
-
     for (unsigned int i=0; i < s.length(); ++i) {
-        switch (s[i]) {
-        case ' ':
-            if (!spaceToo) {
-                if (i) {
-                    t += s[i];
-                } else {
-                    t += std::string("~") + s[i];
-                }
-                break;
-            }
+        if (i==0 && s[i]==' ') {
+            *t = '~';
+            ++t;
+            *t = ' ';
+            ++t;
+            continue;
+        }
 
+        switch (s[i]) {
         case '\\':
-            t += std::string("\\") + s[i];
-            break;
+            *t = '\\';
+            ++t;
+            *t = '\\';
+        break;
 
         case '\n':
-            t += "\\n";
+            *t = '\\';
+            ++t;
+            *t = 'n';
             break;
 
         case '\r':
-            t += "\\r";
+            *t = '\\';
+            ++t;
+            *t = 'r';
             break;
 
         default:
-            t += s[i];
+            *t = s[i];
         }
+        ++t;
     }
-
-    return t.c_str();
+    *t=0;
 }
 
-const char* CSettings::removeSlashes(std::string s)
+void CSettings::removeSlashes(const std::string & s, std::string & t)
 {
     // TODO: check this function again
-
-    std::string t;
-
+    t = "";
     for (unsigned int i=0; i < s.length(); ++i) {
         if (s[i] == '\\') {
             ++i;
@@ -228,9 +246,8 @@ const char* CSettings::removeSlashes(std::string s)
             t += s[i];
         }
     }
-
-    return t.c_str();
 }
+
 
 CSettings & CSettings::operator >> (IFile &file)
 {

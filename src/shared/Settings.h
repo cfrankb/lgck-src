@@ -54,10 +54,9 @@ public:
 protected:
     SETTING *m_settings;
     bool m_bReplaceAll;
-
-    static const char * addSlashes(const std::string s, bool spaceToo);
-    static const char * removeSlashes(const std::string s);
-
+    int calculateCost(const std::string & s);
+    void addSlashes2(const std::string & s, char *t);
+    void removeSlashes(const std::string & s, std::string & t);
 };
 
 #endif // CSETTINGS_H
