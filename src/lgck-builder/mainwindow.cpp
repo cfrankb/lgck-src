@@ -1210,7 +1210,6 @@ void MainWindow::handleGameEvents()
 
 void MainWindow::viewEvent()
 {
-    static int count = 0;
     m_lview->setFocus();
     switch (m_viewMode) {
     case VM_GAME:
@@ -1221,10 +1220,6 @@ void MainWindow::viewEvent()
         if (m_time.elapsed() > m_nextTick) {
             m_nextTick = m_time.elapsed() + TICK_SCALE;
             m_scroll->eventHandler();
-            /*if (count % 2 ==0) {
-            emit updateScene();
-            }
-            ++count;*/
         }
         break;
 
@@ -1232,10 +1227,6 @@ void MainWindow::viewEvent()
         if (m_time.elapsed() > m_nextTick) {
             m_nextTick = m_time.elapsed() + TICK_SCALE;
             m_scroll->editPath();
-            /*if (count % 2 ==0) {
-            emit updateScene();
-            }
-            ++count;*/
         }
     }
 }

@@ -217,7 +217,6 @@ HEADERS  +=  mainwindow.h \
     ../shared/implementers/sdl/sn_sdl.h \
     ../shared/implementers/sdl/im_sdl.h \
     ../shared/implementers/sdl/gr_sdl.h \
-    ../shared/implementers/sdl/dm_sdl.h \
     ../shared/interfaces/IMusic.h \
     ../shared/Display.h \
     ../shared/DisplayManager.h \
