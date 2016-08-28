@@ -56,7 +56,7 @@ class CMakeU():
                     deps.append(src)
         sfile.close()
 
-    def write_batchfile(self):
+    def write_batchfile(self, build):
         objs = []
         objd = []
         src = self.get_source()
@@ -64,8 +64,8 @@ class CMakeU():
         cmds.append('if %1.==link. goto link')
         cmds.append('if %1.==clean. goto clean')
         cmds.append('windres lgck.rc -O coff -o shared\lgck.res')
-        cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data['win32']['paths']]) + \
-            ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data['win32']['flags']]) 
+        cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data[build]['paths']]) + \
+            ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data[build]['flags']])
         for fname in src:
             base = os.path.splitext(fname)[0]
             objn = base + '.o';
@@ -78,17 +78,22 @@ class CMakeU():
             objs.append(objn)
             cmds.append(r'g++ -c %s %s -o %s' % (cflags, fname, objn))
             cmds.append(r'@if %errorlevel% neq 0 goto err')
-        tfile = open(self.data['win32']['output'], 'w')
+        tfile = open(self.data[build]['output'], 'w')
         for objp in objd:
             tfile.write('mkdir %s\n' % objp.replace('/', '\\'))
         for cmd in cmds:
             tfile.write(cmd + '\n')
-        cflags = ' '.join(["{flag}".format(flag=flag) for flag in self.data['win32']['flags']]) + \
+        cflags = ' '.join(["{flag}".format(flag=flag) for flag in self.data[build]['flags']]) + \
             ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']]) 
-        libs = ' '.join(['-{lib}'.format(lib=lib) for lib in self.data['win32']['libs']])
+        libs = ' '.join(['{lib}'.format(lib=lib) for lib in self.data[build]['libs']])
         objs = ' '.join([obj for obj in objs])
         tfile.write(':link\n')
-        tfile.write('g++ %s %s shared\lgck.res %s -o %s\n' % (cflags, objs, libs, self.data['target']))
+        tfile.write('g++ {cflags} {objs} shared\lgck.res {libs} -o {target}\n'.format(
+			cflags=cflags,
+			objs=objs,
+			libs=libs,
+			target=self.data['target']
+		))
         tfile.write(r'@if %errorlevel% neq 0 goto err')
         tfile.write('\n')
         tfile.write('goto out\n')
@@ -141,7 +146,7 @@ class CMakeU():
             objs.append(objn)
         cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data['linux']['paths']]) + \
             ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data['linux']['flags']]) + \
-            ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']]) 
+            ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']])
         tfile = open(self.data['linux']['output'], 'w')
         tfile.write("TARGET=%s\n" % self.data['target'])
         tfile.write('CC=%s\n' % self.data['cxx'])
@@ -220,7 +225,9 @@ class CMakeU():
         if 'linux' in self.data:
             self.write_makefile()
         if 'win32' in self.data:
-            self.write_batchfile()
+            self.write_batchfile('win32')
+        if 'win32-s' in self.data:
+            self.write_batchfile('win32-s')
 
 cmakeu = CMakeU()
 cmakeu.main();

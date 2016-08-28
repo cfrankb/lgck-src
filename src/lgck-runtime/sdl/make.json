@@ -1,5 +1,5 @@
 {
-    "target": "sdl/lgck-runtime",
+    "target": "build/lgck-runtime-sdl",
     "cxx": "g++",
     "linux": {
         "output" : "makefile",
@@ -26,15 +26,13 @@
             "../../../redist/include"
         ],
         "libs" : [
-            "L../../../redist/lib/sdl2-204",
-            "L../../../redist/lib",
-            "lz",
-            "lm",
-            "llua52",
-            "lmingw32",
-            "lSDL2main",
-            "lSDL2",
-            "lSDL2_mixer"
+            "-L../../../redist/lib/static",
+            "-static",
+			"-lmingw32",
+			"-lSDL2_mixer -lFLAC -lvorbisfile -lvorbis -logg",
+			"-lSDL2main -lSDL2 -lSDL2_mixer  -lm -ldinput8 -ldxguid -ldxerr8",
+			"-luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32",
+			"-lversion -luuid -llua52 -lz -static-libgcc"
         ],
         "flags" : ["-std=gnu++11", "-O3", "-Wall"]
     },
@@ -44,9 +42,9 @@
         "../shared/implementers/sdl/*.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/sdl/*.cpp",
-        "shared/lgck_res.cpp"
+        "build/lgck_res.cpp"
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
-    "obj_dir": "target/sdl",
+    "obj_dir": "build/sdl",
     "declare" : []
 }

@@ -26,3 +26,4 @@ src/easydoc/bak/*
 src/obl5t/testcase/*
 src/lgck-runtime/make.bat
 src/lgck-runtime/makefile
+src/lgck-runtime/build/*

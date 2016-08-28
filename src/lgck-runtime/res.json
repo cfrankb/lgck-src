@@ -1,5 +1,5 @@
 {
-    "out": "shared/lgck_res.cpp",
+    "out": "build/lgck_res.cpp",
     "name": "add_lgck_res",
     "base": "../lgck-builder/",
     "file_list" : [

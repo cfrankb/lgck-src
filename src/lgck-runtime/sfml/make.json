@@ -1,5 +1,5 @@
 {
-    "target": "sfml/lgck-runtime",
+    "target": "build/lgck-runtime-sfml",
     "cxx": "g++",
     "linux": {
         "output" : "makefile",
@@ -29,18 +29,12 @@
             "../../../redist/include"
         ],
         "libs" : [
-            "L../../../redist/lib",
-            "L../../../redist/lib/sdl2-204",
-            "L../../../redist/lib/sfml",
-            "lz",
-            "lm",
-            "llua52",
-            "lSDL2",
-            "lSDL2_mixer",
-            "lsfml-main",
-            "lsfml-graphics",
-            "lsfml-window",
-            "lsfml-system"
+            "-L../../../redist/lib/static",
+            "-static",
+            "-lmingw32",
+            "-lSDL2main -lSDL2 -lSDL2_mixer -lsfml-main -lsfml-graphics-s -lsfml-window-s -lsfml-system-s",
+            "-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32",
+            "-lversion -luuid -llua -lz -lvorbisenc -lvorbisfile -lvorbis -logg -static-libgcc"
         ],
         "flags" : ["-std=gnu++11", "-O3", "-Wall"]
     },
@@ -51,9 +45,9 @@
         "../shared/implementers/sfml/*.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/sfml/*.cpp",
-        "shared/lgck_res.cpp"
+        "build/lgck_res.cpp"
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
-    "obj_dir": "target/sfml",
+    "obj_dir": "build/sfml",
     "declare" : []
 }
