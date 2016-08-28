@@ -1,6 +1,6 @@
 /*
     LGCK Builder GUI
-    Copyright (C) 1999, 2014  Francois Blanchette
+    Copyright (C) 1999, 2016  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 #include <QSplashScreen>
 #include <QToolBar>
 #include <QProcess>
+#include <QOpenGLWidget>
+#include <QScrollArea>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -38,7 +40,7 @@
 #include "../shared/interfaces/IImageManager.h"
 #include "../shared/interfaces/IMusic.h"
 #include "../shared/interfaces/ISound.h"
-#include "../shared/implementers/opengl/im_opengl.h"
+#include "../shared/implementers/opengl/im_qtopengl.h"
 #include "../shared/implementers/sdl/mu_sdl.h"
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/GameEvents.h"
@@ -62,13 +64,14 @@
 #include "WizFrameSet.h"
 #include "WizGame.h"
 #include "WizScript.h"
-#include "LevelView.h"
 #include "Snapshot.h"
 #include "ToolBoxDock.h"
 #include "thread_updater.h"
 #include "../shared/ss_version.h"
 #include "WizFont.h"
 #include <QSysInfo>
+#include "levelviewgl.h"
+#include "levelscroll.h"
 
 char MainWindow::m_fileFilter[] = "LGCK games (*.lgckdb)";
 char MainWindow::m_appName[] = "LGCK builder";
@@ -96,35 +99,28 @@ MainWindow::MainWindow(QWidget *parent)
     m_viewMode = VM_EDITOR;
     // initToolBar() must be placed before update menus.
     initToolBar();
-    m_lview = new CLevelView(this);
-    /*QSizePolicy sp;
-    sp.setVerticalPolicy(QSizePolicy::MinimumExpanding);
-    sp.setHorizontalPolicy(QSizePolicy::Maximum);
-    sp.setVerticalPolicy(QSizePolicy::Fixed);
-    sp.setHorizontalPolicy(QSizePolicy::Fixed);
-    m_lview->setSizePolicy(sp);*/
-    m_lview->setGameDB(&m_doc);
-    m_lview->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_scroll = new CLevelScroll(this, &m_doc);
+    m_lview = static_cast<CLevelViewGL*>(m_scroll->viewport());
+    setCentralWidget(m_scroll);
 
-    connect(m_lview, SIGNAL(customContextMenuRequested(const QPoint&)),
+    connect(m_scroll, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showContextMenu(const QPoint&))) ;
-    connect(m_lview, SIGNAL(keyChanged(int, int)),
+    connect(m_scroll, SIGNAL(keyChanged(int, int)),
         this, SLOT( notifyKeyEvent(int, int))) ;
-    connect(m_lview, SIGNAL(menuChanged()),
+    connect(m_scroll, SIGNAL(menuChanged()),
         this, SLOT( updateMenus())) ;
-    connect(m_lview, SIGNAL(statusChanged(int, QString)),
+    connect(m_scroll, SIGNAL(statusChanged(int, QString)),
         this, SLOT( setStatus(int, QString))) ;
-    connect(m_lview, SIGNAL(newLevelReq()),
+    connect(m_scroll, SIGNAL(newLevelReq()),
         this, SLOT( addLevel())) ;
     connect(this, SIGNAL(gameModeEnabled(bool)),
-           m_lview, SLOT(setGameMode(bool)));
-    connect(m_lview, SIGNAL(pathEnded()),
+           m_scroll, SLOT(setGameMode(bool)));
+    connect(m_scroll, SIGNAL(pathEnded()),
             this, SLOT(closePath()));
     connect(this, SIGNAL(pathStarted()),
-            m_lview, SLOT(enterEditPath()));
+            m_scroll, SLOT(enterEditPath()));
     connect(this, SIGNAL(pathEnded()),
-            m_lview, SLOT(leaveEditPath()));
-
+            m_scroll, SLOT(leaveEditPath()));
     setMinimumHeight(this->maximumHeight());
 
     m_labels[0] = new QLabel("", ui->statusBar, 0);
@@ -145,8 +141,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_timer.start();
     m_time.start();
     m_nextTick = m_time.elapsed() + TICK_SCALE;
-    m_lview->repaint();
-    setCentralWidget(m_lview);
 
     // create the toolbox
     m_toolBox = new CToolBoxDock(this);
@@ -159,7 +153,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(frameSetChanged(int)),
             m_toolBox, SLOT(updateFrameSet(int)));
 
-    connect(&m_timer, SIGNAL(timeout()), (CLevelView*)this, SLOT(viewEvent()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(viewEvent()));
     m_toolBox->init();
 
     // link the toolBox to MainWindow
@@ -209,7 +203,7 @@ MainWindow::MainWindow(QWidget *parent)
             m_lview, SLOT(showGrid(bool)));
 
     connect(this, SIGNAL(scrollbarShown(bool)),
-            m_lview, SLOT(showScrollbars(bool)));
+            m_scroll, SLOT(showScrollbars(bool)));
 
     connect(this, SIGNAL(gridColorChanged(QString)),
             m_lview, SLOT(setGridColor(QString)));
@@ -218,13 +212,17 @@ MainWindow::MainWindow(QWidget *parent)
             m_lview, SLOT(setGridSize(int)));
 
     connect(this, SIGNAL(levelSelected(int)),
-            m_lview, SLOT(changeLevel(int)));
+            m_scroll, SLOT(changeLevel(int)));
 
-    connect(this, SIGNAL(updateScene()),
-            m_lview, SLOT(sceneUpdated()));
+//    connect(this, SIGNAL(updateScene()),
+  //          m_lview, SLOT(sceneUpdated()));
+  //  connect(this, SIGNAL(updateScene()),
+    //        m_lview, SLOT(needRefresh()));
 
-    connect(this, SIGNAL(focusGL()),
-            m_lview, SLOT(makeCurrent()));
+    //connect(this, SIGNAL(focusGL()),
+    //        m_lview, SLOT(makeCurrent()));
+
+
 
     // reload settings
    // setViewMode(VM_EDITOR);
@@ -248,7 +246,7 @@ void MainWindow::createEventEditor()
     m_editEvents->setWindowTitle(tr("Event script"));
     m_editEvents->hide();
     m_editEvents->setGameFile(&m_doc);
-    QPoint pt = m_lview->pos();
+    QPoint pt = m_scroll->pos();
     pt.setX(pt.x() + 4);
     m_lview->move(pt);
     m_editEvents->move(pt);
@@ -301,10 +299,10 @@ void MainWindow::setStatus(int i, const QString message)
 void MainWindow::hideView(bool hide)
 {
     if (hide) {
-        m_lview->hide();
+        m_scroll->hide();
         ui->centralWidget->show();
     } else {
-        m_lview->show();
+        m_scroll->show();
         ui->centralWidget->hide();
     }
 }
@@ -318,7 +316,7 @@ void MainWindow::focusInEvent ( QFocusEvent * event )
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete m_lview;    
+    //delete m_lview;
     delete (CMusicSDL*) m_doc.music();
     m_doc.attach((IMusic*)NULL);
     delete (CSndSDL*) m_doc.sound();
@@ -365,6 +363,8 @@ void MainWindow::open(QString fileName)
                 files.removeAll(fileName);
                 settings.setValue("recentFileList", files);
             }
+            qDebug("MakeCurrent()");
+            m_lview->makeCurrent();
             m_doc.cacheImages();
             QApplication::restoreOverrideCursor();
             updateTitle();
@@ -1125,6 +1125,7 @@ void MainWindow::testLevel(bool initSound)
 
 void MainWindow::handleGameEvents()
 {
+//    static int count=0;
     int result = m_doc.runEngine();
     if (result) {
         m_doc.stopMusic();
@@ -1199,11 +1200,17 @@ void MainWindow::handleGameEvents()
             m_doc.removePointsOBL();
         }
     }
+    /*if (count % 2 ==0) {
     emit updateScene();
+    }
+    ++count;*/
+
+//    emit updateScene();
 }
 
 void MainWindow::viewEvent()
 {
+    static int count = 0;
     m_lview->setFocus();
     switch (m_viewMode) {
     case VM_GAME:
@@ -1213,16 +1220,22 @@ void MainWindow::viewEvent()
     case VM_EDITOR:
         if (m_time.elapsed() > m_nextTick) {
             m_nextTick = m_time.elapsed() + TICK_SCALE;
-            m_lview->eventHandler();
+            m_scroll->eventHandler();
+            /*if (count % 2 ==0) {
             emit updateScene();
+            }
+            ++count;*/
         }
         break;
 
     case VM_EDIT_PATH:
         if (m_time.elapsed() > m_nextTick) {
             m_nextTick = m_time.elapsed() + TICK_SCALE;
-            m_lview->editPath();
+            m_scroll->editPath();
+            /*if (count % 2 ==0) {
             emit updateScene();
+            }
+            ++count;*/
         }
     }
 }
@@ -1918,13 +1931,13 @@ void MainWindow::setViewMode(int viewMode)
         case VM_GAME:
             emit gameModeEnabled(false);
             if (viewMode != VM_EDITOR) {
-                m_lview->hide();
+                m_scroll->hide();
             }
             break;
 
         case VM_EDITOR:
             if (viewMode == VM_SPRITE_EVENTS) {
-                m_lview->hide();
+                m_scroll->hide();
             }
             break;
         }
@@ -1933,12 +1946,12 @@ void MainWindow::setViewMode(int viewMode)
         m_viewMode = viewMode;
         switch (viewMode) {
         case VM_EDITOR:
-            m_lview->show();
+            m_scroll->show();
             reloadEventCombo();
             break;
 
         case VM_GAME:
-            m_lview->show();
+            m_scroll->show();
             emit gameModeEnabled(true);
             break;
 
@@ -2111,7 +2124,7 @@ void MainWindow::on_actionPaste_triggered()
                 // duplicate path (if applicable)
                 CPathBlock *paths = m_doc.getPaths();
                 entry.m_path = paths->duplicate(entry.m_path);
-                entry.moveBy(CLevelView::OBJ_SCROLL, CLevelView::OBJ_SCROLL);
+                entry.moveBy(CLevelViewGL::OBJ_SCROLL, CLevelViewGL::OBJ_SCROLL);
                 layer.select( layer.add(entry) );
             }
         }
@@ -2157,7 +2170,7 @@ void MainWindow::on_actionCopy_Object_triggered()
                 // duplicate path (if applicable)
                 CPathBlock *paths = m_doc.getPaths();
                 entry.m_path = paths->duplicate(entry.m_path);
-                entry.moveBy(CLevelView::OBJ_SCROLL, CLevelView::OBJ_SCROLL);
+                entry.moveBy(CLevelViewGL::OBJ_SCROLL, CLevelViewGL::OBJ_SCROLL);
                 layer.select( layer.add(entry) );
                 layer.unSelectedAt(0);
             }
@@ -2664,6 +2677,7 @@ void MainWindow::goExternalRuntime()
             list.append(current);
         }
     }
+    qDebug() << list;
     QDir d = QFileInfo(m_runtime).absoluteDir();
     QString errMsg = "";
     if (checkExecutible(m_runtime, errMsg)) {

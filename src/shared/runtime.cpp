@@ -63,6 +63,7 @@ int whatIs(char *cmd)
 bool parseCmdLine(int argc, char* args[], ARGS & out)
 {
     bool err = false;
+    out.filename = "";
     out.skill = 0;
     out.level = -1;
     out.width = 640;

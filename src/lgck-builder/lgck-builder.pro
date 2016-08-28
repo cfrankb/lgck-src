@@ -5,20 +5,21 @@
 #-------------------------------------------------
 
 win32:CONFIG        += static
+win32:CONFIG        += no_lflags_merge
 win32:INCLUDEPATH   += ../../redist/headers
-win32:INCLUDEPATH   += ../../redist/headers/freetype2
 INCLUDEPATH         += ../shared
-unix:INCLUDEPATH    += /usr/include/freetype2
 win32:RC_FILE       = lgck-builder.rc
+win32:DEFINES       += STATIC
+win32:DEFINES       += QT_STATIC_BUILD
 unix:DEFINES        += MAKE_LINUX=1
+DEFINES             += USE_QFILE=1
 QT                  += core gui opengl network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET              = lgck-builder
 TEMPLATE            = app
-QMAKE_CXXFLAGS      += -std=c++0x -O3
-#QMAKE_CXXFLAGS += -std=c++0x -g3
+QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
+QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
 RESOURCES           += lgck-builder.qrc
-DEFINES             += USE_QFILE=1
 
 unix:LIBS += -lqt5scintilla2 \
     -llua5.2 \
@@ -26,16 +27,28 @@ unix:LIBS += -lqt5scintilla2 \
     -lSDL2-2.0 \
     -lz
 
-win32:LIBS += -L../../redist/lib \
+win32:LIBS += \ #-L../../redist/lib \
+    -L../../../redist/lib/static \
+    -L../../../redist/lib/static \
     -lqscintilla2 \
     -llua52 \
+    -lmingw32 \
+    -lSDL2_mixer \
+    -lFLAC -lvorbisfile -lvorbis -logg \
     -lSDL2 \
     -lSDL2_mixer \
-    -lz
+    -ldinput8 -ldxguid -ldxerr8 -luser32 \
+    -lgdi32 -lwinmm -limm32 -lole32 \
+    -loleaut32 -lshell32 -lversion -luuid \
+    -lz \
+    -lQt5OpenGLExtensions \
+    -lQt5OpenGL \
+    -lopengl32
 
 SOURCES +=  mainwindow.cpp \
     main.cpp \
-    LevelView.cpp \
+    levelviewgl.cpp \
+    levelscroll.cpp \
     DlgSource.cpp \
     DlgSkill.cpp \
     DlgGotoLevel.cpp \
@@ -125,7 +138,8 @@ SOURCES +=  mainwindow.cpp \
     DlgExportSprite.cpp
 
 HEADERS  +=  mainwindow.h \
-    LevelView.h \
+    levelviewgl.h \
+    levelscroll.h \
     DlgSource.h \
     DlgSkill.h \
     DlgObject.h \
@@ -197,7 +211,6 @@ HEADERS  +=  mainwindow.h \
     ../shared/inventoryTable.h \
     ../shared/interfaces/IImageManager.h \
     ../shared/interfaces/IGraphics.h \
-#    ../shared/implementers/opengl/dm_opengl.h \
     ../shared/implementers/opengl/im_opengl.h \
     ../shared/implementers/opengl/gr_opengl.h \
     ../shared/implementers/sdl/mu_sdl.h \

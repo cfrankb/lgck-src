@@ -23,13 +23,17 @@ class QComboBox;
 class QLabel;
 class CWEditEvents;
 class QAction;
-class CLevelView;
+class CLevelScroll;
+//class CLevelView;
+class CLevelViewGL;
 class CToolBoxDock;
 class CThreadUpdater;
+class QScrollArea;
 
 #include <QTimer>
 #include <QTime>
 #include <QMainWindow>
+#include <QGLFunctions>
 #include "../shared/stdafx.h"
 #include "../shared/Game.h"
 
@@ -60,7 +64,9 @@ private:
     Ui::MainWindow *ui;
     QComboBox *m_comboEvents;
     QComboBox *m_comboLayers;
-    CLevelView *m_lview;
+    //QScrollArea *m_scroll
+    CLevelScroll *m_scroll;
+    CLevelViewGL *m_lview;
     CToolBoxDock *m_toolBox;
     CWEditEvents *m_editEvents;
     QToolBar *m_levelToolbar;
@@ -138,6 +144,12 @@ private:
     void goExternalRuntime();
     bool checkExecutible(const QString exec, QString & errMsg);
     void showAppSettings(int tab);
+protected:
+    void initializeGL();
+    void paintGL();
+
+    QOpenGLContext *m_context;
+
 private slots:
     void on_actionRestart_triggered();
     void on_actionDebug_triggered();

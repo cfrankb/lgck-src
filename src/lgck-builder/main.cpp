@@ -27,10 +27,12 @@
 
 int main(int argc, char *argv[])
 {
+    //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL, false);
+    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
     QApplication app(argc, argv);
     MainWindow w;
+    w.createEventEditor();
 
-#ifdef Q_OS_WIN32
     char m_fileFilter[] = "LGCK games (*.lgckdb)";
     QString fileName = "";
     bool done = false;
@@ -68,14 +70,13 @@ int main(int argc, char *argv[])
         delete dlg;
     } while (!done);
 
+    w.show();
     if (!fileName.isEmpty()) {
-        w.makeCurrent();
         w.open(fileName);
     }
+#ifdef Q_OS_WIN32
 #else
     srand( time( NULL ) );
 #endif
-    w.createEventEditor();
-    w.show();
     return app.exec();
 }
