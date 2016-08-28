@@ -4,15 +4,16 @@
 #
 #-------------------------------------------------
 
-win32:CONFIG        += static
+win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
-win32:INCLUDEPATH   += ../../redist/headers
+win32:INCLUDEPATH   += ../../../redist/include
 INCLUDEPATH         += ../shared
 win32:RC_FILE       = lgck-builder.rc
 win32:DEFINES       += STATIC
 win32:DEFINES       += QT_STATIC_BUILD
 unix:DEFINES        += MAKE_LINUX=1
 DEFINES             += USE_QFILE=1
+DEFINES             += LGCK_OPENGL_DEBUG=1
 QT                  += core gui opengl network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET              = lgck-builder
@@ -27,8 +28,7 @@ unix:LIBS += -lqt5scintilla2 \
     -lSDL2-2.0 \
     -lz
 
-win32:LIBS += \ #-L../../redist/lib \
-    -L../../../redist/lib/static \
+win32:LIBS += -L../../../redist/lib/static \
     -L../../../redist/lib/static \
     -lqscintilla2 \
     -llua52 \

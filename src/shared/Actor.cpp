@@ -45,7 +45,7 @@ CGame *CActor::m_game = NULL;
 
 void CActor::read(IFile & file, int version)
 {
-    Q_UNUSED(version)
+    Q_UNUSED(version);
     int size = sizeof(CLevelEntry);
     int oldSize;
     file.read(&oldSize,sizeof(int));

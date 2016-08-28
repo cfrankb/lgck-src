@@ -1177,7 +1177,6 @@ void CToolBoxDock::exportSprite()
     CFrameSet * frameSet = gf.m_arrFrames[proto.m_nFrameSet];
     COBL5File oblDoc;
 
-    bool result = false;
     QStringList filters;
     QString selected = tr(g_oblFilter) + "\n" + tr(g_pngFilter);
     QString suffix = "obl";
@@ -1222,7 +1221,6 @@ void CToolBoxDock::exportSprite()
         oblDoc.getImageSet() = *frameSet;
         oblDoc.setFileName(fileName);
         oblDoc.write();
-        result = true;
     }
     delete dlg;
 }
