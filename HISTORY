@@ -5,9 +5,11 @@ HISTORY OF LGCK BUILDER
 - EDITOR: builder can export sprites (obl, png)
 - EDITOR: runtime integration the IDE
 - ENGINE: new level event: OnIntroDraw
+- ENGINE: snapshot_clear()
 - EASYDOC: introducted the concept of alias amd inprove the ui
+- LUA: System Call - ss_notifyAll()
 - BUG FIX: lua script not always regenerated after an event was modified
-
+- BUG FIX: when a snapshot is taken and restored the next level may be replaced by the snapsnot
 
 *** 0.6.0.6
 

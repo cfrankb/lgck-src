@@ -1,11 +1,13 @@
 *-Debug/*
 *-Release/*
+src/*-Debug/*
+src/*-Release/*
 *debug/
 *.user
 *.
 *.pyc
 obl5t/obl5t
-*/bak/
+*/bak
 *2.7pre1
 */obj/
 */build/

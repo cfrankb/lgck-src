@@ -570,7 +570,7 @@ bool CGame::initLevel(int n)
     bool snapshotReloading = false;
     if (m_snapshot->has_snapshot()) {
         m_snapshot->reload(*this);
-        bool snapshotReloading = true;
+        snapshotReloading = true;
         // if this is a restart call the
         // restart event.
        // callLvEvent(CLevel::EL_RESTART);
