@@ -15,23 +15,12 @@
     <normaloff>:/images/icon64.png</normaloff>:/images/icon64.png</iconset>
   </property>
   <property name="windowTitle">
-   <string>DockWidget</string>
+   <string>Doc&amp;kWidget</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="CWPreview" name="graphicsView"/>
-    </item>
-   </layout>
+   <layout class="QGridLayout" name="gridLayout"/>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CWPreview</class>
-   <extends>QGraphicsView</extends>
-   <header>WPreview.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="obl5edit.qrc"/>
  </resources>

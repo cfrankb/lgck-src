@@ -21,6 +21,8 @@
 #include <QResizeEvent>
 #include <QSize>
 #include <QGLWidget>
+#include "previewwidget.h"
+#include "previewscroll.h"
 
 CWPreviewDock::CWPreviewDock(QWidget *parent) :
     QDockWidget(parent),
@@ -28,8 +30,17 @@ CWPreviewDock::CWPreviewDock(QWidget *parent) :
 {    
     m_titleTemplate = "noname - %d%%";
     m_isStatic = false;
-    ui->setupUi(this);        
-    connect(ui->graphicsView, SIGNAL(zoomChanged(int)),
+    ui->setupUi(this);
+
+    m_scroll = new CPreviewScroll(this);
+    m_widget = static_cast<CPreviewWidget *>(m_scroll->viewport());
+    //m_widget = new CPreviewWidget(this);
+
+    ui->gridLayout->addWidget(m_scroll);
+    connect(m_widget, SIGNAL(zoomChanged(int)),
+            this, SLOT(updateTitle(int)));
+
+    connect(m_scroll, SIGNAL(zoomChanged(int)),
             this, SLOT(updateTitle(int)));
 }
 
@@ -43,9 +54,9 @@ void CWPreviewDock::resizeEvent ( QResizeEvent * event )
     Q_UNUSED(event);
 }
 
-CWPreview * CWPreviewDock::getView()
+CPreviewWidget *CWPreviewDock::getView()
 {
-    return ui->graphicsView;
+    return m_widget;
 }
 
 void CWPreviewDock::closeEvent ( QCloseEvent * event )
@@ -64,14 +75,6 @@ void CWPreviewDock::setStatic()
 
 void CWPreviewDock::updateTitle(int zoom)
 {
-    /*
-    QString s;
-    if (m_isStatic) {
-        s.sprintf("Static %d%%", zoom * 100);
-    } else {
-        s.sprintf("Liveview %d%%", zoom * 100);
-    }*/
-
     QString s = QString(m_titleTemplate).arg(zoom * 100);
     setWindowTitle(s);
 }

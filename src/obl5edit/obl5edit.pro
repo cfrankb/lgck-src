@@ -10,7 +10,8 @@ QT       += core gui opengl
 TARGET = obl5edit
 TEMPLATE = app
 INCLUDEPATH += ../shared/qtgui/ColorPicker
-win32:INCLUDEPATH += ../../redist/headers
+INCLUDEPATH += ../shared
+win32:INCLUDEPATH += ../../redist/include
 RESOURCES +=  obl5edit.qrc
 win32:RC_FILE = obl5edit.rc
 OTHER_FILES +=  TODO
@@ -18,7 +19,8 @@ DEFINES += USE_QFILE=1
 win32:DEFINES += MAKE_WIN32
 win32:LIBS += -L../../redist/lib
 LIBS += -lz
-QMAKE_CXXFLAGS      += -std=c++0x -O3
+QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
+QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
 
 SOURCES += mainwindow.cpp \
     main.cpp\
@@ -35,19 +37,21 @@ SOURCES += mainwindow.cpp \
     ../shared/qtgui/ColorPicker/qtcolortriangle.cpp \
     ../shared/qtgui/ColorPicker/colorviewer.cpp \
     ../shared/qtgui/ColorPicker/colorpickerwidget.cpp \
-    FrameView.cpp \
     Pixel.cpp \
     DlgGoto.cpp \
     WizFrameSet.cpp \
     WFrameSet.cpp \
     WizPageImport.cpp \
     DlgImageSize.cpp \
-    WPreview.cpp \
     WFileSave.cpp \
     DlgShortcuts.cpp \
     WHotKey.cpp \
     DlgAlpha.cpp \
-    ../shared/PngMagic.cpp
+    ../shared/PngMagic.cpp \
+    framescroll.cpp \
+    framewidget.cpp \
+    previewwidget.cpp \
+    previewscroll.cpp
 
 HEADERS  += mainwindow.h \
     OBL5File.h \
@@ -64,19 +68,21 @@ HEADERS  += mainwindow.h \
     ../shared/qtgui/ColorPicker/qtcolortriangle.h \
     ../shared/qtgui/ColorPicker/colorviewer.h \
     ../shared/qtgui/ColorPicker/colorpickerwidget.h \
-    FrameView.h \
     Pixel.h \
     DlgGoto.h \
     WizFrameSet.h \
     WFrameSet.h \
     WizPageImport.h \
     DlgImageSize.h \
-    WPreview.h \
     WFileSave.h \
     DlgShortcuts.h \
     WHotKey.h \
     DlgAlpha.h \
-    ../shared/PngMagic.h
+    ../shared/PngMagic.h \
+    framescroll.h \
+    framewidget.h \
+    previewwidget.h \
+    previewscroll.h
 
 FORMS    += mainwindow.ui \
     DlgAbout.ui \

@@ -32,10 +32,11 @@
 #include "../shared/Tools.h"
 #include "../shared/qtgui/ColorPicker/colorpickerwidget.h"
 #include "PixelBoxDock.h"
-#include "FrameView.h"
+#include "framescroll.h"
+#include "framewidget.h"
 #include "WizFrameSet.h"
 #include "WPalette.h"
-#include "WPreview.h"
+#include "previewwidget.h"
 #include "WFileSave.h"
 #include "WPreviewDock.h"
 #include "DlgAbout.h"
@@ -59,11 +60,14 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setOrganizationName(m_author);
     QCoreApplication::setApplicationName(m_appName);
     QCoreApplication::setApplicationVersion("1.0.0");
+
     ui->setupUi(this);
-    ui->centralWidget->hide();
-    m_view = new CFrameView(this);
-    m_view->update();
-    setCentralWidget(m_view);
+    //ui->centralWidget->hide();
+    m_scrollArea = new CFrameScroll(this);
+    m_scrollArea->viewport()->update();
+    //m_view->update();
+    setCentralWidget(m_scrollArea);
+    m_view = static_cast<CFrameWidget*>(m_scrollArea->viewport());
     m_fadeFactor = 255;
 
     updateTitle();
@@ -81,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_previewDock->setObjectName("liveView");
     m_previewDock->setTitleTemplate(tr("Liveview %1%"));
     this->addDockWidget(Qt::LeftDockWidgetArea, m_previewDock);
-    CWPreview *preview = m_previewDock->getView();
+    CPreviewWidget *preview = m_previewDock->getView();
     connect(m_previewDock, SIGNAL(windowClosed()),
             this, SLOT(uncheckPreview()));
     connect(this, SIGNAL(zoomLVChanged(int)),
@@ -91,7 +95,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_animate->setObjectName("animated");
     m_animate->setTitleTemplate(tr("Animated %1%"));
     this->addDockWidget(Qt::RightDockWidgetArea, m_animate);
-    CWPreview *prAnime = m_animate->getView();
+    CPreviewWidget *prAnime = m_animate->getView();
     connect(prAnime, SIGNAL(nextFrame(int)),
             this, SLOT(queryNextFrame(int)));
     connect(this, SIGNAL(nextFrame(int,CFrame*)),
@@ -101,8 +105,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_animate, SIGNAL(windowClosed()),
             this, SLOT(uncheckAnimate()));
 
-    //tabifyDockWidget( preview, m_pixelBox );
-    //setDockOptions(ForceTabbedDocks);
     connect(this, SIGNAL(bkColorSet(uint)),
             m_pixelBox, SLOT(setBkColor(uint)));
     connect(this, SIGNAL(gridColorSet(uint)),
@@ -202,15 +204,15 @@ MainWindow::MainWindow(QWidget *parent)
             m_view, SLOT(setTool(int)));
     connect(this, SIGNAL(zoomChanged(int)),
             m_view, SLOT(changeZoom(int)));
-    connect(m_view, SIGNAL(statusUpdate(int,QString)),
+    connect(m_scrollArea, SIGNAL(statusUpdate(int,QString)),
             this, SLOT(setStatus(int,QString)));
     connect(m_view, SIGNAL(zoomChanged(int)),
             this, SLOT(changeZoom(int)));
-    connect(m_view, SIGNAL(modified()),
+    connect(m_scrollArea, SIGNAL(modified()),
             this, SLOT(imageChanged()));
-    connect(m_view, SIGNAL(modified()),
+    connect(m_scrollArea, SIGNAL(modified()),
             preview, SLOT(imageChanged()));
-    connect(m_view, SIGNAL(mouseUp()),
+    connect(m_scrollArea, SIGNAL(mouseUp()),
             preview, SLOT(imageChanged()));
     connect(this, SIGNAL(gridEnabled(bool)),
             m_view, SLOT(enableGrid(bool)));
@@ -228,6 +230,8 @@ MainWindow::MainWindow(QWidget *parent)
             this,SLOT(setAlphaU(uchar)));
     connect(this, SIGNAL(viewModeChanged(int)),
             m_view, SLOT(setViewMode(int)));
+
+   // ui->centralWidget->show();
 
     reloadSettings();
 }
@@ -327,7 +331,7 @@ void MainWindow::reloadSettings()
     emit alphaChanged(alpha);
     m_lastWidth = settings.value("lastWidth",64).toInt();
     m_lastHeight = settings.value("lastHeight",64).toInt();
-    int viewMode = settings.value("viewMode",CFrameView::MODE_NORMAL).toInt();
+    int viewMode = settings.value("viewMode",CFrameWidget::MODE_NORMAL).toInt();
     emit viewModeChanged(viewMode);
     QAction *actionViewModes[]= {
         ui->actionPaintNormal,
@@ -407,7 +411,7 @@ void MainWindow::reloadSettings()
     // restore animated view
     s = tr("Animated %1%").arg(animateZoom*100);
     m_animate->setWindowTitle(s);
-    CWPreview *prAnime = m_animate->getView();
+    CPreviewWidget *prAnime = m_animate->getView();
     prAnime->animate(animateSpeed);
     prAnime->setZoom(animateZoom);
     ui->actionAnimated_view->setChecked(showAnimated);
@@ -475,12 +479,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
                               this->saveGeometry());
             settings.setValue("mainWindow:state",
                               this->saveState());
-            CWPreview *preview = m_previewDock->getView();
+            CPreviewWidget *preview = m_previewDock->getView();
             settings.setValue("showPreview",
                               preview->isVisible());
             settings.setValue("previewIsFloating",
                               m_previewDock->isFloating());
-            CWPreview *prAnime = m_animate->getView();
+            CPreviewWidget *prAnime = m_animate->getView();
             settings.setValue("showAnimated",
                               prAnime->isVisible());
             settings.setValue("animateSpeed",
@@ -1788,7 +1792,7 @@ void MainWindow::on_actionAdd_static_view_triggered()
     dock->setWindowTitle(tr("Static 100%"));
     this->addDockWidget(Qt::RightDockWidgetArea, dock);
     dock->setStatic();
-    CWPreview *view = dock->getView();
+    CPreviewWidget *view = dock->getView();
     view->assignStatic(m_doc.getCurrent());
 }
 
@@ -2295,24 +2299,24 @@ void MainWindow::on_actionAnimation_Speed_triggered()
 
 void MainWindow::on_actionPaintNormal_triggered()
 {
-    emit viewModeChanged(CFrameView::MODE_NORMAL);
+    emit viewModeChanged(CFrameWidget::MODE_NORMAL);
     emit frameChanged(m_doc.getCurrent());
 }
 
 void MainWindow::on_actionPaintColorOnly_triggered()
 {
-    emit viewModeChanged(CFrameView::MODE_COLOR_ONLY);
+    emit viewModeChanged(CFrameWidget::MODE_COLOR_ONLY);
     emit frameChanged(m_doc.getCurrent());
 }
 
 void MainWindow::on_actionPaintAlphaOnly_triggered()
 {
-    emit viewModeChanged(CFrameView::MODE_ALPHA_ONLY);
+    emit viewModeChanged(CFrameWidget::MODE_ALPHA_ONLY);
     emit frameChanged(m_doc.getCurrent());
 }
 
 void MainWindow::on_actionTapestry_triggered()
 {
-    emit viewModeChanged(CFrameView::MODE_TILED_VIEW);
+    emit viewModeChanged(CFrameWidget::MODE_TILED_VIEW);
     emit frameChanged(m_doc.getCurrent());
 }

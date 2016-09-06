@@ -20,7 +20,8 @@
 #define WIMAGEPRIEVIEW_H
 
 #include <QDockWidget>
-class CWPreview;
+class CPreviewWidget;
+class CPreviewScroll;
 class QString;
 
 namespace Ui {
@@ -35,13 +36,15 @@ public:
     explicit CWPreviewDock(QWidget *parent = 0);
     ~CWPreviewDock();
 
-    CWPreview * getView();
+    CPreviewWidget * getView();
     void setStatic();
     void setTitleTemplate(const QString & s);
 private:
     Ui::CWPreviewDock *ui;
     bool m_isStatic;
     QString m_titleTemplate;
+    CPreviewWidget *m_widget;
+    CPreviewScroll *m_scroll;
 
 protected:
     void resizeEvent ( QResizeEvent * event );
