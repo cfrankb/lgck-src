@@ -47,11 +47,12 @@ private:
     CPreviewScroll *m_scroll;
 
 protected:
-    void resizeEvent ( QResizeEvent * event );
+    virtual void resizeEvent ( QResizeEvent * event );
     virtual void closeEvent ( QCloseEvent * event );
 
 protected slots:
     void updateTitle(int zoom);
+    void newDockedLocation (Qt::DockWidgetArea area);
 
 signals:
     void windowClosed();

@@ -8,6 +8,7 @@ win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
 win32:INCLUDEPATH   += ../../../redist/include
 INCLUDEPATH         += ../shared
+unix:INCLUDEPATH    += /usr/include/x86_64-linux-gnu/qt5
 win32:RC_FILE       = lgck-builder.rc
 win32:DEFINES       += STATIC
 win32:DEFINES       += QT_STATIC_BUILD

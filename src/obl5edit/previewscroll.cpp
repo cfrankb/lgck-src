@@ -26,19 +26,16 @@ CPreviewScroll::CPreviewScroll(QWidget *parent):
 {
     m_widget = new CPreviewWidget(this);
     setViewport(m_widget);
-
     // set view attributes
     setAttribute(Qt::WA_MouseTracking);
     setMouseTracking(true);
     setAcceptDrops(true);
     setContextMenuPolicy(Qt::CustomContextMenu);
     setFrameShape(QFrame::NoFrame);
-
     connect(m_widget, SIGNAL(scrollbarAdjusted()), this, SLOT(updateScrollbars()));
     connect(this, SIGNAL(zoomChanged(int)), m_widget, SLOT(setZoom(int)));
     connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), m_widget, SLOT(setMX(int)));
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)), m_widget, SLOT(setMY(int)));
-
 }
 
 void CPreviewScroll::resizeEvent(QResizeEvent * event)

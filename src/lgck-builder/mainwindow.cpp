@@ -1125,7 +1125,6 @@ void MainWindow::testLevel(bool initSound)
 
 void MainWindow::handleGameEvents()
 {
-//    static int count=0;
     int result = m_doc.runEngine();
     if (result) {
         m_doc.stopMusic();
@@ -1200,12 +1199,6 @@ void MainWindow::handleGameEvents()
             m_doc.removePointsOBL();
         }
     }
-    /*if (count % 2 ==0) {
-    emit updateScene();
-    }
-    ++count;*/
-
-//    emit updateScene();
 }
 
 void MainWindow::viewEvent()

@@ -31,17 +31,15 @@ CWPreviewDock::CWPreviewDock(QWidget *parent) :
     m_titleTemplate = "noname - %d%%";
     m_isStatic = false;
     ui->setupUi(this);
-
     m_scroll = new CPreviewScroll(this);
     m_widget = static_cast<CPreviewWidget *>(m_scroll->viewport());
-    //m_widget = new CPreviewWidget(this);
-
     ui->gridLayout->addWidget(m_scroll);
     connect(m_widget, SIGNAL(zoomChanged(int)),
             this, SLOT(updateTitle(int)));
-
     connect(m_scroll, SIGNAL(zoomChanged(int)),
             this, SLOT(updateTitle(int)));
+    connect(this, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),
+            this, SLOT(newDockedLocation(Qt::DockWidgetArea)));
 }
 
 CWPreviewDock::~CWPreviewDock()
@@ -52,6 +50,7 @@ CWPreviewDock::~CWPreviewDock()
 void CWPreviewDock::resizeEvent ( QResizeEvent * event )
 {
     Q_UNUSED(event);
+    m_widget->update();
 }
 
 CPreviewWidget *CWPreviewDock::getView()
@@ -82,4 +81,9 @@ void CWPreviewDock::updateTitle(int zoom)
 void CWPreviewDock::setTitleTemplate(const QString &s)
 {
     m_titleTemplate = s;
+}
+
+void CWPreviewDock::newDockedLocation(Qt::DockWidgetArea area)
+{
+    m_widget->update();
 }
