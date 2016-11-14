@@ -751,10 +751,10 @@ void CLevelScroll::select(int x1, int y1, int x2, int y2)
 void CLevelScroll::changeLevel(int i)
 {
     qDebug("IN  changeLevel(int) %d **************", i);
-    qDebug("vendor: %s", glGetString(GL_VENDOR));
-    qDebug("renderer: %s", glGetString(GL_RENDERER));
-    qDebug("version: %s", glGetString(GL_VERSION));
-    qDebug("extensions: %s", glGetString(GL_EXTENSIONS));
+    //qDebug("vendor: %s", glGetString(GL_VENDOR));
+    //qDebug("renderer: %s", glGetString(GL_RENDERER));
+    //qDebug("version: %s", glGetString(GL_VERSION));
+    //qDebug("extensions: %s", glGetString(GL_EXTENSIONS));
 
     CLevel * level = NULL;
     if (m_game && m_game->m_nLevels) {
@@ -834,4 +834,12 @@ void CLevelScroll::keyReleaseEvent ( QKeyEvent * event )
 {
     //qDebug("keyPressedReleased");
     keyReflector(event, false);
+}
+
+void CLevelScroll::getGLInfo(QString &vendor, QString &renderer, QString &version, QString &extensions)
+{
+    vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
 }

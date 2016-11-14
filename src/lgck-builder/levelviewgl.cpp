@@ -48,23 +48,16 @@ CLevelViewGL::CLevelViewGL(QWidget* parent, CGame *game):
     m_gridColor = 0x60c0b0a0;
     m_hasFocus = false;
     setUpdateBehavior(QOpenGLWidget::PartialUpdate);
-    //setAcceptDrops(true);
     m_game = game;
-//    setAttribute(Qt::WA_OpaquePaintEvent);
-    //setAttribute(Qt::WA_MouseTracking);
-    //setMouseTracking(true);
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
     format.setMajorVersion( 2 );
     format.setMinorVersion( 0 );
+    //format.setSamples(1);
     format.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(format);
-    m_timer.setInterval(1000 / TICK_MAX_RATE);
-    m_timer.start();
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
-    //    connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
-    //    connect(this, SIGNAL(frameSwapped()), this, SLOT(sceneUpdated()));
 }
 
 CLevelViewGL::~CLevelViewGL()
@@ -89,6 +82,13 @@ void CLevelViewGL::initializeGL()
     } else {
         qWarning("Game object not set. Implementors not attached");
     }
+    // set refresh rate
+    m_timer.setInterval(1000 / TICK_MAX_RATE);
+    m_timer.start();
+    qDebug("vendor: %s", glGetString(GL_VENDOR));
+    qDebug("renderer: %s", glGetString(GL_RENDERER));
+    qDebug("version: %s", glGetString(GL_VERSION));
+    qDebug("extensions: %s", glGetString(GL_EXTENSIONS));
 }
 
 void CLevelViewGL::paintGL()

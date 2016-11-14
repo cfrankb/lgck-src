@@ -12,6 +12,10 @@ public:
     CLevelScroll(QWidget *parent, CGame *game);
     void eventHandler();
     void editPath();
+    void getGLInfo(QString & vendor,
+                   QString & renderer,
+                   QString & version,
+                   QString & extensions);
 
     enum {
         MAX_PIXEL = 0x7ff8,

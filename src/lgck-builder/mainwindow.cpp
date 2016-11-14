@@ -72,6 +72,7 @@
 #include <QSysInfo>
 #include "levelviewgl.h"
 #include "levelscroll.h"
+#include "helper.h"
 
 char MainWindow::m_fileFilter[] = "LGCK games (*.lgckdb)";
 char MainWindow::m_appName[] = "LGCK builder";
@@ -79,7 +80,7 @@ char MainWindow::m_appTitle[] = "LGCK builder IDE";
 char MainWindow::m_author[] = "cfrankb";
 
 #define WEB_PATH QString("http://cfrankb.com/lgck/")
-#define UPDATER_URL "http://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s"
+#define UPDATER_URL "http://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
 
 #define MAX_FONT_SIZE 50
 #define MIN_FONT_SIZE 10
@@ -95,7 +96,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_gridColor[0] = 0;
     m_gridSize = 32;
     m_fontSize = DEFAULT_FONT_SIZE;
-    //move(10,32);
     m_viewMode = VM_EDITOR;
     // initToolBar() must be placed before update menus.
     initToolBar();
@@ -214,18 +214,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(levelSelected(int)),
             m_scroll, SLOT(changeLevel(int)));
 
-//    connect(this, SIGNAL(updateScene()),
-  //          m_lview, SLOT(sceneUpdated()));
-  //  connect(this, SIGNAL(updateScene()),
-    //        m_lview, SLOT(needRefresh()));
-
-    //connect(this, SIGNAL(focusGL()),
-    //        m_lview, SLOT(makeCurrent()));
-
-
-
     // reload settings
-   // setViewMode(VM_EDITOR);
     reloadSettings();
     CSndSDL *sn = new CSndSDL();
     m_doc.attach((ISound*)sn);
@@ -1056,7 +1045,13 @@ void MainWindow::on_actionNew_file_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
+    QString vendor;
+    QString renderer;
+    QString version;
+    QString extensions;
+    m_scroll->getGLInfo(vendor, renderer, version, extensions);
     CDlgAbout *d = new CDlgAbout (this);
+    d->setGLInfo(vendor, renderer, version, extensions);
     d->exec();
     delete d;
 }
@@ -2311,6 +2306,10 @@ void MainWindow::saveSettings()
         settings.beginGroup("Updater");
         settings.setValue("updater_check", m_bUpdate);
         settings.setValue("updater_url", m_updateURL);
+        settings.setValue("uuid", m_uuid);
+        QString ver;
+        formatVersion(ver);
+        settings.setValue("version", ver);
         settings.endGroup();
         settings.beginGroup("Editor");
         settings.setValue("fontSize", m_fontSize);
@@ -2324,6 +2323,17 @@ void MainWindow::saveSettings()
         settings.endGroup();
         settings.sync();
     }
+}
+
+void MainWindow::formatVersion(QString &ver)
+{
+    int version = SS_LGCK_VERSION;
+    int vv[4]={0,0,0,0};
+    for (int i=3; i >= 0; --i) {
+        vv[i] = version & 0xff;
+        version /= 256;
+    }
+    ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
 }
 
 void MainWindow::reloadSettings()
@@ -2385,7 +2395,15 @@ void MainWindow::reloadSettings()
     settings.beginGroup("Updater");
     m_bUpdate = settings.value("updater_check", true).toBool();
     m_updateURL = settings.value("updater_url", UPDATER_URL).toString();
-    m_updateURL = UPDATER_URL;
+    QString savedVersion = settings.value("version", "").toString();
+    char *uuid = getUUID();
+    m_uuid = settings.value("uuid", uuid).toString();
+    delete []uuid;
+    QString currVersion;
+    formatVersion(currVersion);
+    if (currVersion != savedVersion) {
+        m_updateURL = UPDATER_URL;
+    }
     settings.endGroup();
 
     // Runtime
@@ -2533,6 +2551,22 @@ void MainWindow::updateEditor(const QString &url, const QString &ver)
     }
 }
 
+
+const char *getWindowsVersion()
+{
+    switch(QSysInfo::windowsVersion())
+    {
+    case QSysInfo::WV_2000: return "Windows 2000";
+    case QSysInfo::WV_XP: return "Windows XP";
+    case QSysInfo::WV_VISTA: return "Windows Vista";
+    case QSysInfo::WV_WINDOWS7: return "Windows 7";
+    case QSysInfo::WV_WINDOWS8: return "Windows 8";
+    case QSysInfo::WV_WINDOWS8_1:	return "Windows 8.1";
+    case QSysInfo::WV_WINDOWS10: return "Windows 10";
+    default: return "Windows";
+    }
+}
+
 void MainWindow::checkVersion()
 {
     int version = SS_LGCK_VERSION;
@@ -2543,12 +2577,26 @@ void MainWindow::checkVersion()
     }
 
     QString os = "";
+#ifdef Q_OS_LINUX
+    os = "Linux";
+#elif defined(Q_OS_WIN32)
+    os = getWindowsVersion();
+#elif define(Q_OS_UNIX)
+    os = "Unix";
+#elif define(Q_OS_DARWIN)
+    os = "Mac";
+#endif
+    os.replace(" ", "+");
+    QString productVersion = QSysInfo::productVersion();
+    QString productType = QSysInfo::productType();
     QString ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
     QString driver = QGuiApplication::platformName();
     QString url = QString().sprintf(q2c(m_updateURL),
-        q2c(ver),
-        q2c(driver),
-        q2c(os));
+                                    q2c(ver),
+                                    q2c(driver),
+                                    q2c(os),
+                                    q2c(m_uuid),
+                                    q2c(QString(productType + "+" + productVersion)));
     while (m_updater->isRunning());
     m_updater->setUrl(url);
     m_updater->start();

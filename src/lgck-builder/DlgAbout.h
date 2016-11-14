@@ -30,6 +30,10 @@ class CDlgAbout : public QDialog {
 public:
     CDlgAbout(QWidget *parent = 0);
     ~CDlgAbout();
+    void setGLInfo(const QString & vendor,
+                   const QString & renderer,
+                   const QString & version,
+                   const QString & extensions);
 
 protected:
     void changeEvent(QEvent *e);
@@ -37,8 +41,6 @@ protected:
 private:
     Ui::CDlgAbout *m_ui;
 
-private slots:
-//    void on_label_6_linkActivated(QString link);
 };
 
 #endif // DLGABOUT_H

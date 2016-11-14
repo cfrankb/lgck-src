@@ -95,6 +95,7 @@ private:
     bool m_bUpdate;
     QString m_updateURL;
     CThreadUpdater *m_updater;
+    QString m_uuid;
     QString m_runtime;
     QString m_runtimeArgs;
     int m_rez;
@@ -144,6 +145,8 @@ private:
     void goExternalRuntime();
     bool checkExecutible(const QString exec, QString & errMsg);
     void showAppSettings(int tab);
+    void formatVersion(QString &ver);
+
 protected:
     void initializeGL();
     void paintGL();
