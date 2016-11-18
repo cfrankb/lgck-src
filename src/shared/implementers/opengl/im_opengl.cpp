@@ -39,6 +39,10 @@ CIMOpengl::CIMOpengl()
     m_size = 0;
     m_max = GROWBY;
     m_imageSets = new ImageSet * [ m_max ];
+#ifdef LGCK_QT
+    initializeOpenGLFunctions();
+#endif
+
 }
 
 CIMOpengl::~CIMOpengl()

@@ -22,7 +22,16 @@
 #include "interfaces/IImageManager.h"
 #include <unordered_map>
 
+#ifdef LGCK_QT
+    #include <QOpenGLFunctions_2_0>
+#endif
+
+
 class CIMOpengl: public IImageManager
+#ifdef LGCK_QT
+    , protected QOpenGLFunctions_2_0
+#endif
+
 {
 protected:
     CIMOpengl();

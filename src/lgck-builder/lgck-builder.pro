@@ -15,6 +15,7 @@ win32:DEFINES       += QT_STATIC_BUILD
 unix:DEFINES        += MAKE_LINUX=1
 DEFINES             += USE_QFILE=1
 DEFINES             += LGCK_OPENGL_DEBUG=1
+DEFINES             += LGCK_QT=1
 QT                  += core gui opengl network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET              = lgck-builder
