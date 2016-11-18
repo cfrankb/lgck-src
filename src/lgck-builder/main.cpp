@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QGLWidget>
 #include "WizGame.h"
+#include <ctime>
 
 int main(int argc, char *argv[])
 {
@@ -39,6 +40,8 @@ int main(int argc, char *argv[])
 
     do {
         CDlgSelect * dlg = new CDlgSelect(&w);
+        dlg->raise();
+        dlg->setWindowState(Qt::WindowActive) ;
         dlg->exec();
         CWizGame *wiz;
         switch(dlg->getState()) {
@@ -74,9 +77,6 @@ int main(int argc, char *argv[])
     if (!fileName.isEmpty()) {
         w.open(fileName);
     }
-#ifdef Q_OS_WIN32
-#else
     srand( time( NULL ) );
-#endif
     return app.exec();
 }
