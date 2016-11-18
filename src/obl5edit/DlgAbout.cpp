@@ -1,6 +1,6 @@
 /*
-    LGCK Builder package
-    Copyright (C) 2005, 2011  Francois Blanchette
+    LGCK Builder GUI
+    Copyright (C) 1999, 2011  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "DlgAbout.h"
 #include "ui_DlgAbout.h"
 #include "../shared/stdafx.h"
@@ -25,9 +24,6 @@
 #include "../shared/FileWrap.h"
 #include "../shared/Credits.h"
 #include "../shared/ss_version.h"
-//#include "../shared/GameFile.h"
-
-//#define LGCK_VERSION 0x00060004
 
 CDlgAbout::CDlgAbout(QWidget *parent) :
     QDialog(parent),
@@ -35,27 +31,24 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
 {
     m_ui->setupUi(this);
 
+    // About
     QString s;
     QString ver;
     int version = SS_LGCK_VERSION;
     for (int i=0; i < 4; ++i) {
-
         s = QString("%1").arg(version % 256);
         version /= 256;
-
         if (i) {
             ver =  s + "." + ver  ;
         } else {
             ver = s + ver ;
         }
     }
-
     ver = "<b>" + tr("Version ") + ver + "</b>";
 
     m_ui->sVersion->setText(ver);
 
     // license GPL
-
     CFileWrap file;
     if (file.open(":/res/gpl.txt")) {
         int size = file.getSize();
@@ -66,9 +59,7 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
         m_ui->eLicense->setPlainText( buf );
         delete [] buf;
     }
-
     m_ui->eLicense->setReadOnly( true );
-
 
     // legal text
 
@@ -81,11 +72,9 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
         m_ui->eLegal->setPlainText( buf );
         delete [] buf;
     }
-
     m_ui->eLegal->setReadOnly( true );
 
     // team
-
     m_ui->treeTeam->setColumnCount(2);
     m_ui->treeTeam->setColumnWidth(0, 128);
     m_ui->treeTeam->setEditTriggers(0);
@@ -93,14 +82,12 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     m_ui->treeTeam->setRootIsDecorated(false);
     m_ui->treeTeam->setAlternatingRowColors(true);
 
-
     for (int i = 0; team[i].name; ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         item->setText(0, team[i].name);
         item->setText(1, team[i].job);
         m_ui->treeTeam->addTopLevelItem(item);
     }
-
 }
 
 CDlgAbout::~CDlgAbout()
@@ -117,5 +104,22 @@ void CDlgAbout::changeEvent(QEvent *e)
         break;
     default:
         break;
+    }
+}
+
+void CDlgAbout::setGLInfo(const QString & vendor,
+               const QString & renderer,
+               const QString & version,
+               const QString & extensions)
+{
+    m_ui->sOpenGLRenderer->setText(renderer);
+    m_ui->sOpenGLVendor->setText(vendor);
+    m_ui->sOpenGLVersion->setText(version);
+    QRegExp rx("(\\ )");
+    QStringList extList = extensions.split(rx);
+    for (QStringList::iterator it = extList.begin();
+        it != extList.end(); ++it) {
+        QString current = *it;
+        m_ui->cbExtensions->addItem(current);
     }
 }

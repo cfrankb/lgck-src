@@ -57,6 +57,7 @@ public:
     uint penColor();
     uchar alpha();
     int viewMode();
+    void getGLInfo(QString &vendor, QString &renderer, QString &version, QString &extensions);
 
 protected:
     virtual void initializeGL();

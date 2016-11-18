@@ -776,3 +776,11 @@ void CFrameWidget::clearDotArray()
         m_dots->flush();
     }
 }
+
+void CFrameWidget::getGLInfo(QString &vendor, QString &renderer, QString &version, QString &extensions)
+{
+    vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+}

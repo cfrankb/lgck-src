@@ -845,9 +845,15 @@ void MainWindow::updateMenus()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    CDlgAbout * dlg = new CDlgAbout(this);
-    dlg->exec();
-    delete dlg;
+    QString vendor;
+    QString renderer;
+    QString version;
+    QString extensions;
+    m_view->getGLInfo(vendor, renderer, version, extensions);
+    CDlgAbout *d = new CDlgAbout (this);
+    d->setGLInfo(vendor, renderer, version, extensions);
+    d->exec();
+    delete d;
 }
 
 void MainWindow::on_actionQuit_triggered()
