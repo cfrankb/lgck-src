@@ -58,6 +58,9 @@ CLevelViewGL::CLevelViewGL(QWidget* parent, CGame *game):
     format.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(format);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(this, SIGNAL(versionCheck()),
+            parent->parent(), SLOT(checkVersion()));
+
 }
 
 CLevelViewGL::~CLevelViewGL()
@@ -89,19 +92,17 @@ void CLevelViewGL::initializeGL()
     qDebug("renderer: %s", glGetString(GL_RENDERER));
     qDebug("version: %s", glGetString(GL_VERSION));
     qDebug("extensions: %s", glGetString(GL_EXTENSIONS));
+    emit versionCheck();
 }
 
 void CLevelViewGL::paintGL()
 {
-    static int count = 0;
     static bool drawing = false;
     if (!drawing) {     
         drawing = true;
-        if (count % 4 ==0) {
         QOpenGLWidget::paintGL();
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         drawBackground();
-        }
         drawing = false;
     }
 }

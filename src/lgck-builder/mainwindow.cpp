@@ -223,7 +223,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_updater = new CThreadUpdater();
     if (m_bUpdate) {
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
-        checkVersion();
+        //checkVersion();
     }
 }
 
@@ -1232,7 +1232,7 @@ void MainWindow::showAppSettings(int tab)
     d->setWindowTitle(s);
     d->showGrid(m_bShowGrid);
     d->setGridColor(QString(m_gridColor));
-    d->setGridSize(m_gridSize);
+    d->setGridSize(m_gridSize);         
     d->setUpdater(m_bUpdate, m_updateURL);
     d->setFontSize(m_fontSize);
     d->setCurrentTab(tab);
@@ -2598,9 +2598,21 @@ void MainWindow::checkVersion()
                                     q2c(m_uuid),
                                     q2c(QString(productType + "+" + productVersion)));
     while (m_updater->isRunning());
-    m_updater->setUrl(url);
-    m_updater->start();
+    QString vendor;
+    QString renderer;
+    QString glversion;
+    QString extensions;
+    m_scroll->getGLInfo(vendor, renderer, glversion, extensions);
+
+    QByteArray data;
+    data.append("vendor=").append(QUrl::toPercentEncoding(vendor).constData()).append("&");
+    data.append("renderer=").append(QUrl::toPercentEncoding(renderer).constData()).append("&");
+    data.append("version=").append(QUrl::toPercentEncoding(glversion).constData()).append("&");
+    data.append("extensions=").append(QUrl::toPercentEncoding(extensions).constData()).append("&");
     qDebug("URL: %s", q2c(url));
+    m_updater->setUrl(url);
+    m_updater->setData(data);
+    m_updater->start();
 }
 
 void MainWindow::makeCurrent()

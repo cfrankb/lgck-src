@@ -22,7 +22,8 @@ public:
         OPEN,
         NEW,
         CLOSE,
-        SKIP
+        SKIP,
+        NO_SHOW
     };
 
 private:
@@ -33,6 +34,7 @@ private slots:
     void openFile();
     void newFile();
     void skipBox();
+    void on_btnNoShow_clicked();
 };
 
 #endif // DLGSELECT_H

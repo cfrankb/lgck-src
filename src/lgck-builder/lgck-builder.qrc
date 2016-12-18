@@ -74,5 +74,6 @@
         <file>res/manual.edoc</file>
         <file>scripts/templates/waypoint.lua</file>
         <file>res/Tuffy_bold.fnt</file>
+        <file>images/Frank2_scaled33.png</file>
     </qresource>
 </RCC>

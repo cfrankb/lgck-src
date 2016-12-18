@@ -4,18 +4,19 @@ HISTORY OF LGCK BUILDER
 
 - EDITOR: builder can export sprites (obl, png)
 - EDITOR: runtime integration with the IDE
+- EDITOR: improved LGCK builder performance on low-end hardware
 - ENGINE: new level event: OnIntroDraw
 - ENGINE: snapshot_clear()
 - LUA: System Call - ss_notifyAll()
-- TOOLS: Updated the gui to run qt5.7 (replaced qglwidget w/ qopenglwidget)
-- TOOLS: easydocs - introducted the concept of alias amd improve the ui
+- TOOLS: Updated the gui to run on qt5.7 (replaced qglwidget w/ qopenglwidget)
+- TOOLS: easydocs - introducted the concept of alias and improve the ui
 - BUG FIX: lua script not always regenerated after an event was modified
 - BUG FIX: when a snapshot is taken and restored the next level may be replaced by the snapsnot
-- BUG FIX: LGCK builder would crash when no opengl2.0 driver was present
+- BUG FIX: LGCK builder would crash when no opengl2.0 driver were present
 - BUG FIX: lgckdb would become corrupt when core libraries were compiled against GCC 4.x+
 
 This new build addresses issues on VM and low-end hardware that doesn't
-have native drivers supporting Opengl2.0+
+have native drivers supporting Opengl 2.0+
 
 *** 0.6.0.6
 

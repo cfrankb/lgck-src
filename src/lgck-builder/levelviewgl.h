@@ -85,6 +85,7 @@ Q_SIGNALS:
     void whereIsMouse(int &, int &, int &, int &);
     void scrollStatusResync(int &, int &);
     void gameModeStateResync(bool &);
+    void versionCheck();
 
 protected slots:
     void needRefresh();

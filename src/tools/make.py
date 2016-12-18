@@ -63,7 +63,7 @@ class CMakeU():
         cmds = []
         cmds.append('if %1.==link. goto link')
         cmds.append('if %1.==clean. goto clean')
-        cmds.append('windres lgck.rc -O coff -o shared\lgck.res')
+        cmds.append('windres lgck.rc -O coff -o build\lgck.res')
         cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data[build]['paths']]) + \
             ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data[build]['flags']])
         for fname in src:
@@ -88,7 +88,7 @@ class CMakeU():
         libs = ' '.join(['{lib}'.format(lib=lib) for lib in self.data[build]['libs']])
         objs = ' '.join([obj for obj in objs])
         tfile.write(':link\n')
-        tfile.write('g++ {cflags} {objs} shared\lgck.res {libs} -o {target}\n'.format(
+        tfile.write('g++ {cflags} {objs} build\lgck.res {libs} -o {target}\n'.format(
 			cflags=cflags,
 			objs=objs,
 			libs=libs,
@@ -99,7 +99,7 @@ class CMakeU():
         tfile.write('goto out\n')
         tfile.write(':clean\n')
         for objp in objd:
-            tfile.write('deltree %s\n' % objp.replace('/', '\\'))
+            tfile.write('rmdir /s /q %s\n' % objp.replace('/', '\\'))
         tfile.write('goto out\n')
         tfile.write(':err\n')
         tfile.write('@echo fatal error\n')

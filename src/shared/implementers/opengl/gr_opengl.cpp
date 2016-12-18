@@ -389,7 +389,7 @@ void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color 
     //GLDEBUG();
     glEnable(GL_TEXTURE_2D); GLDEBUG();
     glEnable (GL_BLEND); GLDEBUG();
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, texture); GLDEBUG();
     float xx = x;
     for (int i=0; text[i]; ++i) {

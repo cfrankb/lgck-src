@@ -21,6 +21,11 @@ void CThreadUpdater::setUrl(const QString &url)
     m_url = url;
 }
 
+void CThreadUpdater::setData(const QByteArray & data)
+{
+    m_data = data;
+}
+
 void CThreadUpdater::sendRequest()
 {
     //const char *link = "http://cfrankb.fb/lgck/api/chkv.php?ver=00.06.00.06";
@@ -30,15 +35,14 @@ void CThreadUpdater::sendRequest()
     qDebug() << "URL:" << m_url;
 
     // "quit()" the event-loop, when the network request "finished()"
-    QNetworkAccessManager mgr;
-    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+    QNetworkAccessManager manager;
+    QObject::connect(&manager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
     QUrl url = QUrl( m_url );
-    // the HTTP request
-    QNetworkRequest req( url );
-    QNetworkReply *reply = mgr.get(req);
+    QNetworkRequest request( url );
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    //QNetworkReply *reply = manager.get(req);
+    QNetworkReply *reply = manager.post(request, m_data);
     eventLoop.exec(); // blocks stack until "finished()" has been called
-
-
 
     QString result;
     if (reply->error() == QNetworkReply::NoError) {

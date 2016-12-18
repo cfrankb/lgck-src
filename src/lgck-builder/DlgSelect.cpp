@@ -37,3 +37,9 @@ void CDlgSelect::skipBox()
     accept();
 }
 
+
+void CDlgSelect::on_btnNoShow_clicked()
+{
+    m_state = NO_SHOW;
+    accept();
+}
