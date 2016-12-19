@@ -2738,3 +2738,21 @@ void MainWindow::goExternalRuntime()
         showAppSettings(CDlgAppSettings::TAB_RUNTIME);
     }
 }
+
+void MainWindow::on_actionSprite_Editor_triggered()
+{
+    QString appDir = QCoreApplication::applicationDirPath();
+    qDebug() << appDir;
+#ifdef Q_OS_WIN32
+    QString cmd = "obl5edit.exe";
+#else
+    QString cmd = "obl5edit";
+#endif
+    QString runtime = appDir + "/" + cmd;
+    bool result = QProcess::startDetached(runtime);
+    if (!result) {
+        QString errMsg = tr("Running external editor failed");
+        QMessageBox msgBox(QMessageBox::Warning, m_appName, errMsg, 0, this);
+        msgBox.exec();
+    }
+}

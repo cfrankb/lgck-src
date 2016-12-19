@@ -245,6 +245,8 @@ private slots:
     void on_actionEdit_Images_triggered();
     void on_actionImport_Font_triggered();
 
+    void on_actionSprite_Editor_triggered();
+
 signals:
     void levelDeleted(int index);
     void levelMoved(int fromIndex, int toIndex);

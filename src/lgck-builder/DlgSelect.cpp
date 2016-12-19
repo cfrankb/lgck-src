@@ -59,7 +59,7 @@ void CDlgSelect::on_btnSpriteEditor_clicked()
     QString runtime = appDir + "/" + cmd;
     bool result = QProcess::startDetached(runtime);
     if (!result) {
-        QString errMsg = tr("Running external runtime failed");
+        QString errMsg = tr("Running external editor failed");
         QMessageBox msgBox(QMessageBox::Warning, "m_appName", errMsg, 0, this);
         msgBox.exec();
     }
