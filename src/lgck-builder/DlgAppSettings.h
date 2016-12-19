@@ -58,6 +58,8 @@ public:
     void getRuntime(QString & path, QString & args);
     void setRuntime(const QString path, const QString args);
     int getFontSize();
+    bool getSkipSplashScreen();
+    void setSkipSplashScreen(bool state);
     void setCurrentTab(int i);
     static const char *defaultRuntimeArgs();
 

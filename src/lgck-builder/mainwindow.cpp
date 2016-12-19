@@ -1251,6 +1251,7 @@ void MainWindow::showAppSettings(int tab)
     d->setScore(m_score);
     d->setLives(m_lives);
     d->setRuntime(m_runtime, m_runtimeArgs);
+    d->setSkipSplashScreen(m_skipSplash);
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
     if (d->exec() == QDialog::Accepted) {
@@ -1275,10 +1276,10 @@ void MainWindow::showAppSettings(int tab)
         m_fontSize = d->getFontSize();
         d->getRuntime(m_runtime, m_runtimeArgs);
         emit fontSizeChanged(m_fontSize);
+        m_skipSplash = d->getSkipSplashScreen();
     }
     delete d;
 }
-
 
 void MainWindow::showToolBox(bool show)
 {
@@ -2313,6 +2314,7 @@ void MainWindow::saveSettings()
         settings.endGroup();
         settings.beginGroup("Editor");
         settings.setValue("fontSize", m_fontSize);
+        settings.setValue("skipSplash", m_skipSplash);
         settings.endGroup();
         // Runtime
         settings.beginGroup("Runtime");
@@ -2416,6 +2418,7 @@ void MainWindow::reloadSettings()
 
     settings.beginGroup("Editor");
     m_fontSize = settings.value("fontSize", DEFAULT_FONT_SIZE).toInt();
+    m_skipSplash = settings.value("skipSplash", false).toBool();
     emit fontSizeChanged(m_fontSize);
     settings.endGroup();
 }

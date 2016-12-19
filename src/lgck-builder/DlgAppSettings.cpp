@@ -379,3 +379,13 @@ const char *CDlgAppSettings::defaultRuntimeArgs()
 {
     return "%1 --level=%2 --skill=%3 --size=%4x%5";
 }
+
+bool CDlgAppSettings::getSkipSplashScreen()
+{
+    return m_ui->cSkipSplashScreen->isChecked();
+}
+
+void CDlgAppSettings::setSkipSplashScreen(bool state)
+{
+    m_ui->cSkipSplashScreen->setChecked(state);
+}

@@ -102,6 +102,7 @@ private:
     int m_rezW;
     int m_rezH;
     bool m_runtimeExternal;
+    bool m_skipSplash;
     bool maybeSave();
     bool save();
     bool saveAs();
