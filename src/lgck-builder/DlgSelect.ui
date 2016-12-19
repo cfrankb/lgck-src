@@ -132,12 +132,50 @@ Game</string>
    <property name="text">
     <string>Do not show again</string>
    </property>
+   <property name="icon">
+    <iconset resource="lgck-builder.qrc">
+     <normaloff>:/images/pd/dagobert83_cancelx16.png</normaloff>:/images/pd/dagobert83_cancelx16.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>13</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnSpriteEditor">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>360</y>
+     <width>81</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Launch the sprite editor</string>
+   </property>
+   <property name="text">
+    <string>Sprite
+Editor</string>
+   </property>
+   <property name="icon">
+    <iconset resource="lgck-builder.qrc">
+     <normaloff>:/images/sprite_editor.png</normaloff>:/images/sprite_editor.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>48</width>
+     <height>48</height>
+    </size>
+   </property>
   </widget>
   <zorder>label</zorder>
   <zorder>btnOpen</zorder>
   <zorder>btnNew</zorder>
   <zorder>btnSkip</zorder>
   <zorder>btnNoShow</zorder>
+  <zorder>btnSpriteEditor</zorder>
  </widget>
  <resources>
   <include location="lgck-builder.qrc"/>

@@ -1,5 +1,8 @@
 #include "DlgSelect.h"
 #include "ui_DlgSelect.h"
+#include <QDebug>
+#include <QProcess>
+#include <QMessageBox>
 
 CDlgSelect::CDlgSelect(QWidget *parent) :
     QDialog(parent),
@@ -42,4 +45,22 @@ void CDlgSelect::on_btnNoShow_clicked()
 {
     m_state = NO_SHOW;
     accept();
+}
+
+void CDlgSelect::on_btnSpriteEditor_clicked()
+{
+    QString appDir = QCoreApplication::applicationDirPath();
+    qDebug() << appDir;
+#ifdef Q_OS_WIN32
+    QString cmd = "obl5edit.exe";
+#else
+    QString cmd = "obl5edit";
+#endif
+    QString runtime = appDir + "/" + cmd;
+    bool result = QProcess::startDetached(runtime);
+    if (!result) {
+        QString errMsg = tr("Running external runtime failed");
+        QMessageBox msgBox(QMessageBox::Warning, "m_appName", errMsg, 0, this);
+        msgBox.exec();
+    }
 }
