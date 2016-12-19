@@ -2748,11 +2748,10 @@ void MainWindow::on_actionSprite_Editor_triggered()
 #else
     QString cmd = "obl5edit";
 #endif
-    QString runtime = appDir + "/" + cmd;
+    QString runtime = "\"" + appDir + "/" + cmd + "\"";
     bool result = QProcess::startDetached(runtime);
     if (!result) {
-        QString errMsg = tr("Running external editor failed");
-        QMessageBox msgBox(QMessageBox::Warning, m_appName, errMsg, 0, this);
-        msgBox.exec();
+        QString errMsg = tr("Running external editor failed: %1").arg(runtime);
+        warningMessage(errMsg);
     }
 }
