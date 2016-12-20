@@ -32,8 +32,8 @@
   <widget class="QPushButton" name="btnOpen">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>360</y>
+     <x>25</x>
+     <y>368</y>
      <width>81</width>
      <height>91</height>
     </rect>
@@ -52,8 +52,8 @@ Game</string>
    </property>
    <property name="iconSize">
     <size>
-     <width>64</width>
-     <height>64</height>
+     <width>48</width>
+     <height>48</height>
     </size>
    </property>
    <property name="autoDefault">
@@ -66,8 +66,8 @@ Game</string>
   <widget class="QPushButton" name="btnNew">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>360</y>
+     <x>115</x>
+     <y>368</y>
      <width>81</width>
      <height>91</height>
     </rect>
@@ -101,14 +101,14 @@ Game</string>
     </rect>
    </property>
    <property name="text">
-    <string>Skip this splash screen &gt;&gt;&gt;</string>
+    <string>Skip this Splash Screen &gt;&gt;&gt;</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>0</y>
+     <y>4</y>
      <width>581</width>
      <height>461</height>
     </rect>
@@ -130,7 +130,7 @@ Game</string>
     </rect>
    </property>
    <property name="text">
-    <string>Do not show again</string>
+    <string>  Do not show again</string>
    </property>
    <property name="icon">
     <iconset resource="lgck-builder.qrc">
@@ -146,8 +146,8 @@ Game</string>
   <widget class="QPushButton" name="btnSpriteEditor">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>360</y>
+     <x>205</x>
+     <y>368</y>
      <width>81</width>
      <height>91</height>
     </rect>
@@ -165,8 +165,8 @@ Editor</string>
    </property>
    <property name="iconSize">
     <size>
-     <width>48</width>
-     <height>48</height>
+     <width>32</width>
+     <height>32</height>
     </size>
    </property>
   </widget>

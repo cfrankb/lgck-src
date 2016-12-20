@@ -1549,6 +1549,8 @@ void MainWindow::initToolBar()
     ui->toolBar->addAction(ui->actionPrevious);
     ui->toolBar->addAction(ui->actionNext);
     ui->toolBar->addAction(ui->actionGo_to_level);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->actionSprite_Editor);
     m_comboLayers = new QComboBox(this);
     m_comboLayers->setDisabled(true);
     m_layerToolbar = new QToolBar("Layer", this);

@@ -15,6 +15,20 @@ CDlgSelect::CDlgSelect(QWidget *parent) :
     connect(ui->btnNew, SIGNAL(clicked()), this, SLOT(newFile()));
     connect(ui->btnOpen, SIGNAL(clicked()), this, SLOT(openFile()));
     connect(ui->btnSkip, SIGNAL(clicked()), this, SLOT(skipBox()));
+
+    int red=0;
+    int green=0xf0;
+    int blue=0xe0;
+    ui->btnNew->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
+        .arg(red).arg(green).arg(blue));
+    ui->btnNew->setCursor(Qt::PointingHandCursor);
+    ui->btnOpen->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
+        .arg(red).arg(green).arg(blue));
+    ui->btnOpen->setCursor(Qt::PointingHandCursor);
+    ui->btnSpriteEditor->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
+        .arg(red).arg(green).arg(blue));
+    ui->btnSpriteEditor->setCursor(Qt::PointingHandCursor);
+
 }
 
 CDlgSelect::~CDlgSelect()
