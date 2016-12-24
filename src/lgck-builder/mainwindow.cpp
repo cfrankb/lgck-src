@@ -2767,7 +2767,7 @@ void MainWindow::on_actionExport_Game_triggered()
     if (dir.isValid()) {
         qDebug() << tmpPath;
     } else {
-        warningMessage(QString("There was a problem creating tmpFolder: %1").arg(tmpPath));
+        warningMessage(tr("There was a problem creating tmpFolder: %1").arg(tmpPath));
         return;
     }
 
@@ -2818,7 +2818,7 @@ void MainWindow::on_actionExport_Game_triggered()
 
 #ifdef Q_OS_WIN32
     QString sfx = appDir + "/7z.sfx";
-    QString setupOut = tmpPath + "/setup.exe";
+    QString setupOut = tmpPath + "/package.exe";
     std::list<std::string> files;
     files.push_back(q2c(sfx));
     files.push_back(q2c(gameOut));
@@ -2827,7 +2827,7 @@ void MainWindow::on_actionExport_Game_triggered()
         return;
     }
     fileFilter = tr("Executive files (*.exe)");
-    outName = "setup.exe";
+    outName = "package.exe";
     finalOut = setupOut;
 #endif
 

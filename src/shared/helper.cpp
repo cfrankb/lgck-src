@@ -30,7 +30,7 @@ char *getUUID()
     return uuid;
 }
 
-bool copyFile(const std::string in, const std::string out, std::string errMsg)
+bool copyFile(const std::string in, const std::string out, std::string & errMsg)
 {
     bool result = true;
     CFileWrap sfile;
@@ -46,19 +46,20 @@ bool copyFile(const std::string in, const std::string out, std::string errMsg)
         } else {
             char tmp[out.length() + 128];
             sprintf(tmp, "couldn't write: %s", out.c_str());
+            errMsg = tmp;
             result = false;
         }
         delete [] buf;
     } else {
         char tmp[in.length() + 128];
-        sprintf(tmp, "couldn't write: %s", in.c_str());
+        sprintf(tmp, "couldn't read: %s", in.c_str());
         errMsg = tmp;
         result = false;
     }
     return result;
 }
 
-bool concat(const std::list<std::string> files, std::string out, std::string msg)
+bool concat(const std::list<std::string> files, std::string out, std::string & msg)
 {
     CFileWrap tfile;
     bool result = true;

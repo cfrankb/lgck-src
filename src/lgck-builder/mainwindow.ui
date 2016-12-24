@@ -20,7 +20,7 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="lgck-builder.qrc">
     <normaloff>:/images/lgckbuilder64ronnie2.png</normaloff>:/images/lgckbuilder64ronnie2.png</iconset>
   </property>
   <property name="dockOptions">
@@ -240,7 +240,7 @@
   </widget>
   <action name="actionNew_file">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/ronnie/new.png</normaloff>:/images/ronnie/new.png</iconset>
    </property>
    <property name="text">
@@ -252,7 +252,7 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/ronnie/open.png</normaloff>:/images/ronnie/open.png</iconset>
    </property>
    <property name="text">
@@ -264,7 +264,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/ronnie/save.png</normaloff>:/images/ronnie/save.png</iconset>
    </property>
    <property name="text">
@@ -276,7 +276,7 @@
   </action>
   <action name="actionSave_as">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/ronnie/saveas.png</normaloff>:/images/ronnie/saveas.png</iconset>
    </property>
    <property name="text">
@@ -299,7 +299,7 @@
   </action>
   <action name="actionPrevious">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/prev.png</normaloff>:/images/prev.png</iconset>
    </property>
    <property name="text">
@@ -314,7 +314,7 @@
   </action>
   <action name="actionNext">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/next.png</normaloff>:/images/next.png</iconset>
    </property>
    <property name="text">
@@ -329,7 +329,7 @@
   </action>
   <action name="actionCreate_Level">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
    </property>
    <property name="text">
@@ -349,7 +349,7 @@
   </action>
   <action name="actionDelete_Level">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/minus.png</normaloff>:/images/minus.png</iconset>
    </property>
    <property name="text">
@@ -361,7 +361,7 @@
   </action>
   <action name="actionCreateSprite">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
    </property>
    <property name="text">
@@ -409,7 +409,7 @@
   </action>
   <action name="actionCustomize">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/cards-diamond.png</normaloff>:/images/pd/cards-diamond.png</iconset>
    </property>
    <property name="text">
@@ -435,7 +435,7 @@
   </action>
   <action name="actionGo_to_level">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/current.png</normaloff>:/images/current.png</iconset>
    </property>
    <property name="text">
@@ -476,7 +476,7 @@
   </action>
   <action name="actionEdit_Game_Info">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/ronnie/properties.png</normaloff>:/images/ronnie/properties.png</iconset>
    </property>
    <property name="text">
@@ -491,7 +491,7 @@
   </action>
   <action name="actionEdit_Level">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/memo.png</normaloff>:/images/memo.png</iconset>
    </property>
    <property name="text">
@@ -506,8 +506,8 @@
   </action>
   <action name="actionTest_Level">
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/options.png</normaloff>:/images/options.png</iconset>
+    <iconset resource="lgck-builder.qrc">
+     <normaloff>:/images/lgck.ico</normaloff>:/images/lgck.ico</iconset>
    </property>
    <property name="text">
     <string>Test Level</string>
@@ -564,7 +564,7 @@
   </action>
   <action name="actionCreate_layer">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/water_drop_1.png</normaloff>:/images/pd/water_drop_1.png</iconset>
    </property>
    <property name="text">
@@ -576,7 +576,7 @@
   </action>
   <action name="actionDelete_layer">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/emblem-unreadable-2.png</normaloff>:/images/pd/emblem-unreadable-2.png</iconset>
    </property>
    <property name="text">
@@ -610,7 +610,7 @@
   </action>
   <action name="actionEdit_layer">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/tools-hammer_and_nails.png</normaloff>:/images/pd/tools-hammer_and_nails.png</iconset>
    </property>
    <property name="text">
@@ -692,7 +692,7 @@
   </action>
   <action name="actionEdit_Object">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/face-monkey-2.png</normaloff>:/images/pd/face-monkey-2.png</iconset>
    </property>
    <property name="text">
@@ -723,7 +723,7 @@
   </action>
   <action name="actionCopy_Object">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/plusplus.png</normaloff>:/images/plusplus.png</iconset>
    </property>
    <property name="text">
@@ -759,7 +759,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/tango/edit-undo.png</normaloff>:/images/tango/edit-undo.png</iconset>
    </property>
    <property name="text">
@@ -774,7 +774,7 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/tango/edit-redo.png</normaloff>:/images/tango/edit-redo.png</iconset>
    </property>
    <property name="text">
@@ -789,7 +789,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/tango/edit-cut.png</normaloff>:/images/tango/edit-cut.png</iconset>
    </property>
    <property name="text">
@@ -804,7 +804,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/tango/edit-copy.png</normaloff>:/images/tango/edit-copy.png</iconset>
    </property>
    <property name="text">
@@ -819,7 +819,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/tango/edit-paste.png</normaloff>:/images/tango/edit-paste.png</iconset>
    </property>
    <property name="text">
@@ -834,7 +834,7 @@
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/dagobert83_cancelx16.png</normaloff>:/images/pd/dagobert83_cancelx16.png</iconset>
    </property>
    <property name="text">
@@ -862,7 +862,7 @@
   </action>
   <action name="actionEdit_Path">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/footprint.png</normaloff>:/images/pd/footprint.png</iconset>
    </property>
    <property name="text">
@@ -932,7 +932,7 @@
   </action>
   <action name="actionScriptWizard">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/pd/small_chemistry.png</normaloff>:/images/pd/small_chemistry.png</iconset>
    </property>
    <property name="text">
@@ -977,7 +977,7 @@
   </action>
   <action name="actionEdit_Images">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/icon64.png</normaloff>:/images/icon64.png</iconset>
    </property>
    <property name="text">
@@ -997,7 +997,7 @@
   </action>
   <action name="actionSprite_Editor">
    <property name="icon">
-    <iconset>
+    <iconset resource="lgck-builder.qrc">
      <normaloff>:/images/sprite_editor.png</normaloff>:/images/sprite_editor.png</iconset>
    </property>
    <property name="text">
@@ -1011,6 +1011,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="lgck-builder.qrc"/>
+ </resources>
  <connections/>
 </ui>
