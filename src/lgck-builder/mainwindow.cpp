@@ -2757,3 +2757,90 @@ void MainWindow::on_actionSprite_Editor_triggered()
         warningMessage(errMsg);
     }
 }
+
+void MainWindow::on_actionExport_Game_triggered()
+{
+    QString appDir = QCoreApplication::applicationDirPath();
+    QTemporaryDir dir;
+   // dir.setAutoRemove(false);
+    QString tmpPath = dir.path();
+    if (dir.isValid()) {
+        qDebug() << tmpPath;
+    } else {
+        warningMessage(QString("There was a problem creating tmpFolder: %1").arg(tmpPath));
+        return;
+    }
+
+    QString fileFilter = tr("7z archives (*.7z)");
+#ifdef Q_OS_WIN32
+    QString cmd_runtime = "lgck-runtime-sdl.exe";
+    QString stub = "game.exe";
+    QString cmd7z = "\"" + appDir + "/7z.exe\"";
+#else
+    QString cmd_runtime = "lgck-runtime-sdl.exe";
+    QString stub = "game.exe";
+    QString cmd7z = "7z";
+#endif
+
+    QString runtimeSource = appDir + "/" + cmd_runtime;
+    QString runtimeTmp = tmpPath + "/" + stub;
+    std::string src = q2c(runtimeSource);
+    std::string dst = q2c(runtimeTmp);
+    std::string msg;
+    if (!copyFile(src, dst, msg)) {
+        warningMessage(msg.c_str());
+        return;
+    }
+
+    QString gameFile = "game.lgckdb";
+    QString gameFilePath = tmpPath + "/" + gameFile;
+    m_doc.write(q2c(gameFilePath));
+
+    QString outName = "game.7z";
+    QString gameOut = tmpPath + "/" + outName;
+    QString finalOut = gameOut;
+    QString args = QString("a -m0=BCJ2 -m1=LZMA:d25 -m2=LZMA:d19 -m3=LZMA:d19 -mb0:1 -mb0s1:2 -mb0s2:3 %out% %stub% %game%");
+    args = args.replace("%out%", gameOut);
+    args = args.replace("%stub%", stub);
+    args = args.replace("%game%", gameFile);
+    qDebug() << cmd7z + " " + args;
+    QStringList list = args.split(" ", QString::SkipEmptyParts);
+    QProcess proc;
+    proc.setWorkingDirectory(tmpPath);
+    proc.start(cmd7z, list);
+    proc.waitForFinished();
+    int result = proc.exitCode();
+    if (result) {
+        warningMessage(QString("An error occured: %1\nCode: %2")
+                       .arg(cmd7z + " " + args, result));
+    }
+    proc.close();
+
+#ifdef Q_OS_WIN32
+    QString sfx = appDir + "/7z.sfx";
+    QString setupOut = tmpPath + "/setup.exe";
+    std::list<std::string> files;
+    files.push_back(q2c(sfx));
+    files.push_back(q2c(gameOut));
+    if (!concat(files, q2c(setupOut), msg)) {
+        warningMessage(msg.c_str());
+        return;
+    }
+    fileFilter = tr("Executive files (*.exe)");
+    outName = "setup.exe";
+    finalOut = setupOut;
+#endif
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Distribution..."), outName, tr(q2c(fileFilter)));
+    if (!fileName.isEmpty()) {
+        std::string in = q2c(finalOut);
+        std::string out = q2c(fileName);
+        if (!copyFile(in, out, msg)){
+            warningMessage(msg.c_str());
+            return;
+        }
+        QString msgText = tr("Export successful.");
+        QMessageBox msgBox(QMessageBox::Information, m_appName, msgText, 0, this);
+        msgBox.exec();
+    }
+}

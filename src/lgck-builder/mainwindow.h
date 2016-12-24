@@ -247,6 +247,8 @@ private slots:
 
     void on_actionSprite_Editor_triggered();
 
+    void on_actionExport_Game_triggered();
+
 signals:
     void levelDeleted(int index);
     void levelMoved(int fromIndex, int toIndex);

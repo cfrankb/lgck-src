@@ -19,6 +19,8 @@
 #include <cstring>
 #include <cstdio>
 #include <string>
+#include <sys/stat.h>
+#include "helper.h"
 #include "runtime.h"
 
 void showUsage(const char *cmd)
@@ -60,14 +62,40 @@ int whatIs(char *cmd)
     return CMD_INVALID;
 }
 
+inline bool fileExists (const std::string& name) {
+  struct stat buffer;
+  return (stat (name.c_str(), &buffer) == 0);
+}
+
+bool findLgckDB(char *cmd, std::string & outfilePath)
+{
+    std::string ext = ".lgckdb";
+    char *fullpath = realpath(cmd, NULL);
+    std::string base = fullpath;
+    free(fullpath);
+    if (fileExists(base + ext)) {
+        outfilePath = base + ext;
+        return true;
+    }
+    std::string::size_type i = base.find_last_of(".");
+    if (i != std::string::npos) {
+        outfilePath = base.replace(i, ext.length(), ext);
+        if (fileExists(outfilePath)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool parseCmdLine(int argc, char* args[], ARGS & out)
 {
     bool err = false;
     out.filename = "";
     out.skill = 0;
-    out.level = -1;
+    out.level = 0;
     out.width = 640;
     out.height = 480;
+
     for (int i=1; !err && i < argc; ++i) {
         char tmp[strlen(args[i])+1];
         strcpy(tmp, args[i]);
@@ -94,6 +122,10 @@ bool parseCmdLine(int argc, char* args[], ARGS & out)
                     break;
                 }
                 out.level = atoi(p+1);
+                if (out.level < -1) {
+                    fprintf(stderr,"invalid level: %d\n", out.level);
+                    err = true;
+                }
                 break;
             case CMD_SIZE:
                 if (!p || !p[1]) {
@@ -129,7 +161,7 @@ bool parseCmdLine(int argc, char* args[], ARGS & out)
             }
         }
     }
-    if (!err && out.filename.empty()) {
+    if (!err && out.filename.empty() && !findLgckDB(args[0], out.filename)) {
         err = true;
         fprintf(stderr,"no filename specified at command\n");
     }
