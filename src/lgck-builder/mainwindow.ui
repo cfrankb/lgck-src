@@ -507,7 +507,7 @@
   <action name="actionTest_Level">
    <property name="icon">
     <iconset resource="lgck-builder.qrc">
-     <normaloff>:/images/lgck.ico</normaloff>:/images/lgck.ico</iconset>
+     <normaloff>:/images/lgck.png</normaloff>:/images/lgck.png</iconset>
    </property>
    <property name="text">
     <string>Test Level</string>
