@@ -2782,6 +2782,26 @@ void MainWindow::on_actionExport_Game_triggered()
     QString cmd7z = "7z";
 #endif
 
+    QString licensePath = tmpPath + "/licenses";
+    QDir dirTmpTxt(licensePath);
+    if (!dirTmpTxt.exists()){
+        dirTmpTxt.mkpath(licensePath);
+    }
+
+    QDir txtDir(appDir + "/licenses");
+    QStringList nameFilter;
+    nameFilter << "*.txt";
+    QFileInfoList txtList = txtDir.entryInfoList( nameFilter, QDir::Files );
+    foreach (QFileInfo file, txtList){
+        QString src = file.absoluteFilePath();
+        QString dst = licensePath + "/" + file.fileName();
+        std::string msg;
+        if (!copyFile(q2c(src), q2c(dst), msg)) {
+            warningMessage(msg.c_str());
+            return;
+        }
+    }
+
     QString runtimeSource = appDir + "/" + cmd_runtime;
     QString runtimeTmp = tmpPath + "/" + stub;
     std::string src = q2c(runtimeSource);
@@ -2799,7 +2819,7 @@ void MainWindow::on_actionExport_Game_triggered()
     QString outName = "game.7z";
     QString gameOut = tmpPath + "/" + outName;
     QString finalOut = gameOut;
-    QString args = QString("a -m0=BCJ2 -m1=LZMA:d25 -m2=LZMA:d19 -m3=LZMA:d19 -mb0:1 -mb0s1:2 -mb0s2:3 %out% %stub% %game%");
+    QString args = QString("a -m0=BCJ2 -m1=LZMA:d25 -m2=LZMA:d19 -m3=LZMA:d19 -mb0:1 -mb0s1:2 -mb0s2:3 %out% %stub% %game% licenses/*.txt");
     args = args.replace("%out%", gameOut);
     args = args.replace("%stub%", stub);
     args = args.replace("%game%", gameFile);
