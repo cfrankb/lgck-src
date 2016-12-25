@@ -42,14 +42,14 @@ public:
 
 protected:
     int *m_indexSettings;
-    //QString *m_events;
-
+    int *m_countFrameSetUses;
     void changeEvent(QEvent *e);
     void updateIcon(QTreeWidgetItem * item, int protoId);
     void updateIconFrameSet(QTreeWidgetItem * item, int fs);
     void updateObjects (int OldframeSet, int newFrameSet);
     void updateButtons();
     void fillTreeSettings();
+    void countFrameSetUses();
 
 private:
     Ui::CDlgGame *m_ui;
@@ -57,7 +57,6 @@ private:
 
 private slots:
     void on_btnDefaults_clicked();
-    //void on_btnDebug_clicked();
     void on_treeFrameSets_itemSelectionChanged();
     void on_treeSounds_itemSelectionChanged();
     void on_treeObjects_itemSelectionChanged();
@@ -69,9 +68,6 @@ private slots:
     void on_treeFrameSets_doubleClicked(QModelIndex index);
     void on_btnDeleteFrameSet_clicked();
     void on_btnAddFrameSet_clicked();
-//    void on_treeFrameSets_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
-//    void on_treeSounds_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
-//    void on_treeObjects_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
     void on_treeSounds_doubleClicked(QModelIndex index);
     void on_btnDeleteSound_clicked();
     void on_btnAddSound_clicked();
@@ -80,7 +76,6 @@ private slots:
     void on_treeObjects_doubleClicked(QModelIndex index);
     void on_treeEvents_doubleClicked(QModelIndex index);
     void on_btnClearAll_clicked();
-    //void on_btnExportSprite_clicked();
 };
 
 #endif // DLGGAME_H

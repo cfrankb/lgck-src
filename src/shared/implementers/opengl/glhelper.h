@@ -3,34 +3,41 @@
 
 #include <cstdio>
 
-static const char *opengl_msg(unsigned int code);
-
-const char *opengl_msg(unsigned int code){
-    static char tmp[128];
+#ifdef LGCK_OPENGL_DEBUG
+static void opengl_msg(unsigned int code, const char *file, int line);
+void opengl_msg(unsigned int code, const char *file, int line){
+    char tmp[128];
+    tmp[0] = 0;
     switch(code) {
         case GL_NO_ERROR:
-            return "GL_NO_ERROR";
+            strcpy(tmp, "GL_NO_ERROR");
+        break;
         case GL_INVALID_ENUM:
-            return "GL_INVALID_ENUM";
+            strcpy(tmp, "GL_INVALID_ENUM");
+        break;
         case GL_INVALID_VALUE:
-            return "GL_INVALID_VALUE";
+            strcpy(tmp, "GL_INVALID_VALUE");
+        break;
         case GL_INVALID_OPERATION:
-            return "GL_INVALID_OPERATION";
+            strcpy(tmp, "GL_INVALID_OPERATION");
+        break;
         case GL_INVALID_FRAMEBUFFER_OPERATION:
-            return "GL_INVALID_FRAMEBUFFER_OPERATION";
+            strcpy(tmp, "GL_INVALID_FRAMEBUFFER_OPERATION");
+        break;
         case GL_OUT_OF_MEMORY:
-            return "GL_OUT_OF_MEMORY";
+            strcpy(tmp, "GL_OUT_OF_MEMORY");
+        break;
         default:
             sprintf(tmp, "GL UNKNOWN:%u", code);
-            return (const char*)tmp;
+    }
+    if (code != GL_NO_ERROR) {
+        qDebug("Opengl error: %s in %s line %d",
+            tmp, file, line); \
     }
 }
-
-static unsigned int __ERR__;
-/*#define GLDEBUG() __ERR__ = glGetError(); if (__ERR__ != GL_NO_ERROR) { \
-    //qDebug("Opengl error: %s in %s line %d", \
-      //  opengl_msg(__ERR__), __FILE__, __LINE__); \
-  //  }*/
-
-#define GLDEBUG() (1==1);
+    #define GLDEBUG() opengl_msg(glGetError(), __FILE__, __LINE__ );
+#else
+	#define GLDEBUG()
+#endif	
+	
 #endif // GLHELPER_H

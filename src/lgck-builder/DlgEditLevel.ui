@@ -63,7 +63,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -142,6 +142,12 @@
        <width>241</width>
        <height>25</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>This is the unique identifier that for this level. It is used to reference this object.</string>
+     </property>
+     <property name="whatsThis">
+      <string>This is the unique identifier that for this level. It is used to reference this object.</string>
      </property>
      <property name="readOnly">
       <bool>true</bool>

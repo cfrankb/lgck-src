@@ -47,6 +47,7 @@ CDlgGame::CDlgGame(QWidget *parent) :
 {
     m_ui->setupUi(this);
     m_indexSettings = NULL;
+    m_countFrameSetUses = NULL;
 }
 
 CDlgGame::~CDlgGame()
@@ -55,6 +56,9 @@ CDlgGame::~CDlgGame()
     if (m_indexSettings) {
         delete [] m_indexSettings;
         m_indexSettings = NULL;
+    }
+    if (m_countFrameSetUses) {
+        delete [] m_countFrameSetUses;
     }
 }
 
@@ -204,6 +208,8 @@ void CDlgGame::on_btnAddObject_clicked()
         m_ui->treeObjects->setCurrentItem( item );
         updateIcon( item, gf.m_arrProto.getSize() - 1 );
 
+        countFrameSetUses();
+
         gf.setDirty(true);
     } else {
         gf.m_arrProto.removeAt( j );
@@ -240,6 +246,7 @@ void CDlgGame::on_btnDeleteObject_clicked()
         // remove object & delete all references
         gf.killProto( j );
         gf.setDirty( true );
+        countFrameSetUses();
     }
 }
 
@@ -290,6 +297,7 @@ void CDlgGame::updateObjects (int OldframeSet, int newFrameSet)
             updateIcon(item, protoId);
         }
     }
+    countFrameSetUses();
 }
 
 void CDlgGame::on_treeObjects_itemSelectionChanged()
@@ -480,6 +488,7 @@ void CDlgGame::on_treeFrameSets_doubleClicked(QModelIndex index)
         gf.cache()->replace(index.row(), frameSet);
 
         QTreeWidgetItem * item = m_ui->treeFrameSets->topLevelItem( index.row() );
+        countFrameSetUses();
         updateIconFrameSet( item, index.row() );
         updateObjects (index.row(), -1);
 
@@ -507,11 +516,12 @@ void CDlgGame::on_btnAddFrameSet_clicked()
         gf.cache()->add(frameSet);
         // update GUI
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        countFrameSetUses();
         updateIconFrameSet( item, i );
         m_ui->treeFrameSets->addTopLevelItem( item );
         m_ui->treeFrameSets->setCurrentItem( item );
         // set the doc to dirty
-        gf.setDirty( true );
+        gf.setDirty( true );        
     }
     delete wiz;
 }
@@ -544,6 +554,7 @@ void CDlgGame::on_btnDeleteFrameSet_clicked()
         gf.cache()->removeAt( index.row() );
 
         gf.setDirty( true );
+        countFrameSetUses();
     }
 }
 
@@ -573,9 +584,9 @@ void CDlgGame::updateIconFrameSet(QTreeWidgetItem * itm, int fs)
     } else {
         s = QString (tr("%1 images")).arg(frameSet.getSize());
     }
-
     item->setText(0, frameSet.getName());
     item->setText(1, s);
+    item->setText(2, m_countFrameSetUses[fs] ? "used": "unused");
     item->setIcon(0, icon);
 }
 
@@ -744,6 +755,22 @@ void CDlgGame::updateButtons()
     m_ui->btnDeleteLevel->setEnabled( indexLevel.row() >= 0);
 }
 
+void CDlgGame::countFrameSetUses()
+{
+    if (m_countFrameSetUses) {
+        delete [] m_countFrameSetUses;
+    }
+    CGameFile &gf = *((CGameFile*)m_gameFile);
+    int count = gf.m_arrFrames.getSize();
+    m_countFrameSetUses = new int[count];
+    memset(m_countFrameSetUses, 0, sizeof(int)*count);
+    CProtoArray & protos = gf.m_arrProto;
+    for (int i=0; i < protos.getSize(); ++i) {
+        CProto & proto = protos[i];
+        ++m_countFrameSetUses[proto.m_nFrameSet];
+    }
+}
+
 void CDlgGame::init()
 {
     CGameFile &gf = *((CGameFile*)m_gameFile);
@@ -805,13 +832,14 @@ void CDlgGame::init()
 
     // page 4: frame sets
 
-    m_ui->treeFrameSets->setColumnCount(2);
+    m_ui->treeFrameSets->setColumnCount(3);
     m_ui->treeFrameSets->setColumnWidth(0, 128);
     m_ui->treeFrameSets->setColumnWidth(1, 96);
     m_ui->treeFrameSets->setEditTriggers(0);
     m_ui->treeFrameSets->setWordWrap(false);
     m_ui->treeFrameSets->setRootIsDecorated(false);
     m_ui->treeFrameSets->setAlternatingRowColors(true);
+    countFrameSetUses();
 
     for (int i = 0; i < gf.m_arrFrames.getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);

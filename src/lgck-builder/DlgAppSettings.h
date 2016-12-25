@@ -55,7 +55,23 @@ public:
     void setUpdater(bool checked, const QString & url);
     void getUpdater(bool & checked, QString & url);
     void setFontSize(int size);
+    void getRuntime(QString & path, QString & args);
+    void setRuntime(const QString path, const QString args);
     int getFontSize();
+    bool getSkipSplashScreen();
+    void setSkipSplashScreen(bool state);
+    void setCurrentTab(int i);
+    static const char *defaultRuntimeArgs();
+
+    enum {
+        TAB_GRID,
+        TAB_SHORTCUTS,
+        TAB_TEST,
+        TAB_UPDATER,
+        TAB_EDITOR,
+        TAB_RUNTIME,
+        TAB_DEFAULT=0
+    };
 
 protected:
     void changeEvent(QEvent *e);
@@ -83,6 +99,8 @@ private slots:
     void on_eGridColor_textChanged(const QString &arg1);
     void on_cCheckUpdate_clicked(bool checked);
     void on_btnCheckUpdate_clicked();
+    void on_btnRuntime_clicked();
+    void on_btnRestore_clicked();
 };
 
 #endif // DLGAPPSETTINGS_H

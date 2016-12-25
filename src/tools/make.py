@@ -25,10 +25,11 @@ import argparse
 import os
 import binascii
 import subprocess
+import platform
 
+EXIT_SUCCESS = 0
+EXIT_FAILURE = 1
 def chunks(l, n):
-    """ Yield successive n-sized chunks from l.
-    """
     for i in xrange(0, len(l), n):
         yield l[i:i+n]
 
@@ -38,6 +39,7 @@ class CMakeU():
         self.lines = []
 
     def scanfile(self,fpath, deps):
+        print fpath
         sfile = open(fpath, 'r')
         for line in sfile:
             if line[:10] == '#include "':
@@ -54,20 +56,16 @@ class CMakeU():
                     deps.append(src)
         sfile.close()
 
-    def write_batchfile(self):
+    def write_batchfile(self, build):
         objs = []
         objd = []
-        #src = []
-        #for fname in self.data['sources']:
-        #    if '*' in fname:
-        #        for fname in glob.glob(fname):
-        #            src.append(fname)
-        #    else:
-        #        src.append(fname)
         src = self.get_source()
         cmds = []
-        cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data['win32']['paths']]) + \
-            ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data['win32']['flags']]) 
+        cmds.append('if %1.==link. goto link')
+        cmds.append('if %1.==clean. goto clean')
+        cmds.append('windres lgck.rc -O coff -o build\lgck.res')
+        cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data[build]['paths']]) + \
+            ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data[build]['flags']])
         for fname in src:
             base = os.path.splitext(fname)[0]
             objn = base + '.o';
@@ -80,18 +78,28 @@ class CMakeU():
             objs.append(objn)
             cmds.append(r'g++ -c %s %s -o %s' % (cflags, fname, objn))
             cmds.append(r'@if %errorlevel% neq 0 goto err')
-        tfile = open(self.data['win32']['output'], 'w')
+        tfile = open(self.data[build]['output'], 'w')
         for objp in objd:
             tfile.write('mkdir %s\n' % objp.replace('/', '\\'))
         for cmd in cmds:
             tfile.write(cmd + '\n')
-        cflags = ' '.join(["{flag}".format(flag=flag) for flag in self.data['win32']['flags']]) + \
+        cflags = ' '.join(["{flag}".format(flag=flag) for flag in self.data[build]['flags']]) + \
             ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']]) 
-        libs = ' '.join(['-{lib}'.format(lib=lib) for lib in self.data['win32']['libs']])
+        libs = ' '.join(['{lib}'.format(lib=lib) for lib in self.data[build]['libs']])
         objs = ' '.join([obj for obj in objs])
-        tfile.write('g++ %s %s %s -o %s\n' % (cflags, objs, libs, self.data['target']))
+        tfile.write(':link\n')
+        tfile.write('g++ {cflags} {objs} build\lgck.res {libs} -o {target}\n'.format(
+			cflags=cflags,
+			objs=objs,
+			libs=libs,
+			target=self.data['target']
+		))
         tfile.write(r'@if %errorlevel% neq 0 goto err')
         tfile.write('\n')
+        tfile.write('goto out\n')
+        tfile.write(':clean\n')
+        for objp in objd:
+            tfile.write('rmdir /s /q %s\n' % objp.replace('/', '\\'))
         tfile.write('goto out\n')
         tfile.write(':err\n')
         tfile.write('@echo fatal error\n')
@@ -118,12 +126,15 @@ class CMakeU():
         objd = []
         for fname in src:
             deps = [fname]
-            # print fname
             base = os.path.splitext(fname)[0]
             hname = base + '.h'
             if os.path.exists(hname):
                 self.scanfile(hname,deps)
-            self.scanfile(fname,deps)
+            if os.path.exists(fname):
+                self.scanfile(fname,deps)
+            else:
+                print '*',fname
+                exit(EXIT_FAILURE)
             objn = base + '.o';
             if objn[:3] == '../':
                 objn = objn[3:]
@@ -135,7 +146,7 @@ class CMakeU():
             objs.append(objn)
         cflags = ' '.join(["-I{flag}".format(flag=flag) for flag in self.data['linux']['paths']]) + \
             ' ' + ' '.join(["{flag}".format(flag=flag) for flag in self.data['linux']['flags']]) + \
-            ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']]) 
+            ' ' + ' '.join(["-D{flag}".format(flag=flag) for flag in self.data['declare']])
         tfile = open(self.data['linux']['output'], 'w')
         tfile.write("TARGET=%s\n" % self.data['target'])
         tfile.write('CC=%s\n' % self.data['cxx'])
@@ -156,29 +167,27 @@ class CMakeU():
         tfile.write('clean:\n')
         tfile.write('\trm -rf $(ODIR)')
         tfile.close()
-        if 'build' in self.data['linux']:
-            print("TODO: implement this")
-            '''out = [
-                '#!/bin/bash',
-                'cur=`pwd`',
-                'make {0} $1 $2 $3'.format(self.data['linux']['output']),
-                'cd "$pwd"'
-            ]
-            with open(self.data['linux']['build'],'w') as t:
-                t.write('\n'.join(out))
-            subprocess.check_call(["chmod", "+x", self.data['linux']['build']])'''
 
     def write_res(self):
+        with open('res.json') as s:
+            raw = s.read()
+        res = json.loads(raw)
+        print res
         CHUNK_SIZE = 32
-        out_file = self.data['res']['out']
+        out_file = res['out']
         odir = os.path.dirname(out_file)
-        subprocess.check_call(["mkdir", "-p", odir])
-        base = self.data['res']['base']
-        tfile = open(out_file, 'w')
+        print odir
+        if not os.path.exists(odir):
+            if platform.system()=='Windows':
+                subprocess.check_call(["mkdir", odir.replace('/', '\\')])
+            else:
+                subprocess.check_call(["mkdir", "-p", odir])
+        base = res['base']
+        tfile = open(out_file, 'wb')
         tfile.write('#include "FileWrap.h"\n\n');
         i = 0
-        for fname in self.data['res']['file_list']:
-            sfile = open(base + fname, 'r')
+        for fname in res['file_list']:
+            sfile = open(base + fname, 'rb')
             data = sfile.read()
             sfile.close()
             tfile.write('const unsigned char file_%d[]={\n' % i)
@@ -189,9 +198,9 @@ class CMakeU():
                 tfile.write('\n')
             tfile.write('};\n\n')
             i = i + 1
-        tfile.write('void %s()\n{\n' % self.data['res']['name']);
+        tfile.write('void {0}()\n{{\n'.format(res['name']));
         i = 0
-        for fname in self.data['res']['file_list']:
+        for fname in res['file_list']:
             tfile.write('    CFileWrap::addFile(":/%s", (const char*)file_%d, sizeof(file_%d));\n' % (fname, i, i))
             i = i + 1
         tfile.write('}\n')
@@ -208,18 +217,17 @@ class CMakeU():
             raw = f.read() 
             f.close()
         except:
-            print "can't open %s" % args.file
+            print "can't open %s" % self.args.file
             exit(-1)
         self.data = json.loads(raw)
         if self.args.res:
-            if 'res' in self.data:
-                self.write_res()
-            else:
-                print("missing res section")
+            self.write_res()
         if 'linux' in self.data:
             self.write_makefile()
         if 'win32' in self.data:
-            self.write_batchfile()
+            self.write_batchfile('win32')
+        if 'win32-s' in self.data:
+            self.write_batchfile('win32-s')
 
 cmakeu = CMakeU()
 cmakeu.main();

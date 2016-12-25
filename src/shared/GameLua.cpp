@@ -37,6 +37,7 @@
 #include "GameLua.h"
 #include "Display.h"
 #include "Snapshot.h"
+#include "vlamits3.h"
 #include "interfaces/IMusic.h"
 #include "interfaces/IDisplayManager.h"
 #include "interfaces/IGraphics.h"
@@ -78,18 +79,13 @@ CLuaVM CGame::m_lua;
 
 void CGame::initLua()
 {
+    qDebug("initLua");
     // registers functions
     for (int i = 0; exports[i].fnName; ++i) {
         m_lua.registerFn(exports[i].fnName, exports[i].fnAddr);
     }
-
     std::string s;
     generateRuntimeLua(s);
-    CFileWrap file;
-    if (file.open("../debug/runtime.lua", "wb")) {
-        file += s.c_str();
-        file.close();
-    }
     m_lua.exec(s.c_str());
 }
 
@@ -123,6 +119,28 @@ int ss_notifyClosure(lua_State *L)
     CGame::getGame().scene().notifyClosure();
     return 0;
 }
+
+int ss_notifyAll(lua_State *L)
+{
+    const char *fn = "ss_notifyAll";
+    int argc = lua_gettop(L);
+    if ( argc != 3 && argc != 1)  {
+        CGame::error(fn, 3);
+    }
+    if (argc != 1) {
+        int gameEventID = static_cast<int>(lua_tonumber(L, 1));
+        int levelEventID = static_cast<int>(lua_tonumber(L, 2));
+        int spriteEventID = static_cast<int>(lua_tonumber(L, 3));
+        CGame::getGame().callGameEvent(gameEventID);
+        CGame::getGame().callLvEvent(levelEventID);
+        CGame::getGame().scene().notifyAll(spriteEventID);
+    } else {
+        int spriteEventID = static_cast<int>(lua_tonumber(L, 1));
+        CGame::getGame().scene().notifyAll(spriteEventID);
+    }
+    return 0;
+}
+
 
 int countGoals(lua_State *L)
 {
@@ -446,7 +464,11 @@ int killPlayer(lua_State *)
     CGame & game = CGame::getGame();
     CScene & scene = game.scene();
     CActor & player = scene [ game.svar("playerEntry") ] ;
-    game.killPlayer( player );
+    if (player.proto().m_nClass == CLASS_PLAYER_OBJECT) {
+        game.killPlayer( player );
+    } else {
+        qDebug("kill player against none player object.");
+    }
     return 0;
 }
 
@@ -3501,6 +3523,21 @@ int snapshot_reload(lua_State *L)
         return 1;
     }
 }
+
+int snapshot_clear(lua_State *L)
+{
+    const char *fnName = "snapshot_clear";
+    int argc = lua_gettop(L);
+    if (argc != 0) {
+        CGame::error(fnName, 0);
+        return 0;
+    } else {
+        CGame & game = CGame::getGame();
+        game.snapshot().clear();
+        return 0;
+    }
+}
+
 
 int remap(lua_State *L)
 {

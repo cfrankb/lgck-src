@@ -57,6 +57,9 @@ CGROpenGL::CGROpenGL(CGame *game)
     m_imageManager = new CIMOpengl();
     m_game = game;
     m_displayManager = new CDisplayManager(game, m_imageManager, this);
+#ifdef LGCK_QT
+    initializeOpenGLFunctions();
+#endif
 }
 
 CGROpenGL::~CGROpenGL()
@@ -218,7 +221,8 @@ void CGROpenGL::drawScreen()
     glEnable(GL_TEXTURE_2D);
     //glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_MULTISAMPLE);
     int colorMod = m_game->var("colorMod") | ALL_ALPHA;
     float blue = (colorMod & 0xff);// << 16;
     float green = (colorMod & 0xff00) >> 8;
@@ -382,10 +386,10 @@ void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color 
     unsigned int texture = font.textureId();
     ASSERT(texture);
 
-    GLDEBUG();
+    //GLDEBUG();
     glEnable(GL_TEXTURE_2D); GLDEBUG();
     glEnable (GL_BLEND); GLDEBUG();
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, texture); GLDEBUG();
     float xx = x;
     for (int i=0; text[i]; ++i) {

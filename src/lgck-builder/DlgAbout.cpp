@@ -106,3 +106,20 @@ void CDlgAbout::changeEvent(QEvent *e)
         break;
     }
 }
+
+void CDlgAbout::setGLInfo(const QString & vendor,
+               const QString & renderer,
+               const QString & version,
+               const QString & extensions)
+{
+    m_ui->sOpenGLRenderer->setText(renderer);
+    m_ui->sOpenGLVendor->setText(vendor);
+    m_ui->sOpenGLVersion->setText(version);
+    QRegExp rx("(\\ )");
+    QStringList extList = extensions.split(rx);
+    for (QStringList::iterator it = extList.begin();
+        it != extList.end(); ++it) {
+        QString current = *it;
+        m_ui->cbExtensions->addItem(current);
+    }
+}

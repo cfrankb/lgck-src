@@ -42,23 +42,18 @@ bool CDatabase::read()
         file.read( buf, 9 );
         if (memcmp(buf, "EASYDOC!", 8)==0) {
             file.seek(8);
-            int version = VERSION;
+            int version = 0;
             file >> version;
-            if (version <= VERSION) {
+            if (version <= getVersion()) {
                 m_functions.read(file, version);
                 m_classes.read(file, version);
                 m_sections.read(file, version);
                 result = true;
             } else {
-                m_lastError = QString("unknown version %1").arg(version);
+                m_lastError = QString("unknown version: %1").arg(version);
             }
         } else {
-            if (memcmp(buf, "@@easydoc", 9)==0) {
-                file.seek(0);
-                //importText(file);
-            } else {
-                m_lastError = QString("wrong signature");
-            }
+            m_lastError = QString("wrong signature");
         }
         file.close();
 
@@ -81,7 +76,7 @@ bool CDatabase::write()
     CFileWrap file;
     if (file.open(m_fileName, QIODevice::WriteOnly)) {
         file += m_signature;
-        int version = VERSION;
+        int version = getVersion();
         file << version;        
         m_functions.write(file);
         m_classes.write(file);
@@ -122,13 +117,14 @@ void CDatabase::dump(CFileWrap & file)
             "   div.fnFinal {font-size: 9pt; color:blue; font-weight: bold; border-left-width:thin; border-top-width:thin; border-style:solid;  xbackground-color:yellow; xborder-color: black }\r\n"\
             "   div.code {border-left-width:thin; xmargin-top:1em; border-style:solid; border:2px dotted black;background:#eee; padding-left:20px; padding-bottom:20px; padding-top:10px; }\r\n"\
             "   pre.pageBody {width : 540px; font-size:12px;}\n" \
+            "   span.typeany {font-weight: bold; font-style:italic; color:blue}\n" \
+            "   span.typevoid {font-weight: bold; font-style:italic; color:black}\n" \
             "  </style>\r\n";
     if (header) {
         file += " </head>\r\n";
 
         file += " <body>\r\n" ;
     }
-//    file += "  <pre style=\"width : 540px; font-size:12px;\">\r\n";
     file += "  <pre class=pageBody>\r\n";
 
     m_sections.dump(file);
@@ -149,13 +145,6 @@ void CDatabase::exportList(CFileWrap & file)
     m_functions.exportList(file);
 }
 
-void CDatabase::exportText(CFileWrap & file)
-{
-    file += "@@easydoc\n\n";
-    m_classes.exportText(file);
-    m_functions.exportText(file);
-}
-
 void CDatabase::exportWiki(const QString & path)
 {
     m_classes.exportWiki(path, &m_functions);
@@ -167,49 +156,74 @@ void CDatabase::exportWiki(const QString & path)
     file.close();
 }
 
-/*
-void CDatabase::importText(CFileWrap & file)
+void CDatabase::importGameLua(const char *cdata)
 {
-    const char edoc_head [] = "@@easydoc";
-
-    enum {
-        ED_NONE,
-        ED_HEAD,
-        ED_CLASS,
-        ED_FUNCTION
-    };
-
-    int size = file.getSize();
-    char *buf = new char[size+1];
-    buf[size]=0;
-    file.seek(0);
-    file.read(buf,size);
-    file.close();
-    char *p = buf;
-    int line = 1;
-    int w = ED_NONE;
+    char *data = new char[strlen(cdata)+1];
+    strcpy(data, cdata);
+    char *p = data;
     while (*p) {
-        char *n = strstr(p, '\n');
-        char *r = strstr(p, '\r');
-        char **pp = !n || !r ? std::max(n, r) : std::min(n, r);
-        if (pp) {
-            if (pp[0] == '\r' && pp[1] =='\n') {
-                *pp = 0;
-                ++pp;
+        char *pe = strstr(p, "\n");
+        if (pe) {
+            *pe = 0;
+        }
+        char *t = strstr(p, "alias");
+        if (t && *p != '#') {
+            char *pp = strstr(t, "\"");
+            char *alias_name = NULL;
+            char *fn_name = NULL;
+            if (pp) {
+              t = strstr(++pp, "\"");
+              if (t) {
+                  *t = 0;
+                  alias_name = pp;
+                  t = strstr(++t, ",");
+                  if (t) {
+                      ++t;
+                      while (*t == ' ') ++t;
+                      fn_name = t;
+                      while (isalnum(*t) || *t=='_') ++t;
+                      *t = 0;
+                  }
+              }
             }
-            *pp = 0;
-            ++pp;
+            if (alias_name && fn_name) {
+                int iAlias = m_functions.find(alias_name);
+                int iFn = m_functions.find(fn_name);
+                if (iAlias != -1 && iFn == -1) {
+                    qDebug("alias %s >> %s", alias_name, fn_name);
+                    CFunction fn;
+                    fn.copy(m_functions[alias_name]);
+                    m_functions.removeAt(iAlias);
+                    // add function (renamed)
+                    fn.name = fn_name;
+                    fn.m_alias.append(alias_name);
+                    m_functions.add(fn, true);
+                    // add alias
+                    /*
+                    fn.m_alias.clear();
+                    fn.desc = QString("This is an alias for %1.").arg(fn_name);
+                    fn.example = "";
+                    m_functions.add(fn, true);*/
+                } else if (iFn != -1 ) {
+                    qDebug("fn %s add alias %s", fn_name, alias_name);
+                    CFunction & fn = m_functions[fn_name];
+                    if (!fn.m_alias.contains(alias_name)) {
+                        fn.m_alias.append(alias_name);
+                    }
+                } else {
+                    qDebug("EXCEPTION fn %s add alias %s", fn_name, alias_name);
+                }
+            }
         }
-
-        if (*p) {
-            memcmp(p, edoc_head, strlen(edoc_head))
-        }
-
         // next line
-        ++line;
-        p = pp;
+        if (pe){
+            p = ++pe;
+        }
     }
-
-    delete [] buf;
+    delete []data;
 }
-*/
+
+int CDatabase::getVersion()
+{
+    return 0x0006;
+}

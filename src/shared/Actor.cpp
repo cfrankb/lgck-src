@@ -45,6 +45,7 @@ CGame *CActor::m_game = NULL;
 
 void CActor::read(IFile & file, int version)
 {
+    Q_UNUSED(version);
     int size = sizeof(CLevelEntry);
     int oldSize;
     file.read(&oldSize,sizeof(int));
@@ -202,6 +203,11 @@ const CProto & CActor::proto()
     return m_game->m_arrProto[m_nProto];
 }
 
+CProto & CActor::getProto()
+{
+    return m_game->m_arrProto[m_nProto];
+}
+
 const CObject & CActor::object()
 {
     return m_game->m_arrProto.getObject(m_nProto);
@@ -245,12 +251,20 @@ void CActor::stopAnimation()
 
 void CActor::kill()
 {
+
     if (m_nProto < 0) {
         m_nProto = 0;
+        return;
+    }
+
+    const CProto & p = proto();
+    if (p.m_nClass == CLASS_PLAYER_OBJECT) {
+        setState(CHitData::STATE_DEAD, true);
+        set(EXTRA_HP,0);
+        return;
     }
 
     bool is_a_goal = isGoal();
-    const CProto & p = proto();
     bool is_pickup = p.m_nClass == CLASS_PICKUP_TRIGGERS;
 
     const CProto & newproto =  m_game->m_arrProto[p.m_nChProto];
@@ -1715,6 +1729,7 @@ void CActor::togglePathPlayback(bool enable)
     if (enable) {
         m_playback |= CPathBlock::PB_PLAYBACK;
     } else {
+
         m_playback &= (-1 ^ CPathBlock::PB_PLAYBACK);
     }
 
@@ -1725,4 +1740,9 @@ void CActor::togglePathPlayback(bool enable)
         m_propi[EXTRA_PATHDIR] = CGame::INVALID;
         m_propi[EXTRA_PATHPTR] = 0;
     }
+}
+
+const char *CActor::getClassName()
+{
+    return m_game->m_className[proto().m_nClass].c_str();
 }

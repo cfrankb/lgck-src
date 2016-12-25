@@ -19,6 +19,7 @@
 #ifndef GR_SDL_H
 #define GR_SDL_H
 
+#include <cstring>
 #include <SDL2/SDL.h>
 #include "../shared/interfaces/IGraphics.h"
 
@@ -32,7 +33,9 @@ class CFont;
 class CGRSdl : public IGraphics
 {
 public:
-    CGRSdl(CGame *game);
+    CGRSdl();
+    bool init(CGame *game, int w, int h, const char *title);
+    const char* lastError();
     virtual ~CGRSdl();
     virtual const char* signature();
     virtual void drawScreen();
@@ -72,6 +75,7 @@ protected:
         unsigned char green;
         unsigned char blue;
     } m_colorMod;
+    std::string m_lastError;
 };
 
 #endif // GR_SDL_H

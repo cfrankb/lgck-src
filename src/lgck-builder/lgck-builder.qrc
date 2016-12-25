@@ -74,5 +74,9 @@
         <file>res/manual.edoc</file>
         <file>scripts/templates/waypoint.lua</file>
         <file>res/Tuffy_bold.fnt</file>
+        <file>images/Frank2_scaled33.png</file>
+        <file>images/sprite_editor.png</file>
+        <file>images/lgck.ico</file>
+        <file>images/lgck.png</file>
     </qresource>
 </RCC>

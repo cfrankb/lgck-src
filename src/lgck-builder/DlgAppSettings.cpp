@@ -23,9 +23,11 @@
 #include <QTableWidgetItem>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QFileDialog>
 #include "WHotKey.h"
 #include "DlgAppSettings.h"
 #include "ui_DlgAppSettings.h"
+#include "../shared/qtgui/cheat.h"
 
 CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     QDialog(parent),
@@ -65,6 +67,11 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
         m_ui->cbFontSize->addItem(s);
     }
     m_ui->cbFontSize->setCurrentIndex(0);
+    m_ui->sArgsHelp->setText(tr("%1 lgckdb filename\n" \
+                                "%2 level\n" \
+                                "%3 skill\n" \
+                                "%4 width\n" \
+                                "%5 height"));
 }
 
 CDlgAppSettings::~CDlgAppSettings()
@@ -329,4 +336,56 @@ void CDlgAppSettings::setFontSize(int size)
 int CDlgAppSettings::getFontSize()
 {
     return m_ui->cbFontSize->currentIndex() + 10;
+}
+
+void CDlgAppSettings::on_btnRuntime_clicked()
+{
+#ifdef Q_WS_WIN
+    QString fileFilter = tr("Executables (*.exe)");
+#else
+    QString fileFilter = tr("Executables (lgck-runtime*)");
+#endif
+    QString fileName = m_ui->eRuntime->text();
+    fileName = QFileDialog::getOpenFileName(this, tr("Runtime executable"), fileName, tr(q2c(fileFilter)));
+    if (!fileName.isEmpty()) {
+        m_ui->eRuntime->setText(fileName);
+    }
+}
+
+void CDlgAppSettings::on_btnRestore_clicked()
+{
+    //m_ui->eRuntime->setText("");
+    m_ui->eRuntimeArgs->setText(defaultRuntimeArgs());
+}
+
+void CDlgAppSettings::getRuntime(QString & path, QString & args)
+{
+    path = m_ui->eRuntime->text().trimmed();
+    args = m_ui->eRuntimeArgs->text().trimmed();
+}
+
+void CDlgAppSettings::setRuntime(const QString path, const QString args)
+{
+    m_ui->eRuntime->setText(path);
+    m_ui->eRuntimeArgs->setText(args);
+}
+
+void CDlgAppSettings::setCurrentTab(int i)
+{
+    m_ui->tabWidget->setCurrentIndex(i);
+}
+
+const char *CDlgAppSettings::defaultRuntimeArgs()
+{
+    return "%1 --level=%2 --skill=%3 --size=%4x%5";
+}
+
+bool CDlgAppSettings::getSkipSplashScreen()
+{
+    return m_ui->cSkipSplashScreen->isChecked();
+}
+
+void CDlgAppSettings::setSkipSplashScreen(bool state)
+{
+    m_ui->cSkipSplashScreen->setChecked(state);
 }

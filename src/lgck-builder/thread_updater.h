@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QString>
+#include <QByteArray>
 
 class CThreadUpdater : public QThread
 {
@@ -10,6 +11,7 @@ class CThreadUpdater : public QThread
 
 public:
     void setUrl(const QString & url);
+    void setData(const QByteArray & data);
 
 protected:
     void run();
@@ -22,6 +24,7 @@ public slots:
 
 private:
     QString m_url;
+    QByteArray m_data;
 
 };
 

@@ -1,5 +1,8 @@
 #include "DlgSelect.h"
 #include "ui_DlgSelect.h"
+#include <QDebug>
+#include <QProcess>
+#include <QMessageBox>
 
 CDlgSelect::CDlgSelect(QWidget *parent) :
     QDialog(parent),
@@ -12,6 +15,20 @@ CDlgSelect::CDlgSelect(QWidget *parent) :
     connect(ui->btnNew, SIGNAL(clicked()), this, SLOT(newFile()));
     connect(ui->btnOpen, SIGNAL(clicked()), this, SLOT(openFile()));
     connect(ui->btnSkip, SIGNAL(clicked()), this, SLOT(skipBox()));
+
+    int red=0;
+    int green=0xf0;
+    int blue=0xe0;
+    ui->btnNew->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
+        .arg(red).arg(green).arg(blue));
+    ui->btnNew->setCursor(Qt::PointingHandCursor);
+    ui->btnOpen->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
+        .arg(red).arg(green).arg(blue));
+    ui->btnOpen->setCursor(Qt::PointingHandCursor);
+    ui->btnSpriteEditor->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
+        .arg(red).arg(green).arg(blue));
+    ui->btnSpriteEditor->setCursor(Qt::PointingHandCursor);
+
 }
 
 CDlgSelect::~CDlgSelect()
@@ -37,3 +54,27 @@ void CDlgSelect::skipBox()
     accept();
 }
 
+
+void CDlgSelect::on_btnNoShow_clicked()
+{
+    m_state = NO_SHOW;
+    accept();
+}
+
+void CDlgSelect::on_btnSpriteEditor_clicked()
+{
+    QString appDir = QCoreApplication::applicationDirPath();
+    qDebug() << appDir;
+#ifdef Q_OS_WIN32
+    QString cmd = "obl5edit.exe";
+#else
+    QString cmd = "obl5edit";
+#endif
+    QString runtime = "\"" + appDir + "/" + cmd + "\"";
+    bool result = QProcess::startDetached(runtime);
+    if (!result) {
+        QString errMsg = tr("Running external editor failed: %1").arg(runtime);
+        QMessageBox msgBox(QMessageBox::Warning, "m_appName", errMsg, 0, this);
+        msgBox.exec();
+    }
+}

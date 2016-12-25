@@ -36,22 +36,35 @@
 // http://students.cs.byu.edu/~bfish/glfontdl.php
 // http://stackoverflow.com/questions/8847899/opengl-how-to-draw-text-using-only-opengl-methods
 
-CGRSdl::CGRSdl(CGame *game)
+CGRSdl::CGRSdl()
 {
+    m_game = NULL;
+}
+
+bool CGRSdl::init(CGame *game, int w, int h, const char*title)
+{
+    m_game = game;
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
         printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+        return false;
     }
-    m_window = SDL_CreateWindow("LGCK runtime SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+    m_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN );
     if (!m_window) {
         qDebug("SDL_CreateWindow failed");
+        return false;
     }
     queryDriver();
     m_renderer = SDL_CreateRenderer( m_window, -1, SDL_RENDERER_SOFTWARE );
     m_imageManager = new CIMSdl();
     m_imageManager->setRenderer(m_renderer);
-    m_game = game;
     m_displayManager = new CDisplayManager(game, m_imageManager, this);
-    game->updateGeometry(SCREEN_WIDTH, SCREEN_HEIGHT);
+    game->updateGeometry(w, h);
+    return true;
+}
+
+const char* CGRSdl::lastError()
+{
+    return m_lastError.c_str();
 }
 
 CGRSdl::~CGRSdl()

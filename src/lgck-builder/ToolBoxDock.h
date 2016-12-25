@@ -97,6 +97,7 @@ private slots:
     void editEvents();
     void createSprite();
     void editFrames();
+    void exportSprite();
     void updateFrameSet(int frameSet);
 
 signals:

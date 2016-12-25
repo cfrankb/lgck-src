@@ -32,7 +32,7 @@ class CProto
 {
     // Construction
 public:
-    char* getName();
+    char *getName();
     CProto (const char *);
     CProto (const CProto & proto);
     CProto();

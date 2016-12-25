@@ -6,15 +6,13 @@
         "paths" : [
             ".",
             "../shared",
-            "/usr/include",
-            "/usr/include/freetype2"
+            "/usr/include"
         ],
         "libs" : [
             "z",
             "m",
             "pthread",
             "lua5.2",
-            "ftgl",
             "SDL2",
             "SDL2_mixer",
             "GL",
@@ -22,22 +20,20 @@
             "GLU",
             "glut"
         ],
-        "flags" : ["-m64", "-std=c++0x", "-O3", "-fPIE", "-Wall"],
-        "build" : "build.sh"
+        "flags" : ["-m64", "-std=c++0x", "-O3", "-fPIE", "-Wall"]
     },
     "win32": {
         "output" : "make.bat",
         "paths" : [
             "../shared",
-            "../../redist/headers",
-            "../../redist/headers/freetype2"
+            "../../../redist/include"
         ],
         "libs" : [
-            "L../../redist/lib",
+            "L../../../redist/lib/sdl2-204",
+            "L../../../redist/lib",
             "lz",
             "lm",
             "llua52",
-            "lftgl",
             "lSDL2",
             "lSDL2_mixer",
             "lopengl32",
@@ -49,25 +45,14 @@
     "sources": [
         "glut/main.cpp",
         "../shared/*.cpp",
-        "../shared/implementers/*opengl.cpp",
-        "../shared/implementers/sn_sdl.cpp",
-        "../shared/implementers/mu_sdl.cpp",
+        "../shared/implementers/opengl/*opengl.cpp",
+        "../shared/implementers/sdl/sn_sdl.cpp",
+        "../shared/implementers/sdl/mu_sdl.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/glut/*.cpp",
         "shared/lgck_res.cpp"
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
     "obj_dir": "target/glut",
-    "declare" : [],
-    "res": {
-        "out": "shared/lgck_res.cpp",
-        "name": "add_lgck_res",
-        "base": "../lgck-builder/",
-        "file_list" : [
-            "images/points.obl5",
-            "res/DejaVuSans.ttf",
-            "scripts/common.lua",
-            "scripts/functions.lua"
-        ]
-    }
+    "declare" : []
 }

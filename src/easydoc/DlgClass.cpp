@@ -94,9 +94,9 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
 
     // functions (treeFn)
 
-    m_ui->treeFn->setColumnCount(2);
+    m_ui->treeFn->setColumnCount(3);
     m_ui->treeFn->setColumnWidth(0, 16);
-    m_ui->treeFn->setColumnWidth(1, 156);
+    m_ui->treeFn->setColumnWidth(1, 64);
     m_ui->treeFn->setEditTriggers(0);
     m_ui->treeFn->setWordWrap(false);
     m_ui->treeFn->setRootIsDecorated(false);
@@ -111,8 +111,7 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
     // variables (treeVar)
 
     m_ui->treeVar->setColumnCount(2);
-    m_ui->treeVar->setColumnWidth(0, 16);
-    m_ui->treeVar->setColumnWidth(1, 156);
+    m_ui->treeVar->setColumnWidth(0, 64);
     m_ui->treeVar->setEditTriggers(0);
     m_ui->treeVar->setWordWrap(false);
     m_ui->treeVar->setRootIsDecorated(false);
@@ -156,9 +155,6 @@ void CDlgClass::format (QTreeWidgetItem * item, CFunction & fn)
       ICON_LUA
     };
 
-    char states[] = "?+- ";
-    QString name;
-
     QString ret;
     switch (fn.Out().getSize()) {
     case 0:
@@ -174,35 +170,32 @@ void CDlgClass::format (QTreeWidgetItem * item, CFunction & fn)
         break;
     }
 
-    name.sprintf("%c%s %s", states[fn.state], q2c(ret), q2c(fn.name));
     item->setIcon(0, m_icons[icon_langs[fn.lang]]);
-    item->setText(1, name);
     item->setIcon(1, m_icons[icon_states[fn.state]]);
+    item->setText(1, ret);
+    item->setText(2, fn.name);
 }
 
 void CDlgClass::format (QTreeWidgetItem * item, Param & var)
 {
     item->setIcon(0, m_icons[0]);
-    item->setText(1, var.type + " " + var.name);
+    item->setText(0, var.type);
+    item->setText(1, var.name);
 }
 
 void CDlgClass::initFn(CFunction & fn)
 {
-    fn.In().forget();
+    fn.In(0).forget();
     fn.Out().forget();
     fn.state = 0;
     fn.lang = 0;
-    //for (int i=0; i < MAX_PARAMS; i++) {
-    //    fn.In()[i].flags = 0;
-     //   fn.Out()[i].flags = 0;
-    //}
 }
 
 void CDlgClass::on_btnAdd_clicked()
 {
     CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
     CFunction fn;
-    initFn(fn);
+    //initFn(fn);
     d->load(&fn);
     d->setWindowTitle(tr("new method"));
 

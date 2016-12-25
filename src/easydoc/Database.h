@@ -47,8 +47,8 @@ public:
     bool write();
     void dump(CFileWrap & file);
     void exportList(CFileWrap & file);
-    void exportText(CFileWrap & file);
     void exportWiki(const QString &path);
+    void importGameLua(const char *cdata);
 
     void setFileName(const QString fileName);
     QString getFileName();
@@ -56,17 +56,13 @@ public:
         return m_lastError;
     }
 
+    int getVersion();
+
     CFunctions m_functions;
     CClasses m_classes;
     CSections m_sections;
 
 protected:
-
-    enum {
-//        VERSION = 0x0003
-       VERSION = 0x0004
-    };
-
     static char m_signature[];
     bool m_dirty;
     QString m_fileName;

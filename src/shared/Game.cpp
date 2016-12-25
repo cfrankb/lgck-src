@@ -163,11 +163,6 @@ CLevel *CGame::getLayers()
     return m_layers;
 }
 
-void CGame::runtimeLua(std::string & s)
-{    
-    generateRuntimeLua(s);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // cpp interface
 
@@ -567,8 +562,20 @@ bool CGame::initLevel(int n)
 {
     setLevel(n);
     CLevel *s = m_arrLevels[n];
+
     // remove remnant task
     m_tasks->forget();
+
+    // reload snapshot
+    bool snapshotReloading = false;
+    if (m_snapshot->has_snapshot()) {
+        m_snapshot->reload(*this);
+        snapshotReloading = true;
+        // if this is a restart call the
+        // restart event.
+       // callLvEvent(CLevel::EL_RESTART);
+    }
+
     BUFFERLEN = s->getSettingInt("width");
     BUFFERHEI = s->getSettingInt("height");
     if (!BUFFERLEN || !BUFFERHEI) {
@@ -596,18 +603,19 @@ bool CGame::initLevel(int n)
     // init LuaVM
     initLua();
 
-    // Split the background from the sprites
-    m_sBK->forget();
-    m_sFW->forget();
-    splitLevel(s, m_sBK, m_sFW);
-    // copy the other layers here
-    m_layers->forget();
-    for (int i=0; i < s->getSize(); ++i) {
-        CLayer *layer = new CLayer();
-        *layer = (*s)[i];
-        m_layers->addLayer( layer );
+    if (!snapshotReloading) {
+        // Split the background from the sprites
+        m_sBK->forget();
+        m_sFW->forget();
+        splitLevel(s, m_sBK, m_sFW);
+        // copy the other layers here
+        m_layers->forget();
+        for (int i=0; i < s->getSize(); ++i) {
+            CLayer *layer = new CLayer();
+            *layer = (*s)[i];
+            m_layers->addLayer( layer );
+        }
     }
-
     svar("WarpTo") = INVALID;
 
     // Save the background rgb value for future use
@@ -620,14 +628,16 @@ bool CGame::initLevel(int n)
     var("colorMod") = strtol(s->getSetting("colorMod"), NULL, 16);
 
     // allocate the collision map
-    Size sx = CMap::size(BUFFERLEN, BUFFERHEI);
-    var("BUFFERLEN") = BUFFERLEN;
-    var("BUFFERHEI") = BUFFERHEI;
-    m_map->resize(sx.len, sx.hei);
+    if (!snapshotReloading) {
+        Size sx = CMap::size(BUFFERLEN, BUFFERHEI);
+        var("BUFFERLEN") = BUFFERLEN;
+        var("BUFFERHEI") = BUFFERHEI;
+        m_map->resize(sx.len, sx.hei);
 
-    // Map both background and forewardground objects
-    m_sBK->map();
-    m_sFW->map();
+        // Map both background and forewardground objects
+        m_sBK->map();
+        m_sFW->map();
+    }
 
     // Find the player object
     if ( (svar("playerEntry") = m_sFW->findPlayerEntry()) == -1) {
@@ -656,7 +666,9 @@ bool CGame::initLevel(int n)
         player.callEvent(CObject::EO_ACTIVATE);
         centerOnPlayer(player);
         player.setState(CHitData::STATE_HIT | CHitData::STATE_BEGINNING, true);
-        player.set(EXTRA_HP, 50);
+        if (!snapshotReloading) {
+            player.set(EXTRA_HP, 50);
+        }
         player.set(EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
     }
 
@@ -687,13 +699,6 @@ bool CGame::initLevel(int n)
     // reset hard Inventory table
     m_inventoryTable->reset(true);
     m_inventoryTable->addInventory("@player");
-    // reload snapshot
-    if (m_snapshot->has_snapshot()) {
-        m_snapshot->reload(*this);
-        // if this is a restart call the
-        // restart event.
-       // callLvEvent(CLevel::EL_RESTART);
-    }
 
     return true;
 }
@@ -1336,9 +1341,7 @@ void CGame::addToHP(int hp)
 
 void CGame::killPlayer(CActor &player)
 {
-    player.setState(CHitData::STATE_DEAD, true);
-    player.set(EXTRA_HP,0);
-    //player.m_hp = 0;
+    player.kill();
 }
 
 bool CGame::isPlatformClass(int classId)
@@ -1611,10 +1614,7 @@ void CGame::generateRuntimeLua(std::string & s)
         s += t;
     }
 
-    s += "\n";
-
     s += std::string("-- EVENT PROCEDURES (OBJECTS)\n\n");
-
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         CObject & object = m_arrProto.getObject( n );
         for (int j = 0; j < object.getEventCount(); ++j) {
@@ -1623,33 +1623,34 @@ void CGame::generateRuntimeLua(std::string & s)
                 int len = strlen(CProtoArray::getEventName(j)) + strlen(luaCode) + 128;
                 char tmp[len];
                 sprintf(tmp, "function event_obj_%d_%s (self, ticks)\n" \
-                                     "%s\n" \
-                                     "end\n\n", n, CProtoArray::getEventName(j), luaCode
+                        "%s\n" \
+                        "end\n\n", n, CProtoArray::getEventName(j), luaCode
                         );
                 s += std::string(tmp);
             }
         }
     }
 
+    s += "\n";
     if (getSize()) {
-        s += std::string("-- EVENT PROCEDURES (LEVEL)\n\n");
-
-        CLevel & level = * ( m_arrLevels[var("level")] );
-        for (int i = 0; i< level.getEventCount(); ++i) {
-            if (level.getEvent(i)[0]) {
-                int len = strlen(level.getEventName(i)) + strlen(level.getEvent(i)) + 128;
-                char tmp[len];
-                sprintf(tmp, "function event_level_%s()\n" \
-                          "%s\n" \
-                          "end\n\n", level.getEventName(i), level.getEvent(i));
-
-                s += std::string(tmp);
+        for (int w=0; w < getSize(); ++w) {
+            sprintf(tmp,"\n\n-- EVENT PROCEDURES (LEVEL %d)\n\n", w+1);
+            s += std::string(tmp);
+            CLevel & level = *(m_arrLevels[w]);
+            for (int i = 0; i< level.getEventCount(); ++i) {
+                if (level.getEvent(i)[0]) {
+                    int len = strlen(level.getEventName(i)) + strlen(level.getEvent(i)) + 128;
+                    char tmp[len];
+                    sprintf(tmp, "function event_level_%d_%s()\n" \
+                            "%s\n" \
+                            "end\n\n", w+1, level.getEventName(i), level.getEvent(i));
+                    s += std::string(tmp);
+                }
             }
         }
     }
 
     s += std::string("-- EVENT PROCEDURES (GAME)\n\n");
-
     for (int i = 0; i< CGameEvents::getSize(); ++i) {
         if (m_events->getEvent(i)[0]) {
             int len = strlen(CGameEvents::getName(i)) + strlen(m_events->getEvent(i)) + 128;
@@ -1723,7 +1724,6 @@ bool CGame::readScript( const char *scriptName, std::string &out )
         m_lua.debug(tmp);
         qDebug(fmt2, tmp);
     }
-
     return result;
 }
 
@@ -1734,11 +1734,12 @@ void CGame::exec(const char* luaCode)
 
 void CGame::callLvEvent(int eventId)
 {
-    CLevel & level = * (m_arrLevels [ var("level") ]);
+    unsigned int levelId = var32("level");
+    CLevel & level = * (m_arrLevels [ levelId ]);
     const char* luaCode = level.getEvent(eventId);
     if (luaCode[0]) {
         char fnName [255];
-        sprintf(fnName, "event_level_%s", CLevel::getEventName(eventId));
+        sprintf(fnName, "event_level_%d_%s", levelId + 1, CLevel::getEventName(eventId));
 
         /* the function name */
         lua_getglobal(m_lua.getState(), fnName);
@@ -1910,6 +1911,12 @@ long long & CGame::svar(const char *s)
     return *reinterpret_cast<long long *>(&t);
 }
 
+unsigned int & CGame::var32(const char *s)
+{
+    unsigned long long & t = m_vars[s];
+    return *reinterpret_cast<unsigned int *>(&t);
+}
+
 void CGame::setEngineState(unsigned int state)
 {
     unsigned long long now;
@@ -1967,6 +1974,7 @@ void CGame::updateScreen()
         }
         displays()->drawText(-1,-1,text, 0, 15,
                              CGame::bgr2rgb(strtol(level->getSetting("introTextColor"), NULL, 16)));
+        callLvEvent(CLevel::EL_INTRO_DRAW);
         break;
     default:
         graphics()->drawScreen();
@@ -2193,10 +2201,7 @@ void CGame::remap()
 bool CGame::initFonts()
 {
     qDebug("initFont()");
-
-    const char *fontName = ":res/Tuffy_bold.fnt";
-    //const char *fontName = "shared/Arial Black.fnt";
-//    const char *fontName = "shared/DejaVu Sans Mono.fnt";
+    const char *fontName = ":/res/Tuffy_bold.fnt";
     CFileWrap file;
     if (file.open(fontName)) {
         m_font = new CFont;

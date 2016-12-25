@@ -20,40 +20,47 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-//#include "FileWrap.h"
-//#include "struct.h"
-
 class CFileWrap;
-class CParams;
-
 #include "Params.h"
 
 class CFunction
 {
 public:
-    CFunction() {};
-    CFunction(const CFunction & s);
-    ~CFunction() {};
-
-    CFunction & operator = (CFunction & s);
+    CFunction() {
+        init();
+    }
+    ~CFunction() {}
     void copy(CFunction & s);
-
-    CParams & In() { return paramsIn; }
-    CParams & Out() { return paramsOut; }
+    CParams & In(int i) {
+        return paramsIn[i];
+    }
+    CParams & Out()  {
+        return paramsOut;
+    }
+    void read(CFileWrap & file, int version);
+    void write(CFileWrap & file);
+    void init();
 
     QString name;
     int state;
     int lang;
     QString desc;
     QString example;
+    QStringList m_alias;
+    int m_inCount;
+    void removeInSet(int i);
+    int InSetCount() {
+        return m_inCount;
+    }
 
     enum {
         FLAG_OPTIONAL = 1,
-        FLAG_MORE     = 2
+        FLAG_MORE     = 2,
+        MAX_IN_COUNT  = 4
     };
 
 protected:
-    CParams paramsIn;
+    CParams paramsIn[4];
     CParams paramsOut;
 };
 
@@ -65,11 +72,13 @@ public:
     ~CFunctions();
 
     CFunction & operator [] (int i);
+    CFunction & operator [] (const QString & name);
     CFunctions & operator = (CFunctions & src);
     int getSize() const {
         return m_fnCount;
     }
 
+    int find(const QString & name);
     int add(CFunction & fn, bool sorted);
     int insertAt(int i, CFunction & fn);
     void removeAt(int i);
@@ -79,7 +88,7 @@ public:
     bool read(CFileWrap & file, int version);
     void dump(CFileWrap & file, QString prefix="");
     void exportList(CFileWrap & file, QString prefix="");
-    void exportText(CFileWrap & file, QString prefix="");
+    //void exportText(CFileWrap & file, QString prefix="");
     void exportWiki(CFileWrap & file, QString prefix="");
     void exportListWiki(CFileWrap & file, QString prefix);
 

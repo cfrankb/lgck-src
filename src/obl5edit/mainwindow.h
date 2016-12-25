@@ -30,7 +30,8 @@ class CWImagePrieview;
 class CEditView;
 class QTreeWidgetItem;
 class QPushButton;
-class CFrameView;
+class CFrameScroll;
+class CFrameWidget;
 class CWPreviewDock;
 class QToolbar;
 class QAction;
@@ -93,7 +94,8 @@ private:
 
     QAction *m_recentFileActs[MaxRecentFiles];
     COBL5File m_doc;
-    CFrameView *m_view;    
+    CFrameScroll *m_scrollArea;
+    CFrameWidget *m_view;
     QLabel **m_labels;
     QToolButton *m_button;
     QAction *m_actionAlpha;

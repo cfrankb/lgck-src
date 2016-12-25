@@ -40,6 +40,9 @@ protected:
     void changeEvent(QEvent *e);
     CFunction * m_fn;
     const QString formatParam(Param & param);
+    int m_inSet;
+    void updateInTree();
+    void updateInSetCombo();
 
 private:
     Ui::CDlgFunction *m_ui;
@@ -51,6 +54,11 @@ private slots:
     void on_btnDelete_IN_clicked();
     void on_btnAdd_IN_clicked();
     void on_treeIn_doubleClicked(QModelIndex index);
+    void on_btnAdd_Alias_clicked();
+    void on_btnDelete_Alias_clicked();
+    void on_cbInSet_currentIndexChanged(int index);
+    void on_btnAdd_IN_SET_clicked();
+    void on_btnDelete_IN_SET_clicked();
 };
 
 #endif // DLGFUNCTION_H

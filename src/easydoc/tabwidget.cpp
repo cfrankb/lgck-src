@@ -34,12 +34,13 @@ TabWidget::TabWidget(QWidget *parent) :
 
     m_ui->treeFn->setColumnCount(3);
     m_ui->treeFn->setColumnWidth(0, 16);
-    m_ui->treeFn->setColumnWidth(1, 256);
-    m_ui->treeFn->setColumnWidth(2, 64);
+    m_ui->treeFn->setColumnWidth(1, 128);
     m_ui->treeFn->setEditTriggers(0);
     m_ui->treeFn->setWordWrap(false);
     m_ui->treeFn->setRootIsDecorated(false);
     m_ui->treeFn->setAlternatingRowColors(true);
+    m_ui->treeClass->setRootIsDecorated(false);
+    m_ui->treeSection->setRootIsDecorated(false);
 
     QString images[] = {
         ":/images/blue.png",
@@ -103,7 +104,6 @@ void TabWidget::init(CDatabase *db)
     int count;
     count = m_ui->treeFn->model()->rowCount();
     m_ui->treeFn->model()->removeRows(0, count);
-
     for (int i = 0; i < db->m_functions.getSize() ; ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         format(item, db->m_functions[i]);
@@ -112,18 +112,18 @@ void TabWidget::init(CDatabase *db)
 
     count = m_ui->treeClass->model()->rowCount();
     m_ui->treeClass->model()->removeRows(0, count);
-
     for (int i = 0; i < db->m_classes.getSize() ; ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        item->setIcon(0, m_icons[1]);
         item->setText(0, db->m_classes[i]->name());
         m_ui->treeClass->addTopLevelItem(item);
     }
 
     count = m_ui->treeSection->model()->rowCount();
     m_ui->treeSection->model()->removeRows(0, count);
-
     for (int i = 0; i < db->m_sections.getSize() ; ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        item->setIcon(0, m_icons[1]);
         item->setText(0, db->m_sections[i].name);
         m_ui->treeSection->addTopLevelItem(item);
     }
@@ -147,7 +147,7 @@ void TabWidget::format (QTreeWidgetItem * item, CFunction & fn)
       ICON_LUA
     };
 
-    QString name;
+  //  QString name;
     QString ret;
     switch (fn.Out().getSize()) {
     case 0:
@@ -163,25 +163,18 @@ void TabWidget::format (QTreeWidgetItem * item, CFunction & fn)
         break;
     }
 
-    name.sprintf("%s %s", q2c(ret), q2c(fn.name));
     item->setIcon(0, m_icons[icon_langs[fn.lang]]);
-    item->setText(1, name);
     item->setIcon(1, m_icons[icon_states[fn.state]]);
+    item->setText(1, ret);
+    item->setText(2, fn.name);
 }
 
-void TabWidget::initFn(CFunction & fn)
-{
-    fn.In().forget();
-    fn.Out().forget();
-    fn.state = 0;
-    fn.lang = 0;
-}
+
 
 void TabWidget::on_btnAdd_clicked()
 {
     CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
     CFunction fn;
-    initFn(fn);
     d->load(&fn);
     d->setWindowTitle(tr("new function"));
 

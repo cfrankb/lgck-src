@@ -23,59 +23,87 @@
 #include "DlgSelect.h"
 #include <QFileDialog>
 #include <QGLWidget>
+#include <QSettings>
 #include "WizGame.h"
+#include "ss_version.h"
+#include <ctime>
+
+static char appName[] = "LGCK builder";
+static char appTitle[] = "LGCK builder IDE";
+static char author[] = "cfrankb";
 
 int main(int argc, char *argv[])
 {
+    //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL, false);
+    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
+    srand( time( NULL ) );
     QApplication app(argc, argv);
     MainWindow w;
+    w.createEventEditor();
 
-#ifdef Q_OS_WIN32
     char m_fileFilter[] = "LGCK games (*.lgckdb)";
     QString fileName = "";
     bool done = false;
+    QSettings settings(author, appName);
+    settings.beginGroup("Editor");
+    bool skipSplash = settings.value("skipSplash", false).toBool();
+    settings.endGroup();
 
-    do {
-        CDlgSelect * dlg = new CDlgSelect(&w);
-        dlg->exec();
-        CWizGame *wiz;
-        switch(dlg->getState()) {
-        case CDlgSelect::OPEN:
-            fileName = QFileDialog::getOpenFileName(&w, w.tr("Open"), "", w.tr(m_fileFilter));
-            if (!fileName.isEmpty()) {
-                done = true;
+    if (!skipSplash) {
+        do {
+            int version = SS_LGCK_VERSION;
+            int vv[4]={0,0,0,0};
+            for (int i=3; i >= 0; --i) {
+                vv[i] = version & 0xff;
+                version /= 256;
             }
-        break;
-
-        case CDlgSelect::NEW:
-            wiz = new CWizGame();
-            wiz->init(w.getGame());
-            if (wiz->exec()) {
-                wiz->save();
-                w.initToolBox();
-                done = true;
-                w.getGame()->setDirty(true);
-            }
+            QString ver = QString().sprintf("%s %.2d.%.2d.%.2d.%.2d", appTitle, vv[0], vv[1], vv[2], vv[3]);
+            CDlgSelect * dlg = new CDlgSelect(&w);
+            dlg->setWindowTitle(ver);
+            dlg->raise();
+            dlg->setWindowState(Qt::WindowActive) ;
+            dlg->exec();
+            CWizGame *wiz;
+            switch(dlg->getState()) {
+            case CDlgSelect::OPEN:
+                fileName = QFileDialog::getOpenFileName(&w, w.tr("Open"), "", w.tr(m_fileFilter));
+                if (!fileName.isEmpty()) {
+                    done = true;
+                }
             break;
 
-        case CDlgSelect::CLOSE:
-            return 0;
+            case CDlgSelect::NEW:
+                wiz = new CWizGame();
+                wiz->init(w.getGame());
+                if (wiz->exec()) {
+                    wiz->save();
+                    w.initToolBox();
+                    done = true;
+                    w.getGame()->setDirty(true);
+                }
+                break;
 
-        case CDlgSelect::SKIP:
-            done = true;
-        }
+            case CDlgSelect::CLOSE:
+                return 0;
 
-        delete dlg;
-    } while (!done);
+            case CDlgSelect::NO_SHOW:
+                skipSplash = true;
 
+            case CDlgSelect::SKIP:
+                done = true;
+            }
+
+            delete dlg;
+        } while (!done);
+    }
+
+    settings.beginGroup("Editor");
+    settings.setValue("skipSplash", skipSplash);
+    settings.endGroup();
+
+    w.show();
     if (!fileName.isEmpty()) {
-        w.makeCurrent();
         w.open(fileName);
     }
-#else
-    srand( time( NULL ) );
-#endif
-    w.createEventEditor();
-    w.show();
     return app.exec();
 }

@@ -985,6 +985,7 @@ function unfoldEvents1()
         closureEvent = getClosureEvent();
         if closureEvent == EVENT_NO_EVENT and (isLevelEnded() or
             (ticks % 8 == 0  and isEndLevelMeet())) then
+            snapshot_clear();
             setClosure( EVENT_LEVEL_COMPLETED );
         end
 

@@ -209,27 +209,6 @@ void CClasses::dump(CFileWrap & file)
     }
 }
 
-void CClasses::exportText(CFileWrap & file)
-{
-    for (int i = 0; i < m_cCount; ++i) {
-        CClass * cl = m_classes[i];
-        file += QString ("@@class %1\n").arg(cl->name());
-        for (int j = 0; j < cl->variables().getSize(); ++j) {
-            Param & member  = cl->variables()[j];
-            file += "@var " + member.type + " " + member.name + "\n";
-        }
-        if (!cl->desc().isEmpty()) {
-            file += "@text\n";
-            file += cl->desc() +"\n";
-        }
-        file += "\n////////////////////////////////////////////////////////////////////////";
-        if (cl->methods().getSize()) {
-            file += "\n\n";
-        }
-        cl->methods().exportText(file, cl->name() + ":");
-    }
-}
-
 void CClasses::debug(CFileWrap & file)
 {
     for (int i = 0; i < m_cCount; ++i) {

@@ -52,6 +52,7 @@ public:
     void write(IFile & file);
     const CScene & operator = (const CScene & s);
     void notifyClosure();
+    void notifyAll(int eventId);
 
 protected:
     CActor **m_actors;

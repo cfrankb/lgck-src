@@ -23,13 +23,17 @@ class QComboBox;
 class QLabel;
 class CWEditEvents;
 class QAction;
-class CLevelView;
+class CLevelScroll;
+//class CLevelView;
+class CLevelViewGL;
 class CToolBoxDock;
 class CThreadUpdater;
+class QScrollArea;
 
 #include <QTimer>
 #include <QTime>
 #include <QMainWindow>
+#include <QGLFunctions>
 #include "../shared/stdafx.h"
 #include "../shared/Game.h"
 
@@ -60,7 +64,9 @@ private:
     Ui::MainWindow *ui;
     QComboBox *m_comboEvents;
     QComboBox *m_comboLayers;
-    CLevelView *m_lview;
+    //QScrollArea *m_scroll
+    CLevelScroll *m_scroll;
+    CLevelViewGL *m_lview;
     CToolBoxDock *m_toolBox;
     CWEditEvents *m_editEvents;
     QToolBar *m_levelToolbar;
@@ -89,6 +95,14 @@ private:
     bool m_bUpdate;
     QString m_updateURL;
     CThreadUpdater *m_updater;
+    QString m_uuid;
+    QString m_runtime;
+    QString m_runtimeArgs;
+    int m_rez;
+    int m_rezW;
+    int m_rezH;
+    bool m_runtimeExternal;
+    bool m_skipSplash;
     bool maybeSave();
     bool save();
     bool saveAs();
@@ -129,6 +143,16 @@ private:
     virtual void paintEvent ( QPaintEvent * event );
 
     void handleGameEvents();
+    void goExternalRuntime();
+    bool checkExecutible(const QString exec, QString & errMsg);
+    void showAppSettings(int tab);
+    void formatVersion(QString &ver);
+
+protected:
+    void initializeGL();
+    void paintGL();
+
+    QOpenGLContext *m_context;
 
 private slots:
     void on_actionRestart_triggered();
@@ -219,8 +243,11 @@ private slots:
     void on_actionDecrease_Font_Size_triggered();
     void on_actionReset_Font_Size_triggered();
     void on_actionEdit_Images_triggered();
-
     void on_actionImport_Font_triggered();
+
+    void on_actionSprite_Editor_triggered();
+
+    void on_actionExport_Game_triggered();
 
 signals:
     void levelDeleted(int index);

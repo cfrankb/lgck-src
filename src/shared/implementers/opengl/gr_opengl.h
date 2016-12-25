@@ -29,7 +29,14 @@ class CDisplayManager;
 class CDMOpengl;
 class CFont;
 
+#ifdef LGCK_QT
+    #include <QOpenGLFunctions_2_0>
+#endif
+
 class CGROpenGL : public IGraphics
+#ifdef LGCK_QT
+    , protected QOpenGLFunctions_2_0
+#endif
 {
 public:
     CGROpenGL(CGame *game);

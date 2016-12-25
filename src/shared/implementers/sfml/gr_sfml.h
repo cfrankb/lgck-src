@@ -33,7 +33,9 @@ class CFont;
 class CGRSfml : public IGraphics
 {
 public:
-    CGRSfml(CGame *game);
+    CGRSfml();
+    bool init(CGame *game, int w, int h, const char *title);
+    const char* lastError();
     virtual ~CGRSfml();
     virtual const char* signature();
     virtual void drawScreen();
@@ -70,6 +72,7 @@ protected:
     virtual void drawScene (CScene * layer);
     virtual void drawInventory();
     virtual void drawHP();
+    std::string m_lastError;
 };
 
 #endif // GR_SDL_H

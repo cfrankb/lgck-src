@@ -25,9 +25,21 @@ public:
     void setScore(int score);
     void setHP(int hp);
     void setContinue(bool bContinue);
+    bool isExternal();
+    void setExternal(bool external);
+    int getWidth();
+    int getHeight();
+    int getRez();
+    void setRez(int v);
 
 private:
     Ui::CDlgTestLevel *ui;
+    typedef struct {
+        int w;
+        int h;
+    } REZ;
+    static REZ m_rez[];
+
 };
 
 #endif // DLGTESTLEVEL_H

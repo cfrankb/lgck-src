@@ -289,3 +289,29 @@ long CFileWrap::tell()
 {
     return file.pos();
 }
+
+CFileWrap & CFileWrap::operator >> (QStringList & list)
+{
+    list.empty();
+    int size=0;
+    read(&size, sizeof(size));
+    for (int i=0; i < size; ++i) {
+        QString str;
+        *this >> str;
+        list.append(str);
+    }
+    return *this;
+}
+
+CFileWrap & CFileWrap::operator << (const QStringList & list)
+{
+    int size = list.size();
+    write(&size, sizeof(size));
+    QListIterator<QString> itr (list);
+    while (itr.hasNext()) {
+        QString current = itr.next();
+        *this << current;
+        //qDebug() << "{" <<  current << "}";
+    }
+    return *this;
+}

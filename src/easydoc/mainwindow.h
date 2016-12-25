@@ -1,6 +1,6 @@
 /*
     easyDoc - documentation utility for LGCK Builder
-    Copyright (C) 2009, 2010  Francois Blanchette
+    Copyright (C) 2009, 2016  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@ protected:
     bool save();
     bool saveAs();
     void warningMessage(const QString message);
-
     bool updateTitle();
     void updateRecentFileActions();
     void reloadRecentFileActions();
@@ -73,23 +72,23 @@ protected:
 private:
     Ui::MainWindow *ui;
     TabWidget *m_tabs;
-
     void closeEvent(QCloseEvent *event);
+    bool m_saveHTML;
+    void restoreSettings();
 
 private slots:
     void on_action_About_triggered();
-    void on_actionEWiki_triggered();
     void on_actionHTML_triggered();
-//    void on_actionExport_triggered();
     void on_actionSave_as_triggered();
     void on_action_save_triggered();
     void on_action_open_triggered();
     void openRecentFile();
-
     void on_actionNew_triggered();
     void on_actionFunctionList_triggered();
     void on_actionPlain_Text_triggered();
     void on_actionWiki_triggered();
+    void on_actionGameLua_triggered();
+    void on_actionSave_HTML_triggered(bool checked);
 };
 
 #endif // MAINWINDOW_H

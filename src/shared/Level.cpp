@@ -26,6 +26,7 @@
 #include "LevelEntry.h"
 #include <zlib.h>
 #include "Layer.h"
+#include "helper.h"
 #include "../shared/FileWrap.h"
 #include "../shared/qtgui/cheat.h"
 
@@ -43,7 +44,8 @@ std::string CLevel::m_eventList[]={
     "onKeyUp",
     "onGoalKilled",
     "onHandler",
-    "onNotifyClosure"
+    "onNotifyClosure",
+    "onIntroDraw"
 };
 
 CSettings::SETTING CLevel::m_defaults[] =
@@ -80,16 +82,9 @@ CLevel::CLevel()
     m_my = 0;
 
     m_settings.copySettings(m_defaults);
-    char uuid[128];
-    sprintf(uuid, "%.8x-%.4x-%.4x-%.4x-%.8x%.4x",
-            rand(),
-            rand() & 0xffff,
-            rand() & 0xffff,
-            rand() & 0xffff,
-            rand(),
-            rand() & 0xffff
-            );
+    char *uuid = getUUID();
     m_settings["uuid"].value = uuid;
+    delete [] uuid;
     m_eventCount = sizeof(m_eventList) / sizeof(std::string);
     m_events = new std::string [ m_eventCount ] ;
 

@@ -1,20 +1,18 @@
 {
-    "target": "sfml/lgck-runtime",
+    "target": "build/lgck-runtime-sfml",
     "cxx": "g++",
     "linux": {
         "output" : "makefile",
         "paths" : [
             ".",
             "../shared",
-            "/usr/include",
-            "/usr/include/freetype2"
+            "/usr/include"
         ],
         "libs" : [
             "z",
             "m",
             "pthread",
             "lua5.2",
-            "ftgl",
             "SDL2",
             "SDL2_mixer",
             "sfml-graphics",
@@ -28,20 +26,15 @@
         "output" : "make.bat",
         "paths" : [
             "../shared",
-            "../../redist/headers",
-            "../../redist/headers/freetype2"
+            "../../../redist/include"
         ],
         "libs" : [
-            "L../../redist/lib",
-            "lz",
-            "lm",
-            "llua52",
-            "lftgl",
-            "lSDL2",
-            "lSDL2_mixer",
-            "lopengl32",
-            "lglu32",
-            "lfreeglut"
+            "-L../../../redist/lib/static",
+            "-static",
+            "-lmingw32",
+            "-lSDL2main -lSDL2 -lSDL2_mixer -lsfml-main -lsfml-graphics-s -lsfml-window-s -lsfml-system-s",
+            "-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32",
+            "-lversion -luuid -llua -lz -lvorbisenc -lvorbisfile -lvorbis -logg -static-libgcc"
         ],
         "flags" : ["-std=gnu++11", "-O3", "-Wall"]
     },
@@ -52,20 +45,9 @@
         "../shared/implementers/sfml/*.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/sfml/*.cpp",
-        "shared/lgck_res.cpp"
+        "build/lgck_res.cpp"
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
-    "obj_dir": "target/sfml",
-    "declare" : [],
-    "res": {
-        "out": "shared/lgck_res.cpp",
-        "name": "add_lgck_res",
-        "base": "../lgck-builder/",
-        "file_list" : [
-            "images/points.obl5",
-            "res/DejaVuSans.ttf",
-            "scripts/common.lua",
-            "scripts/functions.lua"
-        ]
-    }
+    "obj_dir": "build/sfml",
+    "declare" : []
 }

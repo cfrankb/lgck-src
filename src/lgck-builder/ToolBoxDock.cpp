@@ -1,6 +1,6 @@
 /*
     LGCK Builder GUI
-    Copyright (C) 1999, 2011  Francois Blanchette
+    Copyright (C) 1999, 2016  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,6 +41,12 @@
 #include "DlgFrameSet.h"
 #include "WizSprite.h"
 #include "Snd.h"
+#include "WFileSave.h"
+#include "OBL5File.h"
+
+static const char g_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
+static const char g_oblFilter[] = "Object Blocks (*.obl *.obl5)";
+static const char g_pngFilter[] = "PNG Images (*.png)";
 
 CToolBoxDock::CToolBoxDock(QWidget *parent) :
     QDockWidget(parent),
@@ -574,20 +580,31 @@ void CToolBoxDock::on_treeObjects_customContextMenuRequested(QPoint pos)
         QAction *actionEdit = new QAction(tr("Edit Sprite"), &menu);
         menu.addAction(actionEdit);
 
-        QAction *actionEvents = new QAction(tr("View Source"), &menu);
+        QAction *actionEvents = new QAction(tr("Edit Events"), &menu);
         menu.addAction(actionEvents);
+
+        QAction *actionEditFrames= new QAction(tr("Edit Images"), &menu);
+        menu.addAction(actionEditFrames);
+
+        QAction *actionSeparator1 = new QAction("", &menu);
+        actionSeparator1->setSeparator(true);
+        menu.addAction(actionSeparator1);
 
         QAction *actionDelete = new QAction(tr("Delete Sprite"), &menu);
         menu.addAction(actionDelete);
 
-        QAction *actionAdd = new QAction(tr("New Sprite"), &menu);
-        menu.addAction(actionAdd);
-
         QAction *actionCopy= new QAction(tr("Copy Sprite"), &menu);
         menu.addAction(actionCopy);
 
-        QAction *actionEditFrames= new QAction(tr("Edit Images"), &menu);
-        menu.addAction(actionEditFrames);
+        QAction *actionSeparator2 = new QAction("", &menu);
+        actionSeparator2->setSeparator(true);
+        menu.addAction(actionSeparator2);
+
+        QAction *actionExport= new QAction(tr("Export Sprite"), &menu);
+        menu.addAction(actionExport);
+
+        QAction *actionAdd = new QAction(tr("New Sprite"), &menu);
+        menu.addAction(actionAdd);
 
         // Make sure this item is selected
         m_ui->treeObjects->setCurrentItem( item );
@@ -599,6 +616,7 @@ void CToolBoxDock::on_treeObjects_customContextMenuRequested(QPoint pos)
         connect(actionDelete, SIGNAL(triggered()), this, SLOT(on_btnDeleteSprite_clicked()));
         connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddSprite_clicked()));
         connect(actionEditFrames, SIGNAL(triggered()), this, SLOT(editFrames()));
+        connect(actionExport, SIGNAL(triggered()), this, SLOT(exportSprite()));
 
         //emit menuSeekingItems(& menu, MENU_ITEM::POPUP_MENU_SPRITE);
         menu.exec(this->m_ui->treeObjects->mapToGlobal(pos));
@@ -1140,5 +1158,70 @@ void CToolBoxDock::updateFrameSet(int frameSet)
             updateIcon( item, k );
         }
     }
+}
+
+void CToolBoxDock::exportSprite()
+{
+
+    CProtoIndex * indexProto = (CProtoIndex*) m_index;
+    QTreeWidgetItem * item = m_ui->treeObjects->currentItem();
+    if (!item || !indexProto) {
+        return;
+    }
+
+    ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
+    int protoId = data->protoId;
+
+    CGame & gf = *((CGame*)m_gameFile);
+    CProto & proto = gf.m_arrProto[protoId];
+    CFrameSet * frameSet = gf.m_arrFrames[proto.m_nFrameSet];
+    COBL5File oblDoc;
+
+    QStringList filters;
+    QString selected = tr(g_oblFilter) + "\n" + tr(g_pngFilter);
+    QString suffix = "obl";
+    QString fileName = "";
+    //if (!CFrameSet::isFriendFormat(m_doc.getFormat())) {
+        selected = tr(g_pngFilter) + "\n" + tr(g_oblFilter);
+        suffix = "png";
+        filters.append(tr(g_pngFilter));
+        filters.append(tr(g_oblFilter));
+    //} else {
+      //  filters.append(tr(m_oblFilter));
+       // filters.append(tr(m_pngFilter));
+   // }
+
+    CWFileSave * dlg = new CWFileSave(this,tr("Save As"),"",selected);
+    //dlg->setFilters(filters);
+    //dlg->selectedNameFilter(selected);
+    dlg->setNameFilters(filters);
+    dlg->setAcceptMode(QFileDialog::AcceptSave);
+    dlg->setDefaultSuffix(suffix);
+    //dlg->selectFile(m_doc.getFileName());
+    //QString fileName = QString(proto.m_szName) + "." + suffix;
+    //dlg->selectFile(fileName);
+
+    connect(dlg, SIGNAL(filterSelected(QString)), dlg, SLOT(changeDefaultSuffix(QString)));
+    if (dlg->exec()) {
+        QStringList fileNames = dlg->selectedFiles();
+        if (fileNames.count()>0) {
+            fileName = fileNames[0];
+        }
+    }
+
+    char outFormat[5];
+    if (!fileName.isEmpty()) {
+        selected = dlg->selectedNameFilter();
+        if (selected == tr(g_oblFilter)) {
+            strcpy(outFormat, "OBL5");
+        } else {
+            strcpy(outFormat, "PNG");
+        }
+        oblDoc.setFormat(outFormat);
+        oblDoc.getImageSet() = *frameSet;
+        oblDoc.setFileName(fileName);
+        oblDoc.write();
+    }
+    delete dlg;
 }
 
