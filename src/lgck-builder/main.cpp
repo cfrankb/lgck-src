@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 {
     //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL, false);
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
+    srand( time( NULL ) );
     QApplication app(argc, argv);
     MainWindow w;
     w.createEventEditor();
@@ -104,6 +105,5 @@ int main(int argc, char *argv[])
     if (!fileName.isEmpty()) {
         w.open(fileName);
     }
-    srand( time( NULL ) );
     return app.exec();
 }
