@@ -29,6 +29,7 @@ class CLevelViewGL;
 class CToolBoxDock;
 class CThreadUpdater;
 class QScrollArea;
+class CDlgDistributeGame;
 
 #include <QTimer>
 #include <QTime>
@@ -119,6 +120,8 @@ private:
     void showLayerName();
     void adjustViewPort();
     void commitAll();
+    void exportGame();
+    bool exportGameCore(CDlgDistributeGame &dlg, QString &outMsg);
     QAction** actionShortcuts();
     QStringList & defaultShortcuts();
     void saveSettings();
@@ -244,10 +247,9 @@ private slots:
     void on_actionReset_Font_Size_triggered();
     void on_actionEdit_Images_triggered();
     void on_actionImport_Font_triggered();
-
     void on_actionSprite_Editor_triggered();
-
     void on_actionExport_Game_triggered();
+    void on_actionDistribution_Package_triggered();
 
 signals:
     void levelDeleted(int index);

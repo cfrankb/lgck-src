@@ -137,7 +137,8 @@ SOURCES +=  mainwindow.cpp \
     ../shared/FileMem.cpp \
     OBL5File.cpp \
     WizFont.cpp \
-    DlgExportSprite.cpp
+    DlgExportSprite.cpp \
+    DlgDistributeGame.cpp
 
 HEADERS  +=  mainwindow.h \
     levelviewgl.h \
@@ -239,7 +240,8 @@ HEADERS  +=  mainwindow.h \
     WFileSave.h \
     OBL5File.h \
     WizFont.h \
-    DlgExportSprite.h
+    DlgExportSprite.h \
+    DlgDistributeGame.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \
@@ -265,5 +267,6 @@ FORMS  += mainwindow.ui \
     WizGame.ui \
     WizScript.ui \
     WizFont.ui \
-    DlgExportSprite.ui
+    DlgExportSprite.ui \
+    DlgDistributeGame.ui
 

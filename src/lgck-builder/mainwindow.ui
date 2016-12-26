@@ -194,6 +194,7 @@
     <addaction name="actionView_Source"/>
     <addaction name="menuLayers"/>
     <addaction name="menuPlay_Game"/>
+    <addaction name="actionDistribution_Package"/>
     <addaction name="separator"/>
     <addaction name="actionMove_Level"/>
     <addaction name="actionDelete_Level"/>
@@ -1005,6 +1006,11 @@
    </property>
   </action>
   <action name="actionExport_Game">
+   <property name="text">
+    <string>Distribute Game</string>
+   </property>
+  </action>
+  <action name="actionDistribution_Package">
    <property name="text">
     <string>Distribute Game</string>
    </property>
