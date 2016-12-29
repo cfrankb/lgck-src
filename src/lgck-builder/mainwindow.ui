@@ -685,10 +685,16 @@
    <property name="text">
     <string>Export Sprites</string>
    </property>
+   <property name="statusTip">
+    <string>Export sprites into either png or obl containers.</string>
+   </property>
   </action>
   <action name="actionView_Source">
    <property name="text">
     <string>View Source</string>
+   </property>
+   <property name="statusTip">
+    <string>View the source code for this sprite (event handlers</string>
    </property>
   </action>
   <action name="actionEdit_Object">
@@ -710,6 +716,9 @@
    <property name="text">
     <string>Import Images</string>
    </property>
+   <property name="statusTip">
+    <string>Import images into the database</string>
+   </property>
   </action>
   <action name="action_ShowToolbox">
    <property name="checkable">
@@ -720,6 +729,9 @@
    </property>
    <property name="text">
     <string>ToolBox</string>
+   </property>
+   <property name="statusTip">
+    <string>Show or hide the toolbox</string>
    </property>
   </action>
   <action name="actionCopy_Object">
@@ -752,10 +764,16 @@
    <property name="text">
     <string>Documentation</string>
    </property>
+   <property name="statusTip">
+    <string>Go to the online dodumentation page.</string>
+   </property>
   </action>
   <action name="actionTutorials">
    <property name="text">
     <string>Tutorials</string>
+   </property>
+   <property name="statusTip">
+    <string>Go to the tutorial page</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -1004,15 +1022,24 @@
    <property name="text">
     <string>Sprite Editor</string>
    </property>
+   <property name="statusTip">
+    <string>Launch the Sprite Editor.</string>
+   </property>
   </action>
   <action name="actionExport_Game">
    <property name="text">
     <string>Distribute Game</string>
    </property>
+   <property name="statusTip">
+    <string>Create a distribution to share your game with other people.</string>
+   </property>
   </action>
   <action name="actionDistribution_Package">
    <property name="text">
     <string>Distribute Game</string>
+   </property>
+   <property name="statusTip">
+    <string>Create a distribution to share your game with other people.</string>
    </property>
   </action>
  </widget>

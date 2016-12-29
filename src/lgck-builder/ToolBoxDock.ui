@@ -41,7 +41,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_sprites">
        <attribute name="title">
@@ -210,7 +210,7 @@ Double-click on the one you want to edit.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Delete Object</string>
+            <string>Delete Level</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -230,7 +230,7 @@ Double-click on the one you want to edit.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Add New Object</string>
+            <string>Add New Level</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -358,8 +358,11 @@ Double-click on the one you want to edit.</string>
              <height>24</height>
             </rect>
            </property>
+           <property name="acceptDrops">
+            <bool>false</bool>
+           </property>
            <property name="toolTip">
-            <string>Delete Object</string>
+            <string>Delete Sound</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -379,7 +382,7 @@ Double-click on the one you want to edit.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Add New Object</string>
+            <string>Add New Sound</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -463,6 +466,9 @@ Double-click on the one you want to edit.</string>
              <width>90</width>
              <height>23</height>
             </rect>
+           </property>
+           <property name="toolTip">
+            <string>Clear all events</string>
            </property>
            <property name="text">
             <string>Clear All</string>
