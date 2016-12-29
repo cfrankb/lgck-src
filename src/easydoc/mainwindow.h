@@ -54,6 +54,7 @@ protected:
     bool save();
     bool saveAs();
     void warningMessage(const QString message);
+    void infoMessage(const QString message);
     bool updateTitle();
     void updateRecentFileActions();
     void reloadRecentFileActions();

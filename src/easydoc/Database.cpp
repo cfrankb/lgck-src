@@ -145,14 +145,19 @@ void CDatabase::exportList(CFileWrap & file)
     m_functions.exportList(file);
 }
 
-void CDatabase::exportWiki(const QString & path)
+void CDatabase::exportWiki(const QString & path, QStringList &fileList)
 {
-    m_classes.exportWiki(path, &m_functions);
+    fileList = QStringList();
+    fileList += "lua_functions.txt";
+    m_classes.exportWiki(path, &m_functions, fileList);
     CFileWrap file;
-
     file.open(path + "lua_functions.txt", QIODevice::WriteOnly);
     file += "===== Functions =====\n";
     m_functions.exportWiki(file, "");
+    file.close();
+    file.open(path + "remotesync.dat", QIODevice::WriteOnly);
+    QString strList = fileList.join("\n");
+    file.write(strList.toLatin1().data(), strList.length());
     file.close();
 }
 

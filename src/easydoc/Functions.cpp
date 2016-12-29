@@ -393,7 +393,8 @@ void CFunctions::exportWiki(CFileWrap & file, QString prefix)
         file += paramsOut;
         if (!fn.desc.isEmpty()) {
             file += "=== Description ===\n\n";
-            QString tmp = txt2wiki(fn.desc);
+            char t[fn.desc.length()+1024];
+            QString tmp = txt2wiki(fn.desc, t);
             file += tmp;
             file += "\n";
         }

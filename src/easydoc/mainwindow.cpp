@@ -162,6 +162,12 @@ void MainWindow::warningMessage(const QString message)
     msgBox.exec();
 }
 
+void MainWindow::infoMessage(const QString message)
+{
+    QMessageBox msgBox(QMessageBox::Information, m_appName, message, 0, this);
+    msgBox.exec();
+}
+
 bool MainWindow::updateTitle()
 {
     QString file;
@@ -325,8 +331,10 @@ void MainWindow::on_actionWiki_triggered()
     QString folder = settings.value("wikiFolder", "").toString();
     folder = QFileDialog::getExistingDirectory(this, "Export folder...", folder);
     if (!folder.isEmpty()) {
-        m_doc.exportWiki(folder+"/");
+        QStringList fileList;
+        m_doc.exportWiki(folder + "/", fileList);
         settings.setValue("wikiFolder", folder);
+        infoMessage("Wiki Exported");
     }
 }
 
@@ -336,7 +344,8 @@ void MainWindow::exportWiki(const char *path)
     if (folder[folder.length()-1].toLatin1()!='/') {
         folder += "/";
     }
-    m_doc.exportWiki(folder);
+    QStringList fileList;
+    m_doc.exportWiki(folder, fileList);
 }
 
 void MainWindow::on_actionGameLua_triggered()
