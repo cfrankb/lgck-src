@@ -19,7 +19,7 @@
 --]]
 
 ----------------------------------------------------------------------
--- constants
+-- SECTION: General
     TRUE		        = 1;
     FALSE 		        = 0;
     NULL 		        = 0;
@@ -28,7 +28,7 @@
 ----------------------------------------------------------------------
 -- EVENTS
 
--- OBJECT EVENTS
+-- SECTION: Sprite Events
     EO_SPAWN   		    = 0;
     EO_ACTIVATE		    = 1;
     EO_DEATH		    = 2;
@@ -50,7 +50,7 @@
     EO_RIGHTCLICK       = 18;
     EO_NOTIFYCLOSURE    = 19;
 
--- ENGINE EVENTS
+-- SECTION: Engine Events
     EVENT_NO_EVENT          = 0;
     EVENT_QUIT              = 1;
     EVENT_LEVEL_COMPLETED   = 2;
@@ -58,7 +58,7 @@
     EVENT_PLAYER_DIED       = 4;
     EVENT_NO_PLAYER         = 5;
 
--- LEVEL EVENTS
+-- SECTION: Level Events
     EL_CREATE 			= 0;
     EL_DRAW 			= 1;
     EL_RESTART 			= 2;
@@ -70,7 +70,7 @@
     EL_GOAL_KILLED      = 8;
     EL_HANDLER          = 9;
 
--- GAME EVENTS
+-- SECTION: Game Events
     EG_INIT_GAME        = 0;
     EG_PREPARE_LEVEL    = 1;
     EG_COMPLETE_LEVEL   = 2;
@@ -85,13 +85,13 @@
 
 ----------------------------------------------------------------------
 -- aims
--- basic aims
+-- SECTION: Basic Aims
     UP			        = 0x00;
     DOWN		        = 0x01;
     LEFT		        = 0x02;
     RIGHT               = 0x03;
     AIM_MASK            = 0x03;
--- extended aims
+-- SECTION: Extended Aims
     LEFT_UP	        	= 0x04;
     RIGHT_UP	    	= 0x05;
     LEFT_DOWN	    	= 0x06;
@@ -105,7 +105,7 @@
     HERE	        	= 255;
 
 ----------------------------------------------------------------------
--- JOY STATES
+-- SECTION: Joy States
     JOY_UP	    	    = 1;
     JOY_DOWN    		= 2;
     JOY_LEFT	    	= 4;
@@ -115,7 +115,7 @@
     JOY_ZKEY    		= 64;
 
 ----------------------------------------------------------------------
--- FLAGS
+-- SECTION: Flags
 
     FLAG_NONE		    = 0x00;
     FLAG_METAL		    = 0x01;
@@ -126,7 +126,7 @@
     FLAG_TELEPORT       = 0x20;
 
 ----------------------------------------------------------------------
--- PLAYER STATES
+-- SECTION: Player States
 
     STATE_NONE		    = 0x0;
     STATE_FALL		    = 0x1;
@@ -137,18 +137,19 @@
     STATE_FIRING        = 0x20;
     STATE_LOOKUP        = 0x40;
 
+-- SECTION: Proto
     PROTO_POINTS        = 0xffff;
     PROTO_DEAD_PLAYER   = 0xfffe;
 
 -----------------------------------------------------------------------
--- DEATH_INDICATOR
+-- SECTION: Death Indicator
 
     DI_NONE             = 0;
     DI_ANIMATION        = 1;
     DI_REMOVAL          = 2;
 
 ----------------------------------------------------------------------
--- LEVEL PARAMS
+-- SECTION: Level Params
 
     SPARAM_TITLE        = 0;
     SPARAM_BKCOLOR      = 1;
@@ -159,14 +160,14 @@
     SPARAM_WRAP         = 6;
     SPARAM_NO_GRAVITY   = 7;
 
--- LEVEL WRAP
+-- SECTION: Level Wrap
 
     WRAP_UP             = 1;
     WRAP_DOWN           = 2;
     WRAP_LEFT           = 4;
     WRAP_RIGHT          = 8;
 
--- LEVEL GOAL
+-- SECTION: Level Goal
 
     GOAL_ONLY           = 0;
     GOAL_UP             = 1;
@@ -177,7 +178,7 @@
 
 
 ----------------------------------------------------------------------
--- DISPLAY TYPES
+-- SECTION: Display Types
 
     DISPLAY_TIME_LEFT   = 0;
     DISPLAY_MESSAGE     = 1;
@@ -188,7 +189,7 @@
     DISPLAY_IMAGE	    = 6;
 
 ----------------------------------------------------------------------
--- SKILLS
+-- SECTION: Skills
 
     SKILL_NORMAL	    = 0;
     SKILL_NIGHTMARE	    = 1;
@@ -198,12 +199,12 @@
 ----------------------------------------------------------------------
 -- layers
 
--- types
+-- SECTION: Layer types
     LAYER_BK            = 0;
     LAYER_MAIN          = 1;
     LAYER_FW            = 2;
 
--- scroll speed
+-- SECTION: Layer scroll speed
     SPEED_NOSCROLL      = 0;
     SPEED_WHOLE         = 1;
     SPEED_1_2           = 2;
@@ -216,7 +217,7 @@
     SPEED_CUSTOM        = 0x10;
 
 ----------------------------------------------------------------------
--- Animation Sequences
+-- SECTION: Animation Sequences
     AS_DEFAULT      = 0x00;
     AS_IDLE         = 0x01;
     AS_CUSTOM1      = 0x02;
@@ -258,12 +259,12 @@
     AS_DEAD_RIGHT   = 0x1f;
     AS_MAX_VALUE    = 0x1f;
 
--- options
+-- SECTION: Animation Options
     ASO_REPETE      = 0x0001;
     ASO_OPTION2     = 0x0002;
 
 ----------------------------------------------------------------------
--- path sequences
+-- SECTION: Path Sequences
     PS_DEFAULT           = 0x00;
     PS_IDLE              = 0x01;
     PS_CUSTOM1           = 0x02;
@@ -294,7 +295,7 @@
     PS_SPRITE_CUSTOM     = 0x7f;
 
 ---------------------------------------------------------------------
--- extra data indexes
+-- SECTION: Extra Data
 
     EXTRA_ORGPROTO       = 0x01;
     EXTRA_ORGX           = 0x02;
@@ -320,7 +321,7 @@
     EXTRA_INVENTORY      = 0x16;
 
 ---------------------------------------------------------------------
--- proto data indexes
+-- SECTION: Proto Data
 
     PPARAM_NAME          = 0x01;
     PPARAM_CLASS         = 0x02;
@@ -359,13 +360,13 @@
     PPARAM_B_SOUND       = 0x23;
 
 ---------------------------------------------------------------------
--- Sprite tags (see EXTRA_TAGFLAGS)
+-- SECTION: Sprite tags (see EXTRA_TAGFLAGS)
 
     TAG_REBORN           = 0x0001;
     TAG_ACTIVATED        = 0x0002;
 
 ---------------------------------------------------------------------
--- lgck keycodes
+-- SECTION: Keycodes
     
     KEY_A                = 0x61;
     KEY_B                = 0x62;
@@ -447,4 +448,3 @@
     KEY_UP               = 0x125;
     KEY_DOWN             = 0x126;
     KEY_PAUSE            = 0x140;
-
