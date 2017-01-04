@@ -343,6 +343,30 @@ function Layer:clear()
   layer_clear( self.id );
 end
 
+function Layer:offsetX()
+  return layer_getOffsetX( self.id );
+end
+
+function Layer:offsetY()
+  return layer_getOffsetY( self.id );
+end
+
+function Layer:setOffsetX(x)
+  layer_setOffsetX( self.id, x );
+end
+
+function Layer:setOffsetY(y)
+  layer_setOffsetY( self.id, y );
+end
+
+function Layer:setSpeed(h, v)
+  layer_setSpeed( self.id, h, v );
+end
+
+function Layer:delete()
+  layer_delete( self.id);
+end
+
 --[[
 
     Element ----------------------------------------------------------
@@ -384,26 +408,6 @@ function Element:setImage(imageSet, imageNo)
     return element_setImage(self.layerId, self.id, imageSet, imageNo);
 end
 
---[[
-
-    Global -----------------------------------------------------------
-
-]]--
-
-Global = {};
-Global.__index = Global;
-
-function Global:setInt( name, value )
-end
-
-function Global:setString( name, value )
-end
-
-function Global:getInt( name )
-end
-
-function Global:getString( name )
-end
 
 --[[
 
@@ -451,6 +455,44 @@ function getHitTest( objId, aim )
 
   return h;
 end
+
+function HitTest:hasClass(classID)
+  for i=1, h.bkCount do
+    if h.bkClass[i] == classID then
+        return true
+    end
+  end
+  for i=1, h.fwCount do
+    if h.fwClass[i] == classID then
+        return true
+    end
+  end
+  for i=1, h.acCount do
+    if h.acClass[i] == classID then
+        return true
+    end
+  end
+  return false
+end
+
+function HitTest:hasPlayer()
+  return h.player ~= 0
+end
+
+function HitTest:hasSprite(spriteID)
+  for i=1, h.fwCount do
+    if h.fwEntry[i] == spriteID then
+        return true
+    end
+  end
+  for i=1, h.acCount do
+    if h.acEntry[i] == spriteID then
+        return true
+    end
+  end
+  return false
+end
+
 
 --[[
 
@@ -858,8 +900,8 @@ function Sprite:setHP(...)
     end
 end
 
-function Sprite:getHP(...)
-    return sprite_getHP(self.id, arg[1] );
+function Sprite:getHP()
+    return sprite_getHP(self.id);
 end
 
 function Sprite:frameCount()
@@ -893,6 +935,11 @@ end
 function Sprite:removeItem(protoID)
     sprite_removeItem(self.id, protoID);
 end
+
+function Sprite:togglePathPlayback(enabled)
+    sprite_togglePathPlayback(self.id, enabled);
+end
+
 
 --[[
 
