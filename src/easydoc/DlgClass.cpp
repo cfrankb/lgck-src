@@ -23,6 +23,8 @@
 #include "DlgParam.h"
 #include "DlgSource.h"
 #include "../shared/qtgui/cheat.h"
+#include "const.h"
+#include <QSettings>
 
 CDlgClass::CDlgClass(QWidget *parent) :
     QDialog(parent),
@@ -31,6 +33,16 @@ CDlgClass::CDlgClass(QWidget *parent) :
     m_ui->setupUi(this);
     m_db = NULL;
     m_cl = NULL;
+    QSettings settings(author, appName);
+    bool largeFont = settings.value("largeFont", false).toBool();
+    if (largeFont) {
+        QFont font("Courier", 16);
+        font.setBold(true);
+        m_ui->eDescription->setFont(font);
+        QFont font2("Courier", 12);
+        font2.setBold(true);
+        m_ui->eName->setFont(font2);
+    }
 }
 
 CDlgClass::~CDlgClass()

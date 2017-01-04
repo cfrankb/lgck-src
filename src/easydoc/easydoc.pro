@@ -43,7 +43,8 @@ HEADERS += Class.h \
     Sections.h \
     tabwidget.h \ 
     DlgSource.h \
-    helper.h
+    helper.h \
+    const.h
 
 FORMS += mainwindow.ui \
     DlgAbout.ui \

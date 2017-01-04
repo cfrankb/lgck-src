@@ -22,6 +22,8 @@
 #include "DlgParam.h"
 #include <QMessageBox>
 #include <QInputDialog>
+#include "const.h"
+#include <QSettings>
 
 CDlgFunction::CDlgFunction(QWidget *parent) :
     QDialog(parent),
@@ -30,6 +32,16 @@ CDlgFunction::CDlgFunction(QWidget *parent) :
     m_ui->setupUi(this);
     m_fn = NULL;
     m_inSet = 0;
+    QSettings settings(author, appName);
+    bool largeFont = settings.value("largeFont", false).toBool();
+    if (largeFont) {
+        QFont font("Courier", 14);
+        font.setBold(true);
+        QFont font2("Courier", 12);
+        font2.setBold(true);
+        m_ui->eComment->setFont(font);
+        m_ui->eName->setFont(font2);
+    }
 }
 
 CDlgFunction::~CDlgFunction()
