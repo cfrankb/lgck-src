@@ -1079,7 +1079,7 @@ void CDlgObject::on_cbJump_currentIndexChanged(int index)
 void CDlgObject::setJumpText(int index)
 {
     QString jumpMode[] = {
-        tr("This is the engine default; you need to press JUMP + AIM. This mode allows you to climp ladders."),
+        tr("This is the engine default; you need to press JUMP + AIM. This mode allows you to climb ladders."),
         tr("Press UP to jump and move LEFT/RIGHT. You cannot climb ladders."),
         tr("Press JUMP and move LEFT/RIGHT. And still get to climb ladders. :)")
     };
