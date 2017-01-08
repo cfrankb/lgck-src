@@ -43,6 +43,9 @@ protected:
     int m_inSet;
     void updateInTree();
     void updateInSetCombo();
+    int m_testcase;
+    void updateTestCaseTree();
+    void updateTestCaseCombo();
 
 private:
     Ui::CDlgFunction *m_ui;
@@ -59,6 +62,13 @@ private slots:
     void on_cbInSet_currentIndexChanged(int index);
     void on_btnAdd_IN_SET_clicked();
     void on_btnDelete_IN_SET_clicked();
+    void on_treeTestCase_clicked(const QModelIndex &index);
+    void on_btnAdd_Step_clicked();
+    void on_btnDelete_Step_clicked();
+    void on_treeTestCase_doubleClicked(const QModelIndex &index);
+    void on_btnAdd_TestCase_clicked();
+    void on_btnDelete_TestCase_clicked();
+    void on_cbTestCase_currentIndexChanged(int index);
 };
 
 #endif // DLGFUNCTION_H

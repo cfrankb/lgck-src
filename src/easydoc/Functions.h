@@ -22,6 +22,7 @@
 
 class CFileWrap;
 #include "Params.h"
+#include "testcase.h"
 
 class CFunction
 {
@@ -37,6 +38,9 @@ public:
     CParams & Out()  {
         return paramsOut;
     }
+    CTestCase & TestCase(int i) {
+        return testcase[i];
+    }
     void read(CFileWrap & file, int version);
     void write(CFileWrap & file);
     void init();
@@ -48,20 +52,28 @@ public:
     QString example;
     QStringList m_alias;
     int m_inCount;
+    int m_testCaseCount;
     void removeInSet(int i);
+    void removeTestCase(int i);
     int InSetCount() {
         return m_inCount;
     }
+    int TestCaseCount() {
+        return m_testCaseCount;
+    }
+
 
     enum {
         FLAG_OPTIONAL = 1,
         FLAG_MORE     = 2,
-        MAX_IN_COUNT  = 4
+        MAX_IN_COUNT  = 4,
+        MAX_TEST_CASE = 4
     };
 
 protected:
-    CParams paramsIn[4];
+    CParams paramsIn[MAX_IN_COUNT];
     CParams paramsOut;
+    CTestCase testcase[MAX_TEST_CASE];
 };
 
 class CFunctions

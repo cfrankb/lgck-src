@@ -157,6 +157,10 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr(m_fileFilter));
     if (fileName.isEmpty())
         return false;
+    if (!fileName.endsWith(".edoc")) {
+        fileName += ".edoc";
+    }
+
 
     m_doc.setFileName(fileName);
     return true;

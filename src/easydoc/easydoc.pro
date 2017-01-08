@@ -7,6 +7,8 @@ win32:RC_FILE = easydoc.rc
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 win32:DEFINES += MAKE_WIN32
 DEFINES += USE_QFILE
+QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
+QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
 
 TARGET = easydoc
 TEMPLATE = app
@@ -26,7 +28,10 @@ SOURCES += Class.cpp \
     Sections.cpp \
     tabwidget.cpp \ 
     DlgSource.cpp \
-    helper.cpp
+    helper.cpp \
+    testcase.cpp \
+    DlgStep.cpp \
+    pagecond.cpp
 
 HEADERS += Class.h \
     Classes.h \
@@ -44,7 +49,10 @@ HEADERS += Class.h \
     tabwidget.h \ 
     DlgSource.h \
     helper.h \
-    const.h
+    const.h \
+    testcase.h \
+    DlgStep.h \
+    pagecond.h
 
 FORMS += mainwindow.ui \
     DlgAbout.ui \
@@ -53,4 +61,6 @@ FORMS += mainwindow.ui \
     DlgParam.ui \
     DlgSection.ui \
     tabwidget.ui \ 
-    DlgSource.ui
+    DlgSource.ui \
+    DlgStep.ui \
+    pagecond.ui

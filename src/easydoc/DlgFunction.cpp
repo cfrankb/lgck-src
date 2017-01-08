@@ -1,6 +1,6 @@
 /*
     easyDoc - documentation utility for LGCK Builder
-    Copyright (C) 2009, 2010  Francois Blanchette
+    Copyright (C) 2009, 2017  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #include <QInputDialog>
 #include "const.h"
 #include <QSettings>
+#include "DlgStep.h"
+#include <QDebug>
 
 CDlgFunction::CDlgFunction(QWidget *parent) :
     QDialog(parent),
@@ -42,6 +44,7 @@ CDlgFunction::CDlgFunction(QWidget *parent) :
         m_ui->eComment->setFont(font);
         m_ui->eName->setFont(font2);
     }
+    m_testcase = 0;
 }
 
 CDlgFunction::~CDlgFunction()
@@ -135,6 +138,14 @@ void CDlgFunction::load(CFunction *fn)
         QString current = itr.next();
         m_ui->listAlias->addItem(current);
     }
+
+    // Test Case
+    m_ui->treeTestCase->setColumnCount(2);
+    m_ui->treeTestCase->setEditTriggers(0);
+    m_ui->treeTestCase->setWordWrap(false);
+    m_ui->treeTestCase->setRootIsDecorated(false);
+    updateTestCaseTree();
+    updateTestCaseCombo();
 }
 
 void CDlgFunction::save(CFunction *fn)
@@ -151,7 +162,7 @@ void CDlgFunction::save(CFunction *fn)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// in
+/// in
 
 void CDlgFunction::on_treeIn_doubleClicked(QModelIndex index)
 {
@@ -202,7 +213,7 @@ void CDlgFunction::on_btnDelete_IN_clicked()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// out
+/// out
 
 void CDlgFunction::on_treeOut_doubleClicked(QModelIndex index)
 {
@@ -246,6 +257,9 @@ void CDlgFunction::on_btnDelete_OUT_clicked()
         }
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+/// alias
 
 void CDlgFunction::on_btnAdd_Alias_clicked()
 {
@@ -322,4 +336,129 @@ void CDlgFunction::updateInTree()
         m_ui->treeIn->addTopLevelItem(item);
     }
     qDebug("updateInTree() out");
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+/// test case
+
+void CDlgFunction::updateTestCaseTree()
+{
+    bool disabled = m_fn->m_testCaseCount == 0;
+    m_ui->treeTestCase->setDisabled(disabled);
+    m_ui->btnAdd_Step->setDisabled(disabled);
+    m_ui->btnDelete_Step->setDisabled(disabled);
+    m_ui->cbTestCase->setDisabled(disabled);
+    qDebug("updateTestCaseTree() in");
+    // clear tree
+    int count = m_ui->treeTestCase->model()->rowCount();
+    m_ui->treeTestCase->model()->removeRows(0, count);
+    // grow new leafs
+    CTestCase & testcase = m_fn->TestCase(m_testcase);
+    qDebug("m_testcase: %d", m_testcase);
+    for (int i = 0; i < testcase.getSize(); ++i) {
+        qDebug("%d",i);
+        QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        CStep & step = testcase.m_steps[i];
+        item->setText(0, step.m_name);
+        m_ui->treeTestCase->addTopLevelItem(item);
+    }
+    qDebug("updateTestCaseTree() out");
+}
+
+void CDlgFunction::updateTestCaseCombo()
+{
+    bool disabled = m_fn->m_testCaseCount == 0;
+    m_ui->cbTestCase->setDisabled(disabled);
+    m_ui->cbTestCase->clear();
+    for (int i=0; i < m_fn->m_testCaseCount; ++i) {
+        QString str = QString("test %1").arg(i + 1);
+        m_ui->cbTestCase->addItem(str);
+    }
+}
+
+void CDlgFunction::on_treeTestCase_clicked(const QModelIndex &index)
+{
+
+}
+
+void CDlgFunction::on_btnAdd_Step_clicked()
+{
+    CTestCase & testcase = m_fn->TestCase(m_testcase);
+    int i = testcase.m_count;
+    CDlgStep *d = new CDlgStep(this);
+    d->setWindowTitle("New Step");
+    d->setName(QString("Step %1").arg(i + 1));
+    if (d->exec() == QDialog::Accepted) {
+        qDebug("m_testcase=%d - testcase.m_count=%d", m_testcase, testcase.m_count);
+        CStep & step = testcase.m_steps[i];
+        ++testcase.m_count;
+        d->save(step);
+        QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        item->setText(0, step.m_name);
+        m_ui->treeTestCase->addTopLevelItem(item);
+        m_ui->treeTestCase->setCurrentItem(item);
+    }
+    delete d;
+}
+
+void CDlgFunction::on_btnDelete_Step_clicked()
+{    
+    QModelIndex index = m_ui->treeTestCase->currentIndex();
+    int i = index.row();
+    if (i != -1) {
+        CTestCase & testcase = m_fn->TestCase(m_testcase);
+        testcase.removeAt(i);
+        QAbstractItemModel * model =  m_ui->treeTestCase->model();
+        model->removeRow( i );
+    }
+}
+
+void CDlgFunction::on_treeTestCase_doubleClicked(const QModelIndex &index)
+{
+    int i = index.row();
+    if (i != -1) {
+        CTestCase & testcase = m_fn->TestCase(m_testcase);
+        CDlgStep *d = new CDlgStep(this);
+        d->setWindowTitle("Edit Step");
+        CStep & step = testcase.m_steps[i];
+        d->load(step);
+        if (d->exec() == QDialog::Accepted) {
+            d->save(step);
+            QTreeWidgetItem *item = m_ui->treeTestCase->topLevelItem(i);
+            item->setText(0, step.m_name);
+        }
+        delete d;
+    }
+}
+
+void CDlgFunction::on_btnAdd_TestCase_clicked()
+{
+    if (m_ui->cbTestCase->count() < CFunction::MAX_TEST_CASE) {
+        m_testcase = m_ui->cbTestCase->count();
+        qDebug("m_ui->cbTestCase->count(): %d", m_ui->cbTestCase->count());
+        ++m_fn->m_testCaseCount;
+        m_ui->cbTestCase->addItem(QString("test %1").arg(m_fn->m_testCaseCount));
+        m_ui->cbTestCase->setCurrentIndex(m_testcase);
+        updateTestCaseTree();
+    }
+}
+
+void CDlgFunction::on_btnDelete_TestCase_clicked()
+{
+    if (m_ui->cbTestCase->count() > 0) {
+        m_fn->removeTestCase(m_testcase);
+        if (m_testcase == m_ui->cbTestCase->count() -1) {
+            --m_testcase;
+        }
+        updateTestCaseCombo();
+        updateTestCaseTree();
+        m_ui->cbTestCase->setCurrentIndex(m_testcase);
+    }
+}
+
+void CDlgFunction::on_cbTestCase_currentIndexChanged(int index)
+{
+    m_testcase = std::max(index,0);
+    updateTestCaseTree();
 }

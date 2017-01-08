@@ -511,6 +511,14 @@ void CFunction::read(CFileWrap & file, int version)
     } else {
         m_alias.clear();
     }
+    if (version > 6) {
+        file.read(&m_testCaseCount, sizeof(m_testCaseCount));
+        for (int i=0; i < m_testCaseCount; ++i) {
+            testcase[i].read(file, version);
+        }
+    } else {
+        m_testCaseCount = 0;
+    }
 }
 
 void CFunction::write(CFileWrap & file)
@@ -526,6 +534,13 @@ void CFunction::write(CFileWrap & file)
     file << state;
     file << lang;
     file << m_alias;
+    bool go = true;
+    if (go) {
+        file.write(&m_testCaseCount, sizeof(m_testCaseCount));
+        for (int i=0; i < m_testCaseCount; ++i) {
+            testcase[i].write(file);
+        }
+    }
 }
 
 void CFunction::init()
@@ -537,12 +552,21 @@ void CFunction::init()
     Out().forget();
     state = 0;
     lang = 0;
+    m_testCaseCount = 0;
 }
 
 void CFunction::removeInSet(int i)
 {
-    for (int j=i; j < m_inCount-1; ++j) {
-        paramsIn[i] =paramsIn[i+1];
+    for (int j = i; j < m_inCount - 1; ++j) {
+        paramsIn[j] =paramsIn[j+1];
     }
     --m_inCount;
+}
+
+void CFunction::removeTestCase(int i)
+{
+    for (int j = i; j < m_testCaseCount - 1; ++j) {
+        testcase[j] = testcase[j + 1];
+    }
+    --m_testCaseCount;
 }

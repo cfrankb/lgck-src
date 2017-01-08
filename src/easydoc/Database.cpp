@@ -230,5 +230,5 @@ void CDatabase::importGameLua(const char *cdata)
 
 int CDatabase::getVersion()
 {
-    return 0x0006;
+    return 0x0007;
 }
