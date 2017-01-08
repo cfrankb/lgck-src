@@ -2,12 +2,24 @@
 #include "ui_DlgStep.h"
 #include "pagecond.h"
 #include "testcase.h"
+#include <QSettings>
+#include "const.h"
 
 CDlgStep::CDlgStep(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CDlgStep)
 {
     ui->setupUi(this);
+    QSettings settings(author, appName);
+    bool largeFont = settings.value("largeFont", false).toBool();
+    if (largeFont) {
+        QFont font("Courier", 14);
+        font.setBold(true);
+        QFont font2("Courier", 12);
+        font2.setBold(true);
+        ui->eCode->setFont(font);
+        ui->eName->setFont(font2);
+    }
 }
 
 CDlgStep::~CDlgStep()

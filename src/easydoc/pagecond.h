@@ -17,8 +17,6 @@ class CPageCond : public QWidget
 public:
     explicit CPageCond(QWidget *parent = 0);
     ~CPageCond();
-    void set(int arg, int type, const QString & value);
-    void get(int &arg, int &type, QString &value);
     void load(const CStep & step, int i);
     void save(CStep & step, int i);
 

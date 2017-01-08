@@ -5,16 +5,26 @@
 class CFileWrap;
 
 enum ConditionType:int {
-   argCount,
-   boolean,
-   number,
-   string,
-   table
+    argCount,
+    boolean,
+    number,
+    string,
+    table
+};
+
+enum ConditionOperator:int {
+    equal,
+    greater,
+    smaller,
+    greater_equal,
+    smaller_equal,
+    nop
 };
 
 typedef struct {
   int argNum;
   int type;
+  int op;
   QString value;
 } Condition;
 

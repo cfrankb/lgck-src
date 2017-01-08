@@ -17,8 +17,11 @@ void CStep::read(CFileWrap & file, int version)
     file >> m_code;
     file.read(&m_conditionCount, sizeof(m_conditionCount));
     for (int i=0; i < m_conditionCount; ++i) {
+        m_conditions[i].op = 0;
+        m_conditions[i].type = 0;
         file.read(&m_conditions[i].argNum,4);
-        file.read(&m_conditions[i].type,4);
+        file.read(&m_conditions[i].op,2);
+        file.read(&m_conditions[i].type,2);
         file >> m_conditions[i].value;
     }
 }
@@ -30,7 +33,8 @@ void CStep::write(CFileWrap & file)
     file.write(&m_conditionCount, sizeof(m_conditionCount));
     for (int i=0; i < m_conditionCount; ++i) {
         file.write(&m_conditions[i].argNum,4);
-        file.write(&m_conditions[i].type,4);
+        file.write(&m_conditions[i].op,2);
+        file.write(&m_conditions[i].type,2);
         file << m_conditions[i].value;
     }
 }
