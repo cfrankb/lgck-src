@@ -1,5 +1,11 @@
 HISTORY OF LGCK BUILDER
 
+*** 0.6.0.8
+
+- EDITOR: added export game dialog
+- BUG FIX: ScriptWiz displayed incorrectly in Windows
+
+
 *** 0.6.0.7
 
 - EDITOR: builder can export sprites (obl, png)
