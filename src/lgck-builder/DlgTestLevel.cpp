@@ -173,6 +173,8 @@ void CDlgTestLevel::analyseLevel(CLevel *level)
         iconWarning.addFile(":/images/pd/warning-17_16x14.png");
         ui->sWarningIcon->setPixmap(iconWarning.pixmap(16,16));
         ui->sWarningText->setText(tr("No player detected. You must include one."));
+        ui->sWarningIcon->setToolTip(tr("A player object is required for the level to execute properly. "\
+                                        "This is mandatory and will lead to failure if absent."));
         return;
     }
     if (!hasGoal) {
@@ -180,6 +182,9 @@ void CDlgTestLevel::analyseLevel(CLevel *level)
         iconWarning.addFile(":/images/pd/warning-17_16x14.png");
         ui->sWarningIcon->setPixmap(iconWarning.pixmap(16,16));
         ui->sWarningText->setText(tr("No goal detected. You should include at least one."));
+        ui->sWarningIcon->setToolTip(tr("Not including one goal on this level will lead to "\
+                                        "automatically completing the level upon entry."\
+                                        "This is likely not the intended result."));
         return;
     }
 }

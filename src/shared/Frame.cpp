@@ -31,6 +31,7 @@
 #include "CRC.h"
 #include "IFile.h"
 #include "FileWrap.h"
+#include "helper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFrame
@@ -146,17 +147,11 @@ void CFrame::write(IFile & file)
     file.write(&m_bCustomMap,4);
 
     if ((m_nLen>0) && (m_nHei>0)) {
-        ULONG nDestLen = 4 * m_nLen* m_nHei + 1024;
-        UINT8 *pDest = new UINT8 [nDestLen];
-
-        int err = ::compress(
-                (UINT8 *)pDest,
-                (ULONG *)& nDestLen,
-                (UINT8 *)m_rgb,
-                (ULONG)4 *m_nLen* m_nHei);
-
-        if (err) {
-            //qDebug("CFrame::Write err=%d\n", err);
+        ULONG nDestLen;
+        UINT8 *pDest;
+        int err = compressData((UINT8 *)m_rgb, 4 * m_nLen * m_nHei, &pDest, nDestLen);
+        if (err != Z_OK) {
+            qDebug("CFrame::write error: %d", err);
         }
 
         file.write(&nDestLen,4);
@@ -322,17 +317,11 @@ void CFrame::toPng(UINT8 * & png, int & totalSize, UINT8 *obl5data, int obl5size
         memcpy(d + 1, m_rgb + y * m_nLen, scanLine);
     }
 
-    UINT8 * cData = new UINT8 [ dataSize + 1024 ];
-    ULONG cDataSize = dataSize + 1024;
-
-    int err = compress(
-            (UINT8 *)cData,
-            (ULONG *)& cDataSize,
-            (UINT8 *) data,
-            (ULONG) dataSize);
-
-    if (err) {
-        //qDebug("CFrame::toPng err=%d\n", err);
+    UINT8 * cData;
+    ULONG cDataSize;
+    int err = compressData(data, dataSize, &cData, cDataSize);
+    if (err != Z_OK) {
+        qDebug("CFrame::toPng error: %d", err);
     }
 
     delete [] data;

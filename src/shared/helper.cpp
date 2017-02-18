@@ -4,7 +4,8 @@
 #include <cstdio>
 #include <string>
 #include <list>
-#include <FileWrap.h>
+#include <zlib.h>
+#include "FileWrap.h"
 
 const char *toUpper(char *s)
 {
@@ -222,3 +223,15 @@ char *realpath(const char *path, char resolved_path[PATH_MAX])
 }
 #else
 #endif
+
+int compressData(unsigned char *in_data, unsigned long in_size, unsigned char **out_data, unsigned long & out_size)
+{
+    out_size = ::compressBound(in_size);
+    *out_data = new unsigned char [out_size];
+    return ::compress2(
+                *out_data,
+                &out_size,
+                in_data,
+                in_size,
+                Z_DEFAULT_COMPRESSION);
+}

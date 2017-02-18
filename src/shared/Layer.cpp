@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <zlib.h>
 #include "../shared/IFile.h"
+#include "helper.h"
 
 CLayer::CLayer(const char* name, int type, int h, int v)
 {
@@ -230,7 +231,6 @@ bool CLayer::read(IFile & file, bool compr)
 bool CLayer::write(IFile &file, bool compr)
 {
     int version = LAYER_VER;
-    int err;
     ULONG nTotalSize = 0;
     ULONG nCompressSize = 0;
     UINT8 *pCompressData = NULL;
@@ -243,15 +243,9 @@ bool CLayer::write(IFile &file, bool compr)
     file << (int) sizeof (CLevelEntry);
     nTotalSize = m_size * sizeof (CLevelEntry);
     if (compr) {
-        nCompressSize = nTotalSize + 2048;
-        pCompressData = new UINT8[nCompressSize];
-        err = compress(
-                (UINT8 *)pCompressData,
-                (ULONG *)& nCompressSize,
-                (UINT8 *)m_arrEntries,
-                (ULONG)nTotalSize);
-        if (err) {
-            qDebug("CLayer::Write err=%d\n", err);
+        int err = compressData((UINT8 *)m_arrEntries, (ULONG)nTotalSize, &pCompressData, nCompressSize);
+        if (err != Z_OK) {
+            qDebug("CLayer::Write error: %d", err);
         }
         file << (int) nTotalSize;
         file << (int) nCompressSize;
