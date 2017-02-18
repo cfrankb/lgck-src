@@ -178,24 +178,35 @@
       <string>50</string>
      </property>
     </widget>
-    <zorder>cbSkill</zorder>
-    <zorder>label_4</zorder>
-    <zorder>label</zorder>
-    <zorder>label_2</zorder>
-    <zorder>cContinue</zorder>
-    <zorder>eScore</zorder>
-    <zorder>label_3</zorder>
-    <zorder>cbLives</zorder>
-    <zorder>eHitPoints</zorder>
-    <zorder>cbSkill</zorder>
-    <zorder>label_4</zorder>
-    <zorder>label</zorder>
-    <zorder>cContinue</zorder>
-    <zorder>label_2</zorder>
-    <zorder>eScore</zorder>
-    <zorder>label_3</zorder>
-    <zorder>cbLives</zorder>
-    <zorder>eHitPoints</zorder>
+    <widget class="QLabel" name="sWarningIcon">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="lgck-builder.qrc">:/images/pd/dagobert83_cancelx16.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="sWarningText">
+     <property name="geometry">
+      <rect>
+       <x>37</x>
+       <y>158</y>
+       <width>321</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Warning text goes here</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">

@@ -1068,6 +1068,8 @@ void MainWindow::on_actionTest_Level_triggered()
         dlg->setContinue(m_bContinue);
         dlg->setExternal(m_runtimeExternal);
         dlg->setRez(m_rez);
+        CLevel * level = m_doc [ m_doc.m_nCurrLevel ];
+        dlg->analyseLevel(level);
         if (dlg->exec()) {
             m_skill = dlg->getSkill();
             m_start_hp = dlg->getHP();
