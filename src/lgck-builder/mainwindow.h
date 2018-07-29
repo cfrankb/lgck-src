@@ -121,7 +121,6 @@ private:
     void adjustViewPort();
     void commitAll();
     void exportGame();
-    bool exportGameCore(CDlgDistributeGame &dlg, QString &outMsg);
     QAction** actionShortcuts();
     QStringList & defaultShortcuts();
     void saveSettings();

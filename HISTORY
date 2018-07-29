@@ -2,8 +2,14 @@ HISTORY OF LGCK BUILDER
 
 *** 0.6.0.8
 
+- EDITOR: added portable option to package bundle (windows)
 - EDITOR: added export game dialog
+- EDITOR; replaced setup from InnoSetup with AdvancedInstaller
+- EDITOR: added manifests to satisfy windows app cert kit
+- TOOLS: migrated gui to qt 5.10.1
 - BUG FIX: ScriptWiz displayed incorrectly in Windows
+- BUG FIX: uninitialized font causing game to crash (critical)
+- BUG FIX: export game wasn't including musics
 
 
 *** 0.6.0.7

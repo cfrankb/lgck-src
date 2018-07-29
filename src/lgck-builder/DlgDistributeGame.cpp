@@ -24,7 +24,7 @@ CDlgDistributeGame::CDlgDistributeGame(QWidget *parent) :
     QString cmd_runtime = "lgck-runtime-sdl.exe";
     QString stub = "game.exe";
     QString cmd7z = "\"" + appDir + "/7z.exe\"";
-    ui->rSFX->setChecked(true);
+    ui->rZip->setChecked(true);
 #else
     QString cmd_runtime = "lgck-runtime-sdl.exe";
     QString stub = "game.exe";

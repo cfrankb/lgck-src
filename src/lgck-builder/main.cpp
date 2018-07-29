@@ -38,6 +38,14 @@ int main(int argc, char *argv[])
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
     srand( time( NULL ) );
     QApplication app(argc, argv);
+    QFileInfo fi(app.applicationDirPath());
+    if(fi.isDir() && fi.isWritable()) {
+        // make this app portable
+       // qDebug("app dir: %s", q2c(app.applicationDirPath()));
+        QSettings::setDefaultFormat(QSettings::IniFormat);
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
+    }
+
     MainWindow w;
     w.createEventEditor();
 
