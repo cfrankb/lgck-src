@@ -45,6 +45,7 @@
 #include "DlgShortcuts.h"
 #include "DlgAlpha.h"
 #include "../shared/Frame.h"
+#include "../shared/ss_version.h"
 
 //http://stackoverflow.com/questions/3542718/installing-opengl-for-qt
 char MainWindow::m_appName[] = "Object Block Editor";
@@ -56,10 +57,24 @@ char MainWindow::m_pngFilter[] = "PNG Images (*.png)";
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+
+    QString s;
+    QString appVersion;
+    int version = SS_LGCK_VERSION;
+    for (int i=0; i < 4; ++i) {
+        s = QString("%1").arg(version % 256);
+        version /= 256;
+        if (i) {
+            appVersion = s + "." + appVersion  ;
+        } else {
+            appVersion = s + appVersion ;
+        }
+    }
+
     QCoreApplication::setOrganizationDomain("");
     QCoreApplication::setOrganizationName(m_author);
     QCoreApplication::setApplicationName(m_appName);
-    QCoreApplication::setApplicationVersion("1.0.0");
+    QCoreApplication::setApplicationVersion(appVersion);
 
     ui->setupUi(this);
     //ui->centralWidget->hide();
@@ -240,7 +255,7 @@ void MainWindow::setVisible ( bool visible )
 {
     QWidget::setVisible(visible);
     if (visible) {
-        QSettings settings(m_author, m_appName);
+        QSettings settings;
         settings.beginGroup("UI_Components");
             restoreGeometry(settings.value("mainWindow:geometry").toByteArray());
             restoreState(settings.value("mainWindow:state").toByteArray());
@@ -250,7 +265,7 @@ void MainWindow::setVisible ( bool visible )
 
 void MainWindow::reloadSettings()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     m_saveSettings = settings.value("saveSettings", false).toBool();
     ui->actionSave_Settings->setChecked(m_saveSettings);
 
@@ -430,7 +445,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->ignore();
         return;
     }
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     settings.setValue("saveSettings", m_saveSettings);
     if (m_saveSettings) {
         settings.setValue("zoom", m_view->zoom());
@@ -562,7 +577,7 @@ void MainWindow::open(QString fileName)
                 warningMessage(tr("error:\n") + m_doc.getLastError());
                 m_doc.setFileName(oldFileName);
                 // update fileList
-                QSettings settings(m_author, m_appName);
+                QSettings settings;
                 QStringList files = settings.value("recentFileList").toStringList();
                 files.removeAll(fileName);
                 settings.setValue("recentFileList", files);
@@ -737,7 +752,7 @@ void MainWindow::initFileMenu()
 
 void MainWindow::reloadRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
 
@@ -756,7 +771,7 @@ void MainWindow::reloadRecentFileActions()
 
 void MainWindow::updateRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     QString fileName = m_doc.getFileName();
     files.removeAll(fileName);

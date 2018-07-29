@@ -21,6 +21,8 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include <QSurfaceFormat>
+#include <QSettings>
+#include <QFileInfo>
 
 int main(int argc, char *argv[])
 {
@@ -32,9 +34,15 @@ int main(int argc, char *argv[])
     format.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(format);
 
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    QFileInfo fi(app.applicationDirPath());
+    if(fi.isDir() && fi.isWritable()) {
+        // make the settings portable
+        QSettings::setDefaultFormat(QSettings::IniFormat);
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
+    }
     MainWindow w;
     w.show();
 
-    return a.exec();
+    return app.exec();
 }

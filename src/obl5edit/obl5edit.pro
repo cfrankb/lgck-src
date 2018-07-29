@@ -21,6 +21,7 @@ win32:LIBS += -L../../redist/lib
 LIBS += -lz
 QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
+QMAKE_LFLAGS_WINDOWS += -Wl,--dynamicbase -Wl,--nxcompat
 
 SOURCES += mainwindow.cpp \
     main.cpp\
@@ -51,7 +52,8 @@ SOURCES += mainwindow.cpp \
     framescroll.cpp \
     framewidget.cpp \
     previewwidget.cpp \
-    previewscroll.cpp
+    previewscroll.cpp \
+    ../shared/helper.cpp
 
 HEADERS  += mainwindow.h \
     OBL5File.h \
