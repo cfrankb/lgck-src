@@ -43,7 +43,8 @@ public:
     CFileWrap & operator << (const QStringList & list);
 
     bool open(const QString,  QIODevice::OpenMode mode=QIODevice::ReadOnly);
-    int read(void *buf, int size) { return file.read( (char*) buf, size); }
+    bool open(const char *s, const char *mode);
+    int read(void *buf, int size);
     int write(const void *buf, int size) { return file.write( (char*) buf, size); }
     void close();
     long getSize();

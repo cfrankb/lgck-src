@@ -10,7 +10,7 @@ CDlgStep::CDlgStep(QWidget *parent) :
     ui(new Ui::CDlgStep)
 {
     ui->setupUi(this);
-    QSettings settings(author, appName);
+    QSettings settings;
     bool largeFont = settings.value("largeFont", false).toBool();
     if (largeFont) {
         QFont font("Courier", 14);

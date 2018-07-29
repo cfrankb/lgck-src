@@ -34,7 +34,7 @@ CDlgFunction::CDlgFunction(QWidget *parent) :
     m_ui->setupUi(this);
     m_fn = NULL;
     m_inSet = 0;
-    QSettings settings(author, appName);
+    QSettings settings;
     bool largeFont = settings.value("largeFont", false).toBool();
     if (largeFont) {
         QFont font("Courier", 14);

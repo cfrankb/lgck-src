@@ -97,6 +97,7 @@ private slots:
     void on_actionSave_Wiki_toggled(bool arg1);
     void on_actionRemember_last_file_triggered(bool checked);
     void on_actionLarge_Font_toggled(bool arg1);
+    void on_actionAbout_Qt_triggered();
 };
 
 #endif // MAINWINDOW_H

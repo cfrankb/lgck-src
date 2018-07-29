@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtGui>
+#include <QSettings>
 #include <QMessageBox>
 #include <QResizeEvent>
 #include "stdafx.h"
@@ -27,6 +27,7 @@
 #include "tabwidget.h"
 #include <QFileDialog>
 #include <QToolBar>
+#include "../shared/ss_version.h"
 
 char MainWindow::m_fileFilter[] = "easyDoc (*.edoc)";
 char MainWindow::m_appName[] = "easyDoc";
@@ -37,6 +38,24 @@ static QString g_fileNameHTML;
 MainWindow::MainWindow(QWidget *parent)
     : MainWindowParent(parent), ui(new Ui::MainWindow)
 {
+    QString s;
+    QString appVersion;
+    int version = SS_LGCK_VERSION;
+    for (int i=0; i < 4; ++i) {
+        s = QString("%1").arg(version % 256);
+        version /= 256;
+        if (i) {
+            appVersion = s + "." + appVersion  ;
+        } else {
+            appVersion = s + appVersion ;
+        }
+    }
+
+    QCoreApplication::setOrganizationDomain("");
+    QCoreApplication::setOrganizationName(m_author);
+    QCoreApplication::setApplicationName(m_appName);
+    QCoreApplication::setApplicationVersion(appVersion);
+
     ui->setupUi(this);
     updateTitle();
     initFileMenu();
@@ -92,7 +111,7 @@ void MainWindow::open(const QString & fileNameNew)
                 warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
                 m_doc.setFileName(oldFileName);
                 // update fileList
-                QSettings settings(m_author, m_appName);
+                QSettings settings;
                 QStringList files = settings.value("recentFileList").toStringList();
                 files.removeAll(fileName);
                 settings.setValue("recentFileList", files);
@@ -217,7 +236,7 @@ void MainWindow::initFileMenu()
 
 void MainWindow::reloadRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
 
@@ -236,7 +255,7 @@ void MainWindow::reloadRecentFileActions()
 
 void MainWindow::updateRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     QString fileName = m_doc.getFileName();
     files.removeAll(fileName);
@@ -296,6 +315,7 @@ void MainWindow::on_actionHTML_triggered()
 void MainWindow::on_action_About_triggered()
 {
     CDlgAbout *dlg = new CDlgAbout(this);
+    dlg->setGLInfo("-", "-", "-", "");
     dlg->exec();
     delete dlg;
 }
@@ -337,7 +357,7 @@ void MainWindow::on_actionPlain_Text_triggered()
 
 void MainWindow::on_actionWiki_triggered()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QString folder = settings.value("wikiFolder", "").toString();
     folder = QFileDialog::getExistingDirectory(this, "Export Wiki to folder...", folder);
     if (!folder.isEmpty()) {
@@ -383,13 +403,13 @@ void MainWindow::on_actionGameLua_triggered()
 void MainWindow::on_actionSave_HTML_triggered(bool checked)
 {
     m_saveHTML = checked;
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     settings.setValue("saveHTML", m_saveHTML);
 }
 
 void MainWindow::restoreSettings()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     m_saveHTML = settings.value("saveHTML", false).toBool();
     ui->actionSave_HTML->setChecked(m_saveHTML);
     m_saveWiki = settings.value("saveWiki", false).toBool();
@@ -416,20 +436,25 @@ void MainWindow::initToolbar()
 void MainWindow::on_actionSave_Wiki_toggled(bool arg1)
 {
     m_saveWiki = arg1;
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     settings.setValue("saveWiki", m_saveWiki);
 }
 
 void MainWindow::on_actionRemember_last_file_triggered(bool checked)
 {
     m_remember = checked;
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     settings.setValue("remember", m_remember);
 }
 
 void MainWindow::on_actionLarge_Font_toggled(bool arg1)
 {
     m_largeFont = arg1;
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     settings.setValue("largeFont", m_largeFont);
+}
+
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    QApplication::aboutQt();
 }
