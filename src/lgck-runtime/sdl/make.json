@@ -32,7 +32,7 @@
 			"-lSDL2_mixer -lFLAC -lvorbisfile -lvorbis -logg",
 			"-lSDL2main -lSDL2 -lSDL2_mixer  -lm -ldinput8 -ldxguid -ldxerr8",
 			"-luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32",
-			"-lversion -luuid -llua52 -lz -static-libgcc"
+			"-lversion -luuid -llua -lz -static-libgcc"
         ],
         "flags" : ["-std=gnu++11", "-O3", "-Wall"]
     },
