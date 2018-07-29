@@ -1416,6 +1416,8 @@ bool CGame::isEndLevelMeet()
 
 void CGame::postInitLevel()
 {
+    qDebug("postInitLevel\n");
+
     // invoke onCreate event
     callLvEvent(CLevel::EL_CREATE);
 
@@ -1428,6 +1430,8 @@ void CGame::postInitLevel()
         callGameEvent(CGameEvents::EG_RESTART_LEVEL);
         callLvEvent(CLevel::EL_RESTART);
     }
+
+    qDebug("postInitLevel completed\n");
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -2201,6 +2205,11 @@ void CGame::remap()
 bool CGame::initFonts()
 {
     qDebug("initFont()");
+    if (m_font) {
+        // TODO: revisit this later when fontwiz will be operational
+        qDebug("Font already initialized");
+        return true;
+    }
     const char *fontName = ":/res/Tuffy_bold.fnt";
     CFileWrap file;
     if (file.open(fontName)) {
