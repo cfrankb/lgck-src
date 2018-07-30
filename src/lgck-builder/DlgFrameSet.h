@@ -54,6 +54,8 @@ private slots:
     void on_eName_textChanged(const QString &arg1);
     void updateButtons();
 
+    void on_btnEdit_clicked();
+
 signals:
     void imagesAdded();
     void imageDeleted();
