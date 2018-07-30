@@ -15,8 +15,8 @@ TEMPL = r'''#ifndef VERSION_H
 
 #define VER_COMPANYNAME_STR         "Francois Blanchette"
 #define VER_FILEDESCRIPTION_STR     "{file_desc}"
-#define VER_INTERNALNAME_STR        "{file_desc}"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright © {year} Francois Blanchette"
+#define VER_INTERNALNAME_STR        "{int_file_desc}"
+#define VER_LEGALCOPYRIGHT_STR      "Copyright {c} {year} Francois Blanchette"
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "{app_exe}"
@@ -46,6 +46,15 @@ for f in files:
     file_path = f['file_path'] #../lgck-builder/version.h"
     app_exe = f['app_exe']#lgck-builder.exe'
     file_desc =  f['file_desc']#'LGCK builder'
+    int_file_desc = f['int_file_desc']
 
     with open(file_path, 'w') as t:
-        t.write(TEMPL.format(version=version, version_str=version_str, year=now.year, app_exe=app_exe, file_desc=file_desc))
+        t.write(TEMPL.format(
+            version=version,
+            version_str=version_str,
+            year=now.year,
+            app_exe=app_exe,
+            file_desc=file_desc,
+            int_file_desc=int_file_desc,
+            c='\xa9')
+        )

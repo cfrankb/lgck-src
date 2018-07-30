@@ -2,21 +2,25 @@
     {
         "file_path" : "../lgck-builder/version.h",
         "app_exe" : "lgck-builder.exe",
-        "file_desc" : "LGCK builder"
+        "file_desc" : "LGCK builder IDE",
+        "int_file_desc" : "lgck-builder"
     },
     {
         "file_path" : "../obl5edit/version.h",
         "app_exe" : "obl5edit.exe",
-        "file_desc" : "obl5edit"
+        "file_desc" : "Object Block Editor",
+        "int_file_desc" : "obl5edit"
     },
     {
         "file_path" : "../easydoc/version.h",
         "app_exe" : "easydoc.exe",
-        "file_desc" : "easydoc"
+        "file_desc" : "easydoc",
+        "int_file_desc" : "easydoc"
     },
     {
         "file_path" : "../lgck-runtime/version.h",
         "app_exe" : "lgck-runtime.exe",
-        "file_desc" : "LGCK runtime"
+        "file_desc" : "LGCK runtime",
+        "int_file_desc" : "lgck-runtime"
     }
 ]
