@@ -29,6 +29,7 @@
 #include <QProcess>
 #include <QOpenGLWidget>
 #include <QScrollArea>
+#include <QFileSystemWatcher>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -246,6 +247,10 @@ MainWindow::MainWindow(QWidget *parent)
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
         //checkVersion();
     }
+
+    // TODO: implement watcher
+    // https://stackoverflow.com/questions/10044853/how-to-use-qfilesystemwatcher-to-monitor-a-folder-for-change
+    m_watcher = new QFileSystemWatcher(this);
 }
 
 void MainWindow::createEventEditor()
@@ -2737,10 +2742,14 @@ void MainWindow::on_actionEdit_Images_triggered()
 
 void MainWindow::on_actionImport_Font_triggered()
 {
-    CWizFont *wiz = new CWizFont( static_cast<QWidget*>(parent()) );
-    if (wiz->exec()) {
+    QMessageBox::information(this, tr(m_appName),
+                    tr("Not implemented yet !"),
+                    QMessageBox::Ok);
+
+    //CWizFont *wiz = new CWizFont( static_cast<QWidget*>(parent()) );
+    //if (wiz->exec()) {
         // TODO: implement this
-    }
+    //}
 }
 
 bool MainWindow::checkExecutible(const QString exec, QString & errMsg)
@@ -2842,4 +2851,9 @@ void MainWindow::on_actionExport_Game_triggered()
 void MainWindow::on_actionDistribution_Package_triggered()
 {
     exportGame();
+}
+
+void MainWindow::updateFrameSet(const QString & fileName)
+{
+    qDebug() << QString("frameset updated: %1").arg(fileName);
 }

@@ -215,7 +215,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
     QProcess proc;
     proc.setWorkingDirectory(m_tmpPath);
     proc.start(m_cmd7z, list);
-    proc.waitForFinished();
+    proc.waitForFinished(-1);
     int result = proc.exitCode();
     if (result) {
         outMsg = QString(dlg.tr("An error occured: %1\nCode: %2"))
@@ -235,7 +235,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
             outMsg = msg.c_str();
             return false;
         }
-        fileFilter = dlg.tr("Executive files (*.exe)");
+        fileFilter = dlg.tr("Applications (*.exe)");
         outName = "package.exe";
         finalOut = setupOut;
     }

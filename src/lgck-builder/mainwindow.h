@@ -30,6 +30,7 @@ class CToolBoxDock;
 class CThreadUpdater;
 class QScrollArea;
 class CDlgDistributeGame;
+class QFileSystemWatcher;
 
 #include <QTimer>
 #include <QTime>
@@ -138,6 +139,7 @@ private:
     };
     QLabel *m_labels[3];
     QAction *m_recentFileActs[MaxRecentFiles];
+    QFileSystemWatcher * m_watcher;
     virtual void closeEvent(QCloseEvent *event);
     virtual void setVisible ( bool visible );
     virtual void resizeEvent (QResizeEvent *event);
@@ -250,6 +252,7 @@ private slots:
     void on_actionSprite_Editor_triggered();
     void on_actionExport_Game_triggered();
     void on_actionDistribution_Package_triggered();
+    void updateFrameSet(const QString & fileName);
 
 signals:
     void levelDeleted(int index);
