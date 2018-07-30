@@ -6,10 +6,13 @@ HISTORY OF LGCK BUILDER
 - EDITOR: added export game dialog
 - EDITOR; replaced setup from InnoSetup with AdvancedInstaller
 - EDITOR: added manifests to satisfy windows app cert kit
+- EDITOR: new warnings for no player and no goal
+- EDITOR: lgck-builder and obl5edit can now be associated with files
 - TOOLS: migrated gui to qt 5.10.1
 - BUG FIX: ScriptWiz displayed incorrectly in Windows
-- BUG FIX: uninitialized font causing game to crash (critical)
+- BUG FIX: uninitialized font causing game to crash (critical) introduced in 0.6.0.6
 - BUG FIX: export game wasn't including musics
+- BUG FIX: testing empty level was causing a crash
 
 
 *** 0.6.0.7
