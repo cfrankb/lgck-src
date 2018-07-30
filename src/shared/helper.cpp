@@ -16,16 +16,18 @@ const char *toUpper(char *s)
     }
     return s;
 }
- 
+
 char *getUUID()
 {
     char *uuid = new char[128];
-    sprintf(uuid, "%.8x-%.4x-%.4x-%.4x-%.8x%.4x",
-            rand(),
+    sprintf(uuid, "%.4x%.4x-%.4x-%.4x-%.4x-%.4x%.4x%.4x",
             rand() & 0xffff,
             rand() & 0xffff,
             rand() & 0xffff,
-            rand(),
+            rand() & 0xffff,
+            rand() & 0xffff,
+            rand() & 0xffff,
+            rand() & 0xffff,
             rand() & 0xffff
             );
     return uuid;

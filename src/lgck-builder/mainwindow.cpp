@@ -360,33 +360,46 @@ void MainWindow::open(QString fileName)
         if (fileName.isEmpty()) {
             fileName = QFileDialog::getOpenFileName(this, "", fileName, tr(m_fileFilter));
         }
-        if (!fileName.isEmpty()) {
-            QString oldFileName = m_doc.getFileName();
-            QApplication::setOverrideCursor(Qt::WaitCursor);
-            m_doc.setFileName(fileName.toStdString().c_str());
-            if (!m_doc.read())  {
-                warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
-                m_doc.setFileName(q2c(oldFileName));
-                // update fileList
-                QSettings settings;
-                QStringList files = settings.value("recentFileList").toStringList();
-                files.removeAll(fileName);
-                settings.setValue("recentFileList", files);
-            }
-            qDebug("MakeCurrent()");
-            m_lview->makeCurrent();
-            m_doc.cacheImages();
-            QApplication::restoreOverrideCursor();
-            updateTitle();
-            updateRecentFileActions();
-            reloadRecentFileActions();
-            m_toolBox->init();
-            showLayerName();
-            reloadLayerCombo();
-            setViewMode(VM_EDITOR);
-            emit levelSelected(0);
-        }
+        loadFileName(fileName);
     }
+    updateMenus();
+    m_doc.initFonts();
+}
+
+void MainWindow::loadFileName(const QString & fileName)
+{
+    if (!fileName.isEmpty()) {
+        QString oldFileName = m_doc.getFileName();
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        m_doc.setFileName(fileName.toStdString().c_str());
+        if (!m_doc.read())  {
+            warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
+            m_doc.forget();
+            m_doc.init();
+            m_doc.setFileName(q2c(oldFileName));
+            // update fileList
+            QSettings settings;
+            QStringList files = settings.value("recentFileList").toStringList();
+            files.removeAll(fileName);
+            settings.setValue("recentFileList", files);
+
+        }
+        qDebug("MakeCurrent()");
+
+        QApplication::restoreOverrideCursor();
+
+        updateRecentFileActions();
+        reloadRecentFileActions();
+
+    }
+    updateTitle();
+    m_lview->makeCurrent();
+    m_doc.cacheImages();
+    m_toolBox->init();
+    showLayerName();
+    reloadLayerCombo();
+    setViewMode(VM_EDITOR);
+    emit levelSelected(0);
     updateMenus();
     m_doc.initFonts();
 }
@@ -427,14 +440,6 @@ void MainWindow::warningMessage(const QString message)
     QMessageBox msgBox(QMessageBox::Warning, m_appName, message, 0, this);
     msgBox.exec();
 }
-
-/*
-void MainWindow::setDocument(const QString fileName)
-{
-    m_doc.setFileName(q2c(fileName));
-    m_doc.read();
-}
-*/
 
 bool MainWindow::updateTitle()
 {
@@ -1101,20 +1106,45 @@ void MainWindow::on_actionTest_Level_triggered()
             m_rezH = dlg->getHeight();
             m_rezW = dlg->getWidth();
             qDebug("skill: %d", m_skill);
-            m_doc.clearKeys();
-            m_doc.setVitals(m_start_hp, m_lives, m_score);
-            m_doc.setSkill(m_skill);
-            m_doc.initLua();
-            m_runtimeExternal = dlg->isExternal();
-            if (dlg->isExternal()){
-            // http://stackoverflow.com/questions/19442400/qt-execute-external-program
-                goExternalRuntime();
+            QString errMsg = "";
+            if (!m_doc.getSize()) {
+                errMsg = tr("No level available to play.");
             } else {
-                setViewMode(VM_GAME);
-                testLevel(true);
+                int currLevel = m_doc.m_nCurrLevel;
+                CLevel * level = m_doc[currLevel];
+                if (!level) {
+                    errMsg = tr("No valid level found.");
+                } else {
+                    CLayer * layer = level->getMainLayer();
+                    if (!layer) {
+                        errMsg = tr("No main layer detected.");
+                    } else {
+                        if (layer->getSize() < 1) {
+                            errMsg = tr("Level is empty.");
+                        }
+                    }
+                }
             }
-            // set the start level
-            m_start_level = m_doc.m_nCurrLevel;
+
+            if (errMsg.isEmpty()) {
+                m_doc.clearKeys();
+                m_doc.setVitals(m_start_hp, m_lives, m_score);
+                m_doc.setSkill(m_skill);
+                m_doc.initLua();
+                m_runtimeExternal = dlg->isExternal();
+                if (dlg->isExternal()){
+                // http://stackoverflow.com/questions/19442400/qt-execute-external-program
+                    goExternalRuntime();
+                } else {
+                    setViewMode(VM_GAME);
+                    testLevel(true);
+                }
+                // set the start level
+                m_start_level = m_doc.m_nCurrLevel;
+            } else {
+                 QMessageBox msgBox(QMessageBox::Critical, QString(m_appName), errMsg, 0, this);
+                 msgBox.exec();
+            }
         }
         delete dlg;
     }

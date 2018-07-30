@@ -226,6 +226,7 @@ private slots:
     void on_actionPaintAlphaOnly_triggered();
     void on_actionEdit_Mode_toggled(bool arg1);
     void on_actionFade_triggered();
+    void loadFile(const QString & filename);
 
 signals:
     void penColorChanged(uint penColor);
@@ -248,6 +249,7 @@ signals:
     void changePal(uint *colors, int count);
     void nextFrame(int currFrame, CFrame *);
     void viewModeChanged(int mode);
+    void openFile(const QString & filename);
 };
 
 #endif // MAINWINDOW_H

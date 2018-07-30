@@ -168,6 +168,7 @@ void CDlgTestLevel::analyseLevel(CLevel *level)
             hasGoal = true;
         }
     }
+
     if (!hasPlayer) {
         QIcon iconWarning;
         iconWarning.addFile(":/images/pd/warning-17_16x14.png");

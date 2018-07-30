@@ -27,6 +27,7 @@
 #include "WizGame.h"
 #include "ss_version.h"
 #include <ctime>
+#include <QMessageBox>
 
 static char appName[] = "LGCK builder";
 static char appTitle[] = "LGCK builder IDE";
@@ -41,7 +42,6 @@ int main(int argc, char *argv[])
     QFileInfo fi(app.applicationDirPath());
     if(fi.isDir() && fi.isWritable()) {
         // make this app portable
-       // qDebug("app dir: %s", q2c(app.applicationDirPath()));
         QSettings::setDefaultFormat(QSettings::IniFormat);
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
     }
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.createEventEditor();
 
-    char m_fileFilter[] = "LGCK games (*.lgckdb)";
+    const char m_fileFilter[] = "LGCK games (*.lgckdb)";
     QString fileName = "";
     bool done = false;
     QSettings settings(author, appName);
@@ -57,7 +57,11 @@ int main(int argc, char *argv[])
     bool skipSplash = settings.value("skipSplash", false).toBool();
     settings.endGroup();
 
-    if (!skipSplash) {
+    if (argc == 2) {
+        fileName = argv[1];
+    }
+
+    if (!skipSplash && fileName.isEmpty()) {
         do {
             int version = SS_LGCK_VERSION;
             int vv[4]={0,0,0,0};
@@ -111,7 +115,13 @@ int main(int argc, char *argv[])
 
     w.show();
     if (!fileName.isEmpty()) {
-        w.open(fileName);
+        if (fileName.toLower().endsWith(".lgckdb")) {
+            w.open(fileName);
+        } else {
+            QString errMsg = QObject::tr("Invalid file: %1").arg(fileName);
+            QMessageBox msgBox(QMessageBox::Critical, QString(appName), errMsg, 0, &w);
+            msgBox.exec();
+        }
     }
     return app.exec();
 }

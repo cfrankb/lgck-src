@@ -248,6 +248,9 @@ MainWindow::MainWindow(QWidget *parent)
 
    // ui->centralWidget->show();
 
+    connect(this, SIGNAL(openFile(QString)),
+            this, SLOT(loadFile(QString)));
+
     reloadSettings();
 }
 
@@ -565,28 +568,35 @@ void MainWindow::open(QString fileName)
             delete dlg;
         }
 
-        if (!fileName.isEmpty()) {
-            QString oldFileName = m_doc.getFileName();
-            m_doc.setFileName(fileName);
-            if (m_doc.read())  {
-                qDebug("size: %d", m_doc.getSize());
-                m_doc.setCurrentIndex(0);
-                CFrame * frame = m_doc.getCurrent();
-                emit frameChanged(frame);
-            } else {
-                warningMessage(tr("error:\n") + m_doc.getLastError());
-                m_doc.setFileName(oldFileName);
-                // update fileList
-                QSettings settings;
-                QStringList files = settings.value("recentFileList").toStringList();
-                files.removeAll(fileName);
-                settings.setValue("recentFileList", files);
-            }
+        loadFile(fileName);
+    }
+    updateMenus();
+    updateStatus();
+}
 
-            updateTitle();
-            updateRecentFileActions();
-            reloadRecentFileActions();
+void MainWindow::loadFile(const QString &fileName)
+{
+    if (!fileName.isEmpty()) {
+        QString oldFileName = m_doc.getFileName();
+        m_doc.setFileName(fileName);
+        if (m_doc.read())  {
+            qDebug("size: %d", m_doc.getSize());
+            m_doc.setCurrentIndex(0);
+            CFrame * frame = m_doc.getCurrent();
+            emit frameChanged(frame);
+        } else {
+            warningMessage(tr("error:\n") + m_doc.getLastError());
+            m_doc.setFileName(oldFileName);
+            // update fileList
+            QSettings settings;
+            QStringList files = settings.value("recentFileList").toStringList();
+            files.removeAll(fileName);
+            settings.setValue("recentFileList", files);
         }
+
+        updateTitle();
+        updateRecentFileActions();
+        reloadRecentFileActions();
     }
     updateMenus();
     updateStatus();

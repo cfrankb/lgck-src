@@ -41,8 +41,12 @@ int main(int argc, char *argv[])
         QSettings::setDefaultFormat(QSettings::IniFormat);
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
     }
+
     MainWindow w;
     w.show();
-
+    if (argc == 2) {
+        QString fileName = argv[1];
+        w.openFile(fileName);
+    }
     return app.exec();
 }

@@ -149,6 +149,7 @@ private:
     bool checkExecutible(const QString exec, QString & errMsg);
     void showAppSettings(int tab);
     void formatVersion(QString &ver);
+    void loadFileName(const QString &fileName);
 
 protected:
     void initializeGL();
