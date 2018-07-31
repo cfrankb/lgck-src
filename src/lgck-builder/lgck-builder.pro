@@ -134,8 +134,8 @@ SOURCES +=  mainwindow.cpp \
     ../shared/implementers/opengl/gr_opengl.cpp \
     ../shared/implementers/sdl/mu_sdl.cpp \
     ../shared/implementers/sdl/sn_sdl.cpp \
-    ../shared/implementers/sdl/im_sdl.cpp \
-    ../shared/implementers/sdl/gr_sdl.cpp \
+ #   ../shared/implementers/sdl/im_sdl.cpp \
+#    ../shared/implementers/sdl/gr_sdl.cpp \
   # ../shared/implementers/sfml/mu_sfml.cpp \
   #  ../shared/implementers/sfml/sn_sfml.cpp \
     ../shared/inputs/qt/kt_qt.cpp \

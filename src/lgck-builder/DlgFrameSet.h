@@ -24,6 +24,7 @@
 
 class CGameFile;
 class CFrameSet;
+class QString;
 
 namespace Ui {
     class CDlgFrameSet;
@@ -40,7 +41,7 @@ public:
 
 protected:
     void changeEvent(QEvent *e);
-    //void updateButtons();
+    bool fileExists(QString & path);
 
     CFrameSet *m_frameSet;
 

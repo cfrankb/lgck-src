@@ -95,6 +95,11 @@ void CDlgFrameSet::init(CFrameSet * frameSet)
 
     emit refill();
     updateButtons();
+
+    // disable button if sprite editor not found
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString path = appDir + "/obl5edit.exe";
+    m_ui->btnEdit->setDisabled(!fileExists(path));
 }
 
 void CDlgFrameSet::updateButtons()
@@ -124,10 +129,18 @@ void CDlgFrameSet::on_eName_textChanged(const QString &arg1)
     updateButtons();
 }
 
+bool CDlgFrameSet::fileExists(QString & path)
+{
+    return QFileInfo::exists(path) && QFileInfo(path).isFile();
+}
+
 void CDlgFrameSet::on_btnEdit_clicked()
 {
     if (QMessageBox::information(this, "", tr("You are about to edit this image set using the Sprite Editor.\nJust save and exit when you are done with your changes."),
                              QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok) {
+
+         // set cursor to hourglass
+         QApplication::setOverrideCursor(Qt::WaitCursor);
 
         // create temp file
         QString appDir = QCoreApplication::applicationDirPath();
@@ -176,5 +189,7 @@ void CDlgFrameSet::on_btnEdit_clicked()
             }
         }
         tmp.setAutoRemove(true);
+        // restore cursor
+        QApplication::restoreOverrideCursor();
     }
 }
