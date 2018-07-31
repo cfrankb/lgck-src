@@ -5,10 +5,10 @@
 
 CMusicSFML::CMusicSFML()
 {
-   qDebug("CMusicSFML");
+    qDebug("CMusicSFML");
     m_valid = true;
-    m_music =  new sf::Music;
-     qDebug("CMusicSFML OUT");
+    m_music =  NULL;
+    qDebug("CMusicSFML OUT");
 }
 
 CMusicSFML::~CMusicSFML()
@@ -19,8 +19,12 @@ CMusicSFML::~CMusicSFML()
 bool CMusicSFML::open(const char *file)
 {
     close();
+    m_music = new sf::Music;
     if (m_music) {
         if (!m_music->openFromFile(file)) {
+            delete m_music;
+            m_music = NULL;
+            qDebug("opening %s failed\n", file);
             return false;
         }
     }
