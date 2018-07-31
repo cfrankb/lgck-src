@@ -60,7 +60,7 @@ bool CFolders::open(const char* fileName, bool create)
             return writeHeader();
         }
     } else {
-        if (m_file.open(fileName, "rb+")) {
+        if (m_file.open(fileName, "rb")) {
             return readHeader() && readFolderIndex() && readFileIndex();
         }
     }

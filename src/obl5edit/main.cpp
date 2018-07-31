@@ -36,7 +36,8 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
     QFileInfo fi(app.applicationDirPath());
-    if(fi.isDir() && fi.isWritable()) {
+    QString portable = QApplication::applicationDirPath() + "/portable.txt";
+    if(fi.isDir() && fi.isWritable() && QFileInfo::exists(portable)) {
         // make the settings portable
         QSettings::setDefaultFormat(QSettings::IniFormat);
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
