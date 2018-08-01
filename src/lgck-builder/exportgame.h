@@ -2,13 +2,15 @@
 #define EXPORTGAME_H
 
 #include <QString>
+#include <QObject>
 #include <QTemporaryDir>
 
 class CDlgDistributeGame;
 class CGameFile;
 
-class CExportGame
+class CExportGame: public QObject
 {
+    Q_OBJECT
 public:
     CExportGame();
     bool exportCore(CDlgDistributeGame & dlg, CGameFile &file, QString & outMsg);

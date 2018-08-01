@@ -30,7 +30,6 @@
 #include <QMessageBox>
 
 static char appName[] = "LGCK builder";
-static char appTitle[] = "LGCK builder IDE";
 static char author[] = "cfrankb";
 
 int main(int argc, char *argv[])
@@ -50,7 +49,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.createEventEditor();
 
-    const char m_fileFilter[] = "LGCK games (*.lgckdb)";
     QString fileName = "";
     bool done = false;
     QSettings settings(author, appName);
@@ -70,7 +68,7 @@ int main(int argc, char *argv[])
                 vv[i] = version & 0xff;
                 version /= 256;
             }
-            QString ver = QString().sprintf("%s %.2d.%.2d.%.2d.%.2d", appTitle, vv[0], vv[1], vv[2], vv[3]);
+            QString ver = QString().sprintf("%s %.2d.%.2d.%.2d.%.2d", QObject::tr("LGCK builder IDE"), vv[0], vv[1], vv[2], vv[3]);
             CDlgSelect * dlg = new CDlgSelect(&w);
             dlg->setWindowTitle(ver);
             dlg->raise();
@@ -79,7 +77,7 @@ int main(int argc, char *argv[])
             CWizGame *wiz;
             switch(dlg->getState()) {
             case CDlgSelect::OPEN:
-                fileName = QFileDialog::getOpenFileName(&w, w.tr("Open"), "", w.tr(m_fileFilter));
+                fileName = QFileDialog::getOpenFileName(&w, QObject::tr("Open"), "", QObject::tr("LGCK games (*.lgckdb)"));
                 if (!fileName.isEmpty()) {
                     done = true;
                 }
