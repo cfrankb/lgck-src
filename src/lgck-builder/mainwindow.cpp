@@ -77,9 +77,7 @@
 #include "DlgDistributeGame.h"
 #include "ExportGame.h"
 
-char MainWindow::m_fileFilter[] = "LGCK games (*.lgckdb)";
 char MainWindow::m_appName[] = "LGCK builder";
-char MainWindow::m_appTitle[] = "LGCK builder IDE";
 char MainWindow::m_author[] = "cfrankb";
 
 #define WEB_PATH QString("http://cfrankb.com/lgck/")
@@ -363,7 +361,7 @@ void MainWindow::open(QString fileName)
     commitAll();
     if (maybeSave()) {
         if (fileName.isEmpty()) {
-            fileName = QFileDialog::getOpenFileName(this, "", fileName, tr(m_fileFilter));
+            fileName = QFileDialog::getOpenFileName(this, "", fileName, tr("LGCK games (*.lgckdb)"));
         }
         loadFileName(fileName);
     }
@@ -432,7 +430,7 @@ bool MainWindow::save()
 bool MainWindow::saveAs()
 {
     commitAll();
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr(m_fileFilter));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
     //qDebug("picked : %s\n", q2c(fileName));
     if (fileName.isEmpty())
         return false;
@@ -454,7 +452,7 @@ bool MainWindow::updateTitle()
     } else {
         file = QFileInfo(m_doc.getFileName()).fileName();
     }
-    setWindowTitle(tr("%1[*] - %2").arg(file).arg(tr(m_appTitle)));
+    setWindowTitle(tr("%1[*] - %2").arg(file).arg(tr("LGCK builder IDE")));
     return true;
 }
 

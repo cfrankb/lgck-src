@@ -68,9 +68,9 @@ int main(int argc, char *argv[])
                 vv[i] = version & 0xff;
                 version /= 256;
             }
-            QString ver = QString().sprintf("%s %.2d.%.2d.%.2d.%.2d", QObject::tr("LGCK builder IDE"), vv[0], vv[1], vv[2], vv[3]);
+            QString ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
             CDlgSelect * dlg = new CDlgSelect(&w);
-            dlg->setWindowTitle(ver);
+            dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
             dlg->raise();
             dlg->setWindowState(Qt::WindowActive) ;
             dlg->exec();
