@@ -144,8 +144,7 @@ void CDlgFrameSet::on_btnEdit_clicked()
 
         // create temp file
         QString appDir = QCoreApplication::applicationDirPath();
-        QTemporaryFile tmp ;
-        tmp.setFileTemplate("XXXXXXXXXXXX.obl");
+        QTemporaryFile tmp(QDir::temp().absoluteFilePath("XXXXXXXXXXX.obl")) ;
         tmp.open();
         tmp.setAutoRemove(false);
         tmp.close();
