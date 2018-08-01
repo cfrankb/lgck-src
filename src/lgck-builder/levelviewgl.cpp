@@ -241,7 +241,7 @@ void CLevelViewGL::drawScreen()
         int y2 = sz.height();
         // Color: #RRGGBB
         int bkColor = strtol(level.getSetting("bkcolor"), NULL, 16);
-        float blue = (bkColor & 0xff) << 16;
+        float blue = (bkColor & 0xff);
         float green = (bkColor & 0xff00) >> 8;
         float red = (bkColor >> 16) & 0xff;
         glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
