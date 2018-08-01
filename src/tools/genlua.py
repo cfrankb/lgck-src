@@ -37,6 +37,12 @@ class GenLua():
         tf_lua = open(self.data['output']['lua'], 'w')
         write_GPL(tf_lua, '--[[', ']]--')
         tf_lua.write('-- auto-generated\n')
+        tf_lua.write('''
+if unpack == nil then
+    -- to keep lua 5.2 happy
+    unpack = table.unpack;
+end
+        ''')
         cpp_file = self.data['output']['cpp']
         src = ''
         if os.path.isfile(cpp_file):

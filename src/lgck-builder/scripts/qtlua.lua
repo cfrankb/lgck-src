@@ -16,6 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 -- auto-generated
+
+if unpack == nil then
+    -- to keep lua 5.2 happy
+    unpack = table.unpack;
+end
+
 CWBtnColor = {};
 CWBtnColor.__index = CWBtnColor;
 
