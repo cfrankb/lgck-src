@@ -79,8 +79,8 @@ void CWizGame::init(CGame *game)
     }
 
     // select default
-    ui->rSetByDifficulty->setChecked(true);
-    on_rSetByDifficulty_clicked();
+    ui->rSetByLevel->setChecked(true);
+    on_rSetByLevel_clicked();
 
     // clear the list and start over
 

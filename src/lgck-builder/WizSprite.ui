@@ -29,6 +29,9 @@
    <iconset resource="lgck-builder.qrc">
     <normaloff>:/images/lgckbuilder64ronnie2.png</normaloff>:/images/lgckbuilder64ronnie2.png</iconset>
   </property>
+  <property name="whatsThis">
+   <string>This wizard will guide you through the process of creating a new sprite.</string>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>
@@ -120,6 +123,9 @@
    </widget>
   </widget>
   <widget class="CWizPageEasy" name="pageEasy">
+   <property name="whatsThis">
+    <string>This is where you decide what to name your sprite and what iwll be it's role in your game.</string>
+   </property>
    <property name="subTitle">
     <string>Easy Setup</string>
    </property>
@@ -176,12 +182,12 @@
      <rect>
       <x>60</x>
       <y>160</y>
-      <width>93</width>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Brick/Wall</string>
+     <string>Brick/Wall/Bridge</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="rObject">
@@ -306,6 +312,9 @@
     <property name="toolTip">
      <string>This is the human readable name for the sprite.</string>
     </property>
+    <property name="whatsThis">
+     <string>This is the human readable name for the sprite.</string>
+    </property>
     <property name="maxLength">
      <number>31</number>
     </property>
@@ -358,6 +367,9 @@
       <width>121</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="whatsThis">
+     <string>By clicking this box, you will enable this sprite to be invisible but still affect other sprite colliding with it.</string>
     </property>
     <property name="text">
      <string>System Invisble</string>
@@ -423,6 +435,9 @@
       <width>211</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="whatsThis">
+     <string>Smart masking allows the engine to detect empty portion of image and avoid causing false positive for collision detection. By clicking this box you can disable this feature for this sprite.</string>
     </property>
     <property name="text">
      <string>Do not &quot;SmartMask&quot; this object</string>
@@ -602,6 +617,22 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>210</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cfrankb.com/lgck/download.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Get some free sprites here !!!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="openExternalLinks">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QWizardPage" name="pagePlayer">
    <property name="subTitle">
@@ -642,6 +673,12 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Maximum number of concurrent bullets that can be alive at the same time</string>
+    </property>
+    <property name="whatsThis">
+     <string>Maximum number of concurrent bullets that can be alive at the same time</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbMaxFall">
     <property name="geometry">
@@ -651,6 +688,12 @@
       <width>81</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>This is the maximum fall that it can take. Beyond that it will get hurt.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This is the maximum fall that it can take. Beyond that it will get hurt.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_66">
@@ -688,6 +731,12 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>This is the speed at which this sprite will fall when there is gravity.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This is the speed at which this sprite will fall when there is gravity.</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbFireRate">
     <property name="geometry">
@@ -698,6 +747,12 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Rate of fire. How often can this sprite fire a bullet.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Rate of fire. How often can this sprite fire a bullet.</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbJump">
     <property name="geometry">
@@ -707,6 +762,12 @@
       <width>81</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>This is the jump mode for the player. A more detailed description is available below the box.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This is the jump mode for the player. A more detailed description is available below the box.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_28">
@@ -757,8 +818,17 @@ p, li { white-space: pre-wrap; }
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>The default paths are used for jumping. If this option is ticked off, you will need to manually create the jump paths for this sprite.</string>
+    </property>
+    <property name="whatsThis">
+     <string>The default paths are used for jumping. If this option is ticked off, you will need to manually create the jump paths for this sprite.</string>
+    </property>
     <property name="text">
      <string>Generate Default Paths</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="Line" name="line">
@@ -782,6 +852,12 @@ p, li { white-space: pre-wrap; }
       <width>141</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>This allows the player to fire bullet. Checking this box will automatically add an event script to handle this situation.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This allows the player to fire bullet. Checking this box will automatically add an event script to handle this situation.</string>
     </property>
     <property name="text">
      <string>Enable bullet firing</string>
@@ -809,6 +885,12 @@ p, li { white-space: pre-wrap; }
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Select a sprite that will be used as the player bullet. This sprite will be created and aimed in the direction where the player is aimed.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Select a sprite that will be used as the player bullet. This sprite will be created and aimed in the direction where the player is aimed.</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label_36">
     <property name="geometry">
@@ -832,6 +914,12 @@ p, li { white-space: pre-wrap; }
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Sound to be played when this sprite fires a bullet.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Sound to be played when this sprite fires a bullet.</string>
+    </property>
    </widget>
   </widget>
   <widget class="QWizardPage" name="pageDoor">
@@ -846,6 +934,12 @@ p, li { white-space: pre-wrap; }
       <width>201</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>This sprite will be used to unlock the door. This other sprite should be marked as an inventory item so that the player can pick it up.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This sprite will be used to unlock the door. This other sprite should be marked as an inventory item so that the player can pick it up.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_37">
@@ -869,6 +963,12 @@ p, li { white-space: pre-wrap; }
       <width>121</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>If this is ticked, the &quot;door&quot; sprite is killed/destroyed when it is unlocked.</string>
+    </property>
+    <property name="whatsThis">
+     <string>If this is ticked, the &quot;door&quot; sprite is killed/destroyed when it is unlocked.</string>
     </property>
     <property name="text">
      <string>destroy on use</string>
@@ -908,7 +1008,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="text">
-     <string>kill sprite if fall off the screen</string>
+     <string>kill sprite if falls off the screen</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="cKillPlayerOnTouch">
