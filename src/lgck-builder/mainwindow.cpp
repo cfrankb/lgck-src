@@ -844,6 +844,7 @@ void MainWindow::on_actionCreate_Level_triggered()
         showLayerName();        
         reloadLayerCombo();
         emit levelAdded();
+        emit levelSelected(m_doc.m_nCurrLevel);
     } else {
         delete level;
     }
@@ -868,6 +869,7 @@ void MainWindow::on_actionDelete_Level_triggered()
             if (!m_doc.getSize()) {
                 m_doc.m_nCurrLevel = -1;
             }
+            emit levelSelected(m_doc.m_nCurrLevel);
             showLayerName();
             reloadLayerCombo();
             updateMenus();
