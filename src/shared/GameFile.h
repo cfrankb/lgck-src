@@ -32,6 +32,7 @@ class IImageManager;
 class CTasks;
 class CGameEvents;
 class CSettings;
+class CDisplayConfig;
 
 typedef struct
 {
@@ -171,6 +172,7 @@ public:
     CPathBlock * getPaths();
     CGameEvents * getEvents();
     CSettings * getSettings();
+    CDisplayConfig * getDisplayConfig();
 
     /////////////////////////////////////////////////////////////////
     // i/o
@@ -194,6 +196,7 @@ protected:
     CPathBlock *m_paths;
     CGameEvents *m_events;
     CSettings *m_settings;
+    CDisplayConfig *m_displayConfig;
     typedef struct {
         std::string name;
         std::string src;

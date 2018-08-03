@@ -1180,7 +1180,6 @@ void MainWindow::testLevel(bool initSound)
 void MainWindow::handleGameEvents()
 {
     int result = m_doc.runEngine();
-    qDebug("result: %d", result);
     if (result) {
         m_doc.stopMusic();
         setViewMode( VM_EDITOR );

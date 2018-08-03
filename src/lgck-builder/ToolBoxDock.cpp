@@ -43,6 +43,9 @@
 #include "Snd.h"
 #include "WFileSave.h"
 #include "OBL5File.h"
+#include "displayconfig.h"
+#include "Display.h"
+#include "dlgdisplay.h"
 
 static const char g_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
 static const char g_oblFilter[] = "Object Blocks (*.obl *.obl5)";
@@ -539,6 +542,41 @@ void CToolBoxDock::reloadEvents()
     }
 }
 
+void CToolBoxDock::reloadDisplays()
+{
+    // page x: displays
+    qDebug("reload displays()");
+
+    CGame &gf = *((CGame*)m_gameFile);
+    int count = m_ui->treeDisplays->model()->rowCount();
+    m_ui->treeDisplays->model()->removeRows(0, count);
+    m_ui->treeDisplays->setColumnCount(1);
+    m_ui->treeDisplays->setColumnWidth(0, 128);
+    m_ui->treeDisplays->setEditTriggers(0);
+    m_ui->treeDisplays->setWordWrap(false);
+    m_ui->treeDisplays->setRootIsDecorated(false);
+    m_ui->treeDisplays->setAlternatingRowColors(true);
+
+    QIcon iconBlank;
+    iconBlank.addFile(":/images/blank.png");
+
+    QIcon iconCheck;
+    iconCheck.addFile(":/images/check.png");
+
+    CDisplayConfig & conf = *(gf.getDisplayConfig());
+    qDebug("displays: %d", conf.getSize());
+    for (int i = 0; i < conf.getSize(); ++i) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        CDisplay *display = conf[i];
+        item->setText(0, display->name());
+        if (display->isProtected()) {
+            item->setIcon(0, iconCheck);
+        } else {
+            item->setIcon(0, iconBlank);
+        }
+        m_ui->treeDisplays->addTopLevelItem(item);
+    }
+}
 
 void CToolBoxDock::reload()
 {
@@ -546,6 +584,7 @@ void CToolBoxDock::reload()
     reloadSounds();
     reloadLevels();
     reloadEvents();
+    reloadDisplays();
     updateButtons();
 }
 
@@ -1225,3 +1264,17 @@ void CToolBoxDock::exportSprite()
     delete dlg;
 }
 
+void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
+{
+    int i = index.row();
+    if (i !=-1)  {
+        CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+        CDlgDisplay dlg;
+        CDisplay & d = *(conf[i]);
+        dlg.setWindowTitle(tr("Edit display %1").arg(d.name()));
+        dlg.load(d);
+        if (dlg.exec() == QDialog::Accepted) {
+            dlg.save(d);
+        }
+    }
+}

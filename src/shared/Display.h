@@ -27,6 +27,7 @@ class CDisplay
 public:
     ~CDisplay();
     CDisplay(const char * name = "", int x=0, int y=0, int type=0);
+    void setName(const char *name);
     void setShadow( bool shadow, int tx, int ty );
     void enableShadow( bool shadow );
     void setShadowOffset(  int tx, int ty );
@@ -39,6 +40,8 @@ public:
     void setFontSize(int size);
     void setExpireTime(int time);
     void setVisible(bool visible);
+    void setTemplate(const char *s);
+    void setProtected(bool b);
     void show();
     void hide();
     void setText(const char* content, int displayType=DISPLAY_MESSAGE);
@@ -49,10 +52,21 @@ public:
     int blue();
     int alpha();
     int type();
+    int shadowX();
+    int shadowY();
+    int shadowR();
+    int shadowG();
+    int shadowB();
+    int shadowA();
     bool visible();
-    const char* name();
+    const char* name() const;
     const char* text();
+    const char *templateStr();
+    bool isProtected();
     int size();
+    bool shadow();
+    int imageSet();
+    int imageNo();
     void flip();
     enum {
         DISPLAY_TIME_LEFT       = 0,
@@ -67,6 +81,7 @@ public:
     void write (IFile &file );
     void read ( IFile & file, int version );
 
+protected:
     int m_x;
     int m_y;
     int m_state;
@@ -88,10 +103,11 @@ public:
     int m_imageSet;
     int m_imageNo;
 
-protected:
-    int m_id;
+    int m_uid;
     std::string m_name;
     std::string m_content;
+    std::string m_template;
+    bool m_protected;
     enum {
         VERSION = 0x0001
     };

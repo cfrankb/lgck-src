@@ -29,7 +29,7 @@ win32:QMAKE_LIBDIR    += ../../../redist/lib
 CONFIG( debug, debug|release ) {
     # debug
     win32:LIBS      += -lqscintilla2_qt5d
-    DEFINES         += LGCK_OPENGL_DEBUG=1
+    win32:DEFINES   += LGCK_OPENGL_DEBUG=1
 } else {
     # release
     win32:LIBS      += -lqscintilla2_qt5
@@ -151,7 +151,10 @@ SOURCES +=  mainwindow.cpp \
     WizFont.cpp \
     DlgExportSprite.cpp \
     DlgDistributeGame.cpp \
-    exportgame.cpp
+    exportgame.cpp \
+    ../shared/displayconfig.cpp \
+    dlgdisplay.cpp \
+    wslider.cpp
 
 HEADERS  +=  mainwindow.h \
     levelviewgl.h \
@@ -257,7 +260,10 @@ HEADERS  +=  mainwindow.h \
     WizFont.h \
     DlgExportSprite.h \
     DlgDistributeGame.h \
-    exportgame.h
+    exportgame.h \
+    ../shared/displayconfig.h \
+    dlgdisplay.h \
+    wslider.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \
@@ -284,5 +290,6 @@ FORMS  += mainwindow.ui \
     WizScript.ui \
     WizFont.ui \
     DlgExportSprite.ui \
-    DlgDistributeGame.ui
+    DlgDistributeGame.ui \
+    dlgdisplay.ui
 

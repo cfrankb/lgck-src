@@ -60,6 +60,7 @@ protected:
     void reloadSounds();
     void reloadLevels();
     void reloadEvents();
+    void reloadDisplays();
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
 
@@ -99,6 +100,7 @@ private slots:
     void editFrames();
     void exportSprite();
     void updateFrameSet(int frameSet);
+    void on_treeDisplays_doubleClicked(const QModelIndex &index);
 
 signals:
     void levelSelection(int index);

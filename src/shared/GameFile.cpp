@@ -40,6 +40,7 @@
 #include "../shared/Layer.h"
 #include "GameEvents.h"
 #include "../shared/helper.h"
+#include "displayconfig.h"
 
 CSettings::SETTING CGameFile::m_gameDefaults[] =
 {
@@ -108,6 +109,8 @@ CGameFile::CGameFile()
     m_events = new CGameEvents;
     m_settings = new CSettings;
     m_imageManager = NULL;
+    m_displayConfig = new CDisplayConfig;
+    m_displayConfig->reset();
     // ImageManager must be created before Init();
     init();
     parseClassList();
@@ -119,6 +122,7 @@ CGameFile::~CGameFile()
     delete m_strings;
     delete m_events;
     delete m_settings;
+    delete m_displayConfig;
 }
 
 void CGameFile::parseClassList()
@@ -256,6 +260,7 @@ void CGameFile::forget ()
     m_events->forget();
     m_clipboard->forget();
     m_strings->forget();
+    m_displayConfig->reset();
 }
 
 void CGameFile::restoreDefaults()
@@ -571,6 +576,16 @@ bool CGameFile::read(const char *filepath)
             qDebug("no paths defined\n");
         }
 
+        // displayconf
+        CFolder::CFileEntry * displayConf = fs.checkOut("displayConf.dat");
+        if (displayConf) {
+            file.seek(displayConf->getOffset());
+            m_displayConfig->read(file);
+        } else {
+            qDebug("Warning: missing `displayConf`. Using defaults.\n");
+            m_displayConfig->reset();
+        }
+
         qDebug("read done ;) \n");
         return true;
     }
@@ -681,6 +696,14 @@ bool CGameFile::write(const char *filepath)
             levels.addFile(levelName, bSize, aSize - bSize);
             fs += (aSize - bSize);
         }
+
+        // displayconf
+        bSize = fs.getSize();
+        file.seek(bSize);
+        m_displayConfig->write(file);
+        aSize = file.getSize();
+        root.addFile("displayConf.dat", bSize, aSize - bSize);
+        fs += (aSize - bSize);
 
         fs.writeFileIndex ( );
         fs.writeFolderIndex( );
@@ -816,4 +839,9 @@ int CGameFile::getLevelByUUID(const char *uuid)
         }
     }
     return -1;
+}
+
+CDisplayConfig * CGameFile::getDisplayConfig()
+{
+    return m_displayConfig;
 }

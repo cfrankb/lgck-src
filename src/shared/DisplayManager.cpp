@@ -51,10 +51,6 @@ CDisplayManager::~CDisplayManager()
     if (m_displays) {
         delete [] m_displays;
     }
-
-   /* if (m_font) {
-        delete m_font;
-    }*/
 }
 
 CDisplay & CDisplayManager::add(CDisplay & display)
@@ -105,8 +101,6 @@ CDisplay & CDisplayManager::operator [] (const char * name)
             return m_displays [ i ];
         }
     }
-
-    //qDebug("display ``%s`` not found", q2c(name));
     return m_displays [ 0 ];
 }
 
@@ -117,7 +111,6 @@ int CDisplayManager::findDisplay(const char *name)
             return  i ;
         }
     }
-    //qDebug("display ``%s`` not found", q2c(name));
     return -1;
 }
 
@@ -126,7 +119,7 @@ void CDisplayManager::drawImage(CDisplay & display)
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
-    m_graphics->paintImage(display.x(), screenHei - display.y(), display.m_imageSet, display.m_imageNo);
+    m_graphics->paintImage(display.x(), screenHei - display.y(), display.imageSet(), display.imageNo());
 }
 
 void CDisplayManager::drawText(CDisplay & display)
@@ -164,19 +157,19 @@ void CDisplayManager::drawText(CDisplay & display)
         }
     }
 
-    if (display.m_shadow) {
-        Color color = {(UINT8)display.m_shadowR, (UINT8)display.m_shadowG, (UINT8)display.m_shadowB, (UINT8)display.m_shadowA};
-        m_graphics->render(*font, display.text(), x + display.m_shadowX, y + display.m_shadowY, color);
+    if (display.shadow()) {
+        Color color = {(UINT8)display.shadowR(), (UINT8)display.shadowG(), (UINT8)display.shadowB(), (UINT8)display.shadowA()};
+        m_graphics->render(*font, display.text(), x + display.shadowX(), y + display.shadowY(), color);
     }
 
-    Color color = { (UINT8)display.m_r, (UINT8)display.m_g, (UINT8)display.m_b, (UINT8)display.m_a};
+    Color color = { (UINT8)display.red(), (UINT8)display.green(), (UINT8)display.blue(), (UINT8)display.alpha()};
     m_graphics->render(*font, display.text(), x, y, color);
 }
 
 void CDisplayManager::drawLives(CDisplay & display)
 {
-    char tmp[16];
-    sprintf(tmp, "%.2d", m_game->getLives());
+    char tmp[256];
+    sprintf(tmp, display.templateStr(), m_game->getLives());
     display.setText(tmp, CDisplay::DISPLAY_SAME);
     drawText(display);
 }
@@ -203,7 +196,7 @@ bool CDisplayManager::isValidIndex(int i)
 
 void CDisplayManager::draw()
 {
-    char tmp[4];
+    char tmp[256];
     int score;
     for (int i=0; i < m_size; ++i) {
         if (m_displays[i].visible()) {
@@ -211,7 +204,7 @@ void CDisplayManager::draw()
 
             case CDisplay::DISPLAY_TIME_LEFT:
                 if (m_game->getTimeLeft()  > 0) {
-                    sprintf(tmp, "%.3d", m_game->getTimeLeft());
+                    sprintf(tmp, m_displays[i].templateStr(), m_game->getTimeLeft());
                     m_displays[i].setText(tmp, CDisplay::DISPLAY_SAME);
                     drawText(m_displays[i]);
                 }
@@ -227,19 +220,13 @@ void CDisplayManager::draw()
                 break;
 
             case CDisplay::DISPLAY_IMAGE:
-                //qDebug("display %d = %s \n", i, m_displays[i].name());
                 drawImage(m_displays[i]);
                 break;
 
             case CDisplay::DISPLAY_SCORE:
-                char text[9];
-                text[8] = 0;
                 score = m_game->getScore();
-                for (int j = 7; j >= 0; --j) {
-                    text[j] = '0' + score % 10;
-                    score /= 10;
-                }
-                m_displays[i].setText(text, CDisplay::DISPLAY_SAME);
+                sprintf(tmp, m_displays[i].templateStr(), score);
+                m_displays[i].setText(tmp, CDisplay::DISPLAY_SAME);
                 drawText(m_displays[i]);
                 break;
 

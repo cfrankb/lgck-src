@@ -9,11 +9,11 @@
 
 CDisplay::CDisplay(const char* name, int x, int y, int type)
 {
-    m_id = rand();
+    m_uid = rand();
     m_name = name;
     m_x = x;
     m_y = y;
-    m_type = type;
+    setType(type);
     m_r = 0x20;
     m_g = 0x80;
     m_r = 0xf0;
@@ -82,6 +82,19 @@ void CDisplay::setXY(int x, int y)
 void CDisplay::setType(int type)
 {
     m_type = type;
+    switch (type) {
+        case DISPLAY_TIME_LEFT:
+            m_template = "%.3d";
+        break;
+        case DISPLAY_SCORE:
+            m_template = "%.8d";
+        break;
+        case DISPLAY_LIVES:
+            m_template = "%.2d";
+        break;
+        default:
+            m_template = "";
+    }
 }
 
 void CDisplay::setColor(int r, int g, int b, int a)
@@ -145,7 +158,7 @@ bool CDisplay::visible()
     return m_visible;
 }
 
-const char* CDisplay::name()
+const char* CDisplay::name() const
 {
     return m_name.c_str();
 }
@@ -209,8 +222,10 @@ void CDisplay::write(IFile & file)
     file.write(&m_shadowA, sizeof(int));
     file.write(&m_imageSet, sizeof(int));
     file.write(&m_imageNo, sizeof(int));
+    file.write(&m_protected, sizeof(bool));
     file << m_name;
     file << m_content;
+    file << m_template;
 }
 
 void CDisplay::read(IFile &file, int version)
@@ -238,6 +253,78 @@ void CDisplay::read(IFile &file, int version)
     file.read(&m_shadowA, sizeof(int));
     file.read(&m_imageSet, sizeof(int));
     file.read(&m_imageNo, sizeof(int));
+    file.read(&m_protected, sizeof(bool));
     file >> m_name;
     file >> m_content;
+    file >> m_template;
+}
+
+const char * CDisplay::templateStr()
+{
+    return m_template.c_str();
+}
+
+void CDisplay::setTemplate(const char *s)
+{
+    m_template = s;
+}
+
+bool CDisplay::isProtected()
+{
+    return m_protected;
+}
+
+void CDisplay::setProtected(bool b)
+{
+    m_protected = b;
+}
+
+void CDisplay::setName(const char *name)
+{
+    m_name = name;
+}
+
+bool CDisplay::shadow()
+{
+    return m_shadow;
+}
+
+int CDisplay::shadowX()
+{
+    return m_shadowX;
+}
+
+int CDisplay::shadowY()
+{
+    return m_shadowY;
+}
+
+int CDisplay::shadowR()
+{
+    return m_shadowR;
+}
+
+int CDisplay::shadowG()
+{
+    return m_shadowG;
+}
+
+int CDisplay::shadowB()
+{
+    return m_shadowB;
+}
+
+int CDisplay::shadowA()
+{
+    return m_shadowA;
+}
+
+int CDisplay::imageSet()
+{
+    return m_imageSet;
+}
+
+int CDisplay::imageNo()
+{
+    return m_imageNo;
 }
