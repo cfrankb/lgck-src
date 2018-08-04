@@ -1141,13 +1141,12 @@ void MainWindow::on_actionTest_Level_triggered()
                 // http://stackoverflow.com/questions/19442400/qt-execute-external-program
                     goExternalRuntime();
                 } else {
-                    setViewMode(VM_GAME);
+                    // set the start level
+                    m_start_level = m_doc.m_nCurrLevel;
                     testLevel(true);
                 }
-                // set the start level
-                m_start_level = m_doc.m_nCurrLevel;
             } else {
-                 QMessageBox msgBox(QMessageBox::Critical, QString(m_appName), errMsg, 0, this);
+                 QMessageBox msgBox(QMessageBox::Warning, QString(m_appName), errMsg, 0, this);
                  msgBox.exec();
             }
         }
