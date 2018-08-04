@@ -21,6 +21,7 @@ public:
     void reset();
     bool read(IFile & file);
     bool write(IFile & file);
+    void killFrameSet(int frameSet);
     CDisplay *operator[](int i);
     CDisplay *operator[](const char *s);
 

@@ -176,3 +176,16 @@ CDisplay *CDisplayConfig::operator[](const char *s)
 {
     return find(s);
 }
+
+void CDisplayConfig::killFrameSet(int frameSet)
+{
+    for (int i=0; i < m_size; ++i) {
+        CDisplay * d = m_displays[i];
+        int is = d->imageSet();
+        if (is == frameSet) {
+            d->setImage(0,0);
+        } else {
+            d->setImage(--is, d->imageNo());
+        }
+    }
+}

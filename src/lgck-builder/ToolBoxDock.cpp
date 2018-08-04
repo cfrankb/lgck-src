@@ -1297,6 +1297,7 @@ void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
         CDlgDisplay dlg;
         CDisplay & d = *(conf[i]);
         dlg.setWindowTitle(tr("Edit display %1").arg(d.name()));
+        dlg.setGameFile(m_gameFile);
         dlg.load(d);
         if (dlg.exec() == QDialog::Accepted) {
             dlg.save(d);

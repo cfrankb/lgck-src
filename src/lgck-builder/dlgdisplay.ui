@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tabGeneral">
     <attribute name="title">
@@ -464,6 +464,85 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Image</string>
+    </attribute>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Image set</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbFrameSet">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>15</y>
+       <width>161</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+     </property>
+     <property name="minimumContentsLength">
+      <number>16</number>
+     </property>
+     <property name="duplicatesEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="modelColumn">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbBaseFrame">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>45</y>
+       <width>63</width>
+       <height>25</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="sImage">
+     <property name="geometry">
+      <rect>
+       <x>25</x>
+       <y>85</y>
+       <width>171</width>
+       <height>181</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ICON</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Base Image</string>
      </property>
     </widget>
    </widget>

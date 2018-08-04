@@ -400,6 +400,7 @@ void CGameFile::killFrameSet(int nFrameSet)
 
     m_arrProto.killFrameSet(nFrameSet);
     m_clipboard->clear();
+    m_displayConfig->killFrameSet(nFrameSet);
 }
 
 void CGameFile::killProto(int nProto)
