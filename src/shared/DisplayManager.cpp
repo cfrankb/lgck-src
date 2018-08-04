@@ -118,25 +118,55 @@ void CDisplayManager::drawImage(CDisplay & display)
 {
     int screenLen;
     int screenHei;
+    int x = display.x();
+    int y = display.y();
     m_graphics->getScreenSize(screenLen, screenHei);
-    m_graphics->paintImage(display.x(), screenHei - display.y(), display.imageSet(), display.imageNo());
+    int flagX = display.flagX();
+    int flagY = display.flagY();
+    if (flagX || flagY) {
+        CFrame *frame = m_game->m_arrFrames.getFrame(display.imageSet(), display.imageNo());
+        switch (flagX) {
+        case CDisplay::FLAG_X_ALIGN_LEFT:
+            x = 0;
+            break;
+        case CDisplay::FLAG_X_ALIGN_RIGHT:
+            x = screenLen - frame->m_nLen;
+            break;
+        case CDisplay::FLAG_X_ALIGN_CENTER:
+            x = (screenLen - frame->m_nLen) / 2;
+        }
+        switch (flagY) {
+        case CDisplay::FLAG_Y_ALIGN_TOP:
+            y = 0;
+            break;
+        case CDisplay::FLAG_Y_ALIGN_BOTTOM:
+            y = screenHei - frame->m_nHei;
+            break;
+        case CDisplay::FLAG_Y_ALIGN_CENTER:
+            y = (screenHei - frame->m_nHei) / 2;
+        }
+    }
+    m_graphics->paintImage(x, screenHei - y, display.imageSet(), display.imageNo());
 }
 
 void CDisplayManager::drawText(CDisplay & display)
 {
+    int flagX = display.flagX();
+    int flagY = display.flagY();
+
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
-
     CFont * font = m_game->m_font;
     font->FaceSize(display.size());
+    int sx = font->Advance(display.text());
+    int sy = display.size();
     int x = display.x();
     if (x < 0) {
         if ( x != -1) {
             x = screenLen + display.x();
         } else {
             if (x == -1) {
-                int sx = font->Advance(display.text());
                 x = (screenLen - sx) / 2;
             } else {
                 x = screenLen - x;
@@ -150,10 +180,33 @@ void CDisplayManager::drawText(CDisplay & display)
             y = screenHei - display.y();
         } else {
             if (y == -1) {
-                y = (screenHei - display.size() ) / 2;
+                y = (screenHei - sy ) / 2;
             } else {
                 y = screenHei - y;
             }
+        }
+    }
+
+    if (flagX || flagY) {
+        switch (flagX) {
+        case CDisplay::FLAG_X_ALIGN_LEFT:
+            x = 0;
+            break;
+        case CDisplay::FLAG_X_ALIGN_RIGHT:
+            x = screenLen - sx;
+            break;
+        case CDisplay::FLAG_X_ALIGN_CENTER:
+            x = (screenLen - sx) / 2;
+        }
+        switch (flagY) {
+        case CDisplay::FLAG_Y_ALIGN_TOP:
+            y = 0;
+            break;
+        case CDisplay::FLAG_Y_ALIGN_BOTTOM:
+            y = screenHei - sy;
+            break;
+        case CDisplay::FLAG_Y_ALIGN_CENTER:
+            y = (screenHei - sy) / 2;
         }
     }
 
@@ -201,7 +254,6 @@ void CDisplayManager::draw()
     for (int i=0; i < m_size; ++i) {
         if (m_displays[i].visible()) {
             switch (m_displays[i].type()) {
-
             case CDisplay::DISPLAY_TIME_LEFT:
                 if (m_game->getTimeLeft()  > 0) {
                     sprintf(tmp, m_displays[i].templateStr(), m_game->getTimeLeft());

@@ -190,7 +190,7 @@ void CDisplayConfig::killFrameSet(int frameSet)
         int is = d->imageSet();
         if (is == frameSet) {
             d->setImage(0,0,false);
-        } else {
+        } else if (is > frameSet){
             d->setImage(--is, d->imageNo(), false);
         }
     }

@@ -251,6 +251,26 @@
       </rect>
      </property>
     </widget>
+    <widget class="QComboBox" name="cbFlagX">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>180</y>
+       <width>69</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbFlagY">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>210</y>
+       <width>69</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tabShadow">
     <attribute name="title">
@@ -560,6 +580,30 @@
    <header>wslider.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>eName</tabstop>
+  <tabstop>cbType</tabstop>
+  <tabstop>eFontSize</tabstop>
+  <tabstop>eColor</tabstop>
+  <tabstop>sAlpha</tabstop>
+  <tabstop>eX</tabstop>
+  <tabstop>eY</tabstop>
+  <tabstop>cVisible</tabstop>
+  <tabstop>eAlpha</tabstop>
+  <tabstop>btnColor</tabstop>
+  <tabstop>eShadowColor</tabstop>
+  <tabstop>btnShadowColor</tabstop>
+  <tabstop>sShadowAlpha</tabstop>
+  <tabstop>eShadowAlpha</tabstop>
+  <tabstop>eShadowX</tabstop>
+  <tabstop>cShadowVisible</tabstop>
+  <tabstop>eShadowY</tabstop>
+  <tabstop>eText</tabstop>
+  <tabstop>eTemplate</tabstop>
+  <tabstop>cbFrameSet</tabstop>
+  <tabstop>cbBaseFrame</tabstop>
+  <tabstop>tabWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

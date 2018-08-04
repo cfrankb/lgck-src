@@ -106,6 +106,8 @@ private slots:
     void on_btnAddDisplay_clicked();
     void on_treeDisplays_clicked(const QModelIndex &index);
 
+    void on_treeDisplays_customContextMenuRequested(const QPoint &pos);
+
 signals:
     void levelSelection(int index);
     void levelDeleted(int index);

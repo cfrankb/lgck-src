@@ -1297,8 +1297,9 @@ void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
         CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
         CDlgDisplay dlg;
         CDisplay & d = *(conf[i]);
-        dlg.setWindowTitle(tr("Edit display %1").arg(d.name()));
+        dlg.setWindowTitle(tr("Edit Overlay %1 %2").arg(d.name()).arg(d.isProtected() ? tr("[system]") : ""));
         dlg.setGameFile(m_gameFile);
+        dlg.setDisplayID(i);
         dlg.load(d);
         if (dlg.exec() == QDialog::Accepted) {
             dlg.save(d);
@@ -1313,13 +1314,13 @@ void CToolBoxDock::on_btnDeleteDisplay_clicked()
     QModelIndex index = m_ui->treeDisplays->currentIndex();
     int i = index.row();
     if (i == -1) {
-        QMessageBox::warning(this, "", tr("No Display selected."), QMessageBox::Ok);
+        QMessageBox::warning(this, "", tr("No Overlay selected."), QMessageBox::Ok);
         return;
     }
     CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
     CDisplay *d = conf[i];
     if (d->isProtected()) {
-        QMessageBox::warning(this, "", tr("This Display is owned by the engine and cannot be deleted."), QMessageBox::Ok);
+        QMessageBox::warning(this, "", tr("This Overlay is owned by the engine and cannot be deleted."), QMessageBox::Ok);
         return;
     }
     QMessageBox::StandardButton
@@ -1344,7 +1345,7 @@ void CToolBoxDock::on_btnAddDisplay_clicked()
     CDlgDisplay dlg;
     CDisplay d;
     d.setType(CDisplay::DISPLAY_MESSAGE);
-    dlg.setWindowTitle(tr("New display"));
+    dlg.setWindowTitle(tr("New overlay"));
     dlg.setGameFile(m_gameFile);
     dlg.load(d);
     if (dlg.exec() == QDialog::Accepted) {
@@ -1371,4 +1372,43 @@ void CToolBoxDock::on_treeDisplays_clicked(const QModelIndex &index)
     CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
     int i = index.row();
     m_ui->btnDeleteDisplay->setEnabled(i != -1 && !conf[i]->isProtected());
+}
+
+void CToolBoxDock::on_treeDisplays_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem * item = this->m_ui->treeDisplays->itemAt(pos);
+    if (item) {
+        // Make sure this item is selected
+        m_ui->treeDisplays->setCurrentItem( item );
+
+        CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+        QModelIndex index = this->m_ui->treeDisplays->currentIndex();
+        int i = index.row();
+
+        // create pop-up
+        QMenu menu(this->m_ui->treeDisplays);
+        QAction *actionEdit = new QAction(tr("Edit Overlay"), &menu);
+        menu.addAction(actionEdit);
+
+        QAction *actionAdd = new QAction(tr("New Overlay"), &menu);
+        menu.addAction(actionAdd);
+        if (i != -1 && !conf[i]->isProtected()) {
+            QAction *actionDelete = new QAction(tr("Delete Overlay"), &menu);
+            menu.addAction(actionDelete);
+            connect(actionDelete, SIGNAL(triggered()), this, SLOT(on_btnDeleteDisplay_clicked()));
+        }
+
+        // create an action and connect it to a signal
+        connect(actionEdit, SIGNAL(triggered()), this, SLOT(on_treeDisplays_doubleClicked()));
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddDisplay_clicked()));
+        menu.exec(this->m_ui->treeDisplays->mapToGlobal(pos));
+    } else {
+        QMenu menu(this->m_ui->treeObjects);
+        QAction *actionAdd = new QAction(tr("New Overlay"), &menu);
+        menu.addAction(actionAdd);
+
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddDisplay_clicked()));
+        //emit menuSeekingItems(& menu, MENU_ITEM::POPUP_MENU_NO_SPRITE);
+        menu.exec(this->m_ui->treeObjects->mapToGlobal(pos));
+    }
 }

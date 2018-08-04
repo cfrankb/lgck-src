@@ -401,13 +401,13 @@ Double-click on the one you want to edit.</string>
         <enum>Qt::LeftToRight</enum>
        </property>
        <attribute name="title">
-        <string>Displays</string>
+        <string>Overlays</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_11">
         <item row="0" column="0">
          <widget class="QTreeWidget" name="treeDisplays">
           <property name="toolTip">
-           <string>This is a list of all the displays contained in your game. 
+           <string>This is a list of all the overlays contained in your game. 
 Double-click on the one you want to edit.</string>
           </property>
           <property name="layoutDirection">

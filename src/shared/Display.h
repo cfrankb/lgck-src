@@ -100,8 +100,8 @@ public:
 
     enum {
         FLAG_Y_NONE,
-        FLAG_Y_ALIGN_LEFT,
-        FLAG_Y_ALIGN_RIGHT,
+        FLAG_Y_ALIGN_TOP,
+        FLAG_Y_ALIGN_BOTTOM,
         FLAG_Y_ALIGN_CENTER
     };
 

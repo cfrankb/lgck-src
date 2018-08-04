@@ -9,13 +9,15 @@ HISTORY OF LGCK BUILDER
 - EDITOR: new warnings for no player and no goal
 - EDITOR: lgck-builder and obl5edit can now be associated with files
 - EDITOR: tigher integration between lgck builder and obl5edit
+- EDITOR: overlay options exposed in UI
 - ENGINE: SFML runtime completed
 - TOOLS: migrated gui to qt 5.10.1
 - BUG FIX: ScriptWiz displayed incorrectly in Windows
 - BUG FIX: uninitialized font causing game to crash (critical) introduced in 0.6.0.6
 - BUG FIX: export game wasn't including musics
 - BUG FIX: testing empty level was causing a crash
-
+- BUG FIX: background color displays incorrectly in editor
+- BUG FIX: level shows completed before starting
 
 *** 0.6.0.7
 

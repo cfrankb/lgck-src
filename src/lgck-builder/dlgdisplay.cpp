@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QImage>
 #include "Display.h"
+#include "displayconfig.h"
 
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
@@ -13,7 +14,7 @@
 #include "Frame.h"
 
 #define STR(__INT__) QString().sprintf("%d", __INT__)
-#define TEXT(__CX__) q2c(__CX__->text())
+#define TEXT(__CX__) q2c(__CX__->text().trimmed())
 #define COLOR(RGB) (RGB & 0xff0000) >> 16, (RGB & 0xff00) >> 8, (RGB & 0xff)
 #define TOINT(__E__) __E__->text().toInt()
 
@@ -22,6 +23,7 @@ CDlgDisplay::CDlgDisplay(QWidget *parent) :
     ui(new Ui::CDlgDisplay)
 {
     ui->setupUi(this);
+    m_id = CDisplayConfig::NOT_FOUND;
 }
 
 CDlgDisplay::~CDlgDisplay()
@@ -53,6 +55,28 @@ void CDlgDisplay::load(CDisplay & d)
         ui->cbType->addItem(types[i]);
     }
 
+    const QString flagX[]= {
+        tr("manual"),
+        tr("left"),
+        tr("right"),
+        tr("center")
+    };
+
+    const QString flagY[]= {
+        tr("manual"),
+        tr("up"),
+        tr("down"),
+        tr("center")
+    };
+
+    for (unsigned int i=0; i < sizeof(flagX)/sizeof(QString); ++i) {
+        ui->cbFlagX->addItem(flagX[i]);
+    }
+
+    for (unsigned int i=0; i < sizeof(flagY)/sizeof(QString); ++i) {
+        ui->cbFlagY->addItem(flagY[i]);
+    }
+
     // page 1
     ui->eName->setText(d.name());
     ui->cbType->setCurrentIndex(d.type());
@@ -64,6 +88,8 @@ void CDlgDisplay::load(CDisplay & d)
     ui->eY->setText(STR(d.y()));
     ui->sAlpha->setBuddy(ui->eAlpha);
     ui->sAlpha->setSliderPosition(d.alpha());
+    ui->cbFlagX->setCurrentIndex(d.flagX());
+    ui->cbFlagY->setCurrentIndex(d.flagY());
 
     // page 2
     ui->btnShadowColor->setBuddy(ui->eShadowColor);
@@ -106,6 +132,8 @@ void CDlgDisplay::load(CDisplay & d)
     ui->cbBaseFrame->setCurrentIndex( d.imageNo() );
 
     enableType(d.type());
+    ui->eX->setEnabled(d.flagX() == 0);
+    ui->eY->setEnabled(d.flagY() == 0);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(strlen(d.name()) > 0);
 }
 
@@ -114,13 +142,12 @@ void CDlgDisplay::save(CDisplay & d)
     // page 1
     d.setName(TEXT(ui->eName));
     d.setText(TEXT(ui->eText));
-    qDebug("type: %d", d.type());
     d.setType(ui->cbType->currentIndex());
-    qDebug("@@@type: %d", d.type());
     d.setVisible(ui->cVisible->isChecked());
     d.setColor(COLOR(ui->btnColor->colorBGR()), ui->sAlpha->sliderPosition());
     d.setFontSize(TOINT(ui->eFontSize));
     d.setXY(TOINT(ui->eX), TOINT(ui->eY));
+    d.setFlagXY(ui->cbFlagX->currentIndex(), ui->cbFlagY->currentIndex());
 
     // page 2
     d.setShadowColor(COLOR(ui->btnShadowColor->colorBGR()), ui->sShadowAlpha->sliderPosition());
@@ -135,7 +162,6 @@ void CDlgDisplay::save(CDisplay & d)
         d.setImage(0, 0, false);
       //  d.setType(ui->cbType->currentIndex(), false);
     }
-    qDebug("@@@@@@@type: %d", d.type());
 }
 
 void CDlgDisplay::enableType(int type)
@@ -274,5 +300,28 @@ void CDlgDisplay::on_cbBaseFrame_currentIndexChanged(int index)
 
 void CDlgDisplay::on_eName_textChanged(const QString &arg1)
 {
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(arg1.length()>0);
+    bool enabled = false;
+    if (arg1.length() > 0) {
+        QString name = arg1.trimmed();
+       // ui->eName->setText(name);
+        CDisplayConfig * conf = m_gameFile->getDisplayConfig();
+        int i = conf->indexOf(q2c(name));
+        enabled = i == m_id || i == CDisplayConfig::NOT_FOUND;
+    }
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
+}
+
+void CDlgDisplay::setDisplayID(int id)
+{
+    m_id = id;
+}
+
+void CDlgDisplay::on_cbFlagX_currentIndexChanged(int index)
+{
+    ui->eX->setEnabled(index == 0);
+}
+
+void CDlgDisplay::on_cbFlagY_currentIndexChanged(int index)
+{
+    ui->eY->setEnabled(index == 0);
 }

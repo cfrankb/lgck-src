@@ -25,13 +25,15 @@ public:
     CDisplay *operator[](int i);
     CDisplay *operator[](const char *s);
 
+    enum {
+        NOT_FOUND = -1
+    };
 protected:
     void resize();
 
     enum {
         GROWBY = 20,
         MAX = 32,
-        NOT_FOUND = -1,
         VERSION = 2
     };
 
