@@ -262,6 +262,26 @@ void CToolBoxDock::createSprite()
     delete wiz;
 }
 
+void CToolBoxDock::checkFrameSetUses(int frameSet)
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    int *uses = gf.countFrameSetUses();
+    CFrameSet *fs = gf.m_arrFrames[frameSet];
+    if (!uses[frameSet]) {
+        QMessageBox::StandardButton
+                ret = QMessageBox::warning(
+                    dynamic_cast<QWidget*>(parent()),
+                    "", tr("ImageSet `%1` appears to no longer being used.\n"
+                           "Do you want to remove it?").arg(fs->getName()),
+                    QMessageBox::Yes | QMessageBox::No);
+        if (ret == QMessageBox::Yes) {
+            gf.m_arrFrames.removeAt(frameSet);
+            gf.killFrameSet(frameSet);
+        }
+    }
+    delete [] uses;
+}
+
 void CToolBoxDock::on_btnDeleteSprite_clicked()
 {
     CGame & gf = *((CGame*)m_gameFile);
@@ -278,6 +298,8 @@ void CToolBoxDock::on_btnDeleteSprite_clicked()
                                           "#%1 `%2`?").arg( j ) . arg( proto.getName() ),
                                        QMessageBox::Ok | QMessageBox::Cancel);
     if (ret == QMessageBox::Ok) {
+        // get frameset
+        int frameSet = proto.m_nFrameSet;
 
         // remove visual
         QAbstractItemModel * model =  m_ui->treeObjects->model();
@@ -305,6 +327,9 @@ void CToolBoxDock::on_btnDeleteSprite_clicked()
         }
         // let other interfaces that we deleted a sprite
         emit spriteDeleted(j);
+
+        // check if this frameSet is still being used
+        checkFrameSetUses(frameSet);
     }
 }
 
@@ -564,7 +589,6 @@ void CToolBoxDock::reloadDisplays()
     iconCheck.addFile(":/images/check.png");
 
     CDisplayConfig & conf = *(gf.getDisplayConfig());
-    qDebug("displays: %d", conf.getSize());
     for (int i = 0; i < conf.getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         CDisplay *display = conf[i];
@@ -1266,6 +1290,7 @@ void CToolBoxDock::exportSprite()
 
 void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
 {
+    CGame & gf = *((CGame*)m_gameFile);
     int i = index.row();
     if (i !=-1)  {
         CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
@@ -1275,6 +1300,7 @@ void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
         dlg.load(d);
         if (dlg.exec() == QDialog::Accepted) {
             dlg.save(d);
+            gf.setDirty(true);
         }
     }
 }

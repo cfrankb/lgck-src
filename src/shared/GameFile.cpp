@@ -845,3 +845,16 @@ CDisplayConfig * CGameFile::getDisplayConfig()
 {
     return m_displayConfig;
 }
+
+int *CGameFile::countFrameSetUses()
+{;
+    int count = m_arrFrames.getSize();
+    int * countFrameSetUses = new int[count];
+    memset(countFrameSetUses, 0, sizeof(int)*count);
+    CProtoArray & protos = m_arrProto;
+    for (int i=0; i < protos.getSize(); ++i) {
+        CProto & proto = protos[i];
+        ++countFrameSetUses[proto.m_nFrameSet];
+    }
+    return countFrameSetUses;
+}

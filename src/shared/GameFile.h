@@ -173,6 +173,7 @@ public:
     CGameEvents * getEvents();
     CSettings * getSettings();
     CDisplayConfig * getDisplayConfig();
+    int * countFrameSetUses();
 
     /////////////////////////////////////////////////////////////////
     // i/o

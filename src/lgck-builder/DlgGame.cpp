@@ -760,15 +760,7 @@ void CDlgGame::countFrameSetUses()
     if (m_countFrameSetUses) {
         delete [] m_countFrameSetUses;
     }
-    CGameFile &gf = *((CGameFile*)m_gameFile);
-    int count = gf.m_arrFrames.getSize();
-    m_countFrameSetUses = new int[count];
-    memset(m_countFrameSetUses, 0, sizeof(int)*count);
-    CProtoArray & protos = gf.m_arrProto;
-    for (int i=0; i < protos.getSize(); ++i) {
-        CProto & proto = protos[i];
-        ++m_countFrameSetUses[proto.m_nFrameSet];
-    }
+    m_countFrameSetUses = m_gameFile->countFrameSetUses();
 }
 
 void CDlgGame::init()

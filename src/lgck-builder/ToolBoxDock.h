@@ -63,6 +63,7 @@ protected:
     void reloadDisplays();
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
+    void checkFrameSetUses(int frameSet);
 
 private slots:
     void on_btnDeleteSprite_clicked();
