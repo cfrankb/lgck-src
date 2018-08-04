@@ -28,6 +28,8 @@ private slots:
 
     void on_cbBaseFrame_currentIndexChanged(int index);
 
+    void on_eName_textChanged(const QString &arg1);
+
 private:
     void setImage(int frameSet, int frameNo);
     QIcon makeIcon(void *png, int size);

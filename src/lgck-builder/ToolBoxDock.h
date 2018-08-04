@@ -102,6 +102,9 @@ private slots:
     void exportSprite();
     void updateFrameSet(int frameSet);
     void on_treeDisplays_doubleClicked(const QModelIndex &index);
+    void on_btnDeleteDisplay_clicked();
+    void on_btnAddDisplay_clicked();
+    void on_treeDisplays_clicked(const QModelIndex &index);
 
 signals:
     void levelSelection(int index);

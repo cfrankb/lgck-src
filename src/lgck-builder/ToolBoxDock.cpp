@@ -586,7 +586,7 @@ void CToolBoxDock::reloadDisplays()
     iconBlank.addFile(":/images/blank.png");
 
     QIcon iconCheck;
-    iconCheck.addFile(":/images/check.png");
+    iconCheck.addFile(":/images/system.png");
 
     CDisplayConfig & conf = *(gf.getDisplayConfig());
     for (int i = 0; i < conf.getSize(); ++i) {
@@ -600,6 +600,7 @@ void CToolBoxDock::reloadDisplays()
         }
         m_ui->treeDisplays->addTopLevelItem(item);
     }
+    m_ui->btnDeleteDisplay->setEnabled(false);
 }
 
 void CToolBoxDock::reload()
@@ -1304,4 +1305,70 @@ void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
             gf.setDirty(true);
         }
     }
+}
+
+void CToolBoxDock::on_btnDeleteDisplay_clicked()
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    QModelIndex index = m_ui->treeDisplays->currentIndex();
+    int i = index.row();
+    if (i == -1) {
+        QMessageBox::warning(this, "", tr("No Display selected."), QMessageBox::Ok);
+        return;
+    }
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    CDisplay *d = conf[i];
+    if (d->isProtected()) {
+        QMessageBox::warning(this, "", tr("This Display is owned by the engine and cannot be deleted."), QMessageBox::Ok);
+        return;
+    }
+    QMessageBox::StandardButton
+            ret = QMessageBox::warning(
+                this,  "",  tr("Are you sure that you want to delete\n"
+                               "`%1` ?") .arg(d->name()),
+                QMessageBox::Ok | QMessageBox::Cancel);
+    if (ret == QMessageBox::Ok) {
+        // remove visual
+        QAbstractItemModel * model =  m_ui->treeDisplays->model();
+        model->removeRow( index.row() );
+        conf.removeAt(i);
+        gf.setDirty( true );
+        m_ui->btnDeleteDisplay->setEnabled(false);
+    }
+}
+
+void CToolBoxDock::on_btnAddDisplay_clicked()
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    CDlgDisplay dlg;
+    CDisplay d;
+    d.setType(CDisplay::DISPLAY_MESSAGE);
+    dlg.setWindowTitle(tr("New display"));
+    dlg.setGameFile(m_gameFile);
+    dlg.load(d);
+    if (dlg.exec() == QDialog::Accepted) {
+        dlg.save(d);
+        int pos = conf.getSize();
+        conf.add(d);
+        QAbstractItemModel * model =  m_ui->treeDisplays->model();
+        if (!model) {
+            qDebug("model is null\n");
+        }
+        model->insertRow(pos);
+        QTreeWidgetItem * item = m_ui->treeDisplays->topLevelItem( pos );
+        m_ui->treeDisplays->setCurrentItem( item );
+        item->setText(0, d.name());
+        QIcon iconBlank;
+        iconBlank.addFile(":/images/blank.png");
+        item->setIcon(0, iconBlank);
+        gf.setDirty(true);
+    }
+}
+
+void CToolBoxDock::on_treeDisplays_clicked(const QModelIndex &index)
+{
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    int i = index.row();
+    m_ui->btnDeleteDisplay->setEnabled(i != -1 && !conf[i]->isProtected());
 }

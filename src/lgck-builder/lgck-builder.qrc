@@ -80,5 +80,6 @@
         <file>images/lgck.png</file>
         <file>images/pd/ATTENT03_16x13.png</file>
         <file>images/pd/warning-17_16x14.png</file>
+        <file>images/system.png</file>
     </qresource>
 </RCC>

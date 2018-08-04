@@ -407,7 +407,7 @@ Double-click on the one you want to edit.</string>
         <item row="0" column="0">
          <widget class="QTreeWidget" name="treeDisplays">
           <property name="toolTip">
-           <string>This is a list of all the levels contained in your game. 
+           <string>This is a list of all the displays contained in your game. 
 Double-click on the one you want to edit.</string>
           </property>
           <property name="layoutDirection">
@@ -448,6 +448,62 @@ Double-click on the one you want to edit.</string>
             <string notr="true">1</string>
            </property>
           </column>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupDisplays">
+          <property name="minimumSize">
+           <size>
+            <width>60</width>
+            <height>23</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+          <widget class="QToolButton" name="btnDeleteDisplay">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>0</y>
+             <width>20</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Delete Display</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="lgck-builder.qrc">
+             <normaloff>:/images/minus.png</normaloff>:/images/minus.png</iconset>
+           </property>
+          </widget>
+          <widget class="QToolButton" name="btnAddDisplay">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>25</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Add New Display</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="lgck-builder.qrc">
+             <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>

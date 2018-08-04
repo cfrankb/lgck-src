@@ -37,6 +37,7 @@ void CDlgDisplay::load(CDisplay & d)
     ui->tabWidget->setCurrentIndex(0);
 
     ui->eName->setEnabled(!d.isProtected());
+    ui->cbType->setEnabled(!d.isProtected());
 
     const QString types[] = {
         tr("Time Left"),
@@ -79,8 +80,8 @@ void CDlgDisplay::load(CDisplay & d)
     ui->eText->setText(d.text());
     setImage(d.imageSet(), d.imageNo());
 
+    // page 4
     // frame set
-
     for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
         CFrameSet & frameSet = *gf.m_arrFrames[n];
         UINT8 *png;
@@ -101,11 +102,11 @@ void CDlgDisplay::load(CDisplay & d)
     ui->cbFrameSet->setCurrentIndex( d.imageSet() );
 
     // frame no
-
     fillFrameCombo( d.imageSet() );
     ui->cbBaseFrame->setCurrentIndex( d.imageNo() );
 
     enableType(d.type());
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(strlen(d.name()) > 0);
 }
 
 void CDlgDisplay::save(CDisplay & d)
@@ -113,7 +114,9 @@ void CDlgDisplay::save(CDisplay & d)
     // page 1
     d.setName(TEXT(ui->eName));
     d.setText(TEXT(ui->eText));
+    qDebug("type: %d", d.type());
     d.setType(ui->cbType->currentIndex());
+    qDebug("@@@type: %d", d.type());
     d.setVisible(ui->cVisible->isChecked());
     d.setColor(COLOR(ui->btnColor->colorBGR()), ui->sAlpha->sliderPosition());
     d.setFontSize(TOINT(ui->eFontSize));
@@ -125,11 +128,14 @@ void CDlgDisplay::save(CDisplay & d)
 
     // page 3
     d.setTemplate(TEXT(ui->eTemplate));
+    qDebug("****type: %d", d.type());
     if (d.type() == CDisplay::DISPLAY_IMAGE) {
         d.setImage(ui->cbFrameSet->currentIndex(), ui->cbBaseFrame->currentIndex());
     } else {
-        d.setImage(0, 0);
+        d.setImage(0, 0, false);
+      //  d.setType(ui->cbType->currentIndex(), false);
     }
+    qDebug("@@@@@@@type: %d", d.type());
 }
 
 void CDlgDisplay::enableType(int type)
@@ -264,4 +270,9 @@ void CDlgDisplay::on_cbBaseFrame_currentIndexChanged(int index)
     int frameSet = ui->cbFrameSet->currentIndex();
     int frameNo = index;
     setImage(frameSet, frameNo);
+}
+
+void CDlgDisplay::on_eName_textChanged(const QString &arg1)
+{
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(arg1.length()>0);
 }

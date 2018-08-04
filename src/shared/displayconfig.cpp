@@ -39,7 +39,13 @@ CDisplay * CDisplayConfig::find(const char *name)
 
 void CDisplayConfig::removeAt(int i)
 {
-
+    if (i >= 0 && i < m_size) {
+        delete m_displays[i];
+        for (int j = i + 1; j < m_size; ++j) {
+            m_displays[j-1] = m_displays[j];
+        }
+        -- m_size;
+    }
 }
 
 void CDisplayConfig::resize()
@@ -183,9 +189,9 @@ void CDisplayConfig::killFrameSet(int frameSet)
         CDisplay * d = m_displays[i];
         int is = d->imageSet();
         if (is == frameSet) {
-            d->setImage(0,0);
+            d->setImage(0,0,false);
         } else {
-            d->setImage(--is, d->imageNo());
+            d->setImage(--is, d->imageNo(), false);
         }
     }
 }

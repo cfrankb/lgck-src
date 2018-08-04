@@ -60,9 +60,11 @@ void CDisplay::setShadowColor( int r, int g, int b, int a )
     set(DI_SHADOWA, a);
 }
 
-void CDisplay::setImage(int imageSet, int imageNo)
+void CDisplay::setImage(int imageSet, int imageNo, bool resetType)
 {
-    set(DI_TYPE, DISPLAY_IMAGE);
+    if (resetType) {
+        set(DI_TYPE, DISPLAY_IMAGE);
+    }
     set(DI_IMAGESET, imageSet);
     set(DI_IMAGENO, imageNo);
 }

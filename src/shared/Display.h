@@ -33,7 +33,7 @@ public:
     void enableShadow( bool shadow );
     void setShadowOffset(  int tx, int ty );
     void setShadowColor( int r, int g, int b, int a );
-    void setImage(int imageSet, int imageNo);
+    void setImage(int imageSet, int imageNo, bool resetType=true);
     void setAlpha(int alpha);
     void setXY(int x, int y);
     void setType(int type, bool resetTemplate=true);
