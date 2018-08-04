@@ -14,13 +14,13 @@ public:
     int indexOf(const char *name);
     CDisplay *find(const char *name);
     void removeAt(int i);
-    CDisplay & add(const CDisplay & display);
+    CDisplay & add(CDisplay &display);
     int getSize();
     void forget();
     CDisplay & add(const char *name, int x, int y, int type);
     void reset();
-    void read(IFile & file);
-    void write(IFile & file);
+    bool read(IFile & file);
+    bool write(IFile & file);
     CDisplay *operator[](int i);
     CDisplay *operator[](const char *s);
 
@@ -31,7 +31,7 @@ protected:
         GROWBY = 20,
         MAX = 32,
         NOT_FOUND = -1,
-        VERSION = 1
+        VERSION = 2
     };
 
     int m_size;

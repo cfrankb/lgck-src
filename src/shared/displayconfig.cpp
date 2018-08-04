@@ -53,9 +53,8 @@ void CDisplayConfig::resize()
     }
 }
 
-CDisplay & CDisplayConfig::add(const CDisplay & display)
+CDisplay & CDisplayConfig::add(CDisplay & display)
 {
-    qDebug("adding %s", display.name());
     CDisplay *newDisplay;
     int i = indexOf(display.name());
     if (i == NOT_FOUND) {
@@ -70,7 +69,6 @@ CDisplay & CDisplayConfig::add(const CDisplay & display)
         // reuse existing display
         *(m_displays[i]) = display;
     }
-    qDebug("count: %d -- it %d", m_size, i);
     return *(m_displays[i]);
 }
 
@@ -97,7 +95,6 @@ void CDisplayConfig::forget()
 void CDisplayConfig::reset()
 {
     // clear everything add the engine default
-    qDebug("CDisplayConfig::reset()");
     forget();
 
     CDisplay & display1 = add("timeLeft", - 64, 0, CDisplay::DISPLAY_TIME_LEFT);
@@ -136,12 +133,15 @@ void CDisplayConfig::reset()
     display5.setProtected(true);
 }
 
-void CDisplayConfig::read(IFile & file)
+bool CDisplayConfig::read(IFile & file)
 {
     reset();
     unsigned int file_version = 0;
     file.read(&file_version, sizeof(file_version));
-    ASSERT(file_version==VERSION);
+    if(file_version != VERSION) {
+        qDebug("incorrect version CDisplayConfig");
+        return false;
+    }
     int size;
     file.read(&size, sizeof(size));
     for (int i=0; i < size; ++i) {
@@ -149,9 +149,10 @@ void CDisplayConfig::read(IFile & file)
         display.read(file, file_version);
         add(display);
     }
+    return true;
 }
 
-void CDisplayConfig::write(IFile & file)
+bool CDisplayConfig::write(IFile & file)
 {
     unsigned int version = VERSION;
     file.write(&version, sizeof(version));
@@ -159,6 +160,7 @@ void CDisplayConfig::write(IFile & file)
     for (int i=0; i < m_size; ++i) {
         m_displays[i]->write(file);
     }
+    return true;
 }
 
 CDisplay *CDisplayConfig::operator[](int i)
