@@ -96,7 +96,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>210</y>
+      <y>250</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -109,7 +109,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>140</y>
+      <y>180</y>
       <width>241</width>
       <height>51</height>
      </rect>
@@ -118,6 +118,22 @@
      <string>To streamline this process you can enable the Expert Mode by checking the box below below.</string>
     </property>
     <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_40">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>140</y>
+      <width>241</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://cfrankb.com/lgck/sprite_wizard_explained.html&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;You can get more information here.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="openExternalLinks">
      <bool>true</bool>
     </property>
    </widget>
@@ -157,6 +173,12 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>This is the hero of the game. You need to include one of these on every level.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This is the hero of the game. You need to include one of these on every level.</string>
+    </property>
     <property name="text">
      <string>Player</string>
     </property>
@@ -173,6 +195,12 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Doors block the hero from moving further. They can only be unlocked with keys.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Doors block the hero from moving further. They can only be unlocked with keys.</string>
+    </property>
     <property name="text">
      <string>Door</string>
     </property>
@@ -185,6 +213,12 @@
       <width>121</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Solid walls can provide obstacles but they can also be platforms.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Solid walls can provide obstacles but they can also be platforms.</string>
     </property>
     <property name="text">
      <string>Brick/Wall/Bridge</string>
@@ -199,6 +233,12 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Objects provide the largest range of interractions. They can be animated, trigger actions and evem move. They are killed on contact with the hero.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Objects provide the largest range of interractions. They can be animated, trigger actions and evem move. They are killed on contact with the hero.</string>
+    </property>
     <property name="text">
      <string>Object</string>
     </property>
@@ -211,6 +251,12 @@
       <width>93</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Keys are used to unlock doors.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Doors block the hero from moving further. They can only be unlocked with keys.</string>
     </property>
     <property name="text">
      <string>Key</string>
@@ -225,6 +271,15 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Monsters are enemies that can damage the hero.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>Monsters are enemies that can damage the hero.</string>
+    </property>
     <property name="text">
      <string>Monster</string>
     </property>
@@ -237,6 +292,12 @@
       <width>131</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Animated things can be used to provided background animation as well offer some degree of interractivity with the hero.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Animated things can be used to provided background animation as well offer some degree of interractivity with the hero.</string>
     </property>
     <property name="text">
      <string>Animated things</string>
@@ -251,6 +312,12 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Ladders are used to climb.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Solid walls can provide obstacles but they can also be platforms.</string>
+    </property>
     <property name="text">
      <string>Ladder</string>
     </property>
@@ -263,6 +330,12 @@
       <width>111</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>These are immediately deadly static elements of the game. They will kill the hero on contact.</string>
+    </property>
+    <property name="statusTip">
+     <string>These are immediately deadly static elements of the game. They will kill the hero on contact.</string>
     </property>
     <property name="text">
      <string>Lava / Acid</string>
@@ -277,6 +350,12 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Switches provide interractivty. The hero can press the Z-key to trigger specific actions.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Switches provide interractivty. The hero can press the Z-key to trigger specific actions.</string>
+    </property>
     <property name="text">
      <string>Switch</string>
     </property>
@@ -289,6 +368,12 @@
       <width>101</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Background are static elements of the game. They cannot move or have animations.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Background are static elements of the game. They cannot move or have animations.</string>
     </property>
     <property name="text">
      <string>Background</string>
@@ -330,6 +415,22 @@
     </property>
     <property name="text">
      <string>Name</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_39">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>260</y>
+      <width>191</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://cfrankb.com/lgck/sprite_wizard_explained.html&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;Explain these options to me.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="openExternalLinks">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -622,12 +723,12 @@
      <rect>
       <x>230</x>
       <y>210</y>
-      <width>171</width>
+      <width>181</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cfrankb.com/lgck/download.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Get some free sprites here !!!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cfrankb.com/lgck/download.html&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;Get some free sprites here !!!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="openExternalLinks">
      <bool>true</bool>
@@ -1007,6 +1108,12 @@ p, li { white-space: pre-wrap; }
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Kills this sprite if it falls off the screen.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Kills this sprite if it falls off the screen.</string>
+    </property>
     <property name="text">
      <string>kill sprite if falls off the screen</string>
     </property>
@@ -1019,6 +1126,12 @@ p, li { white-space: pre-wrap; }
       <width>171</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Kills the hero if he/she touches this sprite.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Kills the hero if he/she touches this sprite.</string>
     </property>
     <property name="text">
      <string>kill player on touch</string>
@@ -1174,6 +1287,15 @@ p, li { white-space: pre-wrap; }
       <height>23</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Monsters cannot traverse this sprite.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>Monsters cannot traverse this sprite.</string>
+    </property>
     <property name="text">
      <string>solid to monsters</string>
     </property>
@@ -1186,6 +1308,12 @@ p, li { white-space: pre-wrap; }
       <width>141</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>This sprite will be automatically marked a goal for completing the level.  Every levels MUST include at least ONE goal. </string>
+    </property>
+    <property name="whatsThis">
+     <string>This sprite will be automatically marked a goal for completing the level.  Every levels MUST include at least ONE goal. </string>
     </property>
     <property name="text">
      <string>automatic goal</string>
@@ -1200,6 +1328,12 @@ p, li { white-space: pre-wrap; }
       <height>20</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>When the hero lands on this sprite, he/she won't be able to splatten it. </string>
+    </property>
+    <property name="whatsThis">
+     <string>When the hero lands on this sprite, he/she won't be able to splatten it. </string>
+    </property>
     <property name="text">
      <string>cannot be splat</string>
     </property>
@@ -1213,6 +1347,12 @@ p, li { white-space: pre-wrap; }
       <height>23</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>If a gravity environment this sprite will prevent the hero and monsters from falling.</string>
+    </property>
+    <property name="whatsThis">
+     <string>If a gravity environment this sprite will prevent the hero and monsters from falling.</string>
+    </property>
     <property name="text">
      <string>antigravity</string>
     </property>
@@ -1225,6 +1365,12 @@ p, li { white-space: pre-wrap; }
       <width>161</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>When touched this sprite will take a snapshot of the current level and allow the hero to return to that state upon death. This lets you setup progression milestones on a level.</string>
+    </property>
+    <property name="whatsThis">
+     <string>When touched this sprite will take a snapshot of the current level and allow the hero to return to that state upon death. This lets you setup progression milestones on a level.</string>
     </property>
     <property name="text">
      <string>act as a waypoint</string>
@@ -1247,6 +1393,12 @@ p, li { white-space: pre-wrap; }
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Plays a sound when the sprite dies.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Plays a sound when the sprite dies.</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbBonusHP">
     <property name="geometry">
@@ -1257,6 +1409,12 @@ p, li { white-space: pre-wrap; }
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Give the hero extra hit points (health).</string>
+    </property>
+    <property name="whatsThis">
+     <string>Give the hero extra hit points (health).</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbPoints">
     <property name="geometry">
@@ -1266,6 +1424,12 @@ p, li { white-space: pre-wrap; }
       <width>81</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Give the hero extra points (score).</string>
+    </property>
+    <property name="whatsThis">
+     <string>Give the hero extra points (score).</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_26">
@@ -1329,6 +1493,12 @@ p, li { white-space: pre-wrap; }
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Delay before this sprite is reborn.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Delay before this sprite is reborn.</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label_22">
     <property name="geometry">
@@ -1352,6 +1522,12 @@ p, li { white-space: pre-wrap; }
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Number of time this sprite can be reborn after it dies.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Number of time this sprite can be reborn after it dies.</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbChangeTo">
     <property name="geometry">
@@ -1362,6 +1538,12 @@ p, li { white-space: pre-wrap; }
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Upon death the sprite will turn into this other sprite.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Upon death the sprite will turn into this other sprite.</string>
+    </property>
    </widget>
    <widget class="QCheckBox" name="cNoChangeAtDeath">
     <property name="geometry">
@@ -1371,6 +1553,12 @@ p, li { white-space: pre-wrap; }
       <width>101</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Don't change this sprite into another sprite when it dies.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Don't change this sprite into another sprite when it dies.</string>
     </property>
     <property name="text">
      <string>No change</string>
