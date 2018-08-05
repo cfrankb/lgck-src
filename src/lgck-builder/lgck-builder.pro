@@ -4,6 +4,12 @@
 #
 #-------------------------------------------------
 
+build_nr.commands = python ../tools/buildcount.py
+build_nr.depends = FORCE
+QMAKE_EXTRA_TARGETS += build_nr
+PRE_TARGETDEPS += build_nr
+HEADERS  += ../shared/ss_build.h
+
 #win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
 win32:INCLUDEPATH   += ../../../redist/include

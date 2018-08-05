@@ -27,3 +27,4 @@ src/obl5t/testcase/*
 src/lgck-runtime/make.bat
 src/lgck-runtime/makefile
 src/lgck-runtime/build/*
+src/shared/ss_build.h
