@@ -109,6 +109,7 @@ void CDisplayConfig::reset()
     display1.setVisible(true);
     display1.setShadow(true, 4, 4);
     display1.setProtected(true);
+    display1.setFlagXY(CDisplay::FLAG_X_ALIGN_RIGHT, CDisplay::FLAG_Y_ALIGN_TOP);
 
     CDisplay & display2 = add("score", 0, 0, CDisplay::DISPLAY_SCORE);
     display2.setColor(222, 222, 222, 0xf0);
@@ -130,13 +131,15 @@ void CDisplayConfig::reset()
     display4.setText("PRESS F4", CDisplay::DISPLAY_SAME);
     display4.setShadow(true, 4, 4);
     display4.setProtected(true);
+    display4.setFlagXY(CDisplay::FLAG_X_ALIGN_CENTER, CDisplay::FLAG_Y_ALIGN_CENTER);
 
     CDisplay & display5 = add("lives", -1, 0, CDisplay::DISPLAY_LIVES);
-    display5.setColor(0xff, 0xff, 0xFF, 0x40);
+    display5.setColor(0xff, 0xff, 0xFF, 0xff);
     display5.setFontSize(26);
-    display5.setTemplate("Lives %.2d");
+    display5.setTemplate("Men %.2d");
     display5.setVisible(false);
     display5.setProtected(true);
+    display5.setFlagXY(CDisplay::FLAG_X_ALIGN_CENTER, CDisplay::FLAG_Y_ALIGN_TOP);
 }
 
 bool CDisplayConfig::read(IFile & file)
