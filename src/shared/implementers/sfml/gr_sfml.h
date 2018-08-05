@@ -73,6 +73,8 @@ protected:
     virtual void drawInventory();
     virtual void drawHP();
     std::string m_lastError;
+    int m_screenWidth;
+    int m_screenHeight;
 };
 
 #endif // GR_SDL_H

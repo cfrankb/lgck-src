@@ -42,6 +42,8 @@ CGRSfml::CGRSfml()
 
 bool CGRSfml::init(CGame *game, int w, int h, const char *title)
 {
+    m_screenWidth = w;
+    m_screenHeight = h;
     m_window = new sf::RenderWindow(sf::VideoMode(w, h), title);
     if (!m_window) {
         qDebug("sf::RenderWindow failed");
@@ -71,8 +73,8 @@ const char* CGRSfml::signature()
 
 void CGRSfml::getScreenSize(int & len, int & hei)
 {
-    len = SCREEN_WIDTH;
-    hei = SCREEN_HEIGHT;
+    len = m_screenWidth;
+    hei = m_screenHeight;
 }
 
 void CGRSfml::drawLayer(CLayer * layer, int mx, int my)
