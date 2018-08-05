@@ -37,11 +37,17 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
       <property name="tabPosition">
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_sprites">
        <attribute name="title">
@@ -406,6 +412,9 @@ Double-click on the one you want to edit.</string>
        <layout class="QGridLayout" name="gridLayout_11">
         <item row="0" column="0">
          <widget class="QTreeWidget" name="treeDisplays">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
           <property name="toolTip">
            <string>This is a list of all the overlays contained in your game. 
 Double-click on the one you want to edit.</string>
@@ -515,6 +524,9 @@ Double-click on the one you want to edit.</string>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QTreeWidget" name="treeEvents">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
           <property name="toolTip">
            <string>This is a list of all the events contained in your game. 
 Double-click on the one you want to edit.</string>

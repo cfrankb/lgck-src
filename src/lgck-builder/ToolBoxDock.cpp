@@ -1226,7 +1226,6 @@ void CToolBoxDock::updateFrameSet(int frameSet)
 
 void CToolBoxDock::exportSprite()
 {
-
     CProtoIndex * indexProto = (CProtoIndex*) m_index;
     QTreeWidgetItem * item = m_ui->treeObjects->currentItem();
     if (!item || !indexProto) {
@@ -1245,25 +1244,17 @@ void CToolBoxDock::exportSprite()
     QString selected = tr(g_oblFilter) + "\n" + tr(g_pngFilter);
     QString suffix = "obl";
     QString fileName = "";
-    //if (!CFrameSet::isFriendFormat(m_doc.getFormat())) {
-        selected = tr(g_pngFilter) + "\n" + tr(g_oblFilter);
-        suffix = "png";
-        filters.append(tr(g_pngFilter));
-        filters.append(tr(g_oblFilter));
-    //} else {
-      //  filters.append(tr(m_oblFilter));
-       // filters.append(tr(m_pngFilter));
-   // }
+
+    selected = tr(g_pngFilter) + "\n" + tr(g_oblFilter);
+    suffix = "png";
+    filters.append(tr(g_pngFilter));
+    filters.append(tr(g_oblFilter));
 
     CWFileSave * dlg = new CWFileSave(this,tr("Save As"),"",selected);
-    //dlg->setFilters(filters);
-    //dlg->selectedNameFilter(selected);
+
     dlg->setNameFilters(filters);
     dlg->setAcceptMode(QFileDialog::AcceptSave);
     dlg->setDefaultSuffix(suffix);
-    //dlg->selectFile(m_doc.getFileName());
-    //QString fileName = QString(proto.m_szName) + "." + suffix;
-    //dlg->selectFile(fileName);
 
     connect(dlg, SIGNAL(filterSelected(QString)), dlg, SLOT(changeDefaultSuffix(QString)));
     if (dlg->exec()) {
@@ -1399,16 +1390,51 @@ void CToolBoxDock::on_treeDisplays_customContextMenuRequested(const QPoint &pos)
         }
 
         // create an action and connect it to a signal
-        connect(actionEdit, SIGNAL(triggered()), this, SLOT(on_treeDisplays_doubleClicked()));
+        connect(actionEdit, SIGNAL(triggered()), this, SLOT(editDisplay()));
         connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddDisplay_clicked()));
         menu.exec(this->m_ui->treeDisplays->mapToGlobal(pos));
     } else {
-        QMenu menu(this->m_ui->treeObjects);
+        QMenu menu(this->m_ui->treeDisplays);
         QAction *actionAdd = new QAction(tr("New Overlay"), &menu);
         menu.addAction(actionAdd);
 
         connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddDisplay_clicked()));
-        //emit menuSeekingItems(& menu, MENU_ITEM::POPUP_MENU_NO_SPRITE);
-        menu.exec(this->m_ui->treeObjects->mapToGlobal(pos));
+        menu.exec(this->m_ui->treeDisplays->mapToGlobal(pos));
     }
+}
+
+void CToolBoxDock::editDisplay()
+{
+    QModelIndex index = m_ui->treeDisplays->currentIndex();
+    on_treeDisplays_doubleClicked(index);
+}
+
+void CToolBoxDock::on_treeEvents_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem * item = this->m_ui->treeEvents->itemAt(pos);
+    if (item) {
+        // Make sure this item is selected
+        m_ui->treeEvents->setCurrentItem( item );
+        // create pop-up
+        QMenu menu(this->m_ui->treeEvents);
+        QAction *actionEdit = new QAction(tr("Edit Event"), &menu);
+        menu.addAction(actionEdit);
+
+        // create an action and connect it to a signal
+        connect(actionEdit, SIGNAL(triggered()), this, SLOT(editEvent()));
+        menu.exec(this->m_ui->treeEvents->mapToGlobal(pos));
+    } else {
+        QMenu menu(this->m_ui->treeEvents);
+        QAction *actionClear = new QAction(tr("Clear all events"), &menu);
+        menu.addAction(actionClear);
+
+        connect(actionClear, SIGNAL(triggered()), this, SLOT(on_btnClearAll_clicked()));
+        menu.exec(this->m_ui->treeEvents->mapToGlobal(pos));
+    }
+}
+
+void CToolBoxDock::editEvent()
+{
+    QModelIndex index = m_ui->treeEvents->currentIndex();
+    on_treeEvents_doubleClicked(index);
 }

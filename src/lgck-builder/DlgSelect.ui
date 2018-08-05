@@ -170,12 +170,29 @@ Editor</string>
     </size>
    </property>
   </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>10</y>
+     <width>201</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cfrankb.com/lgck/tutorials.htm&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;Watch online tutorials !&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
   <zorder>label</zorder>
   <zorder>btnOpen</zorder>
   <zorder>btnNew</zorder>
   <zorder>btnSkip</zorder>
   <zorder>btnNoShow</zorder>
   <zorder>btnSpriteEditor</zorder>
+  <zorder>label_2</zorder>
  </widget>
  <resources>
   <include location="lgck-builder.qrc"/>

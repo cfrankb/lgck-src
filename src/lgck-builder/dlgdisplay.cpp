@@ -64,8 +64,8 @@ void CDlgDisplay::load(CDisplay & d)
 
     const QString flagY[]= {
         tr("manual"),
-        tr("up"),
-        tr("down"),
+        tr("top"),
+        tr("bottom"),
         tr("center")
     };
 
@@ -155,12 +155,10 @@ void CDlgDisplay::save(CDisplay & d)
 
     // page 3
     d.setTemplate(TEXT(ui->eTemplate));
-    qDebug("****type: %d", d.type());
     if (d.type() == CDisplay::DISPLAY_IMAGE) {
         d.setImage(ui->cbFrameSet->currentIndex(), ui->cbBaseFrame->currentIndex());
     } else {
         d.setImage(0, 0, false);
-      //  d.setType(ui->cbType->currentIndex(), false);
     }
 }
 
@@ -303,7 +301,6 @@ void CDlgDisplay::on_eName_textChanged(const QString &arg1)
     bool enabled = false;
     if (arg1.length() > 0) {
         QString name = arg1.trimmed();
-       // ui->eName->setText(name);
         CDisplayConfig * conf = m_gameFile->getDisplayConfig();
         int i = conf->indexOf(q2c(name));
         enabled = i == m_id || i == CDisplayConfig::NOT_FOUND;
