@@ -13,6 +13,12 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="toolTip">
+   <string>Overlay properties</string>
+  </property>
+  <property name="whatsThis">
+   <string>Overlay properties</string>
+  </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
@@ -54,6 +60,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Y coordinate of that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Y coordinate of that overlay.</string>
+     </property>
     </widget>
     <widget class="QLineEdit" name="eX">
      <property name="geometry">
@@ -63,6 +75,12 @@
        <width>113</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>X coordinate of that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>X coordinate of that overlay.</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_4">
@@ -86,6 +104,12 @@
        <width>231</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Human readable name</string>
+     </property>
+     <property name="whatsThis">
+      <string>Human readable name</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -132,9 +156,12 @@
       <rect>
        <x>80</x>
        <y>40</y>
-       <width>221</width>
+       <width>231</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Type of overlay</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -185,6 +212,12 @@
        <height>17</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Enable that overlay to be visible by default.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Enable that overlay to be visible by default.</string>
+     </property>
      <property name="text">
       <string>visible</string>
      </property>
@@ -197,6 +230,12 @@
        <width>113</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Font size of the text to be displayed in that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Font size of the text to be displayed in that overlay.</string>
      </property>
     </widget>
     <widget class="CWBtnColor" name="btnColor">
@@ -221,6 +260,15 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
+     <property name="statusTip">
+      <string/>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
      <property name="maximum">
       <number>255</number>
      </property>
@@ -237,6 +285,9 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Hex representation of the color of that overlay.</string>
+     </property>
      <property name="inputMask">
       <string>hhhhhh</string>
      </property>
@@ -250,6 +301,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
     </widget>
     <widget class="QComboBox" name="cbFlagX">
      <property name="geometry">
@@ -260,6 +317,12 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Alignment of that overlay. Manual means to alignment. Left will stick that overlay on the left side of the screen. Right will stack the overlay against the right side of the screen. Center will center this overlay on the screen.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Alignment of that overlay. Manual means to alignment. Left will stick that overlay on the left side of the screen. Right will stack the overlay against the right side of the screen. Center will center this overlay on the screen.</string>
+     </property>
     </widget>
     <widget class="QComboBox" name="cbFlagY">
      <property name="geometry">
@@ -269,6 +332,12 @@
        <width>69</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Alignment of that overlay. Manual means to alignment. Top will stick that overlay on the top side of the screen. Bottom will stack the overlay against the bottom of the screen. Center will center this overlay on the screen.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Alignment of that overlay. Manual means to alignment. Top will stick that overlay on the top side of the screen. Bottom will stack the overlay against the bottom of the screen. Center will center this overlay on the screen.</string>
      </property>
     </widget>
    </widget>
@@ -284,6 +353,12 @@
        <width>113</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>X offset of the shadow from the text (in pixels).</string>
+     </property>
+     <property name="whatsThis">
+      <string>X offset of the shadow from the text (in pixels).</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_8">
@@ -347,6 +422,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Y offset of the shadow from the text (in pixels).</string>
+     </property>
+     <property name="whatsThis">
+      <string>Y offset of the shadow from the text (in pixels).</string>
+     </property>
     </widget>
     <widget class="CWBtnColor" name="btnShadowColor">
      <property name="geometry">
@@ -356,6 +437,12 @@
        <width>81</width>
        <height>24</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
      </property>
      <property name="text">
       <string/>
@@ -369,6 +456,12 @@
        <width>191</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
      </property>
      <property name="maximum">
       <number>255</number>
@@ -387,7 +480,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>The shadow is display underneat the text using the color and offsets provided above.</string>
+      <string>The shadow is displayed underneat the text using the color and offsets provided above.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -402,6 +495,12 @@
        <height>17</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>If checked, the shadow will be visible.</string>
+     </property>
+     <property name="whatsThis">
+      <string>If checked, the shadow will be visible.</string>
+     </property>
      <property name="text">
       <string>Visible</string>
      </property>
@@ -415,6 +514,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
+     </property>
      <property name="inputMask">
       <string>hhhhhh</string>
      </property>
@@ -427,6 +532,12 @@
        <width>41</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
      </property>
     </widget>
    </widget>
@@ -442,6 +553,12 @@
        <width>241</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Text to be displayed on that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Text to be displayed on that overlay.</string>
      </property>
      <property name="text">
       <string/>
@@ -482,6 +599,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -513,6 +636,12 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>ImageSet to be selected from.</string>
+     </property>
+     <property name="whatsThis">
+      <string>ImageSet to be selected from.</string>
+     </property>
      <property name="editable">
       <bool>false</bool>
      </property>
@@ -538,6 +667,12 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Actual image to display.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Actual image to display.</string>
+     </property>
     </widget>
     <widget class="QLabel" name="sImage">
      <property name="geometry">
@@ -547,6 +682,12 @@
        <width>171</width>
        <height>181</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Image to be displayed on that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Image to be displayed on that overlay.</string>
      </property>
      <property name="text">
       <string>ICON</string>
@@ -584,13 +725,15 @@
   <tabstop>eName</tabstop>
   <tabstop>cbType</tabstop>
   <tabstop>eFontSize</tabstop>
-  <tabstop>eColor</tabstop>
-  <tabstop>sAlpha</tabstop>
-  <tabstop>eX</tabstop>
-  <tabstop>eY</tabstop>
   <tabstop>cVisible</tabstop>
-  <tabstop>eAlpha</tabstop>
+  <tabstop>eColor</tabstop>
   <tabstop>btnColor</tabstop>
+  <tabstop>sAlpha</tabstop>
+  <tabstop>eAlpha</tabstop>
+  <tabstop>eX</tabstop>
+  <tabstop>cbFlagX</tabstop>
+  <tabstop>eY</tabstop>
+  <tabstop>cbFlagY</tabstop>
   <tabstop>eShadowColor</tabstop>
   <tabstop>btnShadowColor</tabstop>
   <tabstop>sShadowAlpha</tabstop>

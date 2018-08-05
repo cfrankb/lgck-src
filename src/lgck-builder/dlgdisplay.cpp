@@ -40,6 +40,7 @@ void CDlgDisplay::load(CDisplay & d)
 
     ui->eName->setEnabled(!d.isProtected());
     ui->cbType->setEnabled(!d.isProtected());
+    ui->eName->setFocus();
 
     const QString types[] = {
         tr("Time Left"),

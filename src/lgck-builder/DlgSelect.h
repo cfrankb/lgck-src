@@ -36,6 +36,7 @@ private slots:
     void skipBox();
     void on_btnNoShow_clicked();
     void on_btnSpriteEditor_clicked();
+    void on_btnTutorials_clicked();
 };
 
 #endif // DLGSELECT_H

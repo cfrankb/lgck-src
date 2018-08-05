@@ -19,6 +19,7 @@
 #include <QColorDialog>
 #include <QMessageBox>
 #include <QFile>
+#include <QClipboard>
 #include "DlgEditLevel.h"
 #include "DlgSource.h"
 #include "ui_DlgEditLevel.h"
@@ -306,4 +307,10 @@ void CDlgEditLevel::setNewLevel()
 void CDlgEditLevel::on_btnColorMod_clicked()
 {
 
+}
+
+void CDlgEditLevel::on_pushButton_clicked()
+{
+    QClipboard *clip = QApplication::clipboard();
+    clip->setText(m_ui->eUUID->text());
 }

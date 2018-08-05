@@ -16,7 +16,7 @@ CDisplay::CDisplay(const char* name, int x, int y, int type)
     set(DI_R, 0x20);
     set(DI_G, 0x80);
     set(DI_R, 0xf0);
-    set(DI_A, 0x80);
+    set(DI_A, 0xff);
     set(DI_VISIBLE, 0);
     set(DI_SHADOW, 0);
     set(DI_SHADOWX, 4);

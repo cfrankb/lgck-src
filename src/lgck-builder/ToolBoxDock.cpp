@@ -586,7 +586,7 @@ void CToolBoxDock::reloadDisplays()
     iconBlank.addFile(":/images/blank.png");
 
     QIcon iconCheck;
-    iconCheck.addFile(":/images/system.png");
+    iconCheck.addFile(":/images/pd/gesloten_slot.png");
 
     CDisplayConfig & conf = *(gf.getDisplayConfig());
     for (int i = 0; i < conf.getSize(); ++i) {
@@ -1288,7 +1288,7 @@ void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
         CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
         CDlgDisplay dlg;
         CDisplay & d = *(conf[i]);
-        dlg.setWindowTitle(tr("Edit Overlay %1 %2").arg(d.name()).arg(d.isProtected() ? tr("[system]") : ""));
+        dlg.setWindowTitle(tr("Edit Overlay ``%1`` %2").arg(d.name()).arg(d.isProtected() ? tr("[locked]") : ""));
         dlg.setGameFile(m_gameFile);
         dlg.setDisplayID(i);
         dlg.load(d);
