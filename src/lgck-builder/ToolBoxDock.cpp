@@ -1334,7 +1334,9 @@ void CToolBoxDock::on_btnAddDisplay_clicked()
     CGame & gf = *((CGame*)m_gameFile);
     CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
     CDlgDisplay dlg;
-    CDisplay d;
+    CDisplay d = CDisplay("", 0, 0, 0);
+    d.setTemplate("");
+    d.setText("");
     d.setType(CDisplay::DISPLAY_MESSAGE);
     dlg.setWindowTitle(tr("New overlay"));
     dlg.setGameFile(m_gameFile);

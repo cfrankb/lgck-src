@@ -45,7 +45,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tabGeneral">
     <attribute name="title">
@@ -691,6 +691,12 @@
      </property>
      <property name="text">
       <string>ICON</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_16">

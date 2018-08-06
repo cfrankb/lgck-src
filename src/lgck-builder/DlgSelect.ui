@@ -119,9 +119,9 @@ Game</string>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>5</x>
      <y>4</y>
-     <width>641</width>
+     <width>630</width>
      <height>461</height>
     </rect>
    </property>
@@ -133,6 +133,9 @@ Game</string>
    </property>
    <property name="pixmap">
     <pixmap resource="lgck-builder.qrc">:/images/Frank2_scaled33.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QPushButton" name="btnNoShow">
@@ -194,27 +197,11 @@ Editor</string>
     </size>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>10</y>
-     <width>201</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cfrankb.com/lgck/tutorials.htm&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;Watch online tutorials !&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btnTutorials">
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>370</y>
+     <y>368</y>
      <width>81</width>
      <height>91</height>
     </rect>
@@ -246,7 +233,6 @@ tutorials</string>
   <zorder>btnSkip</zorder>
   <zorder>btnNoShow</zorder>
   <zorder>btnSpriteEditor</zorder>
-  <zorder>label_2</zorder>
   <zorder>btnTutorials</zorder>
  </widget>
  <resources>
