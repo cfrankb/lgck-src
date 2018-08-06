@@ -40,7 +40,7 @@ void CDlgDisplay::load(CDisplay & d)
 
     ui->eName->setEnabled(!d.isProtected());
     ui->cbType->setEnabled(!d.isProtected());
-    ui->eName->setFocus();
+  //  ui->eName->setFocus();
 
     const QString types[] = {
         tr("Time Left"),
@@ -110,6 +110,7 @@ void CDlgDisplay::load(CDisplay & d)
     // page 4
     // frame set
     for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
+
         CFrameSet & frameSet = *gf.m_arrFrames[n];
         UINT8 *png;
         int size;
@@ -216,7 +217,8 @@ void CDlgDisplay::on_cbType_currentIndexChanged(int index)
 
 void CDlgDisplay::setImage(int frameSet, int frameNo)
 {
-    if (!frameSet) {
+    if (!frameSet || frameSet < 0) {
+        qDebug("frameset: 0");
         ui->sImage->clear();
         return;
     }
