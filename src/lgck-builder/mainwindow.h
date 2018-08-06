@@ -156,6 +156,8 @@ private:
 protected:
     void initializeGL();
     void paintGL();
+    virtual void showEvent(QShowEvent* pEvent);
+    virtual void changeEvent(QEvent* e);
 
     QOpenGLContext *m_context;
 

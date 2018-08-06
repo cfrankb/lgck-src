@@ -30,6 +30,7 @@
 #include <QOpenGLWidget>
 #include <QScrollArea>
 #include <QFileSystemWatcher>
+#include <QByteArray>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -204,8 +205,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_toolBox, SIGNAL(spriteDeleted(int)),
             this, SLOT(deleteSprite(int)));
 
+  //  connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
+    //        this, SLOT(showToolBox(bool)));
     connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
-            this, SLOT(showToolBox(bool)));
+                     ui->action_ShowToolbox, SLOT(setChecked(bool)));
+    connect(ui->action_ShowToolbox, SIGNAL(triggered(bool)),
+                     m_toolBox, SLOT(setVisible(bool)));
 
     connect(m_toolBox, SIGNAL(spriteChanged(int)),
             this, SLOT(changeSprite(int)));
@@ -1641,6 +1646,8 @@ void MainWindow::initToolBar()
     addToolBar(m_levelToolbar);
     connect(ui->toolBar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionMainToolbar_toggled(bool)));
+
+
     connect(m_levelToolbar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionLevelToolbar_toggled(bool)));
     connect(m_layerToolbar, SIGNAL(visibilityChanged(bool)),
@@ -2854,4 +2861,39 @@ void MainWindow::on_actionDistribution_Package_triggered()
 void MainWindow::updateFrameSet(const QString & fileName)
 {
     qDebug() << QString("frameset updated: %1").arg(fileName);
+}
+
+QByteArray state;
+void MainWindow::showEvent(QShowEvent* pEvent)
+{
+    QMainWindow::showEvent(pEvent);
+    qDebug("showEvent");
+    if (state.length()) {
+        qDebug("restoring now...");
+        this->restoreState(state);
+        state.clear();
+    }
+}
+
+void MainWindow::changeEvent(QEvent* e)
+{
+    qDebug("ischecked: %d eventtype: %d", (int) ui->action_ShowToolbox->isChecked(), e->type());
+    if (e->type() == QEvent::WindowStateChange) {
+        //   WindowStateChange = 105
+        QWindowStateChangeEvent* ev = static_cast<QWindowStateChangeEvent*>(e);
+        if (!(ev->oldState() & Qt::WindowMaximized) && windowState() & Qt::WindowMaximized)
+        {
+            qDebug("Window has been maximized");
+        } else if (!(ev->oldState() & Qt::WindowActive) && windowState() & Qt::WindowActive)
+        {
+            qDebug("Window has been WindowActive");
+        } else if  (!(ev->oldState() & Qt::WindowMinimized) && windowState() & Qt::WindowMinimized)
+        {
+            qDebug("Window has been WindowMinimized");
+        }
+    } else if (e->type() == QEvent::ActivationChange) {
+        // ActivationChange = 99,                  // window activation has changed
+        state = this->saveState();
+    }
+    QMainWindow::changeEvent(e);
 }
