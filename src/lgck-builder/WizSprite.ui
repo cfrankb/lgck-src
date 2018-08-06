@@ -96,7 +96,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>250</y>
+      <y>220</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -109,7 +109,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>180</y>
+      <y>150</y>
       <width>241</width>
       <height>51</height>
      </rect>
@@ -118,22 +118,6 @@
      <string>To streamline this process you can enable the Expert Mode by checking the box below below.</string>
     </property>
     <property name="wordWrap">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_40">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>140</y>
-      <width>241</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://cfrankb.com/lgck/sprite_wizard_explained.html&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;You can get more information here.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="openExternalLinks">
      <bool>true</bool>
     </property>
    </widget>
@@ -728,7 +712,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cfrankb.com/lgck/download.html&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;Get some free sprites here !!!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://cfrankb.com/lgck/download.html&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;Download free sprites here !!!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="openExternalLinks">
      <bool>true</bool>
