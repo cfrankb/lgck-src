@@ -155,7 +155,7 @@ bool CDisplayConfig::read(IFile & file)
     file.read(&size, sizeof(size));
     for (int i=0; i < size; ++i) {
         CDisplay display;
-        display.read(file, file_version);
+        display.read(file);
         add(display);
     }
     return true;

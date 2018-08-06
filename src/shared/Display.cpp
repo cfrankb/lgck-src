@@ -13,9 +13,9 @@ CDisplay::CDisplay(const char* name, int x, int y, int type)
     set(DI_X, x);
     set(DI_Y, y);
     setType(type);
-    set(DI_R, 0x20);
-    set(DI_G, 0x80);
-    set(DI_R, 0xf0);
+    set(DI_R, 0xff);
+    set(DI_G, 0xff);
+    set(DI_B, 0xff);
     set(DI_A, 0xff);
     set(DI_VISIBLE, 0);
     set(DI_SHADOW, 0);
@@ -271,7 +271,7 @@ bool CDisplay::write(IFile & file)
     return true;
 }
 
-bool CDisplay::read(IFile &file, int version)
+bool CDisplay::read(IFile &file)
 {
     m_attrs.clear();
     m_attri.clear();

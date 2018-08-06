@@ -17,15 +17,6 @@ public:
                    QString & version,
                    QString & extensions);
 
-    enum {
-        MAX_PIXEL = 0x7ff8,
-        MARGIN = 32,
-        FAST_SCROLL = 32,
-        OBJ_SCROLL = 16,
-        PATH_SCROLL = 8,
-        MOUSE_POS_MASK = 0xfffffff8
-    };
-
 protected:
     virtual void resizeEvent(QResizeEvent * event);
     virtual void paintEvent(QPaintEvent *event);
@@ -44,7 +35,6 @@ protected:
         return m_gameMode;
     }
     void keyReflector(const QKeyEvent *event, bool pressed);
-
 
     typedef struct {
         bool noScroll;

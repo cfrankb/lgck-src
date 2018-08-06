@@ -2119,7 +2119,7 @@ void CGame::loadGame(IFile &file)
     file.read(&size,sizeof(unsigned int));
     for (unsigned int i=0; i<size; ++i) {
         CDisplay dx;
-        dx.read(file, version);
+        dx.read(file);
         d.add(dx);
     }
 

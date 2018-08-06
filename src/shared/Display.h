@@ -89,7 +89,7 @@ public:
         DISPLAY_SAME            = -1
     } DISPLAY_TYPE;    
     bool write(IFile &file );
-    bool read( IFile & file, int version );
+    bool read(IFile & file);
 
     enum {
         FLAG_X_NONE,
