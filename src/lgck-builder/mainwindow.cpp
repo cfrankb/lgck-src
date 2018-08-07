@@ -29,6 +29,8 @@
 #include <QProcess>
 #include <QOpenGLWidget>
 #include <QScrollArea>
+#include <QFileSystemWatcher>
+#include <QByteArray>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -73,10 +75,10 @@
 #include "levelviewgl.h"
 #include "levelscroll.h"
 #include "helper.h"
+#include "DlgDistributeGame.h"
+#include "ExportGame.h"
 
-char MainWindow::m_fileFilter[] = "LGCK games (*.lgckdb)";
 char MainWindow::m_appName[] = "LGCK builder";
-char MainWindow::m_appTitle[] = "LGCK builder IDE";
 char MainWindow::m_author[] = "cfrankb";
 
 #define WEB_PATH QString("http://cfrankb.com/lgck/")
@@ -90,6 +92,25 @@ char MainWindow::m_author[] = "cfrankb";
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+
+    QString s;
+    QString appVersion;
+    int version = SS_LGCK_VERSION;
+    for (int i=0; i < 4; ++i) {
+        s = QString("%1").arg(version % 256);
+        version /= 256;
+        if (i) {
+            appVersion = s + "." + appVersion  ;
+        } else {
+            appVersion = s + appVersion ;
+        }
+    }
+
+    QCoreApplication::setOrganizationDomain("");
+    QCoreApplication::setOrganizationName(m_author);
+    QCoreApplication::setApplicationName(m_appName);
+    QCoreApplication::setApplicationVersion(appVersion);
+
     ui->setupUi(this);
     m_proto = -1;
     m_event = -1;
@@ -184,8 +205,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_toolBox, SIGNAL(spriteDeleted(int)),
             this, SLOT(deleteSprite(int)));
 
+  //  connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
+    //        this, SLOT(showToolBox(bool)));
     connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
-            this, SLOT(showToolBox(bool)));
+                     ui->action_ShowToolbox, SLOT(setChecked(bool)));
+    connect(ui->action_ShowToolbox, SIGNAL(triggered(bool)),
+                     m_toolBox, SLOT(setVisible(bool)));
 
     connect(m_toolBox, SIGNAL(spriteChanged(int)),
             this, SLOT(changeSprite(int)));
@@ -225,6 +250,10 @@ MainWindow::MainWindow(QWidget *parent)
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
         //checkVersion();
     }
+
+    // TODO: implement watcher
+    // https://stackoverflow.com/questions/10044853/how-to-use-qfilesystemwatcher-to-monitor-a-folder-for-change
+    m_watcher = new QFileSystemWatcher(this);
 }
 
 void MainWindow::createEventEditor()
@@ -337,35 +366,48 @@ void MainWindow::open(QString fileName)
     commitAll();
     if (maybeSave()) {
         if (fileName.isEmpty()) {
-            fileName = QFileDialog::getOpenFileName(this, "", fileName, tr(m_fileFilter));
+            fileName = QFileDialog::getOpenFileName(this, "", fileName, tr("LGCK games (*.lgckdb)"));
         }
-        if (!fileName.isEmpty()) {
-            QString oldFileName = m_doc.getFileName();
-            QApplication::setOverrideCursor(Qt::WaitCursor);
-            m_doc.setFileName(fileName.toStdString().c_str());
-            if (!m_doc.read())  {
-                warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
-                m_doc.setFileName(q2c(oldFileName));
-                // update fileList
-                QSettings settings(m_author, m_appName);
-                QStringList files = settings.value("recentFileList").toStringList();
-                files.removeAll(fileName);
-                settings.setValue("recentFileList", files);
-            }
-            qDebug("MakeCurrent()");
-            m_lview->makeCurrent();
-            m_doc.cacheImages();
-            QApplication::restoreOverrideCursor();
-            updateTitle();
-            updateRecentFileActions();
-            reloadRecentFileActions();
-            m_toolBox->init();
-            showLayerName();
-            reloadLayerCombo();
-            setViewMode(VM_EDITOR);
-            emit levelSelected(0);
-        }
+        loadFileName(fileName);
     }
+    updateMenus();
+    m_doc.initFonts();
+}
+
+void MainWindow::loadFileName(const QString & fileName)
+{
+    if (!fileName.isEmpty()) {
+        QString oldFileName = m_doc.getFileName();
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        m_doc.setFileName(fileName.toStdString().c_str());
+        if (!m_doc.read())  {
+            warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
+            m_doc.forget();
+            m_doc.init();
+            m_doc.setFileName(q2c(oldFileName));
+            // update fileList
+            QSettings settings;
+            QStringList files = settings.value("recentFileList").toStringList();
+            files.removeAll(fileName);
+            settings.setValue("recentFileList", files);
+
+        }
+        qDebug("MakeCurrent()");
+
+        QApplication::restoreOverrideCursor();
+
+        updateRecentFileActions();
+        reloadRecentFileActions();
+
+    }
+    updateTitle();
+    m_lview->makeCurrent();
+    m_doc.cacheImages();
+    m_toolBox->init();
+    showLayerName();
+    reloadLayerCombo();
+    setViewMode(VM_EDITOR);
+    emit levelSelected(0);
     updateMenus();
     m_doc.initFonts();
 }
@@ -393,7 +435,7 @@ bool MainWindow::save()
 bool MainWindow::saveAs()
 {
     commitAll();
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr(m_fileFilter));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
     //qDebug("picked : %s\n", q2c(fileName));
     if (fileName.isEmpty())
         return false;
@@ -407,14 +449,6 @@ void MainWindow::warningMessage(const QString message)
     msgBox.exec();
 }
 
-/*
-void MainWindow::setDocument(const QString fileName)
-{
-    m_doc.setFileName(q2c(fileName));
-    m_doc.read();
-}
-*/
-
 bool MainWindow::updateTitle()
 {
     QString file;
@@ -423,7 +457,7 @@ bool MainWindow::updateTitle()
     } else {
         file = QFileInfo(m_doc.getFileName()).fileName();
     }
-    setWindowTitle(tr("%1[*] - %2").arg(file).arg(tr(m_appTitle)));
+    setWindowTitle(tr("%1[*] - %2").arg(file).arg(tr("LGCK builder IDE")));
     return true;
 }
 
@@ -533,7 +567,7 @@ void MainWindow::initFileMenu()
 
 void MainWindow::reloadRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
     for (int i = 0; i < numRecentFiles; ++i) {
@@ -550,7 +584,7 @@ void MainWindow::reloadRecentFileActions()
 
 void MainWindow::updateRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     QString fileName = m_doc.getFileName();
     files.removeAll(fileName);
@@ -813,6 +847,7 @@ void MainWindow::on_actionCreate_Level_triggered()
         showLayerName();        
         reloadLayerCombo();
         emit levelAdded();
+        emit levelSelected(m_doc.m_nCurrLevel);
     } else {
         delete level;
     }
@@ -837,6 +872,7 @@ void MainWindow::on_actionDelete_Level_triggered()
             if (!m_doc.getSize()) {
                 m_doc.m_nCurrLevel = -1;
             }
+            emit levelSelected(m_doc.m_nCurrLevel);
             showLayerName();
             reloadLayerCombo();
             updateMenus();
@@ -1059,6 +1095,7 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_actionTest_Level_triggered()
 {
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
+        m_doc.initFonts();
         CDlgTestLevel *dlg = new CDlgTestLevel(this);
         dlg->setSkill(m_skill);
         dlg->setHP(m_start_hp);
@@ -1067,6 +1104,8 @@ void MainWindow::on_actionTest_Level_triggered()
         dlg->setContinue(m_bContinue);
         dlg->setExternal(m_runtimeExternal);
         dlg->setRez(m_rez);
+        CLevel * level = m_doc [ m_doc.m_nCurrLevel ];
+        dlg->analyseLevel(level);
         if (dlg->exec()) {
             m_skill = dlg->getSkill();
             m_start_hp = dlg->getHP();
@@ -1077,20 +1116,44 @@ void MainWindow::on_actionTest_Level_triggered()
             m_rezH = dlg->getHeight();
             m_rezW = dlg->getWidth();
             qDebug("skill: %d", m_skill);
-            m_doc.clearKeys();
-            m_doc.setVitals(m_start_hp, m_lives, m_score);
-            m_doc.setSkill(m_skill);
-            m_doc.initLua();
-            m_runtimeExternal = dlg->isExternal();
-            if (dlg->isExternal()){
-            // http://stackoverflow.com/questions/19442400/qt-execute-external-program
-                goExternalRuntime();
+            QString errMsg = "";
+            if (!m_doc.getSize()) {
+                errMsg = tr("No level available to play.");
             } else {
-                setViewMode(VM_GAME);
-                testLevel(true);
+                int currLevel = m_doc.m_nCurrLevel;
+                CLevel * level = m_doc[currLevel];
+                if (!level) {
+                    errMsg = tr("No valid level found.");
+                } else {
+                    CLayer * layer = level->getMainLayer();
+                    if (!layer) {
+                        errMsg = tr("No main layer detected.");
+                    } else {
+                        if (layer->getSize() < 1) {
+                            errMsg = tr("Level is empty.");
+                        }
+                    }
+                }
             }
-            // set the start level
-            m_start_level = m_doc.m_nCurrLevel;
+
+            if (errMsg.isEmpty()) {
+                m_doc.clearKeys();
+                m_doc.setVitals(m_start_hp, m_lives, m_score);
+                m_doc.setSkill(m_skill);
+                m_doc.initLua();
+                m_runtimeExternal = dlg->isExternal();
+                if (dlg->isExternal()){
+                // http://stackoverflow.com/questions/19442400/qt-execute-external-program
+                    goExternalRuntime();
+                } else {
+                    // set the start level
+                    m_start_level = m_doc.m_nCurrLevel;
+                    testLevel(true);
+                }
+            } else {
+                 QMessageBox msgBox(QMessageBox::Warning, QString(m_appName), errMsg, 0, this);
+                 msgBox.exec();
+            }
         }
         delete dlg;
     }
@@ -1187,6 +1250,7 @@ void MainWindow::handleGameEvents()
             break;
         }
         if (restoreEditor) {
+            qDebug("restore editor");
             // set the start level
             m_doc.m_nCurrLevel = m_start_level;
             emit levelSelected(m_start_level);
@@ -1582,6 +1646,8 @@ void MainWindow::initToolBar()
     addToolBar(m_levelToolbar);
     connect(ui->toolBar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionMainToolbar_toggled(bool)));
+
+
     connect(m_levelToolbar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionLevelToolbar_toggled(bool)));
     connect(m_layerToolbar, SIGNAL(visibilityChanged(bool)),
@@ -2271,7 +2337,7 @@ QAction** MainWindow::actionShortcuts()
 void MainWindow::saveSettings()
 {
     setViewMode(VM_EDITOR);
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     settings.setValue("saveSettings", ui->actionSave_Settings->isChecked());
     bool saveSettings = ui->actionSave_Settings->isChecked();
     if (saveSettings) {
@@ -2342,7 +2408,7 @@ void MainWindow::formatVersion(QString &ver)
 
 void MainWindow::reloadSettings()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     qDebug() << settings.fileName();
     // grid
     m_bShowGrid = settings.value("showGrid", true).toBool();
@@ -2429,7 +2495,7 @@ void MainWindow::setVisible(bool visible)
 {
     QWidget::setVisible(visible);
     if (visible) {
-        QSettings settings(m_author, m_appName);
+        QSettings settings;
         settings.beginGroup("UI_Components");
         int version = settings.value("version", 0).toInt();
         if (version == UI_VERSION) {
@@ -2681,10 +2747,14 @@ void MainWindow::on_actionEdit_Images_triggered()
 
 void MainWindow::on_actionImport_Font_triggered()
 {
-    CWizFont *wiz = new CWizFont( static_cast<QWidget*>(parent()) );
-    if (wiz->exec()) {
+    QMessageBox::information(this, tr(m_appName),
+                    tr("Not implemented yet !"),
+                    QMessageBox::Ok);
+
+    //CWizFont *wiz = new CWizFont( static_cast<QWidget*>(parent()) );
+    //if (wiz->exec()) {
         // TODO: implement this
-    }
+    //}
 }
 
 bool MainWindow::checkExecutible(const QString exec, QString & errMsg)
@@ -2758,109 +2828,72 @@ void MainWindow::on_actionSprite_Editor_triggered()
     }
 }
 
+void MainWindow::exportGame()
+{
+    if (m_doc.isDirty() || m_doc.m_path.empty()) {
+        if (!saveAs()) {
+            return;
+        }
+    }
+
+    CDlgDistributeGame dlg(this);
+    if (dlg.exec()) {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        QString outMsg;
+        CExportGame ex;
+        if (!ex.exportCore(dlg, m_doc, outMsg)) {
+            QApplication::restoreOverrideCursor();
+            warningMessage(outMsg);
+        }
+    }
+}
+
 void MainWindow::on_actionExport_Game_triggered()
 {
-    QString appDir = QCoreApplication::applicationDirPath();
-    QTemporaryDir dir;
-   // dir.setAutoRemove(false);
-    QString tmpPath = dir.path();
-    if (dir.isValid()) {
-        qDebug() << tmpPath;
-    } else {
-        warningMessage(tr("There was a problem creating tmpFolder: %1").arg(tmpPath));
-        return;
+    exportGame();
+}
+
+void MainWindow::on_actionDistribution_Package_triggered()
+{
+    exportGame();
+}
+
+void MainWindow::updateFrameSet(const QString & fileName)
+{
+    qDebug() << QString("frameset updated: %1").arg(fileName);
+}
+
+QByteArray state;
+void MainWindow::showEvent(QShowEvent* pEvent)
+{
+    QMainWindow::showEvent(pEvent);
+    qDebug("showEvent");
+    if (state.length()) {
+        qDebug("restoring now...");
+        this->restoreState(state);
+        state.clear();
     }
+}
 
-    QString fileFilter = tr("7z archives (*.7z)");
-#ifdef Q_OS_WIN32
-    QString cmd_runtime = "lgck-runtime-sdl.exe";
-    QString stub = "game.exe";
-    QString cmd7z = "\"" + appDir + "/7z.exe\"";
-#else
-    QString cmd_runtime = "lgck-runtime-sdl.exe";
-    QString stub = "game.exe";
-    QString cmd7z = "7z";
-#endif
-
-    QString licensePath = tmpPath + "/licenses";
-    QDir dirTmpTxt(licensePath);
-    if (!dirTmpTxt.exists()){
-        dirTmpTxt.mkpath(licensePath);
-    }
-
-    QDir txtDir(appDir + "/licenses");
-    QStringList nameFilter;
-    nameFilter << "*.txt";
-    QFileInfoList txtList = txtDir.entryInfoList( nameFilter, QDir::Files );
-    foreach (QFileInfo file, txtList){
-        QString src = file.absoluteFilePath();
-        QString dst = licensePath + "/" + file.fileName();
-        std::string msg;
-        if (!copyFile(q2c(src), q2c(dst), msg)) {
-            warningMessage(msg.c_str());
-            return;
+void MainWindow::changeEvent(QEvent* e)
+{
+    qDebug("ischecked: %d eventtype: %d", (int) ui->action_ShowToolbox->isChecked(), e->type());
+    if (e->type() == QEvent::WindowStateChange) {
+        //   WindowStateChange = 105
+        QWindowStateChangeEvent* ev = static_cast<QWindowStateChangeEvent*>(e);
+        if (!(ev->oldState() & Qt::WindowMaximized) && windowState() & Qt::WindowMaximized)
+        {
+            qDebug("Window has been maximized");
+        } else if (!(ev->oldState() & Qt::WindowActive) && windowState() & Qt::WindowActive)
+        {
+            qDebug("Window has been WindowActive");
+        } else if  (!(ev->oldState() & Qt::WindowMinimized) && windowState() & Qt::WindowMinimized)
+        {
+            qDebug("Window has been WindowMinimized");
         }
+    } else if (e->type() == QEvent::ActivationChange) {
+        // ActivationChange = 99,                  // window activation has changed
+        state = this->saveState();
     }
-
-    QString runtimeSource = appDir + "/" + cmd_runtime;
-    QString runtimeTmp = tmpPath + "/" + stub;
-    std::string src = q2c(runtimeSource);
-    std::string dst = q2c(runtimeTmp);
-    std::string msg;
-    if (!copyFile(src, dst, msg)) {
-        warningMessage(msg.c_str());
-        return;
-    }
-
-    QString gameFile = "game.lgckdb";
-    QString gameFilePath = tmpPath + "/" + gameFile;
-    m_doc.write(q2c(gameFilePath));
-
-    QString outName = "game.7z";
-    QString gameOut = tmpPath + "/" + outName;
-    QString finalOut = gameOut;
-    QString args = QString("a -m0=BCJ2 -m1=LZMA:d25 -m2=LZMA:d19 -m3=LZMA:d19 -mb0:1 -mb0s1:2 -mb0s2:3 %out% %stub% %game% licenses/*.txt");
-    args = args.replace("%out%", gameOut);
-    args = args.replace("%stub%", stub);
-    args = args.replace("%game%", gameFile);
-    qDebug() << cmd7z + " " + args;
-    QStringList list = args.split(" ", QString::SkipEmptyParts);
-    QProcess proc;
-    proc.setWorkingDirectory(tmpPath);
-    proc.start(cmd7z, list);
-    proc.waitForFinished();
-    int result = proc.exitCode();
-    if (result) {
-        warningMessage(QString("An error occured: %1\nCode: %2")
-                       .arg(cmd7z + " " + args, result));
-    }
-    proc.close();
-
-#ifdef Q_OS_WIN32
-    QString sfx = appDir + "/7z.sfx";
-    QString setupOut = tmpPath + "/package.exe";
-    std::list<std::string> files;
-    files.push_back(q2c(sfx));
-    files.push_back(q2c(gameOut));
-    if (!concat(files, q2c(setupOut), msg)) {
-        warningMessage(msg.c_str());
-        return;
-    }
-    fileFilter = tr("Executive files (*.exe)");
-    outName = "package.exe";
-    finalOut = setupOut;
-#endif
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Distribution..."), outName, tr(q2c(fileFilter)));
-    if (!fileName.isEmpty()) {
-        std::string in = q2c(finalOut);
-        std::string out = q2c(fileName);
-        if (!copyFile(in, out, msg)){
-            warningMessage(msg.c_str());
-            return;
-        }
-        QString msgText = tr("Export successful.");
-        QMessageBox msgBox(QMessageBox::Information, m_appName, msgText, 0, this);
-        msgBox.exec();
-    }
+    QMainWindow::changeEvent(e);
 }

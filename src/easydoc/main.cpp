@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "mainwindow.h"
 #include "../shared/qtgui/cheat.h"
+#include <QSettings>
 
 int main(int argc, char *argv[])
 {
@@ -73,6 +74,15 @@ int main(int argc, char *argv[])
     }
 
     QApplication app(argc, argv);
+    QFileInfo fi(app.applicationDirPath());
+    QString portable = QApplication::applicationDirPath() + "/portable.txt";
+    if(fi.isDir() && fi.isWritable() && QFileInfo::exists(portable)) {
+        // make this app portable
+        qDebug("app dir: %s", q2c(app.applicationDirPath()));
+        QSettings::setDefaultFormat(QSettings::IniFormat);
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
+    }
+
     MainWindow w;
     if (!src.isEmpty()) {
         w.open(src);

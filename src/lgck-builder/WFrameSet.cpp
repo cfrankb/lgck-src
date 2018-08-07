@@ -351,6 +351,7 @@ void CWFrameSet::sliceImage()
 
 void CWFrameSet::reload()
 {
+    clear();
     setAcceptDrops(true);
     setColumnCount( 2 );
     setEditTriggers(0);

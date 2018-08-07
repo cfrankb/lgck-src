@@ -32,16 +32,16 @@
             "-L../../../redist/lib/static",
             "-static",
             "-lmingw32",
-            "-lSDL2main -lSDL2 -lSDL2_mixer -lsfml-main -lsfml-graphics-s -lsfml-window-s -lsfml-system-s",
-            "-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32",
-            "-lversion -luuid -llua -lz -lvorbisenc -lvorbisfile -lvorbis -logg -static-libgcc"
+            "-lsfml-audio-s -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32",
+            "-lfreetype -lwinmm -lgdi32 -lsfml-audio-s",
+            "-lopenal32 -lflac -lvorbisenc -lvorbisfile -lvorbis -logg",
+            "-lversion -luuid -llua -lm -lz -static-libgcc"
         ],
-        "flags" : ["-std=gnu++11", "-O3", "-Wall"]
+        "flags" : ["-std=gnu++11", "-O3", "-Wall", "-DSFML_STATIC"]
     },
     "sources": [
         "sfml/main.cpp",
         "../shared/*.cpp",
-        "../shared/implementers/sdl/*.cpp",
         "../shared/implementers/sfml/*.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/sfml/*.cpp",

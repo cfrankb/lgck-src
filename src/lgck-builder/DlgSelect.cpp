@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QProcess>
 #include <QMessageBox>
+#include <QDesktopServices>
+#include <QUrl>
 
 CDlgSelect::CDlgSelect(QWidget *parent) :
     QDialog(parent),
@@ -28,6 +30,9 @@ CDlgSelect::CDlgSelect(QWidget *parent) :
     ui->btnSpriteEditor->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
         .arg(red).arg(green).arg(blue));
     ui->btnSpriteEditor->setCursor(Qt::PointingHandCursor);
+    ui->btnTutorials->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
+        .arg(red).arg(green).arg(blue));
+    ui->btnTutorials->setCursor(Qt::PointingHandCursor);
 
 }
 
@@ -77,4 +82,9 @@ void CDlgSelect::on_btnSpriteEditor_clicked()
         QMessageBox msgBox(QMessageBox::Warning, "m_appName", errMsg, 0, this);
         msgBox.exec();
     }
+}
+
+void CDlgSelect::on_btnTutorials_clicked()
+{
+     QDesktopServices::openUrl(QUrl("https://cfrankb.com/lgck/tutorials.html"));
 }

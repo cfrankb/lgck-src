@@ -29,6 +29,9 @@
    <iconset resource="lgck-builder.qrc">
     <normaloff>:/images/lgckbuilder64ronnie2.png</normaloff>:/images/lgckbuilder64ronnie2.png</iconset>
   </property>
+  <property name="whatsThis">
+   <string>These are the general options of your game.</string>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>
@@ -39,6 +42,9 @@
    <set>QWizard::IndependentPages</set>
   </property>
   <widget class="QWizardPage" name="pageIntro">
+   <property name="whatsThis">
+    <string>This is the game wizard. It will guide you through the process of creating a new game.</string>
+   </property>
    <widget class="QLabel" name="sWelcome">
     <property name="geometry">
      <rect>
@@ -103,6 +109,15 @@
       <height>24</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Name of your game.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>This the name of your game. </string>
+    </property>
    </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
@@ -152,6 +167,12 @@
       <height>24</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Name of the author of this game.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This is where you put the name of the author (or copyright) for this game.</string>
+    </property>
    </widget>
    <widget class="QPlainTextEdit" name="eDescription">
     <property name="geometry">
@@ -161,6 +182,15 @@
       <width>411</width>
       <height>91</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Game description in plain text.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>This is the game description in plain text.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_6">
@@ -178,6 +208,9 @@
    </widget>
   </widget>
   <widget class="QWizardPage" name="pageSpeed">
+   <property name="whatsThis">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;These are game speed settings for actions occuring in your game. Since all the speed are derived from the level speed. Choosing the correct option here will determine how your game will behave.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
    <property name="subTitle">
     <string>Game Speed</string>
    </property>
@@ -202,6 +235,12 @@
        <height>24</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>This is the speed setup in Normal difficulty.</string>
+     </property>
+     <property name="whatsThis">
+      <string>This is the speed setup in Normal difficulty.</string>
+     </property>
     </widget>
     <widget class="QLabel" name="label_18">
      <property name="geometry">
@@ -225,6 +264,12 @@
        <height>24</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>This is speed for gameplay in Nightmare difficulty.</string>
+     </property>
+     <property name="whatsThis">
+      <string>This is speed for gameplay in Nightmare difficulty.</string>
+     </property>
     </widget>
     <widget class="QComboBox" name="cbSpeedHell">
      <property name="geometry">
@@ -234,6 +279,12 @@
        <width>78</width>
        <height>24</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>This is the level speed in Hell difficulty.</string>
+     </property>
+     <property name="whatsThis">
+      <string>This is the level speed in Hell difficulty.</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_19">
@@ -271,6 +322,12 @@
        <height>24</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>This is the level speed in Insane difficulty.</string>
+     </property>
+     <property name="whatsThis">
+      <string>This is the level speed in Insane difficulty.</string>
+     </property>
     </widget>
     <widget class="QLabel" name="label_21">
      <property name="geometry">
@@ -295,6 +352,15 @@
       <height>19</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Setting up the speed by difficulty allows you to set a fix speed for all levels when playing at that difficulty setting.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>Setting up the speed by difficulty allows you to set a fix speed for all levels when playing at that difficulty setting.</string>
+    </property>
     <property name="text">
      <string>Speed set by difficulty</string>
     </property>
@@ -307,6 +373,15 @@
       <width>151</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>This other option, lets you set invidual game speed for each level independant of the difficulty setting.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>This other option, lets you set invidual game speed for each level independant of the difficulty setting.</string>
     </property>
     <property name="text">
      <string>Speed set by level</string>
@@ -334,6 +409,15 @@
       <height>24</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>This is the default speed for each level. This the suggested speed. By choosing this option, you can override the speed for each given level in the level edit dialog box.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>This is the default speed for each level. This the suggested speed. By choosing this option, you can override the speed for each given level in the level edit dialog box.</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label_14">
     <property name="geometry">
@@ -345,7 +429,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NOTE: Game speed can be set by level or by difficulty. &lt;/p&gt;&lt;p&gt;If chose the later, the per level speed setting will be ignored in favor of the difficulty presets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NOTE: Game speed can be set by level or by difficulty. &lt;/p&gt;&lt;p&gt;If you choose the later, the per level speed setting will be ignored in favor of the difficulty presets.&lt;/p&gt;&lt;p&gt;Those speed settings influence how fast sprite moves and how quickly animation occur. This is scales down to every other aspect of the game play.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -363,6 +447,9 @@
     <string>Features</string>
    </property>
    <widget class="QCheckBox" name="checkBox">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>270</x>
@@ -373,6 +460,9 @@
     </property>
     <property name="text">
      <string>Add Default Sounds</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QGroupBox" name="gAutoCenter">
@@ -395,6 +485,12 @@
        <width>78</width>
        <height>24</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Speed of the automatic scrolling of the screen to reposition the viewport relative to the player.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Speed of the automatic scrolling of the screen to reposition the viewport relative to the player.</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_15">
@@ -419,6 +515,12 @@
        <height>24</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Granularity of the viewport camera. This is mesured in pixels.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Granularity of the viewport camera. This is mesured in pixels.</string>
+     </property>
     </widget>
     <widget class="QLabel" name="label_16">
      <property name="geometry">
@@ -442,6 +544,12 @@
       <width>171</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Allows lookup in a gravity environment (only)</string>
+    </property>
+    <property name="whatsThis">
+     <string>Allows lookup in a gravity environment (only)</string>
     </property>
     <property name="text">
      <string>Allow Free Lookup</string>
@@ -482,6 +590,15 @@
       <height>24</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Maximum hit points the player can have.</string>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string>Maximum hit points the player can have.</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbLives">
     <property name="geometry">
@@ -491,6 +608,12 @@
       <width>78</width>
       <height>24</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Initial amount of lives the player  has.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Initial amount of lives the player  has.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_11">
@@ -528,6 +651,12 @@
       <height>24</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Initial hit points the player has.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Initial hit points the player has.</string>
+    </property>
    </widget>
    <widget class="QComboBox" name="cbTimeout">
     <property name="geometry">
@@ -537,6 +666,12 @@
       <width>78</width>
       <height>24</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>The timeout is amout of time the player cannot be hit again by another monster. This is mesured in a game time units.</string>
+    </property>
+    <property name="whatsThis">
+     <string>The timeout is amout of time the player cannot be hit again by another monster. This is mesured in a game time units.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
@@ -573,6 +708,12 @@
       <width>78</width>
       <height>24</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Maximum amount of lives the player has.</string>
+    </property>
+    <property name="whatsThis">
+     <string>Maximum amount of lives the player has.</string>
     </property>
    </widget>
   </widget>

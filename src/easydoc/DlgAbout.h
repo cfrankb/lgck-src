@@ -1,6 +1,6 @@
 /*
-    easyDoc - documentation utility for LGCK Builder
-    Copyright (C) 2009, 2010  Francois Blanchette
+    LGCK Builder GUI
+    Copyright (C) 1999, 2011  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,19 +25,22 @@ namespace Ui {
     class CDlgAbout;
 }
 
-class CDlgAbout : public QDialog
-{
+class CDlgAbout : public QDialog {
     Q_OBJECT
-
 public:
-    explicit CDlgAbout(QWidget *parent = 0);
+    CDlgAbout(QWidget *parent = 0);
     ~CDlgAbout();
+    void setGLInfo(const QString & vendor,
+                   const QString & renderer,
+                   const QString & version,
+                   const QString & extensions);
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
-    Ui::CDlgAbout *ui;
+    Ui::CDlgAbout *m_ui;
+
 };
 
 #endif // DLGABOUT_H

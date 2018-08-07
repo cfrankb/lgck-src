@@ -38,6 +38,7 @@
 #include "Display.h"
 #include "Snapshot.h"
 #include "vlamits3.h"
+#include "helper.h"
 #include "interfaces/IMusic.h"
 #include "interfaces/IDisplayManager.h"
 #include "interfaces/IGraphics.h"
@@ -3332,7 +3333,7 @@ int sprite_isPlayer(lua_State *L)
         CGame & game = CGame::getGame();
         int objId = (int) lua_tonumber(L, 1);
         CScene & scene = game.scene();
-        lua_pushboolean(L, scene[objId].isMonster());
+        lua_pushboolean(L, scene[objId].isPlayer());
         return 1;
     }
 }
@@ -3653,7 +3654,7 @@ int SHR(lua_State *L)
     const char *fnName = "SHR";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 1);
+        CGame::error(fnName, 2);
         lua_pushnumber(L, -1);
         return 0;
     } else {
@@ -3670,7 +3671,7 @@ int SHL(lua_State *L)
     const char *fnName = "SHL";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 1);
+        CGame::error(fnName, 2);
         lua_pushnumber(L, -1);
         return 0;
     } else {
@@ -3680,3 +3681,67 @@ int SHL(lua_State *L)
         return 1;
     }
 }
+
+int uuid(lua_State *L)
+{
+    const char *fnName = "uuid";
+    int argc = lua_gettop(L);
+    if (argc != 0) {
+        CGame::error(fnName, 0);
+        lua_pushnumber(L, -1);
+        return 0;
+    } else {
+        char *uuid_str = getUUID();
+        lua_pushstring(L, uuid_str);
+        delete [] uuid_str;
+        return 1;
+    }
+}
+
+int layer_setSpeed(lua_State *L)
+{
+    const char *fnName = "layer_setSpeed";
+    int argc = lua_gettop(L);
+    if (argc != 3) {
+        CGame::error(fnName, 3);
+        return 0;
+    } else {
+        int layerId =  lua_tonumber(L, 1);
+        CLevel * layers = CGame::getGame().getLayers();
+        if ((layerId < 0) || (layerId >= layers->getSize())) {
+            char tmp[2048];
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            CGame::debug(tmp);
+            return 0;
+        } else {
+            CLayer & layer = (*layers)[layerId];
+            int hspeed =  lua_tonumber(L, 2);
+            int vspeed =  lua_tonumber(L, 3);
+            layer.setSpeed(hspeed, vspeed);
+            return 0;
+        }
+    }
+}
+
+int layer_delete(lua_State *L)
+{
+    const char *fnName = "layer_delete";
+    int argc = lua_gettop(L);
+    if (argc != 1) {
+        CGame::error(fnName, 1);
+        return 0;
+    } else {
+        int layerId =  lua_tonumber(L, 1);
+        CLevel * layers = CGame::getGame().getLayers();
+        if ((layerId < 0) || (layerId >= layers->getSize())) {
+            char tmp[2048];
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            CGame::debug(tmp);
+            return 0;
+        } else {
+            layers->removeLayerById(layerId);
+            return 0;
+        }
+    }
+}
+

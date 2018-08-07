@@ -27,9 +27,9 @@
 #include "WizGame.h"
 #include "ss_version.h"
 #include <ctime>
+#include <QMessageBox>
 
 static char appName[] = "LGCK builder";
-static char appTitle[] = "LGCK builder IDE";
 static char author[] = "cfrankb";
 
 int main(int argc, char *argv[])
@@ -38,10 +38,17 @@ int main(int argc, char *argv[])
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
     srand( time( NULL ) );
     QApplication app(argc, argv);
+    QFileInfo fi(app.applicationDirPath());
+    QString portable = QApplication::applicationDirPath() + "/portable.txt";
+    if(fi.isDir() && fi.isWritable() && QFileInfo::exists(portable)) {
+        // make this app portable
+        QSettings::setDefaultFormat(QSettings::IniFormat);
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
+    }
+
     MainWindow w;
     w.createEventEditor();
 
-    char m_fileFilter[] = "LGCK games (*.lgckdb)";
     QString fileName = "";
     bool done = false;
     QSettings settings(author, appName);
@@ -49,7 +56,11 @@ int main(int argc, char *argv[])
     bool skipSplash = settings.value("skipSplash", false).toBool();
     settings.endGroup();
 
-    if (!skipSplash) {
+    if (argc == 2) {
+        fileName = argv[1];
+    }
+
+    if (!skipSplash && fileName.isEmpty()) {
         do {
             int version = SS_LGCK_VERSION;
             int vv[4]={0,0,0,0};
@@ -57,16 +68,16 @@ int main(int argc, char *argv[])
                 vv[i] = version & 0xff;
                 version /= 256;
             }
-            QString ver = QString().sprintf("%s %.2d.%.2d.%.2d.%.2d", appTitle, vv[0], vv[1], vv[2], vv[3]);
+            QString ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
             CDlgSelect * dlg = new CDlgSelect(&w);
-            dlg->setWindowTitle(ver);
+            dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
             dlg->raise();
             dlg->setWindowState(Qt::WindowActive) ;
             dlg->exec();
             CWizGame *wiz;
             switch(dlg->getState()) {
             case CDlgSelect::OPEN:
-                fileName = QFileDialog::getOpenFileName(&w, w.tr("Open"), "", w.tr(m_fileFilter));
+                fileName = QFileDialog::getOpenFileName(&w, QObject::tr("Open"), "", QObject::tr("LGCK games (*.lgckdb)"));
                 if (!fileName.isEmpty()) {
                     done = true;
                 }
@@ -103,7 +114,13 @@ int main(int argc, char *argv[])
 
     w.show();
     if (!fileName.isEmpty()) {
-        w.open(fileName);
+        if (fileName.toLower().endsWith(".lgckdb")) {
+            w.open(fileName);
+        } else {
+            QString errMsg = QObject::tr("Invalid file: %1").arg(fileName);
+            QMessageBox msgBox(QMessageBox::Critical, QString(appName), errMsg, 0, &w);
+            msgBox.exec();
+        }
     }
     return app.exec();
 }

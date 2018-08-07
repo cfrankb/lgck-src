@@ -18,6 +18,7 @@
 
 #ifndef _DISPLAY_H
 #define _DISPLAY_H
+#include <unordered_map>
 #include <string>
 
 class IFile;
@@ -27,18 +28,22 @@ class CDisplay
 public:
     ~CDisplay();
     CDisplay(const char * name = "", int x=0, int y=0, int type=0);
+    void setName(const char *name);
     void setShadow( bool shadow, int tx, int ty );
     void enableShadow( bool shadow );
     void setShadowOffset(  int tx, int ty );
     void setShadowColor( int r, int g, int b, int a );
-    void setImage(int imageSet, int imageNo);
+    void setImage(int imageSet, int imageNo, bool resetType=true);
     void setAlpha(int alpha);
     void setXY(int x, int y);
-    void setType(int type);
+    void setType(int type, bool resetTemplate=true);
     void setColor(int r, int g, int b, int a);
     void setFontSize(int size);
     void setExpireTime(int time);
     void setVisible(bool visible);
+    void setTemplate(const char *s);
+    void setProtected(bool b);
+    void setFlagXY(int flagX, int flagY);
     void show();
     void hide();
     void setText(const char* content, int displayType=DISPLAY_MESSAGE);
@@ -49,11 +54,30 @@ public:
     int blue();
     int alpha();
     int type();
+    int shadowX();
+    int shadowY();
+    int shadowR();
+    int shadowG();
+    int shadowB();
+    int shadowA();
     bool visible();
     const char* name();
     const char* text();
+    const char *templateStr();
+    bool isProtected();
     int size();
+    bool shadow();
+    int imageSet();
+    int imageNo();
+    int flagX();
+    int flagY();
     void flip();
+
+    int geti(unsigned i);
+    const char* gets(int i);
+    void set(int i, int v);
+    void set(int i, const char *v);
+
     enum {
         DISPLAY_TIME_LEFT       = 0,
         DISPLAY_MESSAGE         = 1,
@@ -64,36 +88,65 @@ public:
         DISPLAY_IMAGE		    = 6,
         DISPLAY_SAME            = -1
     } DISPLAY_TYPE;    
-    void write (IFile &file );
-    void read ( IFile & file, int version );
+    bool write(IFile &file );
+    bool read(IFile & file);
 
-    int m_x;
-    int m_y;
-    int m_state;
-    int m_type;
-    int m_r;
-    int m_g;
-    int m_b;
-    int m_a;
-    int m_size;
-    bool m_visible;
-    bool m_shadow;
-    int m_shadowX;
-    int m_shadowY;
-    int m_timeExpire;
-    int m_shadowR;
-    int m_shadowG;
-    int m_shadowB;
-    int m_shadowA;
-    int m_imageSet;
-    int m_imageNo;
+    enum {
+        FLAG_X_NONE,
+        FLAG_X_ALIGN_LEFT,
+        FLAG_X_ALIGN_RIGHT,
+        FLAG_X_ALIGN_CENTER
+    };
+
+    enum {
+        FLAG_Y_NONE,
+        FLAG_Y_ALIGN_TOP,
+        FLAG_Y_ALIGN_BOTTOM,
+        FLAG_Y_ALIGN_CENTER
+    };
 
 protected:
-    int m_id;
-    std::string m_name;
-    std::string m_content;
+
+    std::unordered_map <int, std::string> m_attrs;
+    std::unordered_map <int, int> m_attri;
+
     enum {
-        VERSION = 0x0001
+        // numbers
+        DI_UUID,
+        DI_X,
+        DI_Y,
+        DI_STATE,
+        DI_TYPE,
+        DI_R,
+        DI_G,
+        DI_B,
+        DI_A,
+        DI_SIZE,
+        DI_VISIBLE,
+        DI_SHADOW,
+        DI_SHADOWX,
+        DI_SHADOWY,
+        DI_TIMEEXPIRE,
+        DI_SHADOWR,
+        DI_SHADOWG,
+        DI_SHADOWB,
+        DI_SHADOWA,
+        DI_IMAGESET,
+        DI_IMAGENO,
+        DI_PROTECTED,
+        DI_FLAG_X,
+        DI_FLAG_Y
+    };
+
+    enum {
+        // strings
+        DI_NAME     = 50,
+        DI_CONTENT  = 51,
+        DI_TEMPLATE = 52
+    };
+
+    enum {
+        VERSION = 0x0002
     };
 }; 
 

@@ -2,6 +2,7 @@
 #define DLGTESTLEVEL_H
 
 #include <QDialog>
+class CLevel;
 
 namespace Ui {
     class CDlgTestLevel;
@@ -31,6 +32,7 @@ public:
     int getHeight();
     int getRez();
     void setRez(int v);
+    void analyseLevel(CLevel *level);
 
 private:
     Ui::CDlgTestLevel *ui;

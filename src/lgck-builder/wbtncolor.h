@@ -20,6 +20,7 @@ public slots:
     void setColor(const QString & color);
     void click();
     unsigned int color();
+    unsigned int colorBGR();
 
 protected:
     void style();

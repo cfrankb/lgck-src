@@ -340,13 +340,13 @@ int CDlgAppSettings::getFontSize()
 
 void CDlgAppSettings::on_btnRuntime_clicked()
 {
-#ifdef Q_WS_WIN
-    QString fileFilter = tr("Executables (*.exe)");
+#ifdef Q_OS_WIN32
+    QString fileFilter = tr("Runtime executables (lgck-runtime*.exe)");
 #else
     QString fileFilter = tr("Executables (lgck-runtime*)");
 #endif
     QString fileName = m_ui->eRuntime->text();
-    fileName = QFileDialog::getOpenFileName(this, tr("Runtime executable"), fileName, tr(q2c(fileFilter)));
+    fileName = QFileDialog::getOpenFileName(this, tr("Select runtime executable"), fileName, tr(q2c(fileFilter)));
     if (!fileName.isEmpty()) {
         m_ui->eRuntime->setText(fileName);
     }

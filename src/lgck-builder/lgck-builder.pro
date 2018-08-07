@@ -4,17 +4,22 @@
 #
 #-------------------------------------------------
 
-win32:CONFIG        += static static-libgcc
+build_nr.commands = python ../tools/buildcount.py
+build_nr.depends = FORCE
+QMAKE_EXTRA_TARGETS += build_nr
+PRE_TARGETDEPS += build_nr
+HEADERS  += ../shared/ss_build.h
+
+#win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
 win32:INCLUDEPATH   += ../../../redist/include
 INCLUDEPATH         += ../shared
 unix:INCLUDEPATH    += /usr/include/x86_64-linux-gnu/qt5
 win32:RC_FILE       = lgck-builder.rc
-win32:DEFINES       += STATIC
-win32:DEFINES       += QT_STATIC_BUILD
+#win32:DEFINES       += STATIC
+#win32:DEFINES       += QT_STATIC_BUILD
 unix:DEFINES        += MAKE_LINUX=1
 DEFINES             += USE_QFILE=1
-DEFINES             += LGCK_OPENGL_DEBUG=1
 DEFINES             += LGCK_QT=1
 QT                  += core gui opengl network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -22,7 +27,19 @@ TARGET              = lgck-builder
 TEMPLATE            = app
 QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
+QMAKE_LFLAGS_WINDOWS += -Wl,--dynamicbase -Wl,--nxcompat
 RESOURCES           += lgck-builder.qrc
+
+win32:QMAKE_LIBDIR    += ../../../redist/lib
+
+CONFIG( debug, debug|release ) {
+    # debug
+    win32:LIBS      += -lqscintilla2_qt5d
+    win32:DEFINES   += LGCK_OPENGL_DEBUG=1
+} else {
+    # release
+    win32:LIBS      += -lqscintilla2_qt5
+}
 
 unix:LIBS += -lqt5scintilla2 \
     -llua5.2 \
@@ -30,21 +47,20 @@ unix:LIBS += -lqt5scintilla2 \
     -lSDL2-2.0 \
     -lz
 
-win32:LIBS += -L../../../redist/lib/static \
-    -L../../../redist/lib/static \
-    -lqscintilla2 \
-    -llua52 \
+win32:LIBS += -llua \
     -lmingw32 \
+   # -lSDL2_mixer \
+   # -lFLAC -lvorbisfile -lvorbis -logg \
     -lSDL2_mixer \
-    -lFLAC -lvorbisfile -lvorbis -logg \
     -lSDL2 \
-    -lSDL2_mixer \
-    -ldinput8 -ldxguid -ldxerr8 -luser32 \
-    -lgdi32 -lwinmm -limm32 -lole32 \
-    -loleaut32 -lshell32 -lversion -luuid \
+ #   -lsfml-audio \
+    #-lSDL2_mixer.dll \
+ #   -ldinput8 -ldxguid -ldxerr8 -luser32 \
+ #   -lgdi32 -lwinmm -limm32 -lole32 \
+ #   -loleaut32 -lshell32 -lversion -luuid \
     -lz \
-    -lQt5OpenGLExtensions \
-    -lQt5OpenGL \
+   # -lQt5OpenGLExtensions \
+   # -lQt5OpenGL \
     -lopengl32
 
 SOURCES +=  mainwindow.cpp \
@@ -124,8 +140,10 @@ SOURCES +=  mainwindow.cpp \
     ../shared/implementers/opengl/gr_opengl.cpp \
     ../shared/implementers/sdl/mu_sdl.cpp \
     ../shared/implementers/sdl/sn_sdl.cpp \
-    ../shared/implementers/sdl/im_sdl.cpp \
-    ../shared/implementers/sdl/gr_sdl.cpp \
+ #   ../shared/implementers/sdl/im_sdl.cpp \
+#    ../shared/implementers/sdl/gr_sdl.cpp \
+  # ../shared/implementers/sfml/mu_sfml.cpp \
+  #  ../shared/implementers/sfml/sn_sfml.cpp \
     ../shared/inputs/qt/kt_qt.cpp \
     ../shared/qtgui/qtlua.cpp \
     ../shared/helper.cpp \
@@ -137,7 +155,12 @@ SOURCES +=  mainwindow.cpp \
     ../shared/FileMem.cpp \
     OBL5File.cpp \
     WizFont.cpp \
-    DlgExportSprite.cpp
+    DlgExportSprite.cpp \
+    DlgDistributeGame.cpp \
+    exportgame.cpp \
+    ../shared/displayconfig.cpp \
+    dlgdisplay.cpp \
+    wslider.cpp
 
 HEADERS  +=  mainwindow.h \
     levelviewgl.h \
@@ -183,7 +206,7 @@ HEADERS  +=  mainwindow.h \
     ../shared/vlamits3.h \
     ../shared/LevelEntry.h \
     ../shared/Level.h \
-    ../shared/Layer.h \    
+    ../shared/Layer.h \
     ../shared/Game.h \
     ../shared/Folders.h \
     ../shared/FileWrap.h \
@@ -219,6 +242,8 @@ HEADERS  +=  mainwindow.h \
     ../shared/implementers/sdl/sn_sdl.h \
     ../shared/implementers/sdl/im_sdl.h \
     ../shared/implementers/sdl/gr_sdl.h \
+  #  ../shared/implementers/sfml/mu_sfml.h \
+  #  ../shared/implementers/sfml/sn_sfml.h \
     ../shared/interfaces/IMusic.h \
     ../shared/Display.h \
     ../shared/DisplayManager.h \
@@ -239,7 +264,12 @@ HEADERS  +=  mainwindow.h \
     WFileSave.h \
     OBL5File.h \
     WizFont.h \
-    DlgExportSprite.h
+    DlgExportSprite.h \
+    DlgDistributeGame.h \
+    exportgame.h \
+    ../shared/displayconfig.h \
+    dlgdisplay.h \
+    wslider.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \
@@ -265,5 +295,7 @@ FORMS  += mainwindow.ui \
     WizGame.ui \
     WizScript.ui \
     WizFont.ui \
-    DlgExportSprite.ui
+    DlgExportSprite.ui \
+    DlgDistributeGame.ui \
+    dlgdisplay.ui
 

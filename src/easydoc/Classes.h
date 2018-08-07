@@ -24,6 +24,7 @@
 #include "Class.h"
 //#include "FileWrap.h"
 class CFileWrap;
+class QStringList;
 
 class CClasses
 {
@@ -43,7 +44,7 @@ public:
     bool write(CFileWrap & file);
     void dump(CFileWrap & file);
     void exportList(CFileWrap & file);
-    void exportWiki(const QString & path, CFunctions *fct);
+    void exportWiki(const QString & path, CFunctions *fct, QStringList &fileList);
     void debug(CFileWrap & file);
     void removeAll();
 

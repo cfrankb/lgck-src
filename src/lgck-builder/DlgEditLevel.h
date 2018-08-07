@@ -58,6 +58,7 @@ private slots:
     void on_cCanvas_toggled(bool checked);
     void on_btnWorldSize_clicked();
     void on_btnColorMod_clicked();
+    void on_pushButton_clicked();
 };
 
 #endif // DLGEDITLEVEL_H

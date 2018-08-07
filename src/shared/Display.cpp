@@ -9,26 +9,25 @@
 
 CDisplay::CDisplay(const char* name, int x, int y, int type)
 {
-    m_id = rand();
-    m_name = name;
-    m_x = x;
-    m_y = y;
-    m_type = type;
-    m_r = 0x20;
-    m_g = 0x80;
-    m_r = 0xf0;
-    m_a = 0x80;
-    m_visible = false;
-    m_shadow = false;
-    m_shadowX = 4;
-    m_shadowY = 4;
-    m_shadowR = 0;
-    m_shadowG = 0;
-    m_shadowB = 0;
-    m_shadowA = 255;
-    m_size = 24;
-    m_imageSet = 0;
-    m_imageNo = 0;
+    set(DI_NAME, name);
+    set(DI_X, x);
+    set(DI_Y, y);
+    setType(type);
+    set(DI_R, 0xff);
+    set(DI_G, 0xff);
+    set(DI_B, 0xff);
+    set(DI_A, 0xff);
+    set(DI_VISIBLE, 0);
+    set(DI_SHADOW, 0);
+    set(DI_SHADOWX, 4);
+    set(DI_SHADOWY, 4);
+    set(DI_SHADOWR, 0);
+    set(DI_SHADOWG, 0);
+    set(DI_SHADOWB, 0);
+    set(DI_SHADOWA, 0xff);
+    set(DI_SIZE, 24);
+    set(DI_IMAGESET,0);
+    set(DI_IMAGENO,0);
 }
 
 CDisplay::~CDisplay()
@@ -37,207 +36,374 @@ CDisplay::~CDisplay()
 
 void CDisplay::setShadow( bool shadow, int tx, int ty )
 {
-    m_shadow = shadow;
-    m_shadowX = tx;
-    m_shadowY = ty;
+    set(DI_SHADOW, shadow ? 1 : 0);
+    set(DI_SHADOWX, tx);
+    set(DI_SHADOWY, ty);
 }
 
 void CDisplay::enableShadow( bool shadow )
 {
-    m_shadow = shadow;
+    set(DI_SHADOW, shadow ? 1 : 0);
 }
 
 void CDisplay::setShadowOffset( int tx, int ty )
 {
-    m_shadowX = tx;
-    m_shadowY = ty;
+    set(DI_SHADOWX, tx);
+    set(DI_SHADOWY, ty);
 }
 
 void CDisplay::setShadowColor( int r, int g, int b, int a )
 {
-    m_shadowR = r;
-    m_shadowG = g;
-    m_shadowB = b;
-    m_shadowA = a;
+    set(DI_SHADOWR, r);
+    set(DI_SHADOWG, g);
+    set(DI_SHADOWB, b);
+    set(DI_SHADOWA, a);
 }
 
-void CDisplay::setImage(int imageSet, int imageNo)
+void CDisplay::setImage(int imageSet, int imageNo, bool resetType)
 {
-    m_type = DISPLAY_IMAGE;
-    m_imageSet = imageSet;
-    m_imageNo = imageNo;
+    if (resetType) {
+        set(DI_TYPE, DISPLAY_IMAGE);
+    }
+    set(DI_IMAGESET, imageSet);
+    set(DI_IMAGENO, imageNo);
 }
 
 void CDisplay::setAlpha(int alpha)
 {
-    m_a = alpha;
+     set(DI_SHADOWA, alpha);
 }
 
 void CDisplay::setXY(int x, int y)
 {
-    m_x = x;
-    m_y = y;
+    set(DI_X, x);
+    set(DI_Y, y);
 }
 
-void CDisplay::setType(int type)
+void CDisplay::setType(int type, bool resetTemplate)
 {
-    m_type = type;
+    set(DI_TYPE, type);
+    if (resetTemplate) {
+        switch (type) {
+            case DISPLAY_TIME_LEFT:
+                set(DI_TEMPLATE, "%.3d");
+            break;
+            case DISPLAY_SCORE:
+                set(DI_TEMPLATE, "%.8d");
+            break;
+            case DISPLAY_LIVES:
+                set(DI_TEMPLATE, "%.2d");
+            break;
+            default:
+                set(DI_TEMPLATE, "");
+        }
+    }
 }
 
 void CDisplay::setColor(int r, int g, int b, int a)
 {
-    m_r = r;
-    m_g = g;
-    m_b = b;
-    m_a = a;
+    set(DI_R, r);
+    set(DI_G, g);
+    set(DI_B, b);
+    set(DI_A, a);
 }
 
 void CDisplay::setFontSize(int size)
 {
-    m_size = size;
+   set(DI_SIZE, size);
 }
 
 void CDisplay::setExpireTime(int time)
 {
-    m_timeExpire = time;
+    set(DI_TIMEEXPIRE, time);
 }
 
 void CDisplay::setVisible(bool visible)
 {
-    m_visible = visible;
+    set(DI_VISIBLE, visible ? 1 : 0);
 }
 
 void CDisplay::show()
 {
-    m_visible = true;
+    set(DI_VISIBLE, true);
 }
 
 void CDisplay::hide()
 {
-    m_visible = false;
+    set(DI_VISIBLE, false);
 }
 
 void CDisplay::setText(const char *content, int type)
 {
-    m_content = content;
+    set(DI_CONTENT, content);
     if (type != DISPLAY_SAME) {
-        m_type = DISPLAY_MESSAGE;
+        set(DI_TYPE, DISPLAY_MESSAGE);
     }
 }
 
 int CDisplay::x()
 {
-    return m_x;
+    return geti(DI_X);
 }
 
 int CDisplay::y()
 {
-    return m_y;
+    return geti(DI_Y);
 }
 
 int CDisplay::type()
 {
-    return m_type;
+    return geti(DI_TYPE);
 }
 
 bool CDisplay::visible()
 {
-    return m_visible;
+    return geti(DI_VISIBLE) ? true : false;
 }
 
 const char* CDisplay::name()
 {
-    return m_name.c_str();
+    return gets(DI_NAME);
 }
 
 void CDisplay::flip()
 {
-    m_visible = !m_visible;
+    set(DI_VISIBLE, !geti(DI_VISIBLE) ? 1 : 0);
 }
 
 int CDisplay::size()
 {
-    return m_size;
+    return geti(DI_SIZE);
 }
 
 const char* CDisplay::text()
 {
-    return m_content.c_str();
+    return gets(DI_CONTENT);
 }
 
 int CDisplay::red()
 {
-    return m_r;
+    return geti(DI_R);
 }
 
 int CDisplay::green()
 {
-    return m_g;
+    return geti(DI_G);
 }
 
 int CDisplay::blue()
 {
-    return m_b;
+    return geti(DI_B);
 }
 
 int CDisplay::alpha()
 {
-    return m_a;
+    return geti(DI_A);
 }
 
-void CDisplay::write(IFile & file)
+bool CDisplay::write(IFile & file)
 {
     unsigned int version = VERSION;
     file.write(&version, sizeof(version));
-    file.write(&m_x, sizeof(int));
-    file.write(&m_y, sizeof(int));
-    file.write(&m_state, sizeof(int));
-    file.write(&m_type, sizeof(int));
-    file.write(&m_r, sizeof(int));
-    file.write(&m_g, sizeof(int));
-    file.write(&m_b, sizeof(int));
-    file.write(&m_a, sizeof(int));
-    file.write(&m_size, sizeof(int));
-    file.write(&m_visible, sizeof(bool));
-    file.write(&m_shadow, sizeof(bool));
-    file.write(&m_shadowX, sizeof(int));
-    file.write(&m_shadowY, sizeof(int));
-    file.write(&m_timeExpire, sizeof(int));
-    file.write(&m_shadowR, sizeof(int));
-    file.write(&m_shadowG, sizeof(int));
-    file.write(&m_shadowB, sizeof(int));
-    file.write(&m_shadowA, sizeof(int));
-    file.write(&m_imageSet, sizeof(int));
-    file.write(&m_imageNo, sizeof(int));
-    file << m_name;
-    file << m_content;
+
+    int intList[] =
+    {
+        // numbers
+        DI_UUID,
+        DI_X,
+        DI_Y,
+        DI_STATE,
+        DI_TYPE,
+        DI_R,
+        DI_G,
+        DI_B,
+        DI_A,
+        DI_SIZE,
+        DI_VISIBLE,
+        DI_SHADOW,
+        DI_SHADOWX,
+        DI_SHADOWY,
+        DI_TIMEEXPIRE,
+        DI_SHADOWR,
+        DI_SHADOWG,
+        DI_SHADOWB,
+        DI_SHADOWA,
+        DI_IMAGESET,
+        DI_IMAGENO,
+        DI_PROTECTED,
+        DI_FLAG_X,
+        DI_FLAG_Y
+    };
+
+    int stringList [] = {
+        // strings
+        DI_NAME    ,
+        DI_CONTENT  ,
+        DI_TEMPLATE
+    };
+
+    unsigned int count = sizeof(intList) / sizeof(int);
+    unsigned int realCount = 0;
+    for (unsigned int i=0; i < count; ++i) {
+        int k = intList[i];
+        if (m_attri[k]) {
+            ++realCount;
+        }
+    }
+
+    file.write(&realCount, 1);
+    for (unsigned int i=0; i < count; ++i) {
+        int k = intList[i];
+        int v = m_attri[k];
+        if (v) {
+            file.write(&k, 1);
+            file.write(&v, 4);
+        }
+    }
+
+    count = sizeof(stringList) / sizeof(int);
+    file.write(&count, 1);
+    for (unsigned int i=0; i < count; ++i) {
+        int k = stringList[i];
+        file.write(&k, 1);
+        file << std::string(m_attrs[k]);
+    }
+    return true;
 }
 
-void CDisplay::read(IFile &file, int version)
+bool CDisplay::read(IFile &file)
 {
+    m_attrs.clear();
+    m_attri.clear();
     unsigned int file_version = 0;
     file.read(&file_version, sizeof(file_version));
-    ASSERT(file_version==VERSION);
-    file.read(&m_x, sizeof(int));
-    file.read(&m_y, sizeof(int));
-    file.read(&m_state, sizeof(int));
-    file.read(&m_type, sizeof(int));
-    file.read(&m_r, sizeof(int));
-    file.read(&m_g, sizeof(int));
-    file.read(&m_b, sizeof(int));
-    file.read(&m_a, sizeof(int));
-    file.read(&m_size, sizeof(int));
-    file.read(&m_visible, sizeof(bool));
-    file.read(&m_shadow, sizeof(bool));
-    file.read(&m_shadowX, sizeof(int));
-    file.read(&m_shadowY, sizeof(int));
-    file.read(&m_timeExpire, sizeof(int));
-    file.read(&m_shadowR, sizeof(int));
-    file.read(&m_shadowG, sizeof(int));
-    file.read(&m_shadowB, sizeof(int));
-    file.read(&m_shadowA, sizeof(int));
-    file.read(&m_imageSet, sizeof(int));
-    file.read(&m_imageNo, sizeof(int));
-    file >> m_name;
-    file >> m_content;
+    if (file_version != VERSION) {
+        qDebug("incorrect version");
+        return false;
+    }
+    int count = 0;
+    file.read(&count, 1);
+    for (int i=0; i < count; ++i) {
+        int k = 0;
+        file.read(&k, 1);
+        int v = 0;
+        file.read(&v, 4);
+        m_attri[k] = v;
+    }
+
+    file.read(&count, 1);
+    for (int i=0; i < count; ++i) {
+        int k = 0;
+        file.read(&k, 1);
+        std::string v;
+        file >> v;
+        m_attrs[k] = v;
+    }
+    return true;
+}
+
+const char * CDisplay::templateStr()
+{
+    return gets(DI_TEMPLATE);
+}
+
+void CDisplay::setTemplate(const char *s)
+{
+    set(DI_TEMPLATE, s);
+}
+
+void CDisplay::setFlagXY(int flagX, int flagY)
+{
+    set(DI_FLAG_X, flagX);
+    set(DI_FLAG_Y, flagY);
+}
+
+bool CDisplay::isProtected()
+{
+    return geti(DI_PROTECTED) ? true : false;
+}
+
+void CDisplay::setProtected(bool b)
+{
+    set(DI_PROTECTED, b ? 1 : 0);
+}
+
+void CDisplay::setName(const char *name)
+{
+    set(DI_NAME, name);
+}
+
+bool CDisplay::shadow()
+{
+    return geti(DI_SHADOW) ? true : false;
+}
+
+int CDisplay::shadowX()
+{
+    return geti(DI_SHADOWX);
+}
+
+int CDisplay::shadowY()
+{
+    return geti(DI_SHADOWY);
+}
+
+int CDisplay::shadowR()
+{
+    return geti(DI_SHADOWR);
+}
+
+int CDisplay::shadowG()
+{
+    return geti(DI_SHADOWG);
+}
+
+int CDisplay::shadowB()
+{
+    return geti(DI_SHADOWB);
+}
+
+int CDisplay::shadowA()
+{
+    return geti(DI_SHADOWA);
+}
+
+int CDisplay::imageSet()
+{
+    return geti(DI_IMAGESET);
+}
+
+int CDisplay::imageNo()
+{
+    return geti(DI_IMAGENO);
+}
+
+int CDisplay::flagX()
+{
+    return geti(DI_FLAG_X);
+}
+
+int CDisplay::flagY()
+{
+    return geti(DI_FLAG_Y);
+}
+
+int CDisplay::geti(unsigned i)
+{
+    return m_attri[i];
+}
+
+const char* CDisplay::gets(int i)
+{
+    return m_attrs[i].c_str();
+}
+
+void CDisplay::set(int i, int v)
+{
+    m_attri[i] = v;
+}
+
+void CDisplay::set(int i, const char * v)
+{
+    m_attrs[i] = v;
 }

@@ -410,27 +410,26 @@ void CDlgObject::load(const int index)
 
 
     // rebirth location
-    const char * locations[] = {
-        "Origin",
-        "Deathbed",
-        "Random"
+    const QString locations[] = {
+        tr("Origin"),
+        tr("Deathbed"),
+        tr("Random")
     };
 
-    for (unsigned int n = 0; n < sizeof(locations)/sizeof(const char*); ++n) {
+    for (unsigned int n = 0; n < sizeof(locations)/sizeof(QString); ++n) {
         m_ui->cbRebirthLocation->addItem(locations[n]);
     }
 
     // TODO: set the proper location here
     m_ui->cbRebirthLocation->setCurrentIndex(proto.m_rebirthLocation);
 
-    const char *jumpModes [] = {
-        "VLA3",
-        "GIANA",
-        "MIXED",
-        NULL
+    const QString jumpModes [] = {
+        tr("VLA3"),
+        tr("GIANA"),
+        tr("MIXED"),
     };
 
-    for (int n = 0; jumpModes[n]; ++n) {
+    for (unsigned int n = 0; n < sizeof(jumpModes) / sizeof(QString); ++n) {
         m_ui->cbJump->addItem(jumpModes[n]);
     }
 
@@ -1079,7 +1078,7 @@ void CDlgObject::on_cbJump_currentIndexChanged(int index)
 void CDlgObject::setJumpText(int index)
 {
     QString jumpMode[] = {
-        tr("This is the engine default; you need to press JUMP + AIM. This mode allows you to climp ladders."),
+        tr("This is the engine default; you need to press JUMP + AIM. This mode allows you to climb ladders."),
         tr("Press UP to jump and move LEFT/RIGHT. You cannot climb ladders."),
         tr("Press JUMP and move LEFT/RIGHT. And still get to climb ladders. :)")
     };

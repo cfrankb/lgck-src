@@ -19,13 +19,15 @@
 #include "stdafx.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtGui>
+#include <QSettings>
 #include <QMessageBox>
 #include <QResizeEvent>
 #include "stdafx.h"
 #include "DlgAbout.h"
 #include "tabwidget.h"
 #include <QFileDialog>
+#include <QToolBar>
+#include "../shared/ss_version.h"
 
 char MainWindow::m_fileFilter[] = "easyDoc (*.edoc)";
 char MainWindow::m_appName[] = "easyDoc";
@@ -36,9 +38,28 @@ static QString g_fileNameHTML;
 MainWindow::MainWindow(QWidget *parent)
     : MainWindowParent(parent), ui(new Ui::MainWindow)
 {
+    QString s;
+    QString appVersion;
+    int version = SS_LGCK_VERSION;
+    for (int i=0; i < 4; ++i) {
+        s = QString("%1").arg(version % 256);
+        version /= 256;
+        if (i) {
+            appVersion = s + "." + appVersion  ;
+        } else {
+            appVersion = s + appVersion ;
+        }
+    }
+
+    QCoreApplication::setOrganizationDomain("");
+    QCoreApplication::setOrganizationName(m_author);
+    QCoreApplication::setApplicationName(m_appName);
+    QCoreApplication::setApplicationVersion(appVersion);
+
     ui->setupUi(this);
     updateTitle();
     initFileMenu();
+    initToolbar();
     restoreSettings();
     m_tabs = new TabWidget(this);
     m_tabs->init(&m_doc);
@@ -90,7 +111,7 @@ void MainWindow::open(const QString & fileNameNew)
                 warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
                 m_doc.setFileName(oldFileName);
                 // update fileList
-                QSettings settings(m_author, m_appName);
+                QSettings settings;
                 QStringList files = settings.value("recentFileList").toStringList();
                 files.removeAll(fileName);
                 settings.setValue("recentFileList", files);
@@ -140,6 +161,10 @@ bool MainWindow::save()
         }
     }
 
+    if (m_saveWiki) {
+        on_actionWiki_triggered();
+    }
+
     updateRecentFileActions();
     reloadRecentFileActions();
 
@@ -151,6 +176,10 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr(m_fileFilter));
     if (fileName.isEmpty())
         return false;
+    if (!fileName.endsWith(".edoc")) {
+        fileName += ".edoc";
+    }
+
 
     m_doc.setFileName(fileName);
     return true;
@@ -159,6 +188,12 @@ bool MainWindow::saveAs()
 void MainWindow::warningMessage(const QString message)
 {
     QMessageBox msgBox(QMessageBox::Warning, m_appName, message, 0, this);
+    msgBox.exec();
+}
+
+void MainWindow::infoMessage(const QString message)
+{
+    QMessageBox msgBox(QMessageBox::Information, m_appName, message, 0, this);
     msgBox.exec();
 }
 
@@ -201,7 +236,7 @@ void MainWindow::initFileMenu()
 
 void MainWindow::reloadRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
 
@@ -220,7 +255,7 @@ void MainWindow::reloadRecentFileActions()
 
 void MainWindow::updateRecentFileActions()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     QString fileName = m_doc.getFileName();
     files.removeAll(fileName);
@@ -261,7 +296,7 @@ void MainWindow::on_actionSave_as_triggered()
 void MainWindow::on_actionHTML_triggered()
 {
     const char fileFilter[] = "html documents (*.html)";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), g_fileNameHTML, tr(fileFilter));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export as HTML document..."), g_fileNameHTML, tr(fileFilter));
     if (!fileName.isEmpty()) {
         CFileWrap file;
         if (!fileName.endsWith(".html")) {
@@ -280,6 +315,7 @@ void MainWindow::on_actionHTML_triggered()
 void MainWindow::on_action_About_triggered()
 {
     CDlgAbout *dlg = new CDlgAbout(this);
+    dlg->setGLInfo("-", "-", "-", "");
     dlg->exec();
     delete dlg;
 }
@@ -298,7 +334,7 @@ void MainWindow::on_actionNew_triggered()
 void MainWindow::on_actionFunctionList_triggered()
 {
     const char fileFilter[] = "text files (*.txt)";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(fileFilter));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Function List..."), "", tr(fileFilter));
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(".txt")) {
             fileName += ".txt";
@@ -321,12 +357,14 @@ void MainWindow::on_actionPlain_Text_triggered()
 
 void MainWindow::on_actionWiki_triggered()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     QString folder = settings.value("wikiFolder", "").toString();
-    folder = QFileDialog::getExistingDirectory(this, "Export folder...", folder);
+    folder = QFileDialog::getExistingDirectory(this, "Export Wiki to folder...", folder);
     if (!folder.isEmpty()) {
-        m_doc.exportWiki(folder+"/");
+        QStringList fileList;
+        m_doc.exportWiki(folder + "/", fileList);
         settings.setValue("wikiFolder", folder);
+        infoMessage("Wiki Exported");
     }
 }
 
@@ -336,7 +374,8 @@ void MainWindow::exportWiki(const char *path)
     if (folder[folder.length()-1].toLatin1()!='/') {
         folder += "/";
     }
-    m_doc.exportWiki(folder);
+    QStringList fileList;
+    m_doc.exportWiki(folder, fileList);
 }
 
 void MainWindow::on_actionGameLua_triggered()
@@ -364,13 +403,58 @@ void MainWindow::on_actionGameLua_triggered()
 void MainWindow::on_actionSave_HTML_triggered(bool checked)
 {
     m_saveHTML = checked;
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     settings.setValue("saveHTML", m_saveHTML);
 }
 
 void MainWindow::restoreSettings()
 {
-    QSettings settings(m_author, m_appName);
+    QSettings settings;
     m_saveHTML = settings.value("saveHTML", false).toBool();
     ui->actionSave_HTML->setChecked(m_saveHTML);
+    m_saveWiki = settings.value("saveWiki", false).toBool();
+    ui->actionSave_Wiki->setChecked(m_saveWiki);
+    m_remember = settings.value("remember", false).toBool();
+    ui->actionRemember_last_file->setChecked(m_remember);
+    m_largeFont = settings.value("largeFont", false).toBool();
+    ui->actionLarge_Font->setChecked(m_largeFont);
+}
+
+void MainWindow::initToolbar()
+{
+    ui->toolBar->setObjectName("mainToolbar");
+    ui->toolBar->setWindowTitle(tr("Main"));
+    ui->toolBar->setIconSize( QSize(16,16) );
+    ui->toolBar->addAction(ui->actionNew);
+    ui->toolBar->addAction(ui->action_open);
+    ui->toolBar->addAction(ui->action_save);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->actionWiki);
+    ui->toolBar->addAction(ui->actionHTML);
+}
+
+void MainWindow::on_actionSave_Wiki_toggled(bool arg1)
+{
+    m_saveWiki = arg1;
+    QSettings settings;
+    settings.setValue("saveWiki", m_saveWiki);
+}
+
+void MainWindow::on_actionRemember_last_file_triggered(bool checked)
+{
+    m_remember = checked;
+    QSettings settings;
+    settings.setValue("remember", m_remember);
+}
+
+void MainWindow::on_actionLarge_Font_toggled(bool arg1)
+{
+    m_largeFont = arg1;
+    QSettings settings;
+    settings.setValue("largeFont", m_largeFont);
+}
+
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    QApplication::aboutQt();
 }

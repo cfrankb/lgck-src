@@ -44,7 +44,7 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
             ver = s + ver ;
         }
     }
-    ver = "<b>" + tr("Version ") + ver + "</b>";
+    ver = "<b>" + tr("Version %1").arg(ver) + "</b>";
 
     m_ui->sVersion->setText(ver);
 

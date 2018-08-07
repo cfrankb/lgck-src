@@ -37,6 +37,12 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
       <property name="tabPosition">
        <enum>QTabWidget::West</enum>
       </property>
@@ -210,7 +216,7 @@ Double-click on the one you want to edit.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Delete Object</string>
+            <string>Delete Level</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -230,7 +236,7 @@ Double-click on the one you want to edit.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Add New Object</string>
+            <string>Add New Level</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -358,8 +364,11 @@ Double-click on the one you want to edit.</string>
              <height>24</height>
             </rect>
            </property>
+           <property name="acceptDrops">
+            <bool>false</bool>
+           </property>
            <property name="toolTip">
-            <string>Delete Object</string>
+            <string>Delete Sound</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -379,7 +388,122 @@ Double-click on the one you want to edit.</string>
             </rect>
            </property>
            <property name="toolTip">
-            <string>Add New Object</string>
+            <string>Add New Sound</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="lgck-builder.qrc">
+             <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabDisplays">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <attribute name="title">
+        <string>Overlays</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_11">
+        <item row="0" column="0">
+         <widget class="QTreeWidget" name="treeDisplays">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <property name="toolTip">
+           <string>This is a list of all the overlays contained in your game. 
+Double-click on the one you want to edit.</string>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="tabKeyNavigation">
+           <bool>true</bool>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="uniformRowHeights">
+           <bool>true</bool>
+          </property>
+          <property name="sortingEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="headerHidden">
+           <bool>true</bool>
+          </property>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerDefaultSectionSize">
+           <number>150</number>
+          </attribute>
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupDisplays">
+          <property name="minimumSize">
+           <size>
+            <width>60</width>
+            <height>23</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+          <widget class="QToolButton" name="btnDeleteDisplay">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>0</y>
+             <width>20</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Delete Display</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="lgck-builder.qrc">
+             <normaloff>:/images/minus.png</normaloff>:/images/minus.png</iconset>
+           </property>
+          </widget>
+          <widget class="QToolButton" name="btnAddDisplay">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>25</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Add New Display</string>
            </property>
            <property name="text">
             <string>...</string>
@@ -400,6 +524,9 @@ Double-click on the one you want to edit.</string>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QTreeWidget" name="treeEvents">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
           <property name="toolTip">
            <string>This is a list of all the events contained in your game. 
 Double-click on the one you want to edit.</string>
@@ -463,6 +590,9 @@ Double-click on the one you want to edit.</string>
              <width>90</width>
              <height>23</height>
             </rect>
+           </property>
+           <property name="toolTip">
+            <string>Clear all events</string>
            </property>
            <property name="text">
             <string>Clear All</string>

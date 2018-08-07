@@ -43,6 +43,9 @@
 #include "Snd.h"
 #include "WFileSave.h"
 #include "OBL5File.h"
+#include "displayconfig.h"
+#include "Display.h"
+#include "dlgdisplay.h"
 
 static const char g_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
 static const char g_oblFilter[] = "Object Blocks (*.obl *.obl5)";
@@ -259,6 +262,26 @@ void CToolBoxDock::createSprite()
     delete wiz;
 }
 
+void CToolBoxDock::checkFrameSetUses(int frameSet)
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    int *uses = gf.countFrameSetUses();
+    CFrameSet *fs = gf.m_arrFrames[frameSet];
+    if (!uses[frameSet]) {
+        QMessageBox::StandardButton
+                ret = QMessageBox::warning(
+                    dynamic_cast<QWidget*>(parent()),
+                    "", tr("ImageSet `%1` appears to no longer being used.\n"
+                           "Do you want to remove it?").arg(fs->getName()),
+                    QMessageBox::Yes | QMessageBox::No);
+        if (ret == QMessageBox::Yes) {
+            gf.m_arrFrames.removeAt(frameSet);
+            gf.killFrameSet(frameSet);
+        }
+    }
+    delete [] uses;
+}
+
 void CToolBoxDock::on_btnDeleteSprite_clicked()
 {
     CGame & gf = *((CGame*)m_gameFile);
@@ -275,6 +298,8 @@ void CToolBoxDock::on_btnDeleteSprite_clicked()
                                           "#%1 `%2`?").arg( j ) . arg( proto.getName() ),
                                        QMessageBox::Ok | QMessageBox::Cancel);
     if (ret == QMessageBox::Ok) {
+        // get frameset
+        int frameSet = proto.m_nFrameSet;
 
         // remove visual
         QAbstractItemModel * model =  m_ui->treeObjects->model();
@@ -302,6 +327,9 @@ void CToolBoxDock::on_btnDeleteSprite_clicked()
         }
         // let other interfaces that we deleted a sprite
         emit spriteDeleted(j);
+
+        // check if this frameSet is still being used
+        checkFrameSetUses(frameSet);
     }
 }
 
@@ -539,6 +567,41 @@ void CToolBoxDock::reloadEvents()
     }
 }
 
+void CToolBoxDock::reloadDisplays()
+{
+    // page x: displays
+    qDebug("reload displays()");
+
+    CGame &gf = *((CGame*)m_gameFile);
+    int count = m_ui->treeDisplays->model()->rowCount();
+    m_ui->treeDisplays->model()->removeRows(0, count);
+    m_ui->treeDisplays->setColumnCount(1);
+    m_ui->treeDisplays->setColumnWidth(0, 128);
+    m_ui->treeDisplays->setEditTriggers(0);
+    m_ui->treeDisplays->setWordWrap(false);
+    m_ui->treeDisplays->setRootIsDecorated(false);
+    m_ui->treeDisplays->setAlternatingRowColors(true);
+
+    QIcon iconBlank;
+    iconBlank.addFile(":/images/blank.png");
+
+    QIcon iconCheck;
+    iconCheck.addFile(":/images/pd/gesloten_slot.png");
+
+    CDisplayConfig & conf = *(gf.getDisplayConfig());
+    for (int i = 0; i < conf.getSize(); ++i) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        CDisplay *display = conf[i];
+        item->setText(0, display->name());
+        if (display->isProtected()) {
+            item->setIcon(0, iconCheck);
+        } else {
+            item->setIcon(0, iconBlank);
+        }
+        m_ui->treeDisplays->addTopLevelItem(item);
+    }
+    m_ui->btnDeleteDisplay->setEnabled(false);
+}
 
 void CToolBoxDock::reload()
 {
@@ -546,6 +609,7 @@ void CToolBoxDock::reload()
     reloadSounds();
     reloadLevels();
     reloadEvents();
+    reloadDisplays();
     updateButtons();
 }
 
@@ -1162,7 +1226,6 @@ void CToolBoxDock::updateFrameSet(int frameSet)
 
 void CToolBoxDock::exportSprite()
 {
-
     CProtoIndex * indexProto = (CProtoIndex*) m_index;
     QTreeWidgetItem * item = m_ui->treeObjects->currentItem();
     if (!item || !indexProto) {
@@ -1181,25 +1244,17 @@ void CToolBoxDock::exportSprite()
     QString selected = tr(g_oblFilter) + "\n" + tr(g_pngFilter);
     QString suffix = "obl";
     QString fileName = "";
-    //if (!CFrameSet::isFriendFormat(m_doc.getFormat())) {
-        selected = tr(g_pngFilter) + "\n" + tr(g_oblFilter);
-        suffix = "png";
-        filters.append(tr(g_pngFilter));
-        filters.append(tr(g_oblFilter));
-    //} else {
-      //  filters.append(tr(m_oblFilter));
-       // filters.append(tr(m_pngFilter));
-   // }
+
+    selected = tr(g_pngFilter) + "\n" + tr(g_oblFilter);
+    suffix = "png";
+    filters.append(tr(g_pngFilter));
+    filters.append(tr(g_oblFilter));
 
     CWFileSave * dlg = new CWFileSave(this,tr("Save As"),"",selected);
-    //dlg->setFilters(filters);
-    //dlg->selectedNameFilter(selected);
+
     dlg->setNameFilters(filters);
     dlg->setAcceptMode(QFileDialog::AcceptSave);
     dlg->setDefaultSuffix(suffix);
-    //dlg->selectFile(m_doc.getFileName());
-    //QString fileName = QString(proto.m_szName) + "." + suffix;
-    //dlg->selectFile(fileName);
 
     connect(dlg, SIGNAL(filterSelected(QString)), dlg, SLOT(changeDefaultSuffix(QString)));
     if (dlg->exec()) {
@@ -1225,3 +1280,163 @@ void CToolBoxDock::exportSprite()
     delete dlg;
 }
 
+void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    int i = index.row();
+    if (i !=-1)  {
+        CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+        CDlgDisplay dlg;
+        CDisplay & d = *(conf[i]);
+        dlg.setWindowTitle(tr("Edit Overlay ``%1`` %2").arg(d.name()).arg(d.isProtected() ? tr("[locked]") : ""));
+        dlg.setGameFile(m_gameFile);
+        dlg.setDisplayID(i);
+        dlg.load(d);
+        if (dlg.exec() == QDialog::Accepted) {
+            dlg.save(d);
+            gf.setDirty(true);
+        }
+    }
+}
+
+void CToolBoxDock::on_btnDeleteDisplay_clicked()
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    QModelIndex index = m_ui->treeDisplays->currentIndex();
+    int i = index.row();
+    if (i == -1) {
+        QMessageBox::warning(this, "", tr("No Overlay selected."), QMessageBox::Ok);
+        return;
+    }
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    CDisplay *d = conf[i];
+    if (d->isProtected()) {
+        QMessageBox::warning(this, "", tr("This Overlay is owned by the engine and cannot be deleted."), QMessageBox::Ok);
+        return;
+    }
+    QMessageBox::StandardButton
+            ret = QMessageBox::warning(
+                this,  "",  tr("Are you sure that you want to delete\n"
+                               "`%1` ?") .arg(d->name()),
+                QMessageBox::Ok | QMessageBox::Cancel);
+    if (ret == QMessageBox::Ok) {
+        // remove visual
+        QAbstractItemModel * model =  m_ui->treeDisplays->model();
+        model->removeRow( index.row() );
+        conf.removeAt(i);
+        gf.setDirty( true );
+        m_ui->btnDeleteDisplay->setEnabled(false);
+    }
+}
+
+void CToolBoxDock::on_btnAddDisplay_clicked()
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    CDlgDisplay dlg;
+    CDisplay d = CDisplay("", 0, 0, 0);
+    d.setTemplate("");
+    d.setText("");
+    d.setType(CDisplay::DISPLAY_MESSAGE);
+    dlg.setWindowTitle(tr("New overlay"));
+    dlg.setGameFile(m_gameFile);
+    dlg.load(d);
+    if (dlg.exec() == QDialog::Accepted) {
+        dlg.save(d);
+        int pos = conf.getSize();
+        conf.add(d);
+        QAbstractItemModel * model =  m_ui->treeDisplays->model();
+        if (!model) {
+            qDebug("model is null\n");
+        }
+        model->insertRow(pos);
+        QTreeWidgetItem * item = m_ui->treeDisplays->topLevelItem( pos );
+        m_ui->treeDisplays->setCurrentItem( item );
+        item->setText(0, d.name());
+        QIcon iconBlank;
+        iconBlank.addFile(":/images/blank.png");
+        item->setIcon(0, iconBlank);
+        gf.setDirty(true);
+    }
+}
+
+void CToolBoxDock::on_treeDisplays_clicked(const QModelIndex &index)
+{
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    int i = index.row();
+    m_ui->btnDeleteDisplay->setEnabled(i != -1 && !conf[i]->isProtected());
+}
+
+void CToolBoxDock::on_treeDisplays_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem * item = this->m_ui->treeDisplays->itemAt(pos);
+    if (item) {
+        // Make sure this item is selected
+        m_ui->treeDisplays->setCurrentItem( item );
+
+        CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+        QModelIndex index = this->m_ui->treeDisplays->currentIndex();
+        int i = index.row();
+
+        // create pop-up
+        QMenu menu(this->m_ui->treeDisplays);
+        QAction *actionEdit = new QAction(tr("Edit Overlay"), &menu);
+        menu.addAction(actionEdit);
+
+        QAction *actionAdd = new QAction(tr("New Overlay"), &menu);
+        menu.addAction(actionAdd);
+        if (i != -1 && !conf[i]->isProtected()) {
+            QAction *actionDelete = new QAction(tr("Delete Overlay"), &menu);
+            menu.addAction(actionDelete);
+            connect(actionDelete, SIGNAL(triggered()), this, SLOT(on_btnDeleteDisplay_clicked()));
+        }
+
+        // create an action and connect it to a signal
+        connect(actionEdit, SIGNAL(triggered()), this, SLOT(editDisplay()));
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddDisplay_clicked()));
+        menu.exec(this->m_ui->treeDisplays->mapToGlobal(pos));
+    } else {
+        QMenu menu(this->m_ui->treeDisplays);
+        QAction *actionAdd = new QAction(tr("New Overlay"), &menu);
+        menu.addAction(actionAdd);
+
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddDisplay_clicked()));
+        menu.exec(this->m_ui->treeDisplays->mapToGlobal(pos));
+    }
+}
+
+void CToolBoxDock::editDisplay()
+{
+    QModelIndex index = m_ui->treeDisplays->currentIndex();
+    on_treeDisplays_doubleClicked(index);
+}
+
+void CToolBoxDock::on_treeEvents_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem * item = this->m_ui->treeEvents->itemAt(pos);
+    if (item) {
+        // Make sure this item is selected
+        m_ui->treeEvents->setCurrentItem( item );
+        // create pop-up
+        QMenu menu(this->m_ui->treeEvents);
+        QAction *actionEdit = new QAction(tr("Edit Event"), &menu);
+        menu.addAction(actionEdit);
+
+        // create an action and connect it to a signal
+        connect(actionEdit, SIGNAL(triggered()), this, SLOT(editEvent()));
+        menu.exec(this->m_ui->treeEvents->mapToGlobal(pos));
+    } else {
+        QMenu menu(this->m_ui->treeEvents);
+        QAction *actionClear = new QAction(tr("Clear all events"), &menu);
+        menu.addAction(actionClear);
+
+        connect(actionClear, SIGNAL(triggered()), this, SLOT(on_btnClearAll_clicked()));
+        menu.exec(this->m_ui->treeEvents->mapToGlobal(pos));
+    }
+}
+
+void CToolBoxDock::editEvent()
+{
+    QModelIndex index = m_ui->treeEvents->currentIndex();
+    on_treeEvents_doubleClicked(index);
+}

@@ -26,6 +26,7 @@
 #include <zlib.h>
 #include "IFile.h"
 #include "PngMagic.h"
+#include "helper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFrameSet
@@ -84,17 +85,11 @@ void CFrameSet::write0x501(IFile & file)
         ptr += 4 * frame->m_nLen *  frame->m_nHei;
     }
 
-    ULONG destSize = totalSize + 1024;
-    UINT8 *dest = new UINT8 [destSize];
-
-    int err = compress(
-            (UINT8 *)dest,
-            (ULONG *)& destSize,
-            (UINT8 *)buffer,
-            (ULONG)totalSize);
-
-    if (err) {
-        printf("CFrameSet::Write err=%d\n", err);
+    ULONG destSize;
+    UINT8 *dest;
+    int err = compressData((UINT8 *)buffer, (ULONG) totalSize, &dest, destSize);
+    if (err != Z_OK) {
+        qDebug("CFrameSet::write0x501 error: %d", err);
     }
 
     // OBL5 IMAGESET HEADER

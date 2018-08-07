@@ -78,5 +78,10 @@
         <file>images/sprite_editor.png</file>
         <file>images/lgck.ico</file>
         <file>images/lgck.png</file>
+        <file>images/pd/ATTENT03_16x13.png</file>
+        <file>images/pd/warning-17_16x14.png</file>
+        <file>images/pd/copy.png</file>
+        <file>images/pd/gesloten_slot.png</file>
+        <file>images/pd/1393320584.png</file>
     </qresource>
 </RCC>

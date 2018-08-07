@@ -1,5 +1,24 @@
 HISTORY OF LGCK BUILDER
 
+*** 0.6.0.8
+
+- EDITOR: added portable option to package bundle (windows)
+- EDITOR: added export game UI dialog
+- EDITOR: added manifests to satisfy windows app cert kit
+- EDITOR: new warnings for no player and no goal
+- EDITOR: lgck-builder and obl5edit can now be associated with files
+- EDITOR: tigher integration between lgck builder and obl5edit
+- EDITOR: overlay options exposed in UI
+- ENGINE: SFML runtime completed
+- TOOLS: migrated gui to qt 5.10.1
+- BUG FIX: ScriptWiz displayed incorrectly in Windows
+- BUG FIX: uninitialized font causing game to crash (critical) introduced in 0.6.0.6
+- BUG FIX: export game wasn't including musics
+- BUG FIX: testing empty level was causing a crash
+- BUG FIX: background color displays incorrectly in editor
+- BUG FIX: level shows completed before starting
+- BUG FIX: toolbox disapearing on minimized
+
 *** 0.6.0.7
 
 - EDITOR: builder can export sprites (obl, png)

@@ -27,3 +27,8 @@ src/obl5t/testcase/*
 src/lgck-runtime/make.bat
 src/lgck-runtime/makefile
 src/lgck-runtime/build/*
+src/shared/ss_build.h
+src/build/bin/*
+src/build/files/*
+src/build/setup/*
+src/tools/buildcount.dat

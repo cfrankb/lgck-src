@@ -24,6 +24,7 @@
 
 class CGameFile;
 class CFrameSet;
+class QString;
 
 namespace Ui {
     class CDlgFrameSet;
@@ -40,7 +41,7 @@ public:
 
 protected:
     void changeEvent(QEvent *e);
-    //void updateButtons();
+    bool fileExists(QString & path);
 
     CFrameSet *m_frameSet;
 
@@ -53,6 +54,8 @@ private slots:
     void on_btnAddFrames_clicked();
     void on_eName_textChanged(const QString &arg1);
     void updateButtons();
+
+    void on_btnEdit_clicked();
 
 signals:
     void imagesAdded();

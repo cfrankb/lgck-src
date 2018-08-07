@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>640</width>
     <height>500</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
+    <width>640</width>
     <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>600</width>
+    <width>640</width>
     <height>500</height>
    </size>
   </property>
@@ -32,7 +32,7 @@
   <widget class="QPushButton" name="btnOpen">
    <property name="geometry">
     <rect>
-     <x>25</x>
+     <x>10</x>
      <y>368</y>
      <width>81</width>
      <height>91</height>
@@ -40,6 +40,9 @@
    </property>
    <property name="toolTip">
     <string>Open an existing game project.</string>
+   </property>
+   <property name="whatsThis">
+    <string>This is the button to open an existing game.</string>
    </property>
    <property name="text">
     <string>Open
@@ -66,7 +69,7 @@ Game</string>
   <widget class="QPushButton" name="btnNew">
    <property name="geometry">
     <rect>
-     <x>115</x>
+     <x>100</x>
      <y>368</y>
      <width>81</width>
      <height>91</height>
@@ -74,6 +77,9 @@ Game</string>
    </property>
    <property name="toolTip">
     <string>Create a new game project.</string>
+   </property>
+   <property name="whatsThis">
+    <string>This is the button to create a new game.</string>
    </property>
    <property name="text">
     <string>New
@@ -94,11 +100,17 @@ Game</string>
   <widget class="QPushButton" name="btnSkip">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>11</x>
      <y>470</y>
-     <width>401</width>
+     <width>441</width>
      <height>23</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>This is the button to skip this splash screen.</string>
+   </property>
+   <property name="whatsThis">
+    <string>This is the button to skip this splash screen.</string>
    </property>
    <property name="text">
     <string>Skip this Splash Screen &gt;&gt;&gt;</string>
@@ -107,11 +119,14 @@ Game</string>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>5</x>
      <y>4</y>
-     <width>581</width>
+     <width>630</width>
      <height>461</height>
     </rect>
+   </property>
+   <property name="whatsThis">
+    <string/>
    </property>
    <property name="text">
     <string/>
@@ -119,15 +134,24 @@ Game</string>
    <property name="pixmap">
     <pixmap resource="lgck-builder.qrc">:/images/Frank2_scaled33.png</pixmap>
    </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="btnNoShow">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>461</x>
      <y>470</y>
      <width>171</width>
      <height>23</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>This is the button to click if don't want to use the splash screen.</string>
+   </property>
+   <property name="whatsThis">
+    <string>This is the button to click if don't want to use the splash screen.</string>
    </property>
    <property name="text">
     <string>  Do not show again</string>
@@ -146,7 +170,7 @@ Game</string>
   <widget class="QPushButton" name="btnSpriteEditor">
    <property name="geometry">
     <rect>
-     <x>205</x>
+     <x>190</x>
      <y>368</y>
      <width>81</width>
      <height>91</height>
@@ -154,6 +178,9 @@ Game</string>
    </property>
    <property name="toolTip">
     <string>Launch the Sprite Editor</string>
+   </property>
+   <property name="whatsThis">
+    <string>This is the button to lauch the sprite editor.</string>
    </property>
    <property name="text">
     <string>Sprite
@@ -170,12 +197,43 @@ Editor</string>
     </size>
    </property>
   </widget>
+  <widget class="QPushButton" name="btnTutorials">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>368</y>
+     <width>81</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Watch tutorials on how to make games.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Watch tutorials on how to make games.</string>
+   </property>
+   <property name="text">
+    <string>Watch
+tutorials</string>
+   </property>
+   <property name="icon">
+    <iconset resource="lgck-builder.qrc">
+     <normaloff>:/images/pd/1393320584.png</normaloff>:/images/pd/1393320584.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+  </widget>
   <zorder>label</zorder>
   <zorder>btnOpen</zorder>
   <zorder>btnNew</zorder>
   <zorder>btnSkip</zorder>
   <zorder>btnNoShow</zorder>
   <zorder>btnSpriteEditor</zorder>
+  <zorder>btnTutorials</zorder>
  </widget>
  <resources>
   <include location="lgck-builder.qrc"/>

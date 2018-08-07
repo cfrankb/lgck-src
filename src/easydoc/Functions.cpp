@@ -311,17 +311,6 @@ void CFunctions::exportWiki(CFileWrap & file, QString prefix)
 {
     for (int i = 0; i < getSize(); ++i) {
         CFunction & fn = m_functions[i];
-        QString langs[] = {
-            "n/a",
-            "cpp",
-            "lua"
-        };
-        const char *states[] =  {
-            "?",
-            "finished",
-            "tba",
-            "untested"
-        };
 
         QString ret;
         switch (fn.Out().getSize()) {
@@ -338,15 +327,16 @@ void CFunctions::exportWiki(CFileWrap & file, QString prefix)
             break;
         }
 
-        QString state = QString(states[fn.state]);
         QString hdr;
         QString paramsIn;
+        QStringList optional;
         for (int k=0; k<fn.InSetCount(); ++k) {
             for (int j = 0; j < fn.In(k).getSize(); ++j) {
                 Param & param  = fn.In(k)[j];
                 QString s = "";
                 if (param.flags & CFunction::FLAG_OPTIONAL) {
                     s += '*';
+                    optional << QString("in parameter ** %1 ** : optional and can be omitted.\n").arg(param.name);
                 }
                 if (param.flags & CFunction::FLAG_MORE) {
                     s += "...";
@@ -378,27 +368,45 @@ void CFunctions::exportWiki(CFileWrap & file, QString prefix)
             paramsOut = "  * __out__ ** void **\\\\\n";
         }
 
-        hdr.sprintf("==== %s%s", q2c(prefix), q2c(fn.name));
-        if (state != "finished") {
-            if (fn.lang) {
-                hdr += " (" + langs[fn.lang] + "/" + state + ")";
-            } else {
-                hdr += " (" + state + ")";
-            }
-        }
-        hdr += "====\n";
+        hdr.sprintf("===== %s%s =====\n", q2c(prefix), q2c(fn.name));
         file += hdr;
-//      file += state;
         file += paramsIn;
         file += paramsOut;
+        QString tmp = "";
         if (!fn.desc.isEmpty()) {
-            file += "=== Description ===\n\n";
-            QString tmp = txt2wiki(fn.desc);
+            char t[fn.desc.length()+1024];
+            tmp = txt2wiki(fn.desc, t);
+        }
+        if (optional.length()) {
+            if (!tmp.isEmpty()) {
+                tmp += "\n\n";
+            }
+            tmp += optional.join('\n');
+        }
+        if (!tmp.isEmpty()){
             file += tmp;
             file += "\n";
         }
-        if (i != getSize() -1) {
+
+        QString text;
+        if (fn.m_alias.length()) {
+            file += "\n** Alias: **";
+            foreach( text, fn.m_alias ) {
+                text = text.trimmed();
+                QString tmp;
+                if (text.contains(":")) {
+                    QStringList list = text.toLower().split(":");
+                    tmp = QString("class_%1#%2").arg(list[0]).arg(list[1]);
+                } else {
+                    tmp = QString("lua_functions#%1").arg(text);
+                }
+                file += QString("%1 ").arg(text);
+            }
             file += "\n\n";
+        }
+
+        if (i != getSize() -1) {
+            file += "----\n\n";
         }
         file += "\n\n";
     }
@@ -503,6 +511,14 @@ void CFunction::read(CFileWrap & file, int version)
     } else {
         m_alias.clear();
     }
+    if (version > 6) {
+        file.read(&m_testCaseCount, sizeof(m_testCaseCount));
+        for (int i=0; i < m_testCaseCount; ++i) {
+            testcase[i].read(file, version);
+        }
+    } else {
+        m_testCaseCount = 0;
+    }
 }
 
 void CFunction::write(CFileWrap & file)
@@ -518,6 +534,13 @@ void CFunction::write(CFileWrap & file)
     file << state;
     file << lang;
     file << m_alias;
+    bool go = true;
+    if (go) {
+        file.write(&m_testCaseCount, sizeof(m_testCaseCount));
+        for (int i=0; i < m_testCaseCount; ++i) {
+            testcase[i].write(file);
+        }
+    }
 }
 
 void CFunction::init()
@@ -529,12 +552,21 @@ void CFunction::init()
     Out().forget();
     state = 0;
     lang = 0;
+    m_testCaseCount = 0;
 }
 
 void CFunction::removeInSet(int i)
 {
-    for (int j=i; j < m_inCount-1; ++j) {
-        paramsIn[i] =paramsIn[i+1];
+    for (int j = i; j < m_inCount - 1; ++j) {
+        paramsIn[j] =paramsIn[j+1];
     }
     --m_inCount;
+}
+
+void CFunction::removeTestCase(int i)
+{
+    for (int j = i; j < m_testCaseCount - 1; ++j) {
+        testcase[j] = testcase[j + 1];
+    }
+    --m_testCaseCount;
 }

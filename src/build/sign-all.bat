@@ -1,0 +1,5 @@
+call bin\csign "files\lgck-builder.exe"
+call bin\csign "files\obl5edit.exe"
+call bin\csign "files\easydoc.exe"
+call bin\csign "files\lgck-runtime-sfml.exe"
+call bin\csign "setup\lgck-setup.exe"

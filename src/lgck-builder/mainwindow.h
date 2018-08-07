@@ -29,6 +29,8 @@ class CLevelViewGL;
 class CToolBoxDock;
 class CThreadUpdater;
 class QScrollArea;
+class CDlgDistributeGame;
+class QFileSystemWatcher;
 
 #include <QTimer>
 #include <QTime>
@@ -119,6 +121,7 @@ private:
     void showLayerName();
     void adjustViewPort();
     void commitAll();
+    void exportGame();
     QAction** actionShortcuts();
     QStringList & defaultShortcuts();
     void saveSettings();
@@ -136,6 +139,7 @@ private:
     };
     QLabel *m_labels[3];
     QAction *m_recentFileActs[MaxRecentFiles];
+    QFileSystemWatcher * m_watcher;
     virtual void closeEvent(QCloseEvent *event);
     virtual void setVisible ( bool visible );
     virtual void resizeEvent (QResizeEvent *event);
@@ -147,10 +151,13 @@ private:
     bool checkExecutible(const QString exec, QString & errMsg);
     void showAppSettings(int tab);
     void formatVersion(QString &ver);
+    void loadFileName(const QString &fileName);
 
 protected:
     void initializeGL();
     void paintGL();
+    virtual void showEvent(QShowEvent* pEvent);
+    virtual void changeEvent(QEvent* e);
 
     QOpenGLContext *m_context;
 
@@ -244,10 +251,10 @@ private slots:
     void on_actionReset_Font_Size_triggered();
     void on_actionEdit_Images_triggered();
     void on_actionImport_Font_triggered();
-
     void on_actionSprite_Editor_triggered();
-
     void on_actionExport_Game_triggered();
+    void on_actionDistribution_Package_triggered();
+    void updateFrameSet(const QString & fileName);
 
 signals:
     void levelDeleted(int index);

@@ -2,12 +2,12 @@
 #include "../shared/qtgui/cheat.h"
 #include <QString>
 
-const char *txt2wiki(QString & in)
+const char *txt2wiki(QString & in, char *out)
 {
     char v[in.length()+1];
     strcpy(v, q2c(in));
     char *s = v;
-    char t[in.length()+1024];
+    char *t = out;
     char *p = t;
     bool trim_s = true;
     bool code_b = false;

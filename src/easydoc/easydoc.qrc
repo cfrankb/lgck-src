@@ -14,5 +14,15 @@
         <file>images/na.png</file>
         <file>res/gpl.txt</file>
         <file>images/mplus.png</file>
+        <file>images/document-new.png</file>
+        <file>images/document-save.png</file>
+        <file>images/document-open.png</file>
+        <file>images/edit-find.png</file>
+        <file>images/matt-icons_emblem-recycle.png</file>
+        <file>images/File.png</file>
+        <file>images/0000-1.png</file>
+        <file>images/girlsm-tr.png</file>
+        <file>images/lgckbuilder64ronnie2.png</file>
+        <file>res/license.txt</file>
     </qresource>
 </RCC>

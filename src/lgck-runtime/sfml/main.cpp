@@ -20,8 +20,8 @@
 #include "../shared/interfaces/ISound.h"
 #include "../shared/implementers/sfml/gr_sfml.h"
 #include "../shared/implementers/sfml/im_sfml.h"
-#include "../shared/implementers/sdl/mu_sdl.h"
-#include "../shared/implementers/sdl/sn_sdl.h"
+#include "../shared/implementers/sfml/mu_sfml.h"
+#include "../shared/implementers/sfml/sn_sfml.h"
 #include "../shared/inputs/sfml/kt_sfml.h"
 #include "../shared/GameEvents.h"
 #include "../shared/Snapshot.h"
@@ -194,9 +194,9 @@ int main( int argc, char* args[] )
         printf("failed to read gamedata:%s [%s]\n", game.getFileName(), game.getLastError());
         return EXIT_FAILURE;
     }
-    CSndSDL *sn = new CSndSDL();
+    CSndSFML *sn = new CSndSFML();
     game.attach((ISound*)sn);
-    CMusicSDL *mu = new CMusicSDL();
+    CMusicSFML *mu = new CMusicSFML();
     game.attach((IMusic*)mu);
     CGRSfml * gm = new CGRSfml();
     gm->init(&game, out.width, out.height, "LGCK / SFML runtime");

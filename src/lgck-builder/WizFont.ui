@@ -17,6 +17,9 @@
    <iconset resource="lgck-builder.qrc">
     <normaloff>:/images/lgckbuilder64ronnie2.png</normaloff>:/images/lgckbuilder64ronnie2.png</iconset>
   </property>
+  <property name="wizardStyle">
+   <enum>QWizard::ClassicStyle</enum>
+  </property>
   <widget class="QWizardPage" name="wizardPage">
    <widget class="QLabel" name="label_3">
     <property name="geometry">

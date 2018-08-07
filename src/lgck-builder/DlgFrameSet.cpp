@@ -22,9 +22,13 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QPushButton>
+#include <QStringList>
+#include <QProcess>
+#include <QTemporaryFile>
 #include "../shared/stdafx.h"
 #include "../shared/FrameSet.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/FileWrap.h"
 
 CDlgFrameSet::CDlgFrameSet(QWidget *parent) :
     QDialog(parent),
@@ -91,6 +95,11 @@ void CDlgFrameSet::init(CFrameSet * frameSet)
 
     emit refill();
     updateButtons();
+
+    // disable button if sprite editor not found
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString path = appDir + "/obl5edit.exe";
+    m_ui->btnEdit->setDisabled(!fileExists(path));
 }
 
 void CDlgFrameSet::updateButtons()
@@ -118,4 +127,68 @@ void CDlgFrameSet::on_eName_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     updateButtons();
+}
+
+bool CDlgFrameSet::fileExists(QString & path)
+{
+    return QFileInfo::exists(path) && QFileInfo(path).isFile();
+}
+
+void CDlgFrameSet::on_btnEdit_clicked()
+{
+    if (QMessageBox::information(this, "", tr("You are about to edit this image set using the Sprite Editor.\nJust save and exit when you are done with your changes."),
+                             QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok) {
+
+         // set cursor to hourglass
+         QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        // create temp file
+        QString appDir = QCoreApplication::applicationDirPath();
+        QTemporaryFile tmp(QDir::temp().absoluteFilePath("XXXXXXXXXXX.obl")) ;
+        tmp.open();
+        tmp.setAutoRemove(false);
+        tmp.close();
+        QString fileName = tmp.fileName();
+        qDebug() << QString("temp file:") + fileName;
+
+        // same image set to temp file
+        CFileWrap file;
+        if (file.open(q2c(tmp.fileName()),"w")) {
+            m_frameSet->write(file);
+            file.close();
+        }
+
+        // lauch the editor
+        QString path = appDir + "/obl5edit.exe";
+        QProcess proc;
+        proc.setWorkingDirectory(appDir);
+        QStringList list;
+        list << fileName;
+        proc.start(path, list);
+        proc.waitForFinished(-1);
+
+        // check the exitCode
+        int result = proc.exitCode();
+        if (result) {
+            QString outMsg = QString(tr("An error occured: %1\nCode: %2"))
+                           .arg(path + " " + list.join(" ")).arg(result);
+            qDebug() << outMsg;
+            QMessageBox msgBox(QMessageBox::Critical, "", outMsg, 0, this);
+            msgBox.exec();
+        } else {
+            // reload the changes
+            if (file.open(q2c(tmp.fileName()),"r")) {
+               m_frameSet->read(file);
+                file.close();
+                emit refill();
+            } else {
+                QString outMsg = QString("Failed to read %1").arg(tmp.fileName());
+                QMessageBox msgBox(QMessageBox::Critical, "", outMsg, 0, this);
+                msgBox.exec();
+            }
+        }
+        tmp.setAutoRemove(true);
+        // restore cursor
+        QApplication::restoreOverrideCursor();
+    }
 }

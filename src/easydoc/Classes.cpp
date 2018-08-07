@@ -223,10 +223,11 @@ void CClasses::removeAll()
     m_cCount = 0;
 }
 
-void CClasses::exportWiki(const QString &path, CFunctions *fct)
+void CClasses::exportWiki(const QString &path, CFunctions *fct, QStringList &fileList)
 {
     CFileWrap fileBin;
     fileBin.open(path + "lua_binding.txt", QIODevice::WriteOnly);
+    fileList << "lua_binding.txt";
 
     fileBin += "===== Lua Binding =====\n";
     fileBin += "==== Classes ====\n";
@@ -236,12 +237,14 @@ void CClasses::exportWiki(const QString &path, CFunctions *fct)
         CFileWrap file;
         QString fname = "class_" + cl->name().toLower();
         file.open(path + fname  + ".txt", QIODevice::WriteOnly);
+        fileList << fname  + ".txt";
         fileBin += QString("  * [[%1|Class %2]]\n").arg(fname, cl->name());
 
         file += QString("===== Class %1 =====\n").arg(cl->name());
         if (!cl->desc().isEmpty()) {
             file += "==== Description ====\n";
-            file += QString(txt2wiki(cl->desc())) +"\n";
+            char t[cl->desc().length()+1024];
+            file += QString(txt2wiki(cl->desc(), t)) +"\n";
         }
 
         file += "==== Members ====\n";

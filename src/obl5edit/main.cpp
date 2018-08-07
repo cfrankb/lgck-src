@@ -21,6 +21,8 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include <QSurfaceFormat>
+#include <QSettings>
+#include <QFileInfo>
 
 int main(int argc, char *argv[])
 {
@@ -32,9 +34,20 @@ int main(int argc, char *argv[])
     format.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(format);
 
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    QFileInfo fi(app.applicationDirPath());
+    QString portable = QApplication::applicationDirPath() + "/portable.txt";
+    if(fi.isDir() && fi.isWritable() && QFileInfo::exists(portable)) {
+        // make the settings portable
+        QSettings::setDefaultFormat(QSettings::IniFormat);
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
+    }
+
     MainWindow w;
     w.show();
-
-    return a.exec();
+    if (argc == 2) {
+        QString fileName = argv[1];
+        w.openFile(fileName);
+    }
+    return app.exec();
 }

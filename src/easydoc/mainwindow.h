@@ -49,11 +49,13 @@ public:
     void exportWiki(const char *path);
 
 protected:
+    void initToolbar();
     void initFileMenu();
     bool maybeSave();
     bool save();
     bool saveAs();
     void warningMessage(const QString message);
+    void infoMessage(const QString message);
     bool updateTitle();
     void updateRecentFileActions();
     void reloadRecentFileActions();
@@ -74,6 +76,9 @@ private:
     TabWidget *m_tabs;
     void closeEvent(QCloseEvent *event);
     bool m_saveHTML;
+    bool m_saveWiki;
+    bool m_remember;
+    bool m_largeFont;
     void restoreSettings();
 
 private slots:
@@ -89,6 +94,10 @@ private slots:
     void on_actionWiki_triggered();
     void on_actionGameLua_triggered();
     void on_actionSave_HTML_triggered(bool checked);
+    void on_actionSave_Wiki_toggled(bool arg1);
+    void on_actionRemember_last_file_triggered(bool checked);
+    void on_actionLarge_Font_toggled(bool arg1);
+    void on_actionAbout_Qt_triggered();
 };
 
 #endif // MAINWINDOW_H

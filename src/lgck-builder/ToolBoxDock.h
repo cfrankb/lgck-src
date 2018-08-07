@@ -60,8 +60,10 @@ protected:
     void reloadSounds();
     void reloadLevels();
     void reloadEvents();
+    void reloadDisplays();
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
+    void checkFrameSetUses(int frameSet);
 
 private slots:
     void on_btnDeleteSprite_clicked();
@@ -99,6 +101,14 @@ private slots:
     void editFrames();
     void exportSprite();
     void updateFrameSet(int frameSet);
+    void on_treeDisplays_doubleClicked(const QModelIndex &index);
+    void on_btnDeleteDisplay_clicked();
+    void on_btnAddDisplay_clicked();
+    void on_treeDisplays_clicked(const QModelIndex &index);
+    void on_treeDisplays_customContextMenuRequested(const QPoint &pos);
+    void editDisplay();
+    void editEvent();
+    void on_treeEvents_customContextMenuRequested(const QPoint &pos);
 
 signals:
     void levelSelection(int index);
@@ -108,7 +118,6 @@ signals:
     void menuSeekingItems(QMenu *, int);
     void spriteDeleted(int sprite);
     void spriteChanged(int sprite);
-
 };
 
 #endif // TOOLBARDOCK_H

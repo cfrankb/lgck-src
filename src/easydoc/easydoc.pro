@@ -2,11 +2,16 @@
 # Project created by QtCreator 2010-02-17T21:49:55
 # -------------------------------------------------
 RESOURCES += easydoc.qrc
+win32:CONFIG        += no_lflags_merge
 INCLUDEPATH += ../shared
 win32:RC_FILE = easydoc.rc
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 win32:DEFINES += MAKE_WIN32
-DEFINES += USE_QFILE
+DEFINES += USE_QFILE MAKE_WIN32
+QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
+QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
+QMAKE_LFLAGS_WINDOWS += -Wl,--dynamicbase -Wl,--nxcompat,--large-address-aware
+win32:LIBS += -lmingw32
 
 TARGET = easydoc
 TEMPLATE = app
@@ -26,7 +31,10 @@ SOURCES += Class.cpp \
     Sections.cpp \
     tabwidget.cpp \ 
     DlgSource.cpp \
-    helper.cpp
+    helper.cpp \
+    testcase.cpp \
+    DlgStep.cpp \
+    pagecond.cpp
 
 HEADERS += Class.h \
     Classes.h \
@@ -43,7 +51,11 @@ HEADERS += Class.h \
     Sections.h \
     tabwidget.h \ 
     DlgSource.h \
-    helper.h
+    helper.h \
+    const.h \
+    testcase.h \
+    DlgStep.h \
+    pagecond.h
 
 FORMS += mainwindow.ui \
     DlgAbout.ui \
@@ -52,4 +64,6 @@ FORMS += mainwindow.ui \
     DlgParam.ui \
     DlgSection.ui \
     tabwidget.ui \ 
-    DlgSource.ui
+    DlgSource.ui \
+    DlgStep.ui \
+    pagecond.ui

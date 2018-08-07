@@ -17,6 +17,13 @@
 #include "inputs/qt/kt_qt.h"
 #include "qtgui/cheat.h"
 
+constexpr int MAX_PIXEL = 0x7ff8;
+constexpr int MARGIN = 32;
+constexpr int FAST_SCROLL = 32;
+constexpr int OBJ_SCROLL = 16;
+constexpr int PATH_SCROLL = 8;
+constexpr int MOUSE_POS_MASK = 0xfffffff8;
+
 CLevelScroll::CLevelScroll(QWidget *parent, CGame *game) :
         QAbstractScrollArea(parent)
 {

@@ -139,7 +139,7 @@
       <rect>
        <x>150</x>
        <y>180</y>
-       <width>241</width>
+       <width>221</width>
        <height>25</height>
       </rect>
      </property>
@@ -151,6 +151,29 @@
      </property>
      <property name="readOnly">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>180</y>
+       <width>21</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Copy to clipboard</string>
+     </property>
+     <property name="whatsThis">
+      <string>Copy to clipboard</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="lgck-builder.qrc">
+       <normaloff>:/images/pd/copy.png</normaloff>:/images/pd/copy.png</iconset>
      </property>
     </widget>
    </widget>
@@ -855,10 +878,12 @@ Double-click on the one you want to edit.</string>
   <customwidget>
    <class>CWBtnColor</class>
    <extends>QPushButton</extends>
-   <header location="global">wbtncolor.h</header>
+   <header>wbtncolor.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="lgck-builder.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

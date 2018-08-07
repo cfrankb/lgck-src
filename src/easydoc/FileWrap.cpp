@@ -315,3 +315,14 @@ CFileWrap & CFileWrap::operator << (const QStringList & list)
     }
     return *this;
 }
+
+int CFileWrap::read(void *buf, int size)
+{
+    return file.read( (char*) buf, size);
+}
+
+
+bool CFileWrap::open(const char *s, const char *mode)
+{
+    return open(QString(s));
+}

@@ -54,7 +54,7 @@ int whatIs(char *cmd)
     if (p) {
         *p = 0;
     }
-    for (int i=0; i < sizeof(cmds)/sizeof(const char*); ++i) {
+    for (unsigned int i=0; i < sizeof(cmds)/sizeof(const char*); ++i) {
         if (!strcmp(tmp, cmds[i])){
             return i;
         }
@@ -71,8 +71,10 @@ bool findLgckDB(char *cmd, std::string & outfilePath)
 {
     std::string ext = ".lgckdb";
     char *fullpath = realpath(cmd, NULL);
-    std::string base = fullpath;
-    free(fullpath);
+    std::string base = fullpath ? fullpath : cmd;
+    if (fullpath && cmd != fullpath) {
+        free(fullpath);
+    }
     if (fileExists(base + ext)) {
         outfilePath = base + ext;
         return true;

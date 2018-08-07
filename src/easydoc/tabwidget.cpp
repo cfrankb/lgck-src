@@ -176,7 +176,7 @@ void TabWidget::on_btnAdd_clicked()
     CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
     CFunction fn;
     d->load(&fn);
-    d->setWindowTitle(tr("new function"));
+    d->setWindowTitle(tr("New Function"));
 
     if (d->exec() == QDialog::Accepted) {
         d->save(&fn);
@@ -220,7 +220,7 @@ void TabWidget::on_treeFn_doubleClicked(QModelIndex index)
     fn.copy(m_db->m_functions[index.row()]);
     CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
     d->load( &fn );
-    d->setWindowTitle(tr("edit function"));
+    d->setWindowTitle(tr("Edit Function"));
 
     if (d->exec() == QDialog::Accepted) {
         d->save(& fn);
@@ -256,7 +256,7 @@ void TabWidget::on_btnAddClass_clicked()
     CDlgClass *d = new CDlgClass((QWidget*)parent());
     CClass * cl = new CClass;
     d->load(m_db, cl);
-    d->setWindowTitle(tr("new class"));        
+    d->setWindowTitle(tr("New Class"));
     if (d->exec() == QDialog::Accepted) {
         d->save( cl);
         int pos = m_db->m_classes.add( cl, true );
@@ -301,7 +301,7 @@ void TabWidget::on_treeClass_doubleClicked(QModelIndex index)
 {
     CDlgClass *d = new CDlgClass ( (QWidget*) parent());
     d->load( m_db, m_db->m_classes[index.row()] );
-    d->setWindowTitle(tr("edit class"));
+    d->setWindowTitle(tr("Edit Class"));
 
     if (d->exec() == QDialog::Accepted) {
 

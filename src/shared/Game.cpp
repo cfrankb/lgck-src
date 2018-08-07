@@ -52,6 +52,7 @@
 #include "../shared/Extra.h"
 #include "../shared/IFile.h"
 #include "../shared/Font.h"
+#include "displayconfig.h"
 
 #define JM_VLA3     0
 #define JM_GIANA    1
@@ -517,6 +518,8 @@ bool CGame::calculateWorldSize(CLevel *s, int &width, int &height)
 
 bool CGame::resetDefaultDisplays()
 {   
+    qDebug("************ CGame::resetDefaultDisplays()");
+
     IDisplayManager *dm = displays();
     if (!dm) {
         qDebug("IDisplayManager not attached\n");
@@ -524,29 +527,12 @@ bool CGame::resetDefaultDisplays()
     }
     clearDisplay();
 
-    CDisplay & display1 = dm->add("timeLeft", - 64, 0, CDisplay::DISPLAY_TIME_LEFT);
-    display1.setColor(0x90, 0x50, 0x80, 0xf0);
-    display1.setFontSize(30);
-    display1.setVisible(true);
-    display1.setShadow(true, 4, 4);
-
-    CDisplay & display2 = dm->add("score", 0, 0, CDisplay::DISPLAY_SCORE);
-    display2.setColor(222, 222, 222, 0xf0);
-    display2.setFontSize(26);
-    display2.setVisible(true);
-    display2.setShadow(true, 1, 1);
-
-    CDisplay & display3 = dm->add("debug", 8, 0, CDisplay::DISPLAY_DEBUGX);
-    display3.setColor(0xff, 0xff, 0x00, 0x40);
-    display3.setFontSize(16);
-    display3.setVisible(false);
-
-    CDisplay & display4 = dm->add("pause", -1, -1, CDisplay::DISPLAY_MESSAGE);
-    display4.setColor(0x00, 0xff, 0xff, 0x80);
-    display4.setFontSize(40);
-    display4.setVisible(getPause());
-    display4.setText("PRESS F4", CDisplay::DISPLAY_SAME);
-    display4.setShadow(true, 4, 4); 
+    CDisplayConfig & conf = *m_displayConfig;
+    for (int i=0; i < m_displayConfig->getSize(); ++i) {
+        // copy displays from displayConf to DisplayManager
+        CDisplay * display = conf[i];
+        dm->add(*display);
+    }
     return true;
 }
 
@@ -1416,6 +1402,8 @@ bool CGame::isEndLevelMeet()
 
 void CGame::postInitLevel()
 {
+    qDebug("postInitLevel\n");
+
     // invoke onCreate event
     callLvEvent(CLevel::EL_CREATE);
 
@@ -1428,6 +1416,8 @@ void CGame::postInitLevel()
         callGameEvent(CGameEvents::EG_RESTART_LEVEL);
         callLvEvent(CLevel::EL_RESTART);
     }
+
+    qDebug("postInitLevel completed\n");
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -2129,7 +2119,7 @@ void CGame::loadGame(IFile &file)
     file.read(&size,sizeof(unsigned int));
     for (unsigned int i=0; i<size; ++i) {
         CDisplay dx;
-        dx.read(file, version);
+        dx.read(file);
         d.add(dx);
     }
 
@@ -2201,6 +2191,11 @@ void CGame::remap()
 bool CGame::initFonts()
 {
     qDebug("initFont()");
+    if (m_font) {
+        // TODO: revisit this later when fontwiz will be operational
+        qDebug("Font already initialized");
+        return true;
+    }
     const char *fontName = ":/res/Tuffy_bold.fnt";
     CFileWrap file;
     if (file.open(fontName)) {

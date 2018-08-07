@@ -4,7 +4,8 @@
 #include <cstdio>
 #include <string>
 #include <list>
-#include <FileWrap.h>
+#include <zlib.h>
+#include "FileWrap.h"
 
 const char *toUpper(char *s)
 {
@@ -15,16 +16,18 @@ const char *toUpper(char *s)
     }
     return s;
 }
- 
+
 char *getUUID()
 {
     char *uuid = new char[128];
-    sprintf(uuid, "%.8x-%.4x-%.4x-%.4x-%.8x%.4x",
-            rand(),
+    sprintf(uuid, "%.4x%.4x-%.4x-%.4x-%.4x-%.4x%.4x%.4x",
             rand() & 0xffff,
             rand() & 0xffff,
             rand() & 0xffff,
-            rand(),
+            rand() & 0xffff,
+            rand() & 0xffff,
+            rand() & 0xffff,
+            rand() & 0xffff,
             rand() & 0xffff
             );
     return uuid;
@@ -222,3 +225,15 @@ char *realpath(const char *path, char resolved_path[PATH_MAX])
 }
 #else
 #endif
+
+int compressData(unsigned char *in_data, unsigned long in_size, unsigned char **out_data, unsigned long & out_size)
+{
+    out_size = ::compressBound(in_size);
+    *out_data = new unsigned char [out_size];
+    return ::compress2(
+                *out_data,
+                &out_size,
+                in_data,
+                in_size,
+                Z_DEFAULT_COMPRESSION);
+}

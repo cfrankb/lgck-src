@@ -16,6 +16,12 @@
   <property name="whatsThis">
    <string/>
   </property>
+  <property name="wizardStyle">
+   <enum>QWizard::ClassicStyle</enum>
+  </property>
+  <property name="options">
+   <set>QWizard::IgnoreSubTitles|QWizard::IndependentPages</set>
+  </property>
   <widget class="QWizardPage" name="wizardPage1">
    <widget class="QLabel" name="sWelcome">
     <property name="geometry">

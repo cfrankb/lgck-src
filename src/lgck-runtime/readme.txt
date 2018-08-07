@@ -1,5 +1,7 @@
 1- Creating the makefile
 
+There are three runtime options: sdl sfml and glut
+
   LINUX:
     ./setup.sh sdl --res
     ./setup.sh sfml --res
@@ -14,8 +16,13 @@
     make clean
     make
 
-3- Running the application
+3- Running the application (linux)
     build/lgck-runtime-sdl <<path_of_lgckdb>>
     build/lgck-runtime-sfml <<path_of_lgckdb>>
     build/lgck-runtime-glut <<path_of_lgckdb>>
 
+    Running on windows
+    build\lgck-runtime-sdl <<path_of_lgckdb>>
+    build\lgck-runtime-sfml <<path_of_lgckdb>>
+    build\lgck-runtime-glut <<path_of_lgckdb>>
+    

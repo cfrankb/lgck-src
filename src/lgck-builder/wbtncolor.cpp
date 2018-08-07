@@ -73,3 +73,10 @@ unsigned int CWBtnColor::color()
         (m_green << 8) +
         (m_blue << 16);
 }
+
+unsigned int CWBtnColor::colorBGR()
+{
+    return (m_red << 16) +
+        (m_green << 8) +
+        (m_blue);
+}

@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CDlgDisplay</class>
+ <widget class="QDialog" name="CDlgDisplay">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>374</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="toolTip">
+   <string>Overlay properties</string>
+  </property>
+  <property name="whatsThis">
+   <string>Overlay properties</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>330</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>361</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tabGeneral">
+    <attribute name="title">
+     <string>General</string>
+    </attribute>
+    <widget class="QLineEdit" name="eY">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>210</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Y coordinate of that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Y coordinate of that overlay.</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eX">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>180</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>X coordinate of that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>X coordinate of that overlay.</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>210</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Y</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eName">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>10</y>
+       <width>231</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Human readable name</string>
+     </property>
+     <property name="whatsThis">
+      <string>Human readable name</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>180</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>X</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Name</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Type</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbType">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>40</y>
+       <width>231</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Type of overlay</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Font Size</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Color</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Alpha</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cVisible">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>90</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Enable that overlay to be visible by default.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Enable that overlay to be visible by default.</string>
+     </property>
+     <property name="text">
+      <string>visible</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eFontSize">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>90</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Font size of the text to be displayed in that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Font size of the text to be displayed in that overlay.</string>
+     </property>
+    </widget>
+    <widget class="CWBtnColor" name="btnColor">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>116</y>
+       <width>81</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="CWSlider" name="sAlpha">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>150</y>
+       <width>191</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
+     <property name="statusTip">
+      <string/>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
+     <property name="maximum">
+      <number>255</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eColor">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>120</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Hex representation of the color of that overlay.</string>
+     </property>
+     <property name="inputMask">
+      <string>hhhhhh</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eAlpha">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>150</y>
+       <width>41</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of that overlay. 255 means fully solid color. 0 is invisible.</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbFlagX">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>180</y>
+       <width>69</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Alignment of that overlay. Manual means to alignment. Left will stick that overlay on the left side of the screen. Right will stack the overlay against the right side of the screen. Center will center this overlay on the screen.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Alignment of that overlay. Manual means to alignment. Left will stick that overlay on the left side of the screen. Right will stack the overlay against the right side of the screen. Center will center this overlay on the screen.</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbFlagY">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>210</y>
+       <width>69</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Alignment of that overlay. Manual means to alignment. Top will stick that overlay on the top side of the screen. Bottom will stack the overlay against the bottom of the screen. Center will center this overlay on the screen.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Alignment of that overlay. Manual means to alignment. Top will stick that overlay on the top side of the screen. Bottom will stack the overlay against the bottom of the screen. Center will center this overlay on the screen.</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tabShadow">
+    <attribute name="title">
+     <string>Shadow</string>
+    </attribute>
+    <widget class="QLineEdit" name="eShadowX">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>110</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>X offset of the shadow from the text (in pixels).</string>
+     </property>
+     <property name="whatsThis">
+      <string>X offset of the shadow from the text (in pixels).</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>offset Y</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Alpha</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Color</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>offset X</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eShadowY">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>150</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Y offset of the shadow from the text (in pixels).</string>
+     </property>
+     <property name="whatsThis">
+      <string>Y offset of the shadow from the text (in pixels).</string>
+     </property>
+    </widget>
+    <widget class="CWBtnColor" name="btnShadowColor">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>18</y>
+       <width>81</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="CWSlider" name="sShadowAlpha">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>70</y>
+       <width>191</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
+     </property>
+     <property name="maximum">
+      <number>255</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>190</y>
+       <width>341</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>The shadow is displayed underneat the text using the color and offsets provided above.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cShadowVisible">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>120</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>If checked, the shadow will be visible.</string>
+     </property>
+     <property name="whatsThis">
+      <string>If checked, the shadow will be visible.</string>
+     </property>
+     <property name="text">
+      <string>Visible</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eShadowColor">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>20</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Color the shadow of that overlay. This applies to the text being displayed.</string>
+     </property>
+     <property name="inputMask">
+      <string>hhhhhh</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eShadowAlpha">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>70</y>
+       <width>41</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
+     </property>
+     <property name="whatsThis">
+      <string>Transparency level of the shadow of the overlay. 255 is a solid color. 0 is fully transparent. Every other value blends with the background. </string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tabContent">
+    <attribute name="title">
+     <string>Content</string>
+    </attribute>
+    <widget class="QLineEdit" name="eText">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>20</y>
+       <width>241</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Text to be displayed on that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Text to be displayed on that overlay.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>22</y>
+       <width>40</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Text</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>47</y>
+       <width>47</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Template</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eTemplate">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>50</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Image</string>
+    </attribute>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Image set</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbFrameSet">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>15</y>
+       <width>161</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>ImageSet to be selected from.</string>
+     </property>
+     <property name="whatsThis">
+      <string>ImageSet to be selected from.</string>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+     </property>
+     <property name="minimumContentsLength">
+      <number>16</number>
+     </property>
+     <property name="duplicatesEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="modelColumn">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbBaseFrame">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>45</y>
+       <width>63</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Actual image to display.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Actual image to display.</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="sImage">
+     <property name="geometry">
+      <rect>
+       <x>25</x>
+       <y>85</y>
+       <width>171</width>
+       <height>181</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Image to be displayed on that overlay.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Image to be displayed on that overlay.</string>
+     </property>
+     <property name="text">
+      <string>ICON</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Base Image</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CWBtnColor</class>
+   <extends>QPushButton</extends>
+   <header>wbtncolor.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CWSlider</class>
+   <extends>QSlider</extends>
+   <header>wslider.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>eShadowX</tabstop>
+  <tabstop>sShadowAlpha</tabstop>
+  <tabstop>eShadowAlpha</tabstop>
+  <tabstop>cShadowVisible</tabstop>
+  <tabstop>eShadowY</tabstop>
+  <tabstop>eName</tabstop>
+  <tabstop>cbType</tabstop>
+  <tabstop>eFontSize</tabstop>
+  <tabstop>cVisible</tabstop>
+  <tabstop>btnColor</tabstop>
+  <tabstop>eColor</tabstop>
+  <tabstop>eShadowColor</tabstop>
+  <tabstop>cbFrameSet</tabstop>
+  <tabstop>cbBaseFrame</tabstop>
+  <tabstop>eText</tabstop>
+  <tabstop>eTemplate</tabstop>
+  <tabstop>eY</tabstop>
+  <tabstop>cbFlagY</tabstop>
+  <tabstop>sAlpha</tabstop>
+  <tabstop>eAlpha</tabstop>
+  <tabstop>eX</tabstop>
+  <tabstop>cbFlagX</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>btnShadowColor</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>CDlgDisplay</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>CDlgDisplay</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

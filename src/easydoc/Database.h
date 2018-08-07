@@ -24,6 +24,8 @@
 #include "Classes.h"
 #include "Sections.h"
 
+class QStringList;
+
 class CDatabase
 {
 public:
@@ -47,7 +49,7 @@ public:
     bool write();
     void dump(CFileWrap & file);
     void exportList(CFileWrap & file);
-    void exportWiki(const QString &path);
+    void exportWiki(const QString &path, QStringList &fileList);
     void importGameLua(const char *cdata);
 
     void setFileName(const QString fileName);
