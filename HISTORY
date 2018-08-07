@@ -4,7 +4,6 @@ HISTORY OF LGCK BUILDER
 
 - EDITOR: added portable option to package bundle (windows)
 - EDITOR: added export game UI dialog
-- EDITOR; replaced setup from InnoSetup with AdvancedInstaller
 - EDITOR: added manifests to satisfy windows app cert kit
 - EDITOR: new warnings for no player and no goal
 - EDITOR: lgck-builder and obl5edit can now be associated with files
