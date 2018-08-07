@@ -45,7 +45,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tabGeneral">
     <attribute name="title">
@@ -728,30 +728,30 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>eShadowX</tabstop>
+  <tabstop>sShadowAlpha</tabstop>
+  <tabstop>eShadowAlpha</tabstop>
+  <tabstop>cShadowVisible</tabstop>
+  <tabstop>eShadowY</tabstop>
   <tabstop>eName</tabstop>
   <tabstop>cbType</tabstop>
   <tabstop>eFontSize</tabstop>
   <tabstop>cVisible</tabstop>
-  <tabstop>eColor</tabstop>
   <tabstop>btnColor</tabstop>
+  <tabstop>eColor</tabstop>
+  <tabstop>eShadowColor</tabstop>
+  <tabstop>cbFrameSet</tabstop>
+  <tabstop>cbBaseFrame</tabstop>
+  <tabstop>eText</tabstop>
+  <tabstop>eTemplate</tabstop>
+  <tabstop>eY</tabstop>
+  <tabstop>cbFlagY</tabstop>
   <tabstop>sAlpha</tabstop>
   <tabstop>eAlpha</tabstop>
   <tabstop>eX</tabstop>
   <tabstop>cbFlagX</tabstop>
-  <tabstop>eY</tabstop>
-  <tabstop>cbFlagY</tabstop>
-  <tabstop>eShadowColor</tabstop>
-  <tabstop>btnShadowColor</tabstop>
-  <tabstop>sShadowAlpha</tabstop>
-  <tabstop>eShadowAlpha</tabstop>
-  <tabstop>eShadowX</tabstop>
-  <tabstop>cShadowVisible</tabstop>
-  <tabstop>eShadowY</tabstop>
-  <tabstop>eText</tabstop>
-  <tabstop>eTemplate</tabstop>
-  <tabstop>cbFrameSet</tabstop>
-  <tabstop>cbBaseFrame</tabstop>
   <tabstop>tabWidget</tabstop>
+  <tabstop>btnShadowColor</tabstop>
  </tabstops>
  <resources/>
  <connections>
