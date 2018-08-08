@@ -148,9 +148,9 @@ void CWizFont::importFont(CFont & font)
               }
           }
           CFont::Glyph glyph = {
-              xx * XSCALE,
-              yy * YSCALE,
-              maxx,//std::min(maxx+2, (int)XSCALE),
+              static_cast<short>(xx * XSCALE),
+              static_cast<short>(yy * YSCALE),
+              static_cast<short>(maxx),
               YSCALE
           };
           font.addGlyph(m_text[i], glyph);

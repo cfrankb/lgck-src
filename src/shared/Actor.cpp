@@ -1207,7 +1207,7 @@ int CActor::childCount()
     int count = 0;
     for (int i=0; i < scene.getSize(); ++i) {
         CActor & actor = scene [ i ];
-        if (actor.m_propi[EXTRA_OWNER] == m_id) {
+        if (static_cast<unsigned int>(actor.m_propi[EXTRA_OWNER]) == m_id) {
             ++count;
         }
     }
