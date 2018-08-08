@@ -20,6 +20,7 @@
 #define _DISPLAY_H
 #include <unordered_map>
 #include <string>
+#include <list>
 
 class IFile;
 
@@ -77,6 +78,7 @@ public:
     const char* gets(int i);
     void set(int i, int v);
     void set(int i, const char *v);
+    std::list<std::string> & lines();
 
     enum {
         DISPLAY_TIME_LEFT       = 0,
@@ -105,10 +107,12 @@ public:
         FLAG_Y_ALIGN_CENTER
     };
 
-protected:
+private:
 
     std::unordered_map <int, std::string> m_attrs;
     std::unordered_map <int, int> m_attri;
+    std::list<std::string> m_lines;
+    void splitString(const char *inData);
 
     enum {
         // numbers

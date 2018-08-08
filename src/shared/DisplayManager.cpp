@@ -32,6 +32,8 @@
 // https://www.google.ca/search?q=ftgl&btnG=Search&safe=off&client=opera&channel=suggest
 // http://devcry.heiho.net/2012/01/ftgl-font-rendering-in-multiple-colors.html
 
+#define RGBA(rgba) rgba & 0xff, (rgba & 0xff00) >> 8, (rgba & 0xff0000) >> 16, (rgba & 0xff000000) >> 24
+
 /////////////////////////////////////////////////////////////////////
 // CDisplayManager
 
@@ -159,20 +161,11 @@ void CDisplayManager::drawText(CDisplay & display)
     m_graphics->getScreenSize(screenLen, screenHei);
     CFont * font = m_game->m_font;
     font->FaceSize(display.size());
-    int sx = font->Advance(display.text());
-    int sy = display.size();
-    int x = display.x();
-    if (x < 0) {
-        if ( x != -1) {
-            x = screenLen + display.x();
-        } else {
-            if (x == -1) {
-                x = (screenLen - sx) / 2;
-            } else {
-                x = screenLen - x;
-            }
-        }
-    }
+
+    std::list<std::string> & lines = display.lines();
+
+    int dy = display.size();
+    int sy = dy * lines.size();
 
     int y = display.y();
     if (y < 0) {
@@ -186,8 +179,34 @@ void CDisplayManager::drawText(CDisplay & display)
             }
         }
     }
+    switch (flagY) {
+    case CDisplay::FLAG_Y_ALIGN_TOP:
+        y = 0;
+        break;
+    case CDisplay::FLAG_Y_ALIGN_BOTTOM:
+        y = screenHei - sy;
+        break;
+    case CDisplay::FLAG_Y_ALIGN_CENTER:
+        y = (screenHei - sy) / 2;
+    }
 
-    if (flagX || flagY) {
+    std::list<std::string>::iterator it;
+    for (it = lines.begin(); it != lines.end(); ++it) {
+        int sx = font->Advance(it->c_str());
+
+        int x = display.x();
+        if (x < 0) {
+            if ( x != -1) {
+                x = screenLen + display.x();
+            } else {
+                if (x == -1) {
+                    x = (screenLen - sx) / 2;
+                } else {
+                    x = screenLen - x;
+                }
+            }
+        }
+
         switch (flagX) {
         case CDisplay::FLAG_X_ALIGN_LEFT:
             x = 0;
@@ -198,25 +217,17 @@ void CDisplayManager::drawText(CDisplay & display)
         case CDisplay::FLAG_X_ALIGN_CENTER:
             x = (screenLen - sx) / 2;
         }
-        switch (flagY) {
-        case CDisplay::FLAG_Y_ALIGN_TOP:
-            y = 0;
-            break;
-        case CDisplay::FLAG_Y_ALIGN_BOTTOM:
-            y = screenHei - sy;
-            break;
-        case CDisplay::FLAG_Y_ALIGN_CENTER:
-            y = (screenHei - sy) / 2;
+
+        if (display.shadow()) {
+            Color color = {(UINT8)display.shadowR(), (UINT8)display.shadowG(), (UINT8)display.shadowB(), (UINT8)display.shadowA()};
+            m_graphics->render(*font, it->c_str(), x + display.shadowX(), y + display.shadowY(), color);
         }
-    }
 
-    if (display.shadow()) {
-        Color color = {(UINT8)display.shadowR(), (UINT8)display.shadowG(), (UINT8)display.shadowB(), (UINT8)display.shadowA()};
-        m_graphics->render(*font, display.text(), x + display.shadowX(), y + display.shadowY(), color);
-    }
+        Color color = { (UINT8)display.red(), (UINT8)display.green(), (UINT8)display.blue(), (UINT8)display.alpha()};
+        m_graphics->render(*font, it->c_str(), x, y, color);
 
-    Color color = { (UINT8)display.red(), (UINT8)display.green(), (UINT8)display.blue(), (UINT8)display.alpha()};
-    m_graphics->render(*font, display.text(), x, y, color);
+        y += dy;
+    }
 }
 
 void CDisplayManager::drawLives(CDisplay & display)
@@ -309,50 +320,13 @@ int CDisplayManager::display_sizeText(int displayId, const char *text)
 void CDisplayManager::drawText(int x, int y, const char *text, int fontID, int fontSize, unsigned int rgba, int shadowOffset, unsigned int shadowColor)
 {
     Q_UNUSED(fontID);
-    int screenLen;
-    int screenHei;
-    m_graphics->getScreenSize(screenLen, screenHei);
 
-    CFont * font = m_game->m_font;
-    font->FaceSize(fontSize);
-    if (x < 0) {
-        if ( x != -1) {
-            x = screenLen + x;
-        } else {
-            if (x == -1) {
-                int sx = font->Advance(text);
-                x = (screenLen - sx) / 2;
-            } else {
-                x = screenLen - x;
-            }
-        }
-    }
-
-    if (y < 0) {
-        if ( y != -1) {
-            y = screenHei + y;
-        } else {
-            if (y == -1) {
-                y = (screenHei - fontSize ) / 2;
-            } else {
-                y = screenHei - y;
-            }
-        }
-    }
-
-    if (shadowOffset && shadowColor) {
-        int red = shadowColor & 0xff;
-        int green = (shadowColor >> 8) & 0xff;
-        int blue = (shadowColor >> 16) & 0xff;
-        int alpha = shadowColor >> 24;
-        Color color = {(UINT8)red, (UINT8)green, (UINT8)blue, (UINT8)alpha};
-        m_graphics->render(*font, text, x + shadowOffset, y + shadowOffset, color);
-    }
-
-    int red = rgba & 0xff;
-    int green = (rgba >> 8) & 0xff;
-    int blue = (rgba >> 16) & 0xff;
-    int alpha = rgba >> 24;
-    Color color = {(UINT8)red, (UINT8)green, (UINT8)blue, (UINT8)alpha};
-    m_graphics->render(*font, text, x, y, color);
+    CDisplay d;
+    d.setFontSize(fontSize);
+    d.setColor(RGBA(rgba));
+    d.setXY(x, y);
+    d.setText(text);
+    d.setShadowColor(RGBA(shadowColor));
+    d.setShadow(shadowColor != 0, shadowOffset, shadowOffset);
+    drawText(d);
 }

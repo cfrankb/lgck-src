@@ -104,7 +104,7 @@ void CDlgDisplay::load(CDisplay & d)
 
     // page 3
     ui->eTemplate->setText(d.templateStr());
-    ui->eText->setText(d.text());
+    ui->eText->setPlainText(d.text());
     setImage(d.imageSet(), d.imageNo());
 
     // page 4
@@ -143,7 +143,7 @@ void CDlgDisplay::save(CDisplay & d)
 {
     // page 1
     d.setName(TEXT(ui->eName));
-    d.setText(TEXT(ui->eText));
+    d.setText(q2c(ui->eText->toPlainText()));
     d.setType(ui->cbType->currentIndex());
     d.setVisible(ui->cVisible->isChecked());
     d.setColor(COLOR(ui->btnColor->colorBGR()), ui->sAlpha->sliderPosition());

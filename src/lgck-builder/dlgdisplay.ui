@@ -45,7 +45,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tabGeneral">
     <attribute name="title">
@@ -545,25 +545,6 @@
     <attribute name="title">
      <string>Content</string>
     </attribute>
-    <widget class="QLineEdit" name="eText">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>20</y>
-       <width>241</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Text to be displayed on that overlay.</string>
-     </property>
-     <property name="whatsThis">
-      <string>Text to be displayed on that overlay.</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_12">
      <property name="geometry">
       <rect>
@@ -581,7 +562,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>47</y>
+       <y>217</y>
        <width>47</width>
        <height>20</height>
       </rect>
@@ -594,7 +575,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>50</y>
+       <y>220</y>
        <width>113</width>
        <height>20</height>
       </rect>
@@ -607,6 +588,16 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+    <widget class="QPlainTextEdit" name="eText">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>20</y>
+       <width>281</width>
+       <height>191</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -742,7 +733,6 @@
   <tabstop>eShadowColor</tabstop>
   <tabstop>cbFrameSet</tabstop>
   <tabstop>cbBaseFrame</tabstop>
-  <tabstop>eText</tabstop>
   <tabstop>eTemplate</tabstop>
   <tabstop>eY</tabstop>
   <tabstop>cbFlagY</tabstop>

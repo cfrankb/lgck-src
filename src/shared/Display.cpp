@@ -136,6 +136,7 @@ void CDisplay::hide()
 void CDisplay::setText(const char *content, int type)
 {
     set(DI_CONTENT, content);
+    splitString(content);
     if (type != DISPLAY_SAME) {
         set(DI_TYPE, DISPLAY_MESSAGE);
     }
@@ -299,6 +300,8 @@ bool CDisplay::read(IFile &file)
         file >> v;
         m_attrs[k] = v;
     }
+
+    splitString(m_attrs[DI_CONTENT].c_str());
     return true;
 }
 
@@ -406,4 +409,36 @@ void CDisplay::set(int i, int v)
 void CDisplay::set(int i, const char * v)
 {
     m_attrs[i] = v;
+}
+
+void CDisplay::splitString(const char *inData)
+{
+    m_lines.clear();
+    int len = strlen(inData);
+    char *tmp = new char[len + 1];
+    strcpy(tmp, inData);
+    char *s = tmp;
+    char *p = s;
+    for (; *s; ++s) {
+        if (s[0] == '\r' && s[1] == '\n') {
+            s[0] = 0;
+            continue;
+        } else if (s[0] == '\r' || s[0] == '\n') {
+            // we have found a new line
+            s[0] = 0;
+            m_lines.push_back(p);
+            p = s + 1;
+        } else if (s[0] == '\t') {
+            s[0] = ' ';
+        }
+    }
+    if (p[0]) {
+        m_lines.push_back(p);
+    }
+    delete [] tmp;
+}
+
+std::list<std::string> & CDisplay::lines()
+{
+    return m_lines;
 }
