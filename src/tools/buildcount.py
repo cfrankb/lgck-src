@@ -28,7 +28,7 @@ ver = data.replace('#define SS_LGCK_VERSION 0x', '').strip()
 ver = re.findall('..?', ver)
 
 version = '.'.join([str(int(x, 16)) for x in ver])
-build = '{version} build {build_no}'.format(version=version, build_no=build_no)
+build = '{version} - build {build_no}'.format(version=version, build_no=build_no)
 print (build)
 
 target = "../shared/ss_build.h"

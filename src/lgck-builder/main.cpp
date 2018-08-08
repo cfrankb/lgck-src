@@ -25,7 +25,7 @@
 #include <QGLWidget>
 #include <QSettings>
 #include "WizGame.h"
-#include "ss_version.h"
+#include "ss_build.h"
 #include <ctime>
 #include <QMessageBox>
 
@@ -62,13 +62,7 @@ int main(int argc, char *argv[])
 
     if (!skipSplash && fileName.isEmpty()) {
         do {
-            int version = SS_LGCK_VERSION;
-            int vv[4]={0,0,0,0};
-            for (int i=3; i >= 0; --i) {
-                vv[i] = version & 0xff;
-                version /= 256;
-            }
-            QString ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+            QString ver = SS_BUILD_STR;//QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
             CDlgSelect * dlg = new CDlgSelect(&w);
             dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
             dlg->raise();
