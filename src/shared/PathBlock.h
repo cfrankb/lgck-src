@@ -19,16 +19,18 @@
 #ifndef PATHBLOCK_H
 #define PATHBLOCK_H
 
+
+#include "ISerial.h"
 class IFile;
 class CPath;
 
-class CPathBlock
+class CPathBlock: public ISerial
 {
 public:
     CPathBlock();
     ~CPathBlock();
-    void read(IFile &file);
-    void write(IFile & file);
+    virtual bool read(IFile &file);
+    virtual bool write(IFile & file);
     void forget();
     CPath & operator [](int i);
     int addPath();

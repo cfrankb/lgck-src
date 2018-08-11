@@ -1,6 +1,6 @@
 /*
     LGCK Builder Runtime
-    Copyright (C) 1999, 2013  Francois Blanchette
+    Copyright (C) 1999, 2018  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,39 +15,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef STRINGTABLE_H
-#define STRINGTABLE_H
+#ifndef __ISERIAL
+#define __ISERIAL
 
 class IFile;
 
-#include <string>
-#include "ISerial.h"
-
-class CStringTable: public ISerial
+class ISerial
 {
 public:
-    CStringTable();
-    ~CStringTable();
-
-    virtual bool read(IFile & file);
-    virtual bool write(IFile & file);
-    const char * operator [] (int i);
-    int add(const char *str);
-    void forget();
-    int set(int i, const char *str);
-    const char * get(int i);
-    int findFree();
-    int duplicate(int i);
-
-protected:
-    enum {
-        GROW_BY = 20
-    };
-
-    int m_size;
-    int m_max;
-    std::string * m_strings;
+    virtual ~ISerial(){};
+    virtual bool read(IFile & file)=0;
+    virtual bool write(IFile & file)=0;
 };
 
-#endif // STRINGTABLE_H
+
+#endif

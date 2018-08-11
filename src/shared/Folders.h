@@ -23,6 +23,7 @@
 #include <string>
 
 class CFileWrap;
+class ISerial;
 
 class CFolder
 {
@@ -139,6 +140,7 @@ public:
     bool readFolderIndex();
     bool writeFileIndex();
     bool readFileIndex();
+    bool writeFile(CFileWrap & file, ISerial & serial, CFolder &folder, const char *name);
 
     typedef struct {
         CFileWrap file;

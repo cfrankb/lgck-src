@@ -21,6 +21,7 @@
 
 #include "LevelEntry.h"
 #include "Object.h"
+#include "ISerial.h"
 
 // ProtoArray.h : header file
 //
@@ -32,13 +33,13 @@ class CProtoIndex;
 class CFileWrap;
 class IFile;
 
-class CProtoArray
+class CProtoArray: public ISerial
 {
 
 // Construction
 public:
-        bool read (IFile & file);
-        bool write (IFile & file);
+        virtual bool read (IFile & file);
+        virtual bool write (IFile & file);
         CProto & getProto(CLevelEntry & entry);
         CProtoArray();
 

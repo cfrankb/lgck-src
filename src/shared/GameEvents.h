@@ -21,15 +21,16 @@
 
 class IFile;
 #include <string>
+#include "ISerial.h"
 
-class CGameEvents
+class CGameEvents: public ISerial
 {
 public:
     CGameEvents();
     ~CGameEvents();
 
-    void read(IFile &file);
-    void write(IFile & file);
+    virtual bool read(IFile &file);
+    virtual bool write(IFile & file);
 
     static int getSize();
     const char * getEvent(int i);

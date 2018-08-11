@@ -272,7 +272,8 @@ HEADERS  +=  mainwindow.h \
     dlgdisplay.h \
     wslider.h \
     ../shared/ss_build.h \
-    ../shared/fontmanager.h
+    ../shared/fontmanager.h \
+    ../shared/ISerial.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \

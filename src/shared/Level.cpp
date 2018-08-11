@@ -338,8 +338,9 @@ CLayer* CLevel::removeLayerById(int layerId)
     return layer;
 }
 
-bool CLevel::write(IFile & file, bool compr)
+bool CLevel::write(IFile & file)
 {
+    bool compr=true;
     int version = getVersion();
     int marker = COMPR;
     if (!compr) {

@@ -4,10 +4,11 @@
 class IFile;
 class CFont;
 #include <string>
+#include "ISerial.h"
 
 #define DEFAULT_FONT "Arial"
 
-class CFontManager
+class CFontManager: public ISerial
 {
 public:
     CFontManager();
@@ -20,8 +21,8 @@ public:
     int getSize();
     void forget();
     void reset();
-    bool read(IFile & file);
-    bool write(IFile & file);
+    virtual bool read(IFile & file);
+    virtual bool write(IFile & file);
     CFont *operator[](int i);
     CFont *operator[](const char *s);
 

@@ -21,6 +21,8 @@
 
 #include "Settings.h"
 #include <string>
+#include "ISerial.h"
+
 class IFile;
 class CLayer;
 
@@ -30,7 +32,7 @@ class CLayer;
 /////////////////////////////////////////////////////////////////////////////
 // CLevel
 
-class CLevel
+class CLevel: public ISerial
 {
 public:
     CLevel();
@@ -82,7 +84,7 @@ public:
     void debug();
     ~CLevel();
     bool read(IFile & file);
-    bool write(IFile & file, bool compr=true);
+    bool write(IFile & file);
     int m_currLayer;
     int m_mx;
     int m_my;

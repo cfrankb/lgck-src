@@ -590,6 +590,16 @@ bool CGameFile::read(const char *filepath)
             m_displayConfig->reset();
         }
 
+        // fonts
+        CFolder::CFileEntry * fonts = fs.checkOut("fonts");
+        if (fonts) {
+            file.seek(fonts->getOffset());
+            m_fontManager->read(file);
+        } else {
+            qDebug("Warning: missing `fonts`. Using defaults.\n");
+            m_fontManager->reset();
+        }
+
         qDebug("read done ;) \n");
         return true;
     }
@@ -612,12 +622,7 @@ bool CGameFile::write(const char *filepath)
         int aSize, bSize;
 
         // proto.dat
-        bSize = fs.getSize();
-        file.seek(bSize);
-        m_arrProto.write(file);
-        aSize = file.getSize();
-        root.addFile("proto.dat", bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, m_arrProto, root, "proto.dat");
 
         // lgck.cfg
         std::string t;
@@ -628,28 +633,13 @@ bool CGameFile::write(const char *filepath)
         fs += t.length();
 
         // events
-        bSize = fs.getSize();
-        file.seek(fs.getSize());
-        m_events->write(file);
-        aSize = file.getSize();
-        root.addFile("events",  bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_events, root, "events");
 
         // strings
-        bSize = fs.getSize();
-        file.seek(fs.getSize());
-        m_strings->write(file);
-        aSize = file.getSize();
-        root.addFile("strings",  bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_strings, root, "strings");
 
         // paths
-        bSize = fs.getSize();
-        file.seek(fs.getSize());
-        m_paths->write(file);
-        aSize = file.getSize();
-        root.addFile("paths",  bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_paths, root, "paths");
 
         // version.dat
         VERSION version;
@@ -666,53 +656,34 @@ bool CGameFile::write(const char *filepath)
 
         CFolder & snd = fs.addFolder("sounds");
         for (int i=0; i < m_arrSounds.getSize(); ++i){
-            int bSize = fs.getSize();
-            file.seek(bSize);
-            if (m_arrSounds[i]->getSize()) {
-                file.write( m_arrSounds[i]->getData(), m_arrSounds[i]->getSize());
-            }
-            int aSize = file.getSize();
-            snd.addFile(m_arrSounds[i]->getName(), bSize, aSize - bSize);
-            fs += (aSize - bSize);
+            CSnd * noise = m_arrSounds[i];
+            fs.writeFile(file, *noise, snd, noise->getName());
         }
 
         CFolder & obl = fs.addFolder("obldata");
         for (int i=0; i < m_arrFrames.getSize(); ++i) {
             CFrameSet * filter = m_arrFrames[i];
-            int bSize = fs.getSize();
-            file.seek(bSize);
-            filter->write(file);
-            int aSize = file.getSize();
-            obl.addFile(filter->getName(), bSize, aSize - bSize);
-            fs += (aSize - bSize);
+            fs.writeFile(file, *filter, obl, filter->getName());
         }
 
         CFolder & levels = fs.addFolder("scripts");
         for (int i = 0; i < getSize(); ++i) {
-            int bSize = fs.getSize();
-            file.seek(bSize);
-            m_arrLevels[i]->write(file);
-            int aSize = file.getSize();
-
             char levelName[16];
-            sprintf(levelName, "level%d", i+1);
-            //QString levelName = QString().arg(i + 1);
-            levels.addFile(levelName, bSize, aSize - bSize);
-            fs += (aSize - bSize);
+            sprintf(levelName, "level%d", i + 1);
+            fs.writeFile(file, *(m_arrLevels[i]), levels, levelName);
         }
 
         // displayconf
-        bSize = fs.getSize();
-        file.seek(bSize);
-        m_displayConfig->write(file);
-        aSize = file.getSize();
-        root.addFile("displayConf.dat", bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_displayConfig, root, "displayConf.dat");
+
+        // fonts
+        fs.writeFile(file, *m_fontManager, root, "fonts");
 
         fs.writeFileIndex ( );
         fs.writeFolderIndex( );
         fs.writeHeader( );
-//        qDebug("writing done\n");
+
+//      qDebug("writing done\n");
         return true;
     }
 

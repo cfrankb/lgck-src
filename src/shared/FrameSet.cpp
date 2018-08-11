@@ -119,8 +119,9 @@ void CFrameSet::write0x501(IFile & file)
     delete[] dest;
 }
 
-bool CFrameSet::write (IFile & file, int version)
+bool CFrameSet::write (IFile & file)
 {
+    int version = OBL_VERSION;
     file.write( "OBL5", 4);
     file.write( &m_size, 4);
     file.write( &version, 4);

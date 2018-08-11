@@ -25,6 +25,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <unistd.h>
+#include "IFile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CSndArray
@@ -261,4 +262,17 @@ void CSnd::debug()
         t[4] = 0;
         memcpy(t, m_data, 4);
     }
+}
+
+bool CSnd::read(IFile & file)
+{
+    return true;
+}
+
+bool CSnd::write(IFile & file)
+{
+    if (getSize()) {
+        file.write(getData(), getSize());
+    }
+    return true;
 }

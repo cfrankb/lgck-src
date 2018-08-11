@@ -47,7 +47,7 @@ CGameEvents::~CGameEvents()
     m_events = NULL;
 }
 
-void CGameEvents::read(IFile & file)
+bool CGameEvents::read(IFile & file)
 {
     int size = 0;
     file.read(&size, 4);
@@ -63,6 +63,7 @@ void CGameEvents::read(IFile & file)
     for (; i < max; ++i) {
         m_events[i] = std::string("");
     }
+    return true;
 }
 
 void CGameEvents::forget()
@@ -73,13 +74,14 @@ void CGameEvents::forget()
     }
 }
 
-void CGameEvents::write(IFile &file)
+bool CGameEvents::write(IFile &file)
 {
     int size = sizeof(m_eventList) / sizeof(std::string);
     file.write(&size,4);
     for (int i=0; i < size; ++i) {
         file << m_events[i];
     }
+    return true;
 }
 
 int CGameEvents::getSize()

@@ -1,11 +1,12 @@
 #ifndef DISPLAYCONFIG_H
 #define DISPLAYCONFIG_H
 
+#include "ISerial.h"
 
 class CDisplay;
 class IFile;
 
-class CDisplayConfig
+class CDisplayConfig: public ISerial
 {
 public:
     CDisplayConfig();
@@ -19,8 +20,8 @@ public:
     void forget();
     CDisplay & add(const char *name, int x, int y, int type);
     void reset();
-    bool read(IFile & file);
-    bool write(IFile & file);
+    virtual bool read(IFile & file);
+    virtual bool write(IFile & file);
     void killFrameSet(int frameSet);
     CDisplay *operator[](int i);
     CDisplay *operator[](const char *s);

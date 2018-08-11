@@ -135,9 +135,11 @@ bool CFontManager::read(IFile & file)
     int size;
     file.read(&size, sizeof(size));
     for (int i=0; i < size; ++i) {
-      //  CDisplay display;
-     //   display.read(file);
-    //    add(display);
+        std::string name;
+        CFont font;
+        file >> name;
+        font.read(file);
+        add(font, name.c_str());
     }
     return true;
 }
@@ -145,10 +147,14 @@ bool CFontManager::read(IFile & file)
 bool CFontManager::write(IFile & file)
 {
     unsigned int version = VERSION;
+    int size = m_size - 1;
     file.write(&version, sizeof(version));
-    file.write(&m_size, sizeof(m_size));
-    for (int i=0; i < m_size; ++i) {
-    //    m_displays[i]->write(file);
+    file.write(&size, sizeof(m_size));
+    // skip over the default font
+    for (int i=1; i < m_size; ++i) {
+        FONT *font = m_fonts[i];
+        file << font->name;
+        font->font->write(file);
     }
     return true;
 }

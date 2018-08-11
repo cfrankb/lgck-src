@@ -20,6 +20,7 @@
 #include <string.h>
 #include "../shared/FileWrap.h"
 #include "Folders.h"
+#include "ISerial.h"
 
 CFolders::CFolders()
 {
@@ -373,5 +374,16 @@ CFolder::CFileEntry * CFolder::operator [] (int i)
 {
     if ( i <0 || i >= m_size) return NULL;
     return & m_files[i];
+}
+
+bool CFolders::writeFile(CFileWrap & file, ISerial & serial, CFolder & folder, const char *name)
+{
+    int bSize = getSize();
+    file.seek(bSize);
+    serial.write(file);
+    int aSize = file.getSize();
+    folder.addFile(name, bSize, aSize - bSize);
+    m_fileSize += (aSize - bSize);
+    return true;
 }
 

@@ -36,7 +36,7 @@ CStringTable::~CStringTable()
     m_strings = NULL;
 }
 
-void CStringTable::read(IFile &file)
+bool CStringTable::read(IFile &file)
 {
     file.read(&m_size, sizeof(UINT32));
     if (m_strings) {
@@ -47,14 +47,16 @@ void CStringTable::read(IFile &file)
     for (int i=0; i<m_size; ++i) {
         file >> m_strings[i];
     }
+    return true;
 }
 
-void CStringTable::write(IFile &file)
+bool CStringTable::write(IFile &file)
 {
     file.write(&m_size, sizeof(UINT32));
     for (int i=0; i<m_size; ++i) {
         file << m_strings[i];
     }
+    return true;
 }
 
 const char * CStringTable::operator [] (int i)

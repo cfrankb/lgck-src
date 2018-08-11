@@ -21,6 +21,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "ISerial.h"
 
 class CFrame;
 class IFile;
@@ -31,7 +32,7 @@ class IFile;
 /////////////////////////////////////////////////////////////////////////////
 // CFrameSet
 
-class CFrameSet
+class CFrameSet: public ISerial
 {
     // Construction
 public:
@@ -74,8 +75,8 @@ public:
     // Implementation
 public:
     ~CFrameSet();
-    bool write(IFile &file, int version=0x501);
-    bool read(IFile &file);
+    virtual bool write(IFile &file);
+    virtual bool read(IFile &file);
     int m_nCurrFrame;
 
     enum {

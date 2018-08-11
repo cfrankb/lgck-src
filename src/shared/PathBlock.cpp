@@ -33,7 +33,7 @@ CPathBlock::~CPathBlock()
     delete [] m_paths;
 }
 
-void CPathBlock::read(IFile & file)
+bool CPathBlock::read(IFile & file)
 {
     UINT32 version = 0;
     file.read(&version, sizeof(UINT32));
@@ -44,9 +44,10 @@ void CPathBlock::read(IFile & file)
     for (int i=0; i<m_size; ++i) {
         m_paths[i].read(file);
     }
+    return true;
 }
 
-void CPathBlock::write(IFile &file)
+bool CPathBlock::write(IFile &file)
 {
     UINT32 version = VERSION;
     file.write(&version, sizeof(UINT32));
@@ -54,6 +55,7 @@ void CPathBlock::write(IFile &file)
     for (int i=0; i<m_size; ++i) {
         m_paths[i].write(file);
     }
+    return true;
 }
 
 void CPathBlock::forget()
