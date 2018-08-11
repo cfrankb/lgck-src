@@ -350,7 +350,6 @@ protected:
     ISound *m_sound;
     CSnapshot *m_snapshot;
     CTasks *m_tasks;
-    CFont *m_font;
 };
 
 /////////////////////////////////////////////////////////////////////////////

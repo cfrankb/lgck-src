@@ -8,7 +8,6 @@ build_nr.commands = python ../tools/buildcount.py
 build_nr.depends = FORCE
 QMAKE_EXTRA_TARGETS += build_nr
 PRE_TARGETDEPS += build_nr
-HEADERS  += ../shared/ss_build.h
 
 #win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
@@ -160,7 +159,9 @@ SOURCES +=  mainwindow.cpp \
     exportgame.cpp \
     ../shared/displayconfig.cpp \
     dlgdisplay.cpp \
-    wslider.cpp
+    wslider.cpp \
+    ../shared/ss_build.cpp \
+    ../shared/fontmanager.cpp
 
 HEADERS  +=  mainwindow.h \
     levelviewgl.h \
@@ -269,7 +270,9 @@ HEADERS  +=  mainwindow.h \
     exportgame.h \
     ../shared/displayconfig.h \
     dlgdisplay.h \
-    wslider.h
+    wslider.h \
+    ../shared/ss_build.h \
+    ../shared/fontmanager.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \

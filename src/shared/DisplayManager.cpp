@@ -24,6 +24,7 @@
 #include "interfaces/IImageManager.h"
 #include "FileWrap.h"
 #include "Font.h"
+#include "fontmanager.h"
 
 // http://www.codehead.co.uk/cbfg/
 // http://doc.qt.io/qt-5/qtwidgets-widgets-charactermap-example.html
@@ -159,7 +160,7 @@ void CDisplayManager::drawText(CDisplay & display)
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
-    CFont * font = m_game->m_font;
+    CFont *font = m_game->getFonts()->find(DEFAULT_FONT);
     font->FaceSize(display.size());
 
     std::list<std::string> & lines = display.lines();
@@ -303,7 +304,7 @@ void CDisplayManager::draw()
 
 int CDisplayManager::display_sizeText(int displayId, const char *text)
 {
-    CFont * font = m_game->m_font;
+    CFont *font = m_game->getFonts()->find(DEFAULT_FONT);
     if (isValidIndex(displayId)) {
         CDisplay & display = m_displays[displayId];
         font->FaceSize(display.size());

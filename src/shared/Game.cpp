@@ -53,6 +53,7 @@
 #include "../shared/IFile.h"
 #include "../shared/Font.h"
 #include "displayconfig.h"
+#include "fontmanager.h"
 
 #define JM_VLA3     0
 #define JM_GIANA    1
@@ -111,7 +112,6 @@ CGame::CGame():CGameFile()
     svar("WarpTo") = INVALID;
     m_snapshot = new CSnapshot;
     m_tasks = new CTasks;
-    m_font = NULL;
 }
 
 CGame::~CGame()
@@ -140,10 +140,6 @@ CGame::~CGame()
     delete m_sFW;
     delete m_snapshot;
     delete m_tasks;
-    if (m_font) {
-        delete m_font;
-    }
-
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -2191,24 +2187,24 @@ void CGame::remap()
 bool CGame::initFonts()
 {
     qDebug("initFont()");
-    if (m_font) {
-        // TODO: revisit this later when fontwiz will be operational
-        qDebug("Font already initialized");
-        return true;
-    }
-    const char *fontName = ":/res/Tuffy_bold.fnt";
-    CFileWrap file;
-    if (file.open(fontName)) {
-        m_font = new CFont;
-        m_font->read(file);
-        file.close();
-        int textureId = m_imageManager->add("Arial", m_font);
-        qDebug("textureId: %u", textureId);
-        m_font->setTextureId(textureId);
-        return true;
-    } else {
-        m_font = NULL;
-        qDebug("can't read %s", fontName);
+    CFontManager * fonts = getFonts();
+    if (!fonts) {
+        qDebug("font manager not created");
         return false;
     }
+    CFont *font = fonts->find(DEFAULT_FONT);
+    if (!font) {
+        qDebug("default font not found");
+        qDebug("total fonts: %d", fonts->getSize());
+        return false;
+    }
+    if (font->textureId()) {
+        qDebug("Font already initialized");
+    } else {
+        qDebug("adding font");
+        int textureId = m_imageManager->add(DEFAULT_FONT, font);
+        qDebug("textureId: %u", textureId);
+        font->setTextureId(textureId);
+    }
+    return true;
 }

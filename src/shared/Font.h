@@ -39,6 +39,7 @@ public:
     int scaleY();
     int face();
     float fixup();
+    CFont &operator = (CFont & s);
 
 protected:
     enum {
@@ -56,7 +57,6 @@ protected:
         return x+1;
     }
 
-    static char m_signature[];
     std::unordered_map<char, CFont::Glyph> m_glyphs;
     std::unordered_map<std::string, std::string> m_props;
     std::string m_text;

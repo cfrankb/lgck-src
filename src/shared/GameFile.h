@@ -33,6 +33,7 @@ class CTasks;
 class CGameEvents;
 class CSettings;
 class CDisplayConfig;
+class CFontManager;
 
 typedef struct
 {
@@ -173,6 +174,7 @@ public:
     CGameEvents * getEvents();
     CSettings * getSettings();
     CDisplayConfig * getDisplayConfig();
+    CFontManager  *getFonts();
     int * countFrameSetUses();
 
     /////////////////////////////////////////////////////////////////
@@ -198,6 +200,7 @@ protected:
     CGameEvents *m_events;
     CSettings *m_settings;
     CDisplayConfig *m_displayConfig;
+    CFontManager *m_fontManager;
     typedef struct {
         std::string name;
         std::string src;

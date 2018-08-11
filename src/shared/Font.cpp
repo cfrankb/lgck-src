@@ -3,12 +3,13 @@
 #include <cstring>
 #include "stdafx.h"
 
-char CFont::m_signature[]="LGCKFONT";
+#define SIGNATURE "LGCKFONT"
 
 CFont::CFont()
 {
     m_pixels = NULL;
     m_text = "";
+    m_textureId = 0;
 }
 
 CFont::~CFont()
@@ -27,6 +28,7 @@ void CFont::forget()
   //  m_text = "";
     m_glyphs.clear();
     m_props.clear();
+    m_textureId = 0;
 }
 
 void CFont::setPixmap(const char *glyphs, unsigned int *pixmap, int width, int height)
@@ -61,7 +63,8 @@ void CFont::write(IFile & file)
 {
     // header
     int version = VERSION;
-    file.write(m_signature, 8);
+    const char *signature = SIGNATURE;
+    file.write(signature, 8);
     file.write(&version, 4);
     file.write(&m_width, 2);
     file.write(&m_height, 2);
@@ -99,7 +102,7 @@ void CFont::read(IFile & file)
     int version = 0;
     // header
     file.read(signature, 8);
-    ASSERT(!memcmp(signature, m_signature,8));
+    ASSERT(!memcmp(signature, SIGNATURE,8));
     file.read(&version, 4);
     ASSERT(version==VERSION);
     m_width = m_height = 0;
@@ -221,3 +224,27 @@ float CFont::fixup()
 {
     return 0.80;
 }
+
+CFont &CFont::operator = (CFont & s)
+{
+    m_glyphs = s.m_glyphs;
+    m_props = s.m_props;
+    m_text = s.m_text;
+    m_width = s.m_width;
+    m_height = s.m_height;
+    m_pxRef = s.m_pxRef;
+    m_scaleX = s.m_scaleX;
+    m_scaleY = s.m_scaleY;
+    m_scale = s.m_scale;
+    m_face = s.m_face;
+    m_textureId = s.m_textureId;
+    int h = pow2roundup(m_height);
+    m_pixels = new unsigned int[m_width*h];
+    if (s.pixels()) {
+        memcpy(m_pixels, s.pixels(), m_width * m_height * 4);
+    } else {
+        memset(m_pixels, 0, m_width * m_height * 4);
+    }
+    return * this;
+}
+

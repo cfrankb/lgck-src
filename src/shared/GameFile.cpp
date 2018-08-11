@@ -41,6 +41,7 @@
 #include "GameEvents.h"
 #include "../shared/helper.h"
 #include "displayconfig.h"
+#include "fontmanager.h"
 
 CSettings::SETTING CGameFile::m_gameDefaults[] =
 {
@@ -111,6 +112,7 @@ CGameFile::CGameFile()
     m_imageManager = NULL;
     m_displayConfig = new CDisplayConfig;
     m_displayConfig->reset();
+    m_fontManager = new CFontManager;
     // ImageManager must be created before Init();
     init();
     parseClassList();
@@ -123,6 +125,7 @@ CGameFile::~CGameFile()
     delete m_events;
     delete m_settings;
     delete m_displayConfig;
+    delete m_fontManager;
 }
 
 void CGameFile::parseClassList()
@@ -858,4 +861,9 @@ int *CGameFile::countFrameSetUses()
         ++countFrameSetUses[proto.m_nFrameSet];
     }
     return countFrameSetUses;
+}
+
+CFontManager * CGameFile::getFonts()
+{
+    return m_fontManager;
 }
