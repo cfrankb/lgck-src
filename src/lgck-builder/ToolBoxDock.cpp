@@ -1295,6 +1295,9 @@ void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
         if (dlg.exec() == QDialog::Accepted) {
             dlg.save(d);
             gf.setDirty(true);
+            QTreeWidgetItem * item = m_ui->treeDisplays->topLevelItem( i );
+            m_ui->treeDisplays->setCurrentItem( item );
+            item->setText(0, d.name());
         }
     }
 }
@@ -1445,7 +1448,7 @@ void CToolBoxDock::updateIcon(int protoId)
 {
     int i = m_index->findProto(protoId);
     if (i !=  -1) {
-        QTreeWidgetItem * item =  m_ui->treeObjects->topLevelItem(i);\
+        QTreeWidgetItem * item =  m_ui->treeObjects->topLevelItem(i);
         updateIcon(item, protoId);
     }
 }
