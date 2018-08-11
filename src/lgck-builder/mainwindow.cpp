@@ -224,6 +224,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(spriteCreated()),
             m_toolBox, SLOT(createSprite()));
 
+    connect(this, SIGNAL(spriteUpdated(int)),
+            m_toolBox, SLOT(updateIcon(int)));
+
     connect(this, SIGNAL(gridVisible(bool)),
             m_lview, SLOT(showGrid(bool)));
 
@@ -1747,6 +1750,7 @@ void MainWindow::on_actionEdit_Object_triggered()
                 if (proto != m_doc.m_arrProto[ entry.m_nProto ]) {
                     m_doc.setDirty(true);
                 }
+                emit spriteUpdated(entry.m_nProto);
             }
             delete d;
         }
@@ -1759,7 +1763,7 @@ void MainWindow::on_actionCustomize_triggered()
         CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
-            CDlgEntry *d = new CDlgEntry (this);
+            CDlgEntry *d = new CDlgEntry(this);
             d->setGameDB( & m_doc);
 
             int triggers[CGameFile::TRIGGER_KEYS + 1];
@@ -1777,6 +1781,7 @@ void MainWindow::on_actionCustomize_triggered()
                     m_doc.setDirty( true );
                 }
             }
+            emit spriteUpdated(entry.m_nProto);
             delete d;
         }
     }

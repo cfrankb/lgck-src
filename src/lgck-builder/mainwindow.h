@@ -24,7 +24,6 @@ class QLabel;
 class CWEditEvents;
 class QAction;
 class CLevelScroll;
-//class CLevelView;
 class CLevelViewGL;
 class CToolBoxDock;
 class CThreadUpdater;
@@ -282,6 +281,7 @@ signals:
     void textInserted(const char *text);
     void fontSizeChanged(int);
     void frameSetChanged(int fs);
+    void spriteUpdated(int protoId);
 };
 
 #endif // MAINWINDOW_H

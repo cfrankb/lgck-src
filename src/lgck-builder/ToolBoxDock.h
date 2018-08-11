@@ -27,6 +27,7 @@
 
 class CGameFile;
 class CProtoIndex;
+class QTreeWidgetItem;
 
 namespace Ui {
     class CToolBoxDock;
@@ -51,7 +52,7 @@ protected:
     CGameFile *m_gameFile;
     int *m_indexSettings;
 
-    void updateIcon(void * item, int protoId);
+    void updateIcon(QTreeWidgetItem *item, int protoId);
     void updateIconFrameSet(void * item, int fs);
     void updateObjects (int OldframeSet, int newFrameSet);
     void updateButtons();
@@ -109,6 +110,7 @@ private slots:
     void editDisplay();
     void editEvent();
     void on_treeEvents_customContextMenuRequested(const QPoint &pos);
+    void updateIcon(int protoId);
 
 signals:
     void levelSelection(int index);

@@ -333,9 +333,9 @@ void CToolBoxDock::on_btnDeleteSprite_clicked()
     }
 }
 
-void CToolBoxDock::updateIcon(void * itm, int protoId)
+void CToolBoxDock::updateIcon(QTreeWidgetItem *itm, int protoId)
 {
-    QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
+    QTreeWidgetItem * item = itm;
     // TODO: make sure to delete these pointers to prevent memory leaks
 
     ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
@@ -1440,3 +1440,13 @@ void CToolBoxDock::editEvent()
     QModelIndex index = m_ui->treeEvents->currentIndex();
     on_treeEvents_doubleClicked(index);
 }
+
+void CToolBoxDock::updateIcon(int protoId)
+{
+    int i = m_index->findProto(protoId);
+    if (i !=  -1) {
+        QTreeWidgetItem * item =  m_ui->treeObjects->topLevelItem(i);\
+        updateIcon(item, protoId);
+    }
+}
+
