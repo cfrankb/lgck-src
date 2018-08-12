@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QFontDatabase>
 #include "Font.h"
+#include "FileWrap.h"
 
 char CWizFont::m_text[] = "abcdefghijklmnopqrstuvwxyz" \
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
@@ -103,14 +104,10 @@ void CWizFont::on_cbFonts_currentIndexChanged(const QString &arg1)
     updateFont(arg1);
 }
 
-void CWizFont::importFont(CFont & font)
+void CWizFont::importFont(CFont & font, QString &name)
 {
-//  QString tmp = ui->cbFonts->currentText()+".fnt";
-//  QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), tmp, tr(m_fileFilter));
- // if (fileName.isEmpty()) {
-  //    return;
- // }
   QString fontName = ui->cbFonts->currentText();
+  name = fontName;
   QImage image;
   bool bold = false;//ui->cBold->isChecked();
   createBitmap(image, fontName, bold, false, false);
@@ -161,18 +158,6 @@ void CWizFont::importFont(CFont & font)
   }
   font.setScale(FONTSIZE, XSCALE, YSCALE);
   font.setPixmap(m_text, pixels, w, h);
-  /*QImage img2(
-       reinterpret_cast<unsigned char *>(pixels),
-       size.width(),
-       size.height(),
-       size.width() * sizeof(unsigned int),
-       QImage::Format_RGB32);
 
-  CFileWrap file;
-  if (file.open(fileName.toLatin1().data(), "wb")) {
-      font.write(file);
-      file.close();
-  }*/
- // img2.save("/home/cfrankb/2.png", "PNG");
   delete [] pixels;
 }

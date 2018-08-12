@@ -2,6 +2,8 @@
 #include "IFile.h"
 #include <cstring>
 #include "stdafx.h"
+#include "helper.h"
+#include <zlib.h>
 
 #define SIGNATURE "LGCKFONT"
 
@@ -59,10 +61,10 @@ int CFont::getSize()
     return m_glyphs.size();
 }
 
-void CFont::write(IFile & file)
+bool CFont::write(IFile & file)
 {
     // header
-    int version = VERSION;
+    int version = VERSION_2;
     const char *signature = SIGNATURE;
     file.write(signature, 8);
     file.write(&version, 4);
@@ -92,10 +94,16 @@ void CFont::write(IFile & file)
         file << kv.second;
     }
     // pixels
-    file.write(m_pixels, m_width * m_height * sizeof(unsigned int));
+    unsigned char *out_data;
+    unsigned long out_size;
+    compressData(reinterpret_cast<unsigned char*>(m_pixels), m_width * m_height * sizeof(unsigned int), &out_data, out_size);
+    file.write(&out_size, 4);
+    file.write(out_data, out_size);
+    delete [] out_data;
+    return true;
 }
 
-void CFont::read(IFile & file)
+bool CFont::read(IFile & file)
 {
     forget();
     char signature[8];
@@ -104,7 +112,11 @@ void CFont::read(IFile & file)
     file.read(signature, 8);
     ASSERT(!memcmp(signature, SIGNATURE,8));
     file.read(&version, 4);
-    ASSERT(version==VERSION);
+    //ASSERT(version==VERSION);
+    if (version != VERSION_1 && version != VERSION_2) {
+        qDebug("invalid version: %d", version);
+        return false;
+    }
     m_width = m_height = 0;
     file.read(&m_width, 2);
     file.read(&m_height, 2);
@@ -138,12 +150,26 @@ void CFont::read(IFile & file)
     }
     // pixels
     int h = pow2roundup(m_height);
-    m_pixels = new unsigned int[m_width*h];
-    file.read(m_pixels, m_width * m_height * sizeof(unsigned int));
     m_height = h;
-    for (int i=0; i < m_width*m_height; ++i) {
-//        m_pixels[i]=0xff0000ff;
+    m_pixels = new unsigned int[m_width*h];
+    unsigned long totalSize = m_width * m_height * sizeof(unsigned int);
+    if (version == VERSION_1) {
+        file.read(m_pixels, totalSize);
+    } else if (version == VERSION_2) {
+        unsigned long tmpSize = 0;
+        file.read(&tmpSize, 4);
+        unsigned char *tmp = new unsigned char[tmpSize];
+        file.read(tmp, tmpSize);
+        int err = uncompress(reinterpret_cast<unsigned char*>(m_pixels),
+                             &totalSize,
+                             tmp,
+                             tmpSize);
+        if (err) {
+            qDebug("CFont::Read err=%d\n", err);
+            return false;
+        }
     }
+    return true;
 }
 
 void CFont::setScale(int px, int scaleX, int scaleY)

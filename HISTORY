@@ -3,7 +3,9 @@ HISTORY OF LGCK BUILDER
 
 *** 0.6.0.9
 
+- EDITOR: FontWizard lets you import system fonts
 - ENGINE: display support multiline text
+- ENGINE: display can have custom fonts
 
 
 *** 0.6.0.8

@@ -109,7 +109,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Select font to importL</string>
+     <string>Select font to import:</string>
     </property>
    </widget>
   </widget>

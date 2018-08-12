@@ -150,7 +150,6 @@
       <string>Import...</string>
      </property>
      <addaction name="actionImages"/>
-     <addaction name="actionImport_Font"/>
     </widget>
     <addaction name="actionNew_file"/>
     <addaction name="actionOpen"/>

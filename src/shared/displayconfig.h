@@ -23,6 +23,7 @@ public:
     virtual bool read(IFile & file);
     virtual bool write(IFile & file);
     void killFrameSet(int frameSet);
+    void killFont(int fontID);
     CDisplay *operator[](int i);
     CDisplay *operator[](const char *s);
 

@@ -233,7 +233,8 @@ bool CDisplay::write(IFile & file)
         DI_IMAGENO,
         DI_PROTECTED,
         DI_FLAG_X,
-        DI_FLAG_Y
+        DI_FLAG_Y,
+        DI_FONT
     };
 
     int stringList [] = {
@@ -389,6 +390,16 @@ int CDisplay::flagX()
 int CDisplay::flagY()
 {
     return geti(DI_FLAG_Y);
+}
+
+int CDisplay::font()
+{
+    return geti(DI_FONT);
+}
+
+void CDisplay::setFont(int fontID)
+{
+    set(DI_FONT, fontID);
 }
 
 int CDisplay::geti(unsigned i)

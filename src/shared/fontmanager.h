@@ -16,6 +16,7 @@ public:
 
     int indexOf(const char *name);
     CFont *find(const char *name);
+    const char* nameAt(int i);
     void removeAt(int i);
     CFont & add(CFont & font, const char * name);
     int getSize();
@@ -25,6 +26,8 @@ public:
     virtual bool write(IFile & file);
     CFont *operator[](int i);
     CFont *operator[](const char *s);
+    CFont *at(int i);
+    void setName(int i, const char *name);
 
     enum {
         NOT_FOUND = -1

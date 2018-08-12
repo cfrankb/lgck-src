@@ -53,6 +53,7 @@ protected:
     int *m_indexSettings;
 
     void updateIcon(QTreeWidgetItem *item, int protoId);
+    void initTree(QTreeWidget *tree);
     void updateIconFrameSet(void * item, int fs);
     void updateObjects (int OldframeSet, int newFrameSet);
     void updateButtons();
@@ -62,6 +63,7 @@ protected:
     void reloadLevels();
     void reloadEvents();
     void reloadDisplays();
+    void reloadFonts();
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
     void checkFrameSetUses(int frameSet);
@@ -111,6 +113,12 @@ private slots:
     void editEvent();
     void on_treeEvents_customContextMenuRequested(const QPoint &pos);
     void updateIcon(int protoId);
+    void on_treeFonts_doubleClicked(const QModelIndex &index);
+    void on_treeFonts_clicked(const QModelIndex &index);
+    void on_treeFonts_customContextMenuRequested(const QPoint &pos);
+    void on_btnAddFont_clicked();
+    void on_btnDeleteFont_clicked();
+    void editFont();
 
 signals:
     void levelSelection(int index);

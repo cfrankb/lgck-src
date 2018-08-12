@@ -2192,19 +2192,18 @@ bool CGame::initFonts()
         qDebug("font manager not created");
         return false;
     }
-    CFont *font = fonts->find(DEFAULT_FONT);
-    if (!font) {
-        qDebug("default font not found");
-        qDebug("total fonts: %d", fonts->getSize());
-        return false;
-    }
-    if (font->textureId()) {
-        qDebug("Font already initialized");
-    } else {
-        qDebug("adding font");
-        int textureId = m_imageManager->add(DEFAULT_FONT, font);
-        qDebug("textureId: %u", textureId);
-        font->setTextureId(textureId);
+
+    for (int i=0; i < fonts->getSize(); ++i) {
+         CFont *font = fonts->at(i);
+         unsigned int tex = font->textureId();
+         if (tex) {
+             qDebug("Font %d already initialized %u", i, tex);
+         } else {
+             qDebug("adding font: %d", i);
+             int textureId = m_imageManager->add(fonts->nameAt(i), font);
+             qDebug("textureId: %u", textureId);
+             font->setTextureId(textureId);
+         }
     }
     return true;
 }

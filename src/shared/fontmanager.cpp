@@ -6,7 +6,6 @@
 
 CFontManager::CFontManager()
 {
-    qDebug("CFontManager()");
     m_size = 0;
     m_max = MAX;
     m_fonts = new FONT*[MAX];
@@ -32,13 +31,11 @@ void CFontManager::deleteFont(FONT *font)
 
 void CFontManager::forget()
 {
-    qDebug("CFontManager::forget()");
     for (int i=0; i < m_size; ++i) {
         deleteFont(m_fonts[i]);
         m_fonts[i] = NULL;
     }
     m_size = 0;
-    qDebug("CFontManager::forget() out");
 }
 
 int CFontManager::indexOf(const char *name)
@@ -87,7 +84,6 @@ CFont & CFontManager::add(CFont & font, const char * name)
 {
     FONT *newFont;
     int i = indexOf(name);
-    qDebug("indexOf %d", i);
     if (i == NOT_FOUND) {
         // create new display
         newFont = new FONT;
@@ -107,7 +103,6 @@ CFont & CFontManager::add(CFont & font, const char * name)
 
 void CFontManager::reset()
 {
-    qDebug("CFontManager::reset()");
     // clear everything add the engine default
     forget();
 
@@ -159,7 +154,13 @@ bool CFontManager::write(IFile & file)
     return true;
 }
 
+
 CFont *CFontManager::operator[](int i)
+{
+    return at(i);
+}
+
+CFont *CFontManager::at(int i)
 {
     if (i >= 0 && i < m_size) {
         return m_fonts[i]->font;
@@ -171,4 +172,14 @@ CFont *CFontManager::operator[](int i)
 CFont *CFontManager::operator[](const char *s)
 {
     return find(s);
+}
+
+const char* CFontManager::nameAt(int i)
+{
+    return m_fonts[i]->name.c_str();
+}
+
+void CFontManager::setName(int i, const char *name)
+{
+    m_fonts[i]->name = name;
 }

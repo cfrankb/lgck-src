@@ -198,3 +198,16 @@ void CDisplayConfig::killFrameSet(int frameSet)
         }
     }
 }
+
+ void CDisplayConfig::killFont(int fontID)
+ {
+     for (int i=0; i < m_size; ++i) {
+         CDisplay * d = m_displays[i];
+         int fontX = d->font();
+         if (fontX == fontID) {
+             d->setFont(0);
+         } else if (fontX > fontID){
+             d->setFont(--fontX);
+         }
+     }
+ }

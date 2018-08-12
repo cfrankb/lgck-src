@@ -17,7 +17,7 @@ class CWizFont : public QWizard
 public:
     explicit CWizFont(QWidget *parent = 0);
     ~CWizFont();
-    void importFont(CFont & font);
+    void importFont(CFont & font,QString &name);
 
 private slots:
     void on_cbFonts_currentIndexChanged(const QString &arg1);

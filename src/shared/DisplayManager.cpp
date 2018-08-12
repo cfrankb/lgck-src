@@ -160,7 +160,11 @@ void CDisplayManager::drawText(CDisplay & display)
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
-    CFont *font = m_game->getFonts()->find(DEFAULT_FONT);
+    CFont *font = m_game->getFonts()->at(display.font());
+    if (!font) {
+        qDebug("invalid fontID: %d", display.font());
+        font = m_game->getFonts()->at(0);
+    }
     font->FaceSize(display.size());
 
     std::list<std::string> & lines = display.lines();
@@ -329,5 +333,6 @@ void CDisplayManager::drawText(int x, int y, const char *text, int fontID, int f
     d.setText(text);
     d.setShadowColor(RGBA(shadowColor));
     d.setShadow(shadowColor != 0, shadowOffset, shadowOffset);
+    d.setFont(fontID);
     drawText(d);
 }

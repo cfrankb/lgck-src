@@ -10,8 +10,8 @@ class CFont
 public:
     CFont();
     ~CFont();
-    void write(IFile & file);
-    void read(IFile & file);
+    bool write(IFile & file);
+    bool read(IFile & file);
 
     typedef struct
     {
@@ -43,7 +43,8 @@ public:
 
 protected:
     enum {
-        VERSION = 0x0001
+        VERSION_1 = 0x0001,
+        VERSION_2 = 0x0002
     };
 
     inline int pow2roundup(int x)

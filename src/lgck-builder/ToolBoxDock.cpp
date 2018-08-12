@@ -46,6 +46,9 @@
 #include "displayconfig.h"
 #include "Display.h"
 #include "dlgdisplay.h"
+#include "fontmanager.h"
+#include "Font.h"
+#include "WizFont.h"
 
 static const char g_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
 static const char g_oblFilter[] = "Object Blocks (*.obl *.obl5)";
@@ -539,14 +542,7 @@ void CToolBoxDock::reloadEvents()
     // page 6: events
 
     CGame &gf = *((CGame*)m_gameFile);
-    int count = m_ui->treeEvents->model()->rowCount();
-    m_ui->treeEvents->model()->removeRows(0, count);
-    m_ui->treeEvents->setColumnCount(1);
-    m_ui->treeEvents->setColumnWidth(0, 128);
-    m_ui->treeEvents->setEditTriggers(0);
-    m_ui->treeEvents->setWordWrap(false);
-    m_ui->treeEvents->setRootIsDecorated(false);
-    m_ui->treeEvents->setAlternatingRowColors(true);
+    initTree(m_ui->treeEvents);
 
     QIcon iconBlank;
     iconBlank.addFile(":/images/blank.png");
@@ -573,14 +569,7 @@ void CToolBoxDock::reloadDisplays()
     qDebug("reload displays()");
 
     CGame &gf = *((CGame*)m_gameFile);
-    int count = m_ui->treeDisplays->model()->rowCount();
-    m_ui->treeDisplays->model()->removeRows(0, count);
-    m_ui->treeDisplays->setColumnCount(1);
-    m_ui->treeDisplays->setColumnWidth(0, 128);
-    m_ui->treeDisplays->setEditTriggers(0);
-    m_ui->treeDisplays->setWordWrap(false);
-    m_ui->treeDisplays->setRootIsDecorated(false);
-    m_ui->treeDisplays->setAlternatingRowColors(true);
+    initTree(m_ui->treeDisplays);
 
     QIcon iconBlank;
     iconBlank.addFile(":/images/blank.png");
@@ -610,6 +599,7 @@ void CToolBoxDock::reload()
     reloadLevels();
     reloadEvents();
     reloadDisplays();
+    reloadFonts();
     updateButtons();
 }
 
@@ -1453,3 +1443,179 @@ void CToolBoxDock::updateIcon(int protoId)
     }
 }
 
+void CToolBoxDock::initTree(QTreeWidget *tree)
+{
+    int count = tree->model()->rowCount();
+    tree->model()->removeRows(0, count);
+    tree->setColumnCount(1);
+    tree->setColumnWidth(0, 128);
+    tree->setEditTriggers(0);
+    tree->setWordWrap(false);
+    tree->setRootIsDecorated(false);
+    tree->setAlternatingRowColors(true);
+}
+
+void CToolBoxDock::reloadFonts()
+{
+    // page x: fonts
+    qDebug("reload fonts()");
+
+    CGame &gf = *((CGame*)m_gameFile);
+    QTreeWidget *tree = m_ui->treeFonts;
+    initTree(tree);
+
+    QIcon iconBlank;
+    iconBlank.addFile(":/images/blank.png");
+
+    QIcon iconCheck;
+    iconCheck.addFile(":/images/pd/gesloten_slot.png");
+
+    CFontManager & fonts = *(gf.getFonts());
+    for (int i = 0; i < fonts.getSize(); ++i) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        item->setText(0, fonts.nameAt(i));
+        if (!i) {
+            item->setIcon(0, iconCheck);
+        } else {
+            item->setIcon(0, iconBlank);
+        }
+        tree->addTopLevelItem(item);
+    }
+    m_ui->btnDeleteFont->setEnabled(false);
+}
+
+void CToolBoxDock::on_treeFonts_doubleClicked(const QModelIndex &index)
+{
+    if (index.row() > 0) {
+        editFont();
+    }
+}
+
+void CToolBoxDock::on_treeFonts_clicked(const QModelIndex &index)
+{
+    int i = index.row();
+    m_ui->btnDeleteFont->setEnabled(i != 0);
+}
+
+void CToolBoxDock::on_treeFonts_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidget *tree = m_ui->treeFonts;
+    QTreeWidgetItem * item = tree->itemAt(pos);
+    if (item) {
+        // Make sure this item is selected
+        tree->setCurrentItem( item );
+
+        QModelIndex index = tree->currentIndex();
+        int i = index.row();
+
+        // create pop-up
+        QMenu menu(tree);
+        QAction *actionAdd = new QAction(tr("New Font"), &menu);
+        menu.addAction(actionAdd);
+        if (i != 0) {
+            QAction *actionEdit = new QAction(tr("Rename Font"), &menu);
+            menu.addAction(actionEdit);
+            QAction *actionDelete = new QAction(tr("Delete Font"), &menu);
+            menu.addAction(actionDelete);
+            connect(actionDelete, SIGNAL(triggered()), this, SLOT(on_btnDeleteFont_clicked()));
+            // create an action and connect it to a signal
+            connect(actionEdit, SIGNAL(triggered()), this, SLOT(editFont()));
+        }
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddFont_clicked()));
+        menu.exec(tree->mapToGlobal(pos));
+    } else {
+        QMenu menu(tree);
+        QAction *actionAdd = new QAction(tr("New Font"), &menu);
+        menu.addAction(actionAdd);
+
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddFont_clicked()));
+        menu.exec(tree->mapToGlobal(pos));
+    }
+}
+
+void CToolBoxDock::on_btnAddFont_clicked()
+{
+    CWizFont *wiz = new CWizFont(static_cast<QWidget*>(parent()));
+    if (wiz->exec()) {
+        CFont font;
+        QString name;
+        wiz->importFont(font, name);
+        CGame &gf = *((CGame*)m_gameFile);
+        CFontManager & fonts = *(gf.getFonts());
+        int pos = fonts.getSize();
+        //char name[16];
+       // sprintf(name, "name_%d", fonts.getSize());
+        fonts.add(font, q2c(name));
+
+        QTreeWidget * tree = m_ui->treeFonts;
+        QAbstractItemModel * model =  tree->model();
+        if (!model) {
+            qDebug("model is null\n");
+        }
+        model->insertRow(pos);
+        QTreeWidgetItem * item = tree->topLevelItem( pos );
+        tree->setCurrentItem( item );
+        item->setText(0, name);
+        QIcon iconBlank;
+        iconBlank.addFile(":/images/blank.png");
+        item->setIcon(0, iconBlank);
+        gf.setDirty(true);
+        m_ui->btnDeleteFont->setEnabled(true);
+    }
+}
+
+void CToolBoxDock::on_btnDeleteFont_clicked()
+{
+    CGame & gf = *((CGame*)m_gameFile);
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    QTreeWidget * tree = m_ui->treeFonts;
+    QModelIndex index = tree->currentIndex();
+    int i = index.row();
+    if (i == -1) {
+        QMessageBox::warning(this, "", tr("No Font selected."), QMessageBox::Ok);
+        return;
+    }
+    if (i == 0) {
+        QMessageBox::warning(this, "", tr("This Font is owned by the engine and cannot be deleted."), QMessageBox::Ok);
+        return;
+    }
+    CFontManager & fonts = *(gf.getFonts());
+    QMessageBox::StandardButton
+            ret = QMessageBox::warning(
+                this,  "",  tr("Are you sure that you want to delete\n"
+                               "`%1` ?") .arg(fonts.nameAt(i)),
+                QMessageBox::Ok | QMessageBox::Cancel);
+    if (ret == QMessageBox::Ok) {
+        // remove visual
+        QAbstractItemModel * model =  m_ui->treeFonts->model();
+        model->removeRow( index.row() );
+        fonts.removeAt(i);
+        gf.setDirty( true );
+        conf.killFont(i);
+        m_ui->btnDeleteFont->setEnabled(false);
+    }
+}
+
+void CToolBoxDock::editFont()
+{
+    QTreeWidget *tree = m_ui->treeFonts;
+    QModelIndex index = tree->currentIndex();
+    int i = index.row();
+    if (i < 0) {
+        return;
+    }
+    if (!i) {
+        QMessageBox::warning(this, "", tr("This font cannot be renamed."),  QMessageBox::Ok);
+        return;
+    }
+    bool ok;
+    QString text = QInputDialog::getText(static_cast<QWidget*>(parent()), tr("Rename Font"),
+                                         tr("Font name:"), QLineEdit::Normal,
+                                         m_gameFile->getFonts()->nameAt(i), &ok);
+    if (ok && !text.isEmpty()) {
+        m_gameFile->getFonts()->setName(i, q2c(text));
+        QTreeWidgetItem * item = tree->topLevelItem( index.row() );
+        item->setText(0, text);
+        m_gameFile->setDirty(true);
+    }
+}

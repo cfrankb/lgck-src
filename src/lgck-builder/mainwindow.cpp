@@ -70,7 +70,6 @@
 #include "ToolBoxDock.h"
 #include "thread_updater.h"
 #include "../shared/ss_version.h"
-#include "WizFont.h"
 #include <QSysInfo>
 #include "levelviewgl.h"
 #include "levelscroll.h"
@@ -205,8 +204,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_toolBox, SIGNAL(spriteDeleted(int)),
             this, SLOT(deleteSprite(int)));
 
-  //  connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
-    //        this, SLOT(showToolBox(bool)));
     connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
                      ui->action_ShowToolbox, SLOT(setChecked(bool)));
     connect(ui->action_ShowToolbox, SIGNAL(triggered(bool)),
@@ -2750,18 +2747,6 @@ void MainWindow::on_actionEdit_Images_triggered()
     }
 }
 
-void MainWindow::on_actionImport_Font_triggered()
-{
-    QMessageBox::information(this, tr(m_appName),
-                    tr("Not implemented yet !"),
-                    QMessageBox::Ok);
-
-    //CWizFont *wiz = new CWizFont( static_cast<QWidget*>(parent()) );
-    //if (wiz->exec()) {
-        // TODO: implement this
-    //}
-}
-
 bool MainWindow::checkExecutible(const QString exec, QString & errMsg)
 {
     if (exec.isEmpty()) {
@@ -2872,9 +2857,7 @@ QByteArray state;
 void MainWindow::showEvent(QShowEvent* pEvent)
 {
     QMainWindow::showEvent(pEvent);
-    qDebug("showEvent");
     if (state.length()) {
-        qDebug("restoring now...");
         this->restoreState(state);
         state.clear();
     }
@@ -2882,7 +2865,6 @@ void MainWindow::showEvent(QShowEvent* pEvent)
 
 void MainWindow::changeEvent(QEvent* e)
 {
-    qDebug("ischecked: %d eventtype: %d", (int) ui->action_ShowToolbox->isChecked(), e->type());
     if (e->type() == QEvent::WindowStateChange) {
         //   WindowStateChange = 105
         QWindowStateChangeEvent* ev = static_cast<QWindowStateChangeEvent*>(e);

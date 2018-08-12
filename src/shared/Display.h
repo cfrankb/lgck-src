@@ -45,6 +45,7 @@ public:
     void setTemplate(const char *s);
     void setProtected(bool b);
     void setFlagXY(int flagX, int flagY);
+    void setFont(int fontID);
     void show();
     void hide();
     void setText(const char* content, int displayType=DISPLAY_MESSAGE);
@@ -73,6 +74,7 @@ public:
     int flagX();
     int flagY();
     void flip();
+    int font();
 
     int geti(unsigned i);
     const char* gets(int i);
@@ -139,7 +141,8 @@ private:
         DI_IMAGENO,
         DI_PROTECTED,
         DI_FLAG_X,
-        DI_FLAG_Y
+        DI_FLAG_Y,
+        DI_FONT
     };
 
     enum {

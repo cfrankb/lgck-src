@@ -7,6 +7,7 @@
 #include <QImage>
 #include "Display.h"
 #include "displayconfig.h"
+#include "fontmanager.h"
 
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
@@ -105,12 +106,16 @@ void CDlgDisplay::load(CDisplay & d)
     // page 3
     ui->eTemplate->setText(d.templateStr());
     ui->eText->setPlainText(d.text());
-    setImage(d.imageSet(), d.imageNo());
+    CFontManager & fonts = *(gf.getFonts());
+    for (int i=0; i < fonts.getSize(); ++i) {
+        ui->cbFont->addItem(fonts.nameAt(i));
+    }
+    ui->cbFont->setCurrentIndex(d.font());
 
     // page 4
     // frame set
+    setImage(d.imageSet(), d.imageNo());
     for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
-
         CFrameSet & frameSet = *gf.m_arrFrames[n];
         UINT8 *png;
         int size;
@@ -157,6 +162,9 @@ void CDlgDisplay::save(CDisplay & d)
 
     // page 3
     d.setTemplate(TEXT(ui->eTemplate));
+    d.setFont(ui->cbFont->currentIndex());
+
+    // page 4
     if (d.type() == CDisplay::DISPLAY_IMAGE) {
         d.setImage(ui->cbFrameSet->currentIndex(), ui->cbBaseFrame->currentIndex());
     } else {
