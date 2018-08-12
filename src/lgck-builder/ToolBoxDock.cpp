@@ -1543,9 +1543,13 @@ void CToolBoxDock::on_btnAddFont_clicked()
         CGame &gf = *((CGame*)m_gameFile);
         CFontManager & fonts = *(gf.getFonts());
         int pos = fonts.getSize();
-        //char name[16];
-       // sprintf(name, "name_%d", fonts.getSize());
-        fonts.add(font, q2c(name));
+        int x = 0;
+        QString newName = name;
+        while (fonts.indexOf(q2c(newName)) != CFontManager::NOT_FOUND) {
+            ++x;
+            newName = QString("%1_%2").arg(name).arg(x);
+        }
+        fonts.add(font, q2c(newName));
 
         QTreeWidget * tree = m_ui->treeFonts;
         QAbstractItemModel * model =  tree->model();
@@ -1555,7 +1559,7 @@ void CToolBoxDock::on_btnAddFont_clicked()
         model->insertRow(pos);
         QTreeWidgetItem * item = tree->topLevelItem( pos );
         tree->setCurrentItem( item );
-        item->setText(0, name);
+        item->setText(0, newName);
         QIcon iconBlank;
         iconBlank.addFile(":/images/blank.png");
         item->setIcon(0, iconBlank);
@@ -1613,7 +1617,14 @@ void CToolBoxDock::editFont()
                                          tr("Font name:"), QLineEdit::Normal,
                                          m_gameFile->getFonts()->nameAt(i), &ok);
     if (ok && !text.isEmpty()) {
-        m_gameFile->getFonts()->setName(i, q2c(text));
+        CFontManager & fonts = *(m_gameFile->getFonts());
+        int x = 0;
+        QString newName = text;
+        while (fonts.indexOf(q2c(newName)) != i && fonts.indexOf(q2c(newName)) != CFontManager::NOT_FOUND) {
+            ++x;
+            newName = QString("%1_%2").arg(text).arg(x);
+        }
+        m_gameFile->getFonts()->setName(i, q2c(newName));
         QTreeWidgetItem * item = tree->topLevelItem( index.row() );
         item->setText(0, text);
         m_gameFile->setDirty(true);
