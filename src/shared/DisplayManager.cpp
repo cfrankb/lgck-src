@@ -324,8 +324,6 @@ int CDisplayManager::display_sizeText(int displayId, const char *text)
 
 void CDisplayManager::drawText(int x, int y, const char *text, int fontID, int fontSize, unsigned int rgba, int shadowOffset, unsigned int shadowColor)
 {
-    Q_UNUSED(fontID);
-
     CDisplay d;
     d.setFontSize(fontSize);
     d.setColor(RGBA(rgba));
