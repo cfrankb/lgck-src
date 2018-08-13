@@ -32,7 +32,7 @@ constexpr int TRIGGER_KEYS    = 0x1f;
 constexpr int TRIGGER_GOAL    = 0x20;
 constexpr int TRIGGER_FROZEN  = 0x40;
 constexpr int TRIGGER_HIDDEN  = 0x80;
-constexpr int TRIGGER_MASK    = 0xf0;
+constexpr int TRIGGER_MASK    = 0xe0;
 
 class CLevelEntry 
 {
