@@ -271,7 +271,7 @@ void CScene::manageAuto()
     int ticks = game.getTickCount();
     for (int i=0; i < m_size; ++i) {
         CActor & entry = *(m_actors[i]);
-        if ( (!(entry.m_nTriggerKey & CGame::TRIGGER_FROZEN))
+        if ( (!(entry.m_nTriggerKey & TRIGGER_FROZEN))
                 && entry.isActive()) {
             const CProto & proto = game.m_arrProto[entry.m_nProto];
             CFrame *pFrame = game.m_arrFrames.getFrame(entry);

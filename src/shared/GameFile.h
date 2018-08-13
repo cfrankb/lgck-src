@@ -75,14 +75,6 @@ public:
         HERE			= 255
     } SPRITE_AIM;
 
-    enum {
-        TRIGGER_KEYS    = 0x1f,
-        TRIGGER_GOAL    = 0x20,
-        TRIGGER_FROZEN  = 0x40,
-        TRIGGER_HIDDEN	= 0x80,
-        TRIGGER_MASK    = 0xf0
-    } TRIGGER;
-
     // settings
     enum {
         PARAM_TITLE             = 0,

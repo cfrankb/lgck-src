@@ -107,7 +107,7 @@ void CGROpenGL::drawLayer(CLayer * layer, int mx, int my)
         }
         int x = entry.m_nX - mx;
         int y = entry.m_nY - my;
-        if (!((entry.m_nTriggerKey & m_game->TRIGGER_HIDDEN) ||
+        if (!((entry.m_nTriggerKey & TRIGGER_HIDDEN) ||
             (x + pFrame->m_nLen <= 0) ||
             (x >= screenLen) ||
             (y + pFrame->m_nHei <= 0) ||
@@ -155,7 +155,7 @@ void CGROpenGL::drawScene(CScene * layer)
         }
         int x = entry.m_nX - mx;
         int y = entry.m_nY - my;
-        if (!((entry.m_nTriggerKey & m_game->TRIGGER_HIDDEN) ||
+        if (!((entry.m_nTriggerKey & TRIGGER_HIDDEN) ||
             (x + pFrame->m_nLen <= 0) ||
             (x >= screenLen) ||
             (y + pFrame->m_nHei <= 0) ||

@@ -68,6 +68,14 @@
     <property name="title">
      <string>&amp;Sprite</string>
     </property>
+    <widget class="QMenu" name="menuAll_Instance">
+     <property name="title">
+      <string>All Instances</string>
+     </property>
+     <addaction name="actionRemove_All"/>
+     <addaction name="actionMark_All_as_Goals"/>
+     <addaction name="actionUnmark_All_as_Goals"/>
+    </widget>
     <addaction name="actionCreateSprite"/>
     <addaction name="actionCopy_Object"/>
     <addaction name="actionDelete_Object"/>
@@ -82,7 +90,7 @@
     <addaction name="actionBrint_to_front"/>
     <addaction name="actionEdit_Path"/>
     <addaction name="separator"/>
-    <addaction name="actionRemove_All"/>
+    <addaction name="menuAll_Instance"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1039,6 +1047,22 @@
    </property>
    <property name="statusTip">
     <string>Create a distribution to share your game with other people.</string>
+   </property>
+  </action>
+  <action name="actionMark_All_as_Goals">
+   <property name="text">
+    <string>Mark All as Goals</string>
+   </property>
+   <property name="statusTip">
+    <string>Mark all instances of this sprite on the current level as as goals toward completing this level.</string>
+   </property>
+  </action>
+  <action name="actionUnmark_All_as_Goals">
+   <property name="text">
+    <string>Unmark All as Goals</string>
+   </property>
+   <property name="statusTip">
+    <string>Unmark all instances of this sprite on the current level as as goals toward completing this level.</string>
    </property>
   </action>
  </widget>

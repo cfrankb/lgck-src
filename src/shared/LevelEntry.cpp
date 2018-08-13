@@ -21,6 +21,7 @@
 #include <cstring>
 #include "Level.h"
 #include "LevelEntry.h"
+#include "Proto.h"
 #include "../shared/IFile.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -111,4 +112,45 @@ bool CLevelEntry::operator != (CLevelEntry & s)
 bool CLevelEntry::operator == (CLevelEntry & s)
 {
     return !memcmp(this, &s, sizeof(CLevelEntry));
+}
+
+void CLevelEntry::markAsGoal()
+{
+    m_nTriggerKey |= TRIGGER_GOAL;
+}
+
+void CLevelEntry::unMarkAsGoal()
+{
+      m_nTriggerKey -= (m_nTriggerKey & TRIGGER_GOAL);
+}
+
+void CLevelEntry::show()
+{
+    m_nTriggerKey &= (-1 ^ TRIGGER_HIDDEN);;
+}
+
+void  CLevelEntry::hide()
+{
+    m_nTriggerKey |= TRIGGER_HIDDEN;
+}
+
+void  CLevelEntry::freeze()
+{
+    m_nTriggerKey |= TRIGGER_FROZEN;
+}
+
+void  CLevelEntry::unFreeze()
+{
+    m_nTriggerKey &= (-1 ^ TRIGGER_FROZEN);
+}
+
+void CLevelEntry::setTriggerKey(int key)
+{
+    key = TRIGGER_KEYS & key ;
+    m_nTriggerKey = key | (m_nTriggerKey & ( 0xff ^ TRIGGER_KEYS));
+}
+
+int CLevelEntry::triggerKey()
+{
+    return m_nTriggerKey & TRIGGER_KEYS;
 }

@@ -67,7 +67,7 @@ void CDlgEntry::init(const int *triggers)
     QIcon iconCheck;
     iconCheck.addFile(":/images/check.png");
 
-    for (int n = 0; n <= CGameFile::TRIGGER_KEYS; ++n) {
+    for (int n = 0; n <= TRIGGER_KEYS; ++n) {
         if (n) {
             QString s = QString(tr("%1")).arg(n);
             if (triggers[n]) {
@@ -91,7 +91,7 @@ void CDlgEntry::load(const int entryPos)
     CLevel & level = (* gf[gf.m_nCurrLevel]);
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];
-    m_ui->cbTriggerKey->setCurrentIndex( entry.m_nTriggerKey & CGameFile::TRIGGER_KEYS );
+    m_ui->cbTriggerKey->setCurrentIndex( entry.m_nTriggerKey & TRIGGER_KEYS );
 
     // attributs
 

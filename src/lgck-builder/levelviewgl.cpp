@@ -275,7 +275,7 @@ void CLevelViewGL::drawScreen()
             (y + pFrame->m_nHei <= 0) ||
             (y >= h)) ) {
             unsigned int texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo);
-            if (entry.m_nTriggerKey & CGame::TRIGGER_HIDDEN){
+            if (entry.m_nTriggerKey & TRIGGER_HIDDEN){
                 if (!im->hasInverse( entry.m_nFrameSet )) {
                     im->cacheInverse( entry.m_nFrameSet, & filter);
                 }

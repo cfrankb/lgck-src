@@ -183,8 +183,8 @@ int sprite_setTriggerKey(lua_State *L)
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
-        int key = CGame::TRIGGER_KEYS & (int) (int) lua_tonumber(L, 2) ;
-        entry.m_nTriggerKey = key | (entry.m_nTriggerKey & ( 0xff ^ CGame::TRIGGER_KEYS));
+        int key = TRIGGER_KEYS & (int) (int) lua_tonumber(L, 2) ;
+        entry.m_nTriggerKey = key | (entry.m_nTriggerKey & ( 0xff ^ TRIGGER_KEYS));
     }
     return 0;
 }
@@ -199,7 +199,7 @@ int sprite_freeze(lua_State *L)
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene[ (int) lua_tonumber(L, 1) ];
-        entry.m_nTriggerKey |= CGame::TRIGGER_FROZEN;
+        entry.m_nTriggerKey |= TRIGGER_FROZEN;
     }
     return 0;
 }
@@ -214,7 +214,7 @@ int sprite_hide(lua_State *L)
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
-        entry.m_nTriggerKey |= CGame::TRIGGER_HIDDEN;
+        entry.m_nTriggerKey |= TRIGGER_HIDDEN;
     }
     return 0;
 }
@@ -230,7 +230,7 @@ int sprite_show(lua_State *L)
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
-        entry.m_nTriggerKey &= (-1 ^ CGame::TRIGGER_HIDDEN);
+        entry.m_nTriggerKey &= (-1 ^ TRIGGER_HIDDEN);
     }
     return 0;
 }
@@ -246,7 +246,7 @@ int sprite_unFreeze(lua_State *L)
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
-        entry.m_nTriggerKey &= (-1 ^ CGame::TRIGGER_FROZEN);
+        entry.m_nTriggerKey &= (-1 ^ TRIGGER_FROZEN);
     }
     return 0;
 }
@@ -277,7 +277,7 @@ int sprite_markAsGoal(lua_State *L)
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
-        entry.m_nTriggerKey |= CGame::TRIGGER_GOAL;
+        entry.m_nTriggerKey |= TRIGGER_GOAL;
     }
     return 0;
 }
@@ -743,7 +743,7 @@ int sprite_getTriggerKey(lua_State *L)
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
-        lua_pushnumber(L, (int)entry.m_nTriggerKey & CGame::TRIGGER_KEYS);
+        lua_pushnumber(L, (int)entry.m_nTriggerKey & TRIGGER_KEYS);
     }
 
     return 1;
@@ -3259,7 +3259,7 @@ int sprite_unmarkAsGoal(lua_State *L)
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         entry.m_nTriggerKey -=
-                (entry.m_nTriggerKey & CGame::TRIGGER_GOAL);
+                (entry.m_nTriggerKey & TRIGGER_GOAL);
     }
     return 0;
 }

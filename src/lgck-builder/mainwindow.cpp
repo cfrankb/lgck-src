@@ -688,6 +688,8 @@ void MainWindow::updateMenus()
             ui->actionMove_Level,
             ui->actionDelete_Level,
             ui->actionRemove_All,
+            ui->actionMark_All_as_Goals,
+            ui->actionUnmark_All_as_Goals,
             ui->actionCopy_Object,
             ui->actionDelete_Object,
             ui->actionSend_to_back,
@@ -788,6 +790,8 @@ void MainWindow::updateMenus()
         ui->actionUndo->setEnabled( false );
         ui->actionRedo->setEnabled( false );
         ui->actionSearch->setEnabled( false );
+        ui->actionMark_All_as_Goals->setEnabled( enableMulti );
+        ui->actionUnmark_All_as_Goals->setEnabled( enableMulti );
 
         ui->actionRemove_All->setEnabled( enableMulti );
         ui->actionBrint_to_front->setEnabled( enableMulti );
@@ -1763,10 +1767,10 @@ void MainWindow::on_actionCustomize_triggered()
             CDlgEntry *d = new CDlgEntry(this);
             d->setGameDB( & m_doc);
 
-            int triggers[CGameFile::TRIGGER_KEYS + 1];
+            int triggers[TRIGGER_KEYS + 1];
             memset(&triggers, 0, sizeof(triggers));
             for (int i=0; i < layer.getSize(); ++i) {
-                int trigger = layer[i].m_nTriggerKey & CGameFile::TRIGGER_KEYS;
+                int trigger = layer[i].m_nTriggerKey & TRIGGER_KEYS;
                 ++triggers[trigger];
             }
             d->init(triggers);
@@ -1834,7 +1838,10 @@ void MainWindow::showContextMenu(const QPoint& pos)
                 menu.addSeparator();
                 menu.addAction(ui->actionCut);
                 menu.addAction(ui->actionDelete);
-                menu.addAction(ui->actionRemove_All);
+                QMenu* submenuA = menu.addMenu( tr("All instances") );
+                submenuA->addAction(ui->actionRemove_All);
+                submenuA->addAction(ui->actionMark_All_as_Goals);
+                submenuA->addAction(ui->actionUnmark_All_as_Goals);
                 menu.exec(m_lview->mapToGlobal(pos));
             } else {
                 // level menu items
@@ -2883,4 +2890,63 @@ void MainWindow::changeEvent(QEvent* e)
         state = this->saveState();
     }
     QMainWindow::changeEvent(e);
+}
+
+ void MainWindow::markAsGoal(bool isGoal)
+ {
+     if (m_doc.getSize()
+             && m_viewMode == VM_EDITOR) {
+         CLevel *level = m_doc [ m_doc.m_nCurrLevel ];
+         CLayer & layer =  * (level->getCurrentLayer());
+         if (layer.getSelectionSize()) {
+             QString msg;
+             if (layer.isSingleSelection()) {
+                 if (isGoal) {
+                     msg = tr("Do you want to mark all instances of this sprite on\n" \
+                        "the current layer as goals?");
+                 } else {
+                     msg = tr("Do you want to unmark all instances of this sprite on\n" \
+                        "the current layer as goals?");
+                 }
+             } else {
+                 if (isGoal) {
+                     msg = tr("Do you want to mark all instances of the selected sprites on\n" \
+                        "the current layer as goals?");
+                 } else {
+                     msg = tr("Do you want to unmark all instances of the selected sprites on\n" \
+                        "the current layer as goals?");
+                 }
+             }
+             QMessageBox::StandardButton ret =  QMessageBox::warning(this, tr(m_appName), msg  ,
+                      QMessageBox::Yes | QMessageBox::No);
+             if (ret == QMessageBox::Yes) {
+                 for (int k=0; k < layer.getSelectionSize(); ++k) {
+                     CLevelEntry obj = layer.getSelection(k);
+                     for (int i=0; i < layer.getSize(); ++i) {
+                         CLevelEntry & entry = layer[i];
+                         if (layer[i].m_nProto == obj.m_nProto) {
+                             if (isGoal) {
+                                 entry.markAsGoal();
+                             } else {
+                                 entry.unMarkAsGoal();
+                             }
+                         }
+                     }
+                 }
+                 //layer.clearSelection();
+                 m_doc.setDirty(true);
+             }
+             m_lview->repaint();
+             updateMenus();
+         }
+     }
+ }
+void MainWindow::on_actionMark_All_as_Goals_triggered()
+{
+   markAsGoal( true );
+}
+
+void MainWindow::on_actionUnmark_All_as_Goals_triggered()
+{
+    markAsGoal( false );
 }

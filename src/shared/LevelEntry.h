@@ -20,13 +20,19 @@
 #define _LEVELENTRY_H
 
 class IFile;
-#include "Proto.h"
+class CProto;
 
 // LevelEntry.h : header file
 //
 
 /////////////////////////////////////////////////////////////////////////////
 // CLevelEntry 
+
+constexpr int TRIGGER_KEYS    = 0x1f;
+constexpr int TRIGGER_GOAL    = 0x20;
+constexpr int TRIGGER_FROZEN  = 0x40;
+constexpr int TRIGGER_HIDDEN  = 0x80;
+constexpr int TRIGGER_MASK    = 0xf0;
 
 class CLevelEntry 
 {
@@ -40,6 +46,14 @@ public:
 
     // Attributes
 public:
+    void markAsGoal();
+    void unMarkAsGoal();
+    void show();
+    void hide();
+    void freeze();
+    void unFreeze();
+    void setTriggerKey(int key);
+    int triggerKey();
 
     // Operations
 public:

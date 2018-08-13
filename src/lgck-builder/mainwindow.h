@@ -151,6 +151,7 @@ private:
     void showAppSettings(int tab);
     void formatVersion(QString &ver);
     void loadFileName(const QString &fileName);
+    void markAsGoal(bool isGoal);
 
 protected:
     void initializeGL();
@@ -253,6 +254,8 @@ private slots:
     void on_actionExport_Game_triggered();
     void on_actionDistribution_Package_triggered();
     void updateFrameSet(const QString & fileName);
+    void on_actionMark_All_as_Goals_triggered();
+    void on_actionUnmark_All_as_Goals_triggered();
 
 signals:
     void levelDeleted(int index);

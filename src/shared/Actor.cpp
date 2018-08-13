@@ -305,11 +305,11 @@ void CActor::kill()
     }
 
     if (isGoal()) {
-        m_nTriggerKey -= CGame::TRIGGER_GOAL;
+        m_nTriggerKey -= TRIGGER_GOAL;
     }
 
     if (isFrozen()) {
-        m_nTriggerKey -= CGame::TRIGGER_FROZEN;
+        m_nTriggerKey -= TRIGGER_FROZEN;
     }
 
     if (p.m_nPoints != 0) {
@@ -358,7 +358,7 @@ void CActor::moveTo(const int x, const int y)
 
 void CActor::callTrigger()
 {
-    m_game->callTrigger(m_nTriggerKey & CGame::TRIGGER_KEYS);
+    m_game->callTrigger(m_nTriggerKey & TRIGGER_KEYS);
 }
 
 void CActor::setGame(CGame *game)
@@ -397,7 +397,7 @@ bool CActor::isVisible()
     CFrame * pFrame = set[m_nFrameNo];
     int x = m_nX - m_game->_mx();
     int y = m_nY - m_game->_my();
-    return !((m_nTriggerKey & CGame::TRIGGER_HIDDEN) ||
+    return !((m_nTriggerKey & TRIGGER_HIDDEN) ||
         (x + pFrame->m_nLen <= 0) ||
         (x >= m_game->m_screenLen) ||
         (y + pFrame->m_nHei <= 0) ||
@@ -572,7 +572,7 @@ bool CActor::map()
         return false;
     CMap & m = m_game->map();
     const CProto & po = proto();
-    if (po.m_nClass != 0 && (m_nTriggerKey & CGame::TRIGGER_HIDDEN) == 0) {
+    if (po.m_nClass != 0 && (m_nTriggerKey & TRIGGER_HIDDEN) == 0) {
         CFrame *frame = m_game->m_arrFrames.getFrame(*this);
         const Size sx = CMap::size(frame);
         const Pos p = m.toMap(m_nX, m_nY);
@@ -708,7 +708,7 @@ bool CActor::isDead()
 
 bool CActor::isHidden()
 {
-    return (m_nTriggerKey & CGame::TRIGGER_HIDDEN) != 0;
+    return (m_nTriggerKey & TRIGGER_HIDDEN) != 0;
 }
 
 void CActor::changeTo(int protoId)
@@ -1038,7 +1038,7 @@ void CActor::doManage()
         return;
     }
 
-    if (! (m_nTriggerKey & (CGame::TRIGGER_HIDDEN | CGame::TRIGGER_FROZEN))
+    if (! (m_nTriggerKey & (TRIGGER_HIDDEN | TRIGGER_FROZEN))
         && !getState(CHitData::STATE_DEAD)
         && m_nProto != 0 ) {
         if (po.m_nClass != CLASS_PLAYER_OBJECT &&
@@ -1306,7 +1306,7 @@ void CActor::crash()
                             && !protoMonster.getOption(CProto::OPTION_NO_SPLAT)) {
                         monster.callEvent(CObject::EO_SPLAT);
                         monster.unMap();
-                        if (monster.m_nTriggerKey & CGame::TRIGGER_KEYS) {
+                        if (monster.m_nTriggerKey & TRIGGER_KEYS) {
                             monster.callTrigger();
                         }
                         monster.callEvent(CObject::EO_DEATH);
@@ -1316,7 +1316,7 @@ void CActor::crash()
                         monster.setState(CHitData::STATE_DEAD, true);
                     } else {
                         if ((protoMonster.m_nPowerLevel > protoPlayer.m_nPowerLevel)
-                            && !(monster.m_nTriggerKey & CGame::TRIGGER_FROZEN)) {
+                            && !(monster.m_nTriggerKey & TRIGGER_FROZEN)) {
                             monster.attackPlayer();
                         }
                     }
@@ -1557,13 +1557,13 @@ int CActor::checkHit()
     CScene & scene = m_game->scene();
     for (int i = 0; i < data.fwCount; ++i) {
         CActor & object = scene[data.fwEntry[i]];
-        int triggerKey = object.m_nTriggerKey & CGame::TRIGGER_KEYS;
+        int triggerKey = object.m_nTriggerKey & TRIGGER_KEYS;
         if (data.fwClass[i] == CLASS_TELEPORT_PAD
                 && !object.isFrozen()
                 && triggerKey) {
             for (int j = 0; j < scene.getSize(); ++j) {
                 CActor & temp = scene[j];
-                if ( (temp.m_nTriggerKey & CGame::TRIGGER_KEYS) == triggerKey) {
+                if ( (temp.m_nTriggerKey & TRIGGER_KEYS) == triggerKey) {
                     CProto & proto = m_game->m_arrProto[temp.m_nProto];
                     if (proto.m_nClass == CLASS_TELEPORT_DESTINATION) {
                         CFrame *frame = m_game->m_arrFrames.getFrame(*this);
@@ -1581,7 +1581,7 @@ int CActor::checkHit()
     for (int i = 0; i < data.fwCount; ++i) {
         CActor & object = scene[ data.fwEntry[i] ];
         const CProto & protoObj = m_game->m_arrProto[object.m_nProto];
-        int triggerKey = object.m_nTriggerKey & CGame::TRIGGER_KEYS;
+        int triggerKey = object.m_nTriggerKey & TRIGGER_KEYS;
         if (object.m_nProto > 0) {
             object.callEvent(CObject::EO_TOUCH);
         }
@@ -1614,12 +1614,12 @@ int CActor::checkHit()
 
 bool CActor::isFrozen()
 {
-    return (m_nTriggerKey & CGame::TRIGGER_FROZEN) != 0;
+    return (m_nTriggerKey & TRIGGER_FROZEN) != 0;
 }
 
 bool CActor::isGoal()
 {
-    return (m_nTriggerKey & CGame::TRIGGER_GOAL) != 0;
+    return (m_nTriggerKey & TRIGGER_GOAL) != 0;
 }
 
 int CActor::getHP()
