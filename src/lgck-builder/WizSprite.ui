@@ -453,6 +453,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>By clicking this box, you will enable this sprite to be invisible but still affect other sprite colliding with it.</string>
+    </property>
     <property name="whatsThis">
      <string>By clicking this box, you will enable this sprite to be invisible but still affect other sprite colliding with it.</string>
     </property>
@@ -469,6 +472,12 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>This is the class of this new sprite.</string>
+    </property>
+    <property name="whatsThis">
+     <string>This is the class of this new sprite.</string>
+    </property>
    </widget>
    <widget class="QLineEdit" name="eName">
     <property name="geometry">
@@ -480,6 +489,9 @@
      </rect>
     </property>
     <property name="toolTip">
+     <string>This is the human readable name for the object</string>
+    </property>
+    <property name="whatsThis">
      <string>This is the human readable name for the object</string>
     </property>
     <property name="maxLength">
@@ -520,6 +532,9 @@
       <width>211</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Smart masking allows the engine to detect empty portion of image and avoid causing false positive for collision detection. By clicking this box you can disable this feature for this sprite.</string>
     </property>
     <property name="whatsThis">
      <string>Smart masking allows the engine to detect empty portion of image and avoid causing false positive for collision detection. By clicking this box you can disable this feature for this sprite.</string>
