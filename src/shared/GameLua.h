@@ -237,6 +237,8 @@ luaFn ( var_get )
 luaFn ( var_set )
 luaFn ( warpTo )
 luaFn ( XOR )
+luaFn ( display_setFlagXY )
+luaFn ( display_setFont )
 
 static FUNCTION exports [] = {
     fn ( addToHP )
@@ -451,6 +453,8 @@ static FUNCTION exports [] = {
     fn ( var_set )
     fn ( warpTo )
     fn ( XOR )
+    fn ( display_setFlagXY )
+    fn ( display_setFont )
     alias ( "activateSprite", sprite_activate )
     alias ( "addDisplayC", display_new )
     alias ( "addElement", element_new )

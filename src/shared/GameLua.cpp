@@ -3745,3 +3745,44 @@ int layer_delete(lua_State *L)
     }
 }
 
+int display_setFlagXY(lua_State *L)
+{
+    const char *fnName = "display_setFlagXY";
+    int argc = lua_gettop(L);
+    if (argc != 3) {
+        CGame::error(fnName, 3);
+    } else {
+        int id = (int) lua_tonumber(L, 1);
+        IDisplayManager * manager = CGame::getGame().displays();
+        if (manager->isValidIndex( id )) {
+            CDisplay & display = manager->getAt(id);
+            display.setFlagXY((int) lua_tonumber(L, 2), (int) lua_tonumber(L, 3));
+        } else {
+            char tmp[1024];
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            CGame::debug(tmp);
+        }
+    }
+    return 0;
+}
+
+int display_setFont(lua_State *L)
+{
+    const char *fnName = "display_setFont";
+    int argc = lua_gettop(L);
+    if (argc != 2) {
+        CGame::error(fnName, 2);
+    } else {
+        int id = (int) lua_tonumber(L, 1);
+        IDisplayManager * manager = CGame::getGame().displays();
+        if (manager->isValidIndex( id )) {
+            CDisplay & display = manager->getAt(id);
+            display.setFont((int) lua_tonumber(L, 2));
+        } else {
+            char tmp[1024];
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            CGame::debug(tmp);
+        }
+    }
+    return 0;
+}

@@ -122,9 +122,17 @@ void CSelection::removeAt(int i)
 
 void CSelection::removeProto(int proto)
 {
-    for (int i=0; i < m_size; ++i) {
-
+    int j = 0;
+    for (int i = 0; i < m_size; ++ i) {
+        if (i != j && (m_entries[i].m_nProto != proto)) {
+            m_entries[j] = m_entries[i];
+            m_index[j] = m_index[i];
+        } else if (m_entries[i].m_nProto == proto) {
+            continue;
+        }
+        ++ j;
     }
+    m_size = j;
 }
  
 void CSelection::applyDelta(int dx, int dy)

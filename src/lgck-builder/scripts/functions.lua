@@ -244,6 +244,15 @@ function Display:sizeText(...)
     return display_sizeText(self.id, unpack(arg));
 end
 
+function Display:setFlagXY(flagX, flagY)
+    return display_setFlagXY(self.id, flagX, flagY);
+end
+
+function Display:setFont(fontID)
+    return display_setFont(self.id, fontID);
+end
+
+
 --[[
 
     Extra ------------------------------------------------------------
