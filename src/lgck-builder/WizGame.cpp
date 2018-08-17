@@ -110,21 +110,6 @@ void CWizGame::init(CGame *game)
         int max;
     } COMBO_SPECIAL;
 
-    COMBO_SPECIAL combos3[] = {
-      {ui->cbACGranular, 8, 1,8},
-      {ui->cbACSpeed, 4, 1, 8}
-    };
-
-    for (unsigned int i=0; i < sizeof(combos3)/sizeof(COMBO_SPECIAL);++i) {
-        COMBO_SPECIAL & c = combos3[i];
-        list.clear();
-        for (int j = c.min; j <= c.max; ++j) {
-            list.append(QString("%1").arg(j));
-        }
-        c.cb->addItems(list);
-        c.cb->setCurrentIndex(c.value - c.min);
-    }
-
     ui->eName->setText(tr("Your new game"));
 }
 
@@ -156,9 +141,7 @@ void CWizGame::save()
         {ui->cbLives, CGame::PARAM_LIVES, MIN_VALUE},
         {ui->cbLivesMax, CGame::PARAM_LIVES_MAX, MIN_VALUE},
         {ui->cbTimeout, CGame::PARAM_TIMEOUT, MIN_VALUE},
-        {ui->cbDefaultSpeed, CGame::PARAM_DEFAULT_SPEED, MIN_SPEED},
-        {ui->cbACGranular, CGame::PARAM_AUTO_CENTER_GR, 1},
-        {ui->cbACSpeed, CGame::PARAM_AUTO_CENTER_SPEED, 1}
+        {ui->cbDefaultSpeed, CGame::PARAM_DEFAULT_SPEED, MIN_SPEED}
     };
 
     for (unsigned int i=0; i < sizeof(combos2)/sizeof(COMBO_INT);++i) {
