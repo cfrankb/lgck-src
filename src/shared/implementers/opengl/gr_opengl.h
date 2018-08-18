@@ -43,14 +43,11 @@ public:
     CGROpenGL(CGame *game);
     virtual ~CGROpenGL();
     virtual const char* signature();
-    virtual void drawScreen();
-   // virtual void getOffset(int & offsetX, int & offsetY);
     virtual void getScreenSize(int & len, int & hei);
     virtual void clear(unsigned int red, unsigned int green, unsigned int blue);
     virtual void clear(unsigned int rgb);
     virtual void paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true);
     virtual void paintImage(int x1, int y1, int frameSet, int frameNo);
-    virtual void paintImage(int x1, int y1, CFrame * frame, int frameSet, int frameNo);
     virtual void render(CFont & font, const char *text, int x, int y, const Color & color);
     virtual IDisplayManager* displayManager();
     virtual void ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true);

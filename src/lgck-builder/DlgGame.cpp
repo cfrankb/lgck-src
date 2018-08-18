@@ -253,14 +253,12 @@ void CDlgGame::on_btnDeleteObject_clicked()
 void CDlgGame::updateIcon(QTreeWidgetItem * itm, int protoId)
 {
     QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
-
-    CGameFile & gf = *((CGameFile*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     CProto & proto = gf.m_arrProto[ protoId ];
 
-    CFrameSet & filter = *gf.m_arrFrames[proto.m_nFrameSet];
     UINT8 *png;
     int size;
-    filter[proto.m_nFrameNo]->toPng(png, size);
+    gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
 
     QImage img;
     if (!img.loadFromData( png, size )) {
@@ -472,8 +470,8 @@ void CDlgGame::on_treeFrameSets_doubleClicked(QModelIndex index)
     }
 
     CDlgFrameSet * d = new CDlgFrameSet (this);
-    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.m_arrFrames[index.row()]->getName()) );
-    CFrameSet * frameSet = new CFrameSet (gf.m_arrFrames[index.row()]);
+    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.frames()[index.row()]->getName()) );
+    CFrameSet * frameSet = new CFrameSet (gf.frames()[index.row()]);
     d->init(frameSet);    
     if (d->exec() == QDialog::Accepted) {
         d->save();
@@ -481,8 +479,8 @@ void CDlgGame::on_treeFrameSets_doubleClicked(QModelIndex index)
         qDebug("on_treeFrameSets_doubleClicked(QModelIndex index) save\n");
         gf.setDirty( true );
 
-        delete gf.m_arrFrames[ index.row() ];
-        gf.m_arrFrames.setAt( index.row(), frameSet);
+        delete gf.frames()[ index.row() ];
+        gf.frames().setAt( index.row(), frameSet);
 
         // update the imageCache
         gf.cache()->replace(index.row(), frameSet);
@@ -503,7 +501,7 @@ void CDlgGame::on_btnAddFrameSet_clicked()
 {
     CWizFrameSet *wiz = new CWizFrameSet( this );
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    int i = gf.m_arrFrames.getSize();
+    int i = gf.frames().getSize();
     wiz->init(i);
     if (wiz->exec()) {
         CFrameSet *frameSet = new CFrameSet (wiz->getFrameSet());
@@ -511,7 +509,7 @@ void CDlgGame::on_btnAddFrameSet_clicked()
         strcpy(name, wiz->getName());
         frameSet->setName(name);
         // add new FrameSet
-        gf.m_arrFrames.add(frameSet);
+        gf.frames().add(frameSet);
         // add this new imageSet to the cache
         gf.cache()->add(frameSet);
         // update GUI
@@ -535,7 +533,7 @@ void CDlgGame::on_btnDeleteFrameSet_clicked()
         return;
     }
 
-    const CFrameSet & frameSet = * gf.m_arrFrames[index.row()];
+    const CFrameSet & frameSet = gf.toFrameSet(index.row());
 
     QMessageBox::StandardButton ret = QMessageBox::warning(this,  "",  tr("Are you sure that you want to delete\n"
                                                                           "`%1` ?") .arg(frameSet.getName()),
@@ -549,7 +547,7 @@ void CDlgGame::on_btnDeleteFrameSet_clicked()
         // delete all references
         gf.killFrameSet ( index.row() );
         // remove frameSet
-        gf.m_arrFrames.removeAt( index.row() );
+        gf.frames().removeAt( index.row() );
         // remove imageSet from cache
         gf.cache()->removeAt( index.row() );
 
@@ -563,10 +561,10 @@ void CDlgGame::updateIconFrameSet(QTreeWidgetItem * itm, int fs)
     CGameFile & gf = *((CGameFile*)m_gameFile);
     QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
 
-    CFrameSet & frameSet = *gf.m_arrFrames[ fs ];
+    CFrameSet & frameSet = gf.toFrameSet(fs);
     UINT8 *png;
     int size;
-    frameSet[ 0 ]->toPng(png, size);
+    gf.toFrame(fs, 0).toPng(png, size);
 
     QImage img;
     if (!img.loadFromData( png, size )) {
@@ -833,7 +831,7 @@ void CDlgGame::init()
     m_ui->treeFrameSets->setAlternatingRowColors(true);
     countFrameSetUses();
 
-    for (int i = 0; i < gf.m_arrFrames.getSize(); ++i) {
+    for (int i = 0; i < gf.frames().getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIconFrameSet( item, i );
         m_ui->treeFrameSets->addTopLevelItem(item);

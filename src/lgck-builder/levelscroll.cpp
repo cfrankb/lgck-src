@@ -288,8 +288,7 @@ void CLevelScroll::editPath()
         // if single selection
         if (layer.getSelectionSize() == 1) {
             CLevelEntry & entry = layer.getSelection(0);
-            CFrameSet & filter = * gf.m_arrFrames [entry.m_nFrameSet];
-            CFrame & frame = * filter [entry.m_nFrameNo];
+            CFrame & frame = gf.toFrame(entry);
             CPathBlock & paths = *(gf.getPaths());
             CPath & path = paths[entry.m_path];
             int scroll = PATH_SCROLL;
@@ -570,8 +569,8 @@ void CLevelScroll::eventHandler()
             CLayer & layer = * level.getCurrentLayer();
             for (int z=0; z < layer.getSelectionSize(); ++z) {
                 CLevelEntry & entry = layer.getSelection(z);//layer[layer.m_currEntry];
-                CFrameSet & filter = * gf.m_arrFrames [entry.m_nFrameSet];
-                CFrame & frame = * filter [entry.m_nFrameNo];
+                CFrameSet & filter = gf.toFrameSet(entry.m_nFrameSet);
+                CFrame & frame = gf.toFrame(entry);
                 if (entry.m_nY < my) {
                     if (my < FAST_SCROLL) {
                         my = 0;
@@ -735,16 +734,15 @@ void CLevelScroll::select(int x1, int y1, int x2, int y2)
     y2 += level.m_my;
     bool hasSelected = false;
     for (int i=0; i < layer.getSize(); ++i) {
-        const CLevelEntry & entry = layer[i];
-        const CFrameSet & filter = * m_game->m_arrFrames [entry.m_nFrameSet];
-        const CFrame *pFrame = filter[entry.m_nFrameNo];
+        CLevelEntry & entry = layer[i];
+        CFrame & frame = m_game->toFrame(entry);
         if ( ((entry.m_nX >= x1 && entry.m_nX <= x2)
-              || (entry.m_nX <= x1 && entry.m_nX + pFrame->m_nLen >= x1)
-              || (entry.m_nX <= x2 && entry.m_nX + pFrame->m_nLen >= x2))
+              || (entry.m_nX <= x1 && entry.m_nX + frame.m_nLen >= x1)
+              || (entry.m_nX <= x2 && entry.m_nX + frame.m_nLen >= x2))
                 &&
                 ((entry.m_nY >= y1 && entry.m_nY <= y2)
-                 || (entry.m_nY <= y1 && entry.m_nY + pFrame->m_nHei >= y1)
-                 || (entry.m_nY <= y2 && entry.m_nY + pFrame->m_nHei >= y2))
+                 || (entry.m_nY <= y1 && entry.m_nY + frame.m_nHei >= y1)
+                 || (entry.m_nY <= y2 && entry.m_nY + frame.m_nHei >= y2))
                 ) {
             layer.select(i);
             hasSelected = true;
@@ -758,11 +756,6 @@ void CLevelScroll::select(int x1, int y1, int x2, int y2)
 void CLevelScroll::changeLevel(int i)
 {
     qDebug("IN  changeLevel(int) %d **************", i);
-    //qDebug("vendor: %s", glGetString(GL_VENDOR));
-    //qDebug("renderer: %s", glGetString(GL_RENDERER));
-    //qDebug("version: %s", glGetString(GL_VERSION));
-    //qDebug("extensions: %s", glGetString(GL_EXTENSIONS));
-
     CLevel * level = NULL;
     if (m_game && m_game->m_nLevels) {
         level = (*m_game)[m_game->m_nCurrLevel];

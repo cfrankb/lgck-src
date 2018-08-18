@@ -48,7 +48,7 @@ public:
     CFrame * getFrame (const int imageSet, const int imageNo);
     CFrameSet * operator [] (int);
     CFrameSet * operator [] (const char *);
-    void add(CFrameSet *pFilter);
+    int add(CFrameSet *pFilter);
     void removeAt(int n);
     void forget();
 

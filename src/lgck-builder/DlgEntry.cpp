@@ -350,8 +350,7 @@ void CDlgEntry::on_btnObject_clicked()
 
 void CDlgEntry::setImage(int frameSet, int frameNo)
 {
-    CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
+    CFrameSet & fs = m_gameFile->toFrameSet(frameSet);
     UINT8 *png;
     int size;
     fs[frameNo]->toPng(png, size);
@@ -366,16 +365,14 @@ void CDlgEntry::setImage(int frameSet, int frameNo)
 
 void CDlgEntry::on_btnNextImage_clicked()
 {
-    CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[m_currSet];
+    CFrameSet & fs = m_gameFile->toFrameSet(m_currSet);
     m_currImage = (m_currImage + 1) % fs.getSize();
     setImage(m_currSet, m_currImage);
 }
 
 void CDlgEntry::on_btnPrevImage_clicked()
 {
-    CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[m_currSet];
+    CFrameSet & fs = m_gameFile->toFrameSet(m_currSet);
     --m_currImage;
     if (m_currImage < 0) {
         m_currImage = std::max(fs.getSize() - 1, 0);

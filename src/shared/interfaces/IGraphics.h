@@ -33,14 +33,12 @@ class IGraphics
 {
 public:
     virtual ~IGraphics()=0;
-    virtual void drawScreen()=0;
     virtual const char* signature()=0;
     virtual void getScreenSize(int & len, int & hei)=0;
     virtual void clear(unsigned int red, unsigned int green, unsigned int blue)=0;
     virtual void clear(unsigned int rgb)=0;
     virtual void paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true)=0;
     virtual void paintImage(int x1, int y1, int frameSet, int frameNo)=0;
-    virtual void paintImage(int x1, int y1, CFrame * frame, int frameSet, int frameNo)=0;
     virtual void render(CFont & font, const char *text, int x, int y, const Color & color)=0;
     virtual IDisplayManager* displayManager()=0;
     virtual void ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true)=0;
@@ -48,12 +46,18 @@ public:
     virtual IImageManager *cache()=0;
 
     void getOffset(int & offsetX, int & offsetY);
+    void drawScreen();
 
 protected:
     CDisplayManager *m_displayManager;
     CGame *m_game;
     void drawSurface(ISurface * surface, int mx, int my);
-    void _drawScreen();
+
+    struct {
+        unsigned char red;
+        unsigned char green;
+        unsigned char blue;
+    } m_colorMod;
 };
 
 inline IGraphics::~IGraphics(){}

@@ -1790,13 +1790,13 @@ void MainWindow::on_actionCustomize_triggered()
 void MainWindow::on_actionImages_triggered()
 {
     CWizFrameSet *wiz = new CWizFrameSet( (QWidget*)parent() );
-    wiz->init(m_doc.m_arrFrames.getSize());
+    wiz->init(m_doc.frames().getSize());
     if (wiz->exec()) {
         CFrameSet *frameSet = new CFrameSet (wiz->getFrameSet());
         char name[32];
         strcpy(name, wiz->getName());
         frameSet->setName(name);
-        m_doc.m_arrFrames.add(frameSet);
+        m_doc.frames().add(frameSet);
         // add this new imageSet to the cache
         m_doc.cache()->add(frameSet);
         // set the doc to dirty
@@ -2733,14 +2733,14 @@ void MainWindow::on_actionEdit_Images_triggered()
             const CProto proto = m_doc.m_arrProto[entry.m_nProto];
             int fs = proto.m_nFrameSet;
             CDlgFrameSet * d = new CDlgFrameSet (this);
-            d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(m_doc.m_arrFrames[fs]->getName()) );
-            CFrameSet * frameSet = new CFrameSet (m_doc.m_arrFrames[fs]);
+            d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(m_doc.frames()[fs]->getName()) );
+            CFrameSet * frameSet = new CFrameSet (m_doc.frames()[fs]);
             d->init(frameSet);
             if (d->exec() == QDialog::Accepted) {
                 m_doc.setDirty( true );
                 // replace frameSet
-                delete m_doc.m_arrFrames[ fs ];
-                m_doc.m_arrFrames.setAt( fs, frameSet);
+                delete m_doc.frames()[ fs ];
+                m_doc.frames().setAt( fs, frameSet);
                 // update the imageCache
                 m_doc.cache()->replace(fs, frameSet);
                 //updateFrameSet

@@ -76,33 +76,6 @@ void CGROpenGL::getScreenSize(int & len, int & hei)
     hei = viewport[3];
 }
 
-void CGROpenGL::drawScreen()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX;
-    int offsetY;
-    getOffset(offsetX, offsetY);    
-    clear(m_game->var("borderColor"));
-    paint(offsetX,
-          screenHei - offsetY,
-          screenLen - offsetX,
-          offsetY,
-          m_game->var("bkColor") | ALL_ALPHA);
-    glEnable(GL_TEXTURE_2D);
-    glEnable (GL_BLEND);;
-    glDisable(GL_MULTISAMPLE);
-    int colorMod = m_game->var("colorMod") | ALL_ALPHA;
-    float blue = (colorMod & 0xff);// << 16;
-    float green = (colorMod & 0xff00) >> 8;
-    float red = (colorMod >> 16) & 0xff;
-    glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
-
-    _drawScreen();
-    glDisable(GL_TEXTURE_2D);
-}
-
 void CGROpenGL::clear(unsigned int red, unsigned int green, unsigned int blue)
 {
     glDisable(GL_TEXTURE_2D);
@@ -139,28 +112,14 @@ void CGROpenGL::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fi
 void CGROpenGL::paintImage(int x1, int y1, int frameSet, int frameNo)
 {
     glEnable(GL_TEXTURE_2D);
+    glEnable (GL_BLEND);
+    glDisable(GL_MULTISAMPLE);
+    glColor4f(m_colorMod.red / 255.0f, m_colorMod.green / 255.0f, m_colorMod.blue / 255.0f, 1.0f);
     unsigned int texture = m_imageManager->getImage(frameSet, frameNo);
-    CFrame *frame = (*( m_game->m_arrFrames[frameSet]))[frameNo];
+    CFrame & frame = m_game->toFrame(frameSet, frameNo);
     glBindTexture(GL_TEXTURE_2D, texture);
-    int ix = pow2roundup(frame->m_nLen);
-    int iy = pow2roundup(frame->m_nHei);
-    int x2 = x1 + ix;
-    int y2 = y1 - iy;
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(x1, y2, 0.0);
-        glTexCoord2f(0.0, 1.0f); glVertex3f(x1, y1, 0.0);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(x2, y1, 0.0);
-        glTexCoord2f(1.0f, 0.0); glVertex3f(x2, y2, 0.0);
-    glEnd();
-}
-
-void CGROpenGL::paintImage(int x1, int y1, CFrame *frame, int frameSet, int frameNo)
-{
-    glEnable(GL_TEXTURE_2D);
-    unsigned int texture = m_imageManager->getImage(frameSet, frameNo);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    int ix = pow2roundup(frame->m_nLen);
-    int iy = pow2roundup(frame->m_nHei);
+    int ix = pow2roundup(frame.m_nLen);
+    int iy = pow2roundup(frame.m_nHei);
     int x2 = x1 + ix;
     int y2 = y1 - iy;
     glBegin(GL_QUADS);

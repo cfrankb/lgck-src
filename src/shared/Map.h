@@ -183,7 +183,7 @@ public:
 
     void resize(const int len, const int hei);
     const Size size() const;
-    static const Size size(const CFrame *frame);
+    static const Size size(const CFrame &frame);
     static const Size size(const int px, const int py);
     static const Pos toScreen(const int mapX, const int mapY);
     static const Pos toScreen(const Pos mapPos);

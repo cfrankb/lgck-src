@@ -393,7 +393,7 @@ bool CActor::isMonster()
 
 bool CActor::isVisible()
 {
-    CFrameSet & set = * (m_game->m_arrFrames)[m_nFrameSet];
+    CFrameSet & set = m_game->toFrameSet(m_nFrameSet);
     CFrame * pFrame = set[m_nFrameNo];
     int x = m_nX - m_game->_mx();
     int y = m_nY - m_game->_my();
@@ -430,7 +430,7 @@ void CActor::callEvent(int event)
 
 bool CActor::canMove(int nAim, bool bActor)
 {
-    CFrame & frame = * m_game->m_arrFrames.getFrame(*this);
+    CFrame & frame = m_game->toFrame(*this);
     const Size sx = CMap::size(&frame);
     Pos p = m_game->map().toMap(m_nX, m_nY);
     const CProto & po = m_game->m_arrProto[m_nProto];
@@ -537,8 +537,8 @@ bool CActor::canFall()
     if (pr.getOption(CProto::OPTION_NO_GRAVITY)) {
         return false;
     }
-    CFrame & frame = * m_game->m_arrFrames.getFrame (*this);
-    const Size sx = CMap::size(&frame);
+    CFrame & frame = m_game->toFrame(*this);
+    const Size sx = CMap::size(frame);
     CMap & m = m_game->map();
     const Pos p = m.toMap(m_nX, m_nY);
     if (!canMove(CGame::FALL, false)) {
@@ -573,14 +573,14 @@ bool CActor::map()
     CMap & m = m_game->map();
     const CProto & po = proto();
     if (po.m_nClass != 0 && (m_nTriggerKey & TRIGGER_HIDDEN) == 0) {
-        CFrame *frame = m_game->m_arrFrames.getFrame(*this);
+        CFrame & frame = m_game->toFrame(*this);
         const Size sx = CMap::size(frame);
         const Pos p = m.toMap(m_nX, m_nY);
         for (int y = 0; y < sx.hei; ++y) {
             if ( m_nY + y >= 0 ) {
                 for (int x = 0; x < sx.len; ++x) {
                     CMapEntry & map = m.at(p.x + x, p.y + y);
-                    if (po.m_bNoSmartMap || frame->map(x,y)) {
+                    if (po.m_bNoSmartMap || frame.map(x,y)) {
                         if (po.m_nClass == CLASS_PLAYER_OBJECT) {
                             map.m_bPlayer = true;
                         } else {
@@ -607,7 +607,7 @@ bool CActor::unMap()
     CMap & m = m_game->map();
     const int nClass = proto().m_nClass;
     if (nClass != 0) {
-        CFrame * frame = m_game->m_arrFrames.getFrame(*this);
+        CFrame & frame = m_game->toFrame(*this);
         const Size sx = CMap::size(frame);
         const Pos p = m.toMap(m_nX, m_nY);
         for (int y=0; y < sx.hei; ++y) {
@@ -742,7 +742,7 @@ void CActor::attack(CActor &t)
 
 bool CActor::isPlayerThere(int nAim)
 {
-    CFrame * frame = m_game->m_arrFrames.getFrame (*this);
+    CFrame & frame = m_game->toFrame (*this);
     Size sx = CMap::size(frame);
     CMap & rmap = m_game->map();
     Pos p = rmap.toMap(m_nX, m_nY);
@@ -755,7 +755,7 @@ bool CActor::isPlayerThere(int nAim)
 
     case CGame::DOWN:
         p.y += sx.hei;
-        if (m_nY >= m_game->BUFFERHEI - frame->m_nHei)
+        if (m_nY >= m_game->BUFFERHEI - frame.m_nHei)
             return false;
         break;
 
@@ -767,7 +767,7 @@ bool CActor::isPlayerThere(int nAim)
 
     case CGame::RIGHT:
         p.x += sx.len;
-        if (m_nX>= m_game->BUFFERLEN - frame->m_nLen)
+        if (m_nX>= m_game->BUFFERLEN - frame.m_nLen)
             return false;
         break;
 
@@ -795,8 +795,8 @@ bool CActor::isPlayerThere(int nAim)
 
 bool CActor::hitTest(int aim, CHitData & hitData)
 {
-    CFrame & frame = * m_game->m_arrFrames.getFrame(*this);
-    const Size sx = CMap::size(&frame);
+    CFrame & frame = m_game->toFrame(*this);
+    const Size sx = CMap::size(frame);
     CMap & rmap = m_game->map();
     Pos p = rmap.toMap(m_nX, m_nY);
 
@@ -960,8 +960,7 @@ void CActor::managePath()
     int nAim = path[m_propi[EXTRA_PATHPTR]];
     bool bcanWalk = canMove(nAim);
 
-    CFrameSet & frameSet = * (m_game->m_arrFrames[m_nFrameSet] );
-    CFrame & frame = * (frameSet[m_nFrameNo]);
+    CFrame & frame = m_game->toFrame(m_nFrameSet, m_nFrameNo);
 
     switch (nAim) {
     case CGame::UP:
@@ -1288,9 +1287,9 @@ void CActor::animate()
 void CActor::crash()
 {   
     const CProto & protoPlayer = proto();
-    CFrame *frame = m_game->m_arrFrames.getFrame( *this );
+    CFrame & frame = m_game->toFrame( *this );
     if ((m_nY >= 0) &&
-        (m_game->BUFFERHEI - m_nY > frame->m_nHei)) {
+        (m_game->BUFFERHEI - m_nY > frame.m_nHei)) {
         Size sx = CMap::size(frame);
         CMap & m = m_game->map();
         Pos p = m.toMap(m_nX, m_nY);
@@ -1566,9 +1565,9 @@ int CActor::checkHit()
                 if ( (temp.m_nTriggerKey & TRIGGER_KEYS) == triggerKey) {
                     CProto & proto = m_game->m_arrProto[temp.m_nProto];
                     if (proto.m_nClass == CLASS_TELEPORT_DESTINATION) {
-                        CFrame *frame = m_game->m_arrFrames.getFrame(*this);
+                        CFrame &frame = m_game->toFrame(*this);
                         unMap();
-                        moveTo(temp.m_nX + 8, temp.m_nY - frame->m_nHei);
+                        moveTo(temp.m_nX + 8, temp.m_nY - frame.m_nHei);
                         map();
                         data.flags |= CHitData::FLAG_TELEPORT;
                     }

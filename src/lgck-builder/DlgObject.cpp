@@ -116,11 +116,11 @@ void CDlgObject::load(const int index)
 
     // frame set
 
-    for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
-        CFrameSet & frameSet = *gf.m_arrFrames[n];
+    for (int n=0; n < gf.frames().getSize(); ++n) {
+        CFrameSet & frameSet = gf.toFrameSet(n);
         UINT8 *png;
         int size;
-        frameSet[0]->toPng(png, size);
+        gf.toFrame(n, 0).toPng(png, size);
 
         QImage img;
         if (!img.loadFromData( png, size )) {
@@ -342,10 +342,9 @@ void CDlgObject::load(const int index)
 
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
         CProto & proto = gf.m_arrProto[i];
-        CFrameSet & frameSet = *gf.m_arrFrames[proto.m_nFrameSet];
         UINT8 *png;
         int size;
-        frameSet[proto.m_nFrameNo]->toPng(png, size);
+        gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
 
         QImage img;
         if (!img.loadFromData( png, size )) {
@@ -747,11 +746,9 @@ void CDlgObject::save(const int index)
 void CDlgObject::setImage(int frameSet, int frameNo)
 {
     CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
-
     UINT8 *png;
     int size;
-    fs[frameNo]->toPng(png, size);
+    gf.toFrame(frameSet, frameNo).toPng(png, size);
 
     QImage img;
     if (!img.loadFromData( png, size )) {
@@ -767,7 +764,7 @@ void CDlgObject::setImage(int frameSet, int frameNo)
 void CDlgObject::fillFrameCombo(int frameSet)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
+    CFrameSet & fs = gf.toFrameSet(frameSet);
 
     m_ui->cbBaseFrame->clear();
 
@@ -902,7 +899,7 @@ void CDlgObject::editAnimation(int idx)
         int frameSet = m_ui->cbFrameSet->currentIndex();
 
         CGameFile & gf = *((CGameFile*)m_gameFile);
-        CFrameSet & fs = *gf.m_arrFrames[frameSet];
+        CFrameSet & fs = gf.toFrameSet(frameSet);
 
         int count = fs.getSize();
 
@@ -1023,8 +1020,8 @@ void CDlgObject::on_btnAddObject_clicked()
         // add new FrameSet
         CGameFile & gf = *((CGameFile*)m_gameFile);
 
-        int frameSet = gf.m_arrFrames.getSize();
-        gf.m_arrFrames.add(new CFrameSet (&fs));
+        int frameSet = gf.frames().getSize();
+        gf.frames().add(new CFrameSet (&fs));
 
         // add this new imageSet to the cache
         gf.cache()->add( &fs);

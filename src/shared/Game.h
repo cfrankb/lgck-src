@@ -274,6 +274,8 @@ public:
     void setDisplayAlpha(int alpha);
     void updateGeometry(int screenLen, int screenHei);
     void clearDisplay();   
+    void restoreDisplays(CDisplayConfig *config);
+    void saveDisplays(CDisplayConfig *config);
 
     /////////////////////////////////////////////////////////////////
     // luaBind

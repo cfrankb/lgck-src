@@ -123,7 +123,7 @@ void CMonster::doManage()
 bool CMonster::testAim(int aim, int  oldAim)
 {
     CGame & game = * (CGame *) m_game;
-    CFrame *frame = game.m_arrFrames.getFrame(*this);
+    CFrame & frame = game.toFrame(*this);
     CMonster t = *this;
 
     bool leap = aim & CGame::LEAP;
@@ -185,7 +185,7 @@ bool CMonster::testAim(int aim, int  oldAim)
 int CMonster::testSupport()
 {
     CGame & game = * (CGame *) m_game;
-    CFrame *frame = game.m_arrFrames.getFrame(*this);
+    CFrame & frame = game.toFrame(*this);
     const Size sx = CMap::size(frame);
     CMap & m = *(game.m_map);
     const Pos p = m.toMap(m_nX, m_nY);

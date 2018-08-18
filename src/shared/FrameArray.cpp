@@ -71,7 +71,7 @@ void CFrameArray::removeAt(int n)
     m_arrFilters[m_nSize] = NULL;
 }
 
-void CFrameArray::add(CFrameSet *pFilter)
+int CFrameArray::add(CFrameSet *pFilter)
 {
     if (m_nSize==m_nMax) {
         m_nMax += GROWBY;
@@ -85,6 +85,7 @@ void CFrameArray::add(CFrameSet *pFilter)
 
     m_arrFilters[m_nSize] = pFilter;
     ++m_nSize;
+    return m_nSize - 1;
 }
 
 CFrameSet * CFrameArray::operator [] (int n)

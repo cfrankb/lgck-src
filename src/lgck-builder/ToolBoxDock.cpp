@@ -228,14 +228,14 @@ void CToolBoxDock::createSprite()
     if (wiz->exec()) {
         wiz->save(j);
         // if we create a new frameset
-        if (gf.m_arrProto[j].m_nFrameSet == gf.m_arrFrames.getSize()) {
+        if (gf.m_arrProto[j].m_nFrameSet == gf.frames().getSize()) {
             qDebug("new frameSet created");
-            int frameSet = gf.m_arrFrames.getSize();
-            gf.m_arrFrames.add(wiz->getFrameSet());
+            int frameSet = gf.frames().getSize();
+            gf.frames().add(wiz->getFrameSet());
             wiz->getFrameSet()->debug();
             char name[256];
             sprintf(name,"img%d",frameSet);
-            gf.m_arrFrames[frameSet]->setName(name);
+            gf.frames()[frameSet]->setName(name);
             gf.cache()->add( wiz->getFrameSet() );
             gf.m_arrProto[j].m_nFrameSet = frameSet;
             gf.m_arrProto[j].m_nFrameNo = 0;
@@ -269,7 +269,7 @@ void CToolBoxDock::checkFrameSetUses(int frameSet)
 {
     CGame & gf = *((CGame*)m_gameFile);
     int *uses = gf.countFrameSetUses();
-    CFrameSet *fs = gf.m_arrFrames[frameSet];
+    CFrameSet *fs = gf.frames()[frameSet];
     if (!uses[frameSet]) {
         QMessageBox::StandardButton
                 ret = QMessageBox::warning(
@@ -278,7 +278,7 @@ void CToolBoxDock::checkFrameSetUses(int frameSet)
                            "Do you want to remove it?").arg(fs->getName()),
                     QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes) {
-            gf.m_arrFrames.removeAt(frameSet);
+            gf.frames().removeAt(frameSet);
             gf.killFrameSet(frameSet);
         }
     }
@@ -355,7 +355,7 @@ void CToolBoxDock::updateIcon(QTreeWidgetItem *itm, int protoId)
     CGame & gf = *((CGame*)m_gameFile);
     CProto & proto = gf.m_arrProto[ protoId ];
 
-    CFrameSet & filter = *gf.m_arrFrames[proto.m_nFrameSet];
+    CFrameSet & filter = *gf.frames()[proto.m_nFrameSet];
     UINT8 *png;
     int size;
     filter[proto.m_nFrameNo]->toPng(png, size);
@@ -1177,15 +1177,15 @@ void CToolBoxDock::editFrames()
     int fs = proto.m_nFrameSet;
 
     CDlgFrameSet * d = new CDlgFrameSet (this);
-    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.m_arrFrames[fs]->getName()) );
-    CFrameSet * frameSet = new CFrameSet (gf.m_arrFrames[fs]);
+    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.frames()[fs]->getName()) );
+    CFrameSet * frameSet = new CFrameSet (gf.frames()[fs]);
     d->init(frameSet);
     if (d->exec() == QDialog::Accepted) {
         qDebug("on_treeFrameSets_doubleClicked(QModelIndex index) save\n");
         gf.setDirty( true );
         // replace frameSet
-        delete gf.m_arrFrames[ fs ];
-        gf.m_arrFrames.setAt( fs, frameSet);
+        delete gf.frames()[ fs ];
+        gf.frames().setAt( fs, frameSet);
         // update the imageCache
         gf.cache()->replace(fs, frameSet);
         updateFrameSet(fs);
@@ -1227,7 +1227,7 @@ void CToolBoxDock::exportSprite()
 
     CGame & gf = *((CGame*)m_gameFile);
     CProto & proto = gf.m_arrProto[protoId];
-    CFrameSet * frameSet = gf.m_arrFrames[proto.m_nFrameSet];
+    CFrameSet * frameSet = gf.frames()[proto.m_nFrameSet];
     COBL5File oblDoc;
 
     QStringList filters;

@@ -132,8 +132,8 @@ void CWizSprite::load(const int index)
     // imageSet
     // frame set
 
-    for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
-        CFrameSet & frameSet = *gf.m_arrFrames[n];
+    for (int n=0; n < gf.frames().getSize(); ++n) {
+        CFrameSet & frameSet = *gf.frames()[n];
         UINT8 *png;
         int size;
         frameSet[0]->toPng(png, size);
@@ -290,7 +290,7 @@ void CWizSprite::load(const int index)
 
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
         CProto & proto = gf.m_arrProto[i];
-        CFrameSet & frameSet = *gf.m_arrFrames[proto.m_nFrameSet];
+        CFrameSet & frameSet = *gf.frames()[proto.m_nFrameSet];
         UINT8 *png;
         int size;
         frameSet[proto.m_nFrameNo]->toPng(png, size);
@@ -466,7 +466,7 @@ void CWizSprite::save(const int index)
         qDebug("FrameSet size: %d", frameSet->getSize());
 
         if (frameSet->getSize()) {
-            proto.m_nFrameSet = gf.m_arrFrames.getSize();
+            proto.m_nFrameSet = gf.frames().getSize();
         } else {
             proto.m_nFrameSet = 0;
         }

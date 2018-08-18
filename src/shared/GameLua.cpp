@@ -2447,8 +2447,7 @@ int getImageSize(lua_State *L)
         CGame & game = CGame::getGame();
         int imageSet = (int) lua_tonumber(L, 1);
         int imageNo = (int) lua_tonumber(L, 2);
-        CFrameSet & obl = * game.m_arrFrames [ imageSet ];
-        CFrame & frame = * obl[imageNo];
+        CFrame & frame = game.toFrame(imageSet, imageNo);
         lua_pushnumber(L, frame.m_nLen);
         lua_pushnumber(L, frame.m_nHei);
         return 2;
@@ -2765,8 +2764,7 @@ int sprite_getHeight(lua_State *L)
     } else {
         int objId = (int) lua_tonumber(L, 1);
         CActor & sprite = game.scene()[objId];
-        CFrameSet *frameSet = game.m_arrFrames[sprite.m_nFrameSet];
-        CFrame frame = (*frameSet)[sprite.m_nFrameNo];
+        CFrame & frame = game.toFrame(sprite);
         lua_pushinteger(L, frame.m_nHei);
         return 1;
     }
@@ -2783,8 +2781,7 @@ int sprite_getWidth(lua_State *L)
     } else {
         int objId = (int) lua_tonumber(L, 1);
         CActor & sprite = game.scene()[objId];
-        CFrameSet *frameSet = game.m_arrFrames[sprite.m_nFrameSet];
-        CFrame frame = (*frameSet)[sprite.m_nFrameNo];
+        CFrame & frame = game.toFrame(sprite);
         lua_pushinteger(L, frame.m_nLen);
         return 1;
     }
@@ -2941,7 +2938,7 @@ int sprite_frameCount(lua_State *L)
     } else {
         int objId = (int) lua_tonumber(L, 1);
         CActor & sprite = game.scene()[objId];
-        CFrameSet & fs = * game.m_arrFrames [ sprite.m_nFrameSet ];
+        CFrameSet & fs = game.toFrameSet(sprite.m_nFrameSet);
         lua_pushinteger(L, fs.getSize());
         return 1;
     }
@@ -2957,7 +2954,7 @@ int frameSet_getSize(lua_State *L)
         return 0;
     } else {
         int frameSet = (int) lua_tonumber(L, 1);
-        CFrameSet & fs = * game.m_arrFrames [ frameSet ];
+        CFrameSet & fs = game.toFrameSet(frameSet);
         lua_pushinteger(L, fs.getSize());
         return 1;
     }

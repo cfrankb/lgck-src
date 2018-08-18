@@ -42,7 +42,7 @@ void CDlgExportSprite::reloadSprites()
     ui->treeObjects->setAlternatingRowColors(true);
     ui->treeObjects->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->treeObjects->enableDrag(false);
-    for (int i = 1; i < gf.m_arrFrames.getSize(); ++i) {
+    for (int i = 1; i < gf.frames().getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIcon(item, i );
         ui->treeObjects->addTopLevelItem(item);
@@ -73,10 +73,9 @@ void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
     CGameFile & gf = *m_gameFile;
     CProto & proto = gf.m_arrProto[ protoId ];
 
-    CFrameSet & filter = *gf.m_arrFrames[proto.m_nFrameSet];
     UINT8 *png;
     int size;
-    filter[proto.m_nFrameNo]->toPng(png, size);
+    gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
 
     QImage img;
     if (!img.loadFromData( png, size )) {
@@ -121,14 +120,12 @@ void CDlgExportSprite::on_btnExport_clicked()
         COBL5File oblDoc;
         foreach(QTreeWidgetItem *item, itemList) {
            ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
-           //qDebug("selected Sprite (proto): %d", data->protoId);
            CGameFile & gf = *m_gameFile;
            CProto & proto = gf.m_arrProto[ data->protoId ];
-           CFrameSet * frameSet = gf.m_arrFrames[proto.m_nFrameSet];
+           CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
            QString fileName = QDir(dir).filePath(QString(proto.m_szName) + "." + suffix);
-           //qDebug("path: %s", fileName.toLatin1().constData());
            oblDoc.setFormat(outFormat);
-           oblDoc.getImageSet() = *frameSet;
+           oblDoc.getImageSet() = frameSet;
            oblDoc.setFileName(fileName);
            oblDoc.write();
         }

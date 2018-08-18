@@ -34,6 +34,7 @@ class CGameEvents;
 class CSettings;
 class CDisplayConfig;
 class CFontManager;
+class CActor;
 
 typedef struct
 {
@@ -168,6 +169,11 @@ public:
     CDisplayConfig * getDisplayConfig();
     CFontManager  *getFonts();
     int * countFrameSetUses();
+    CFrame & toFrame(int frameSet, int frameNo);
+    CFrame & toFrame(CLevelEntry &entry);
+    CFrame & toFrame(CActor & actor);
+    CFrameSet & toFrameSet(int frameSet);
+    CFrameArray & frames();
 
     /////////////////////////////////////////////////////////////////
     // i/o

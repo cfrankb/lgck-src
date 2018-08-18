@@ -838,3 +838,28 @@ CFontManager * CGameFile::getFonts()
 {
     return m_fontManager;
 }
+
+CFrame & CGameFile::toFrame(int frameSet, int frameNo)
+{
+    return *(m_arrFrames.getFrame(frameSet, frameNo));
+}
+
+CFrame & CGameFile::toFrame(CLevelEntry & entry)
+{
+    return *(m_arrFrames.getFrame(entry));
+}
+
+CFrame & CGameFile::toFrame(CActor & actor)
+{
+    return *(m_arrFrames.getFrame(* dynamic_cast<CLevelEntry*>(&actor)));
+}
+
+CFrameSet & CGameFile::toFrameSet(int frameSet)
+{
+    return *(m_arrFrames[frameSet]);
+}
+
+CFrameArray & CGameFile::frames()
+{
+    return m_arrFrames;
+}

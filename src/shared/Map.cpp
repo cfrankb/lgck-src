@@ -144,11 +144,11 @@ const Size CMap::size() const
     return s;
 }
 
-const Size CMap::size(const CFrame *frame)
+const Size CMap::size(const CFrame & frame)
 {
     Size s;
-    s.len = frame->m_nLen / GRID;
-    s.hei = frame->m_nHei / GRID;
+    s.len = frame.m_nLen / GRID;
+    s.hei = frame.m_nHei / GRID;
     return s;
 }
 

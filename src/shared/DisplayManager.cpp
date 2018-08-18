@@ -136,26 +136,26 @@ void CDisplayManager::drawImage(CDisplay & display)
     int flagX = display.flagX();
     int flagY = display.flagY();
     if (flagX || flagY) {
-        CFrame *frame = m_game->m_arrFrames.getFrame(display.imageSet(), display.imageNo());
+        CFrame & frame = m_game->toFrame(display.imageSet(), display.imageNo());
         switch (flagX) {
         case CDisplay::FLAG_X_ALIGN_LEFT:
             x = 0;
             break;
         case CDisplay::FLAG_X_ALIGN_RIGHT:
-            x = screenLen - frame->m_nLen;
+            x = screenLen - frame.m_nLen;
             break;
         case CDisplay::FLAG_X_ALIGN_CENTER:
-            x = (screenLen - frame->m_nLen) / 2;
+            x = (screenLen - frame.m_nLen) / 2;
         }
         switch (flagY) {
         case CDisplay::FLAG_Y_ALIGN_TOP:
             y = 0;
             break;
         case CDisplay::FLAG_Y_ALIGN_BOTTOM:
-            y = screenHei - frame->m_nHei;
+            y = screenHei - frame.m_nHei;
             break;
         case CDisplay::FLAG_Y_ALIGN_CENTER:
-            y = (screenHei - frame->m_nHei) / 2;
+            y = (screenHei - frame.m_nHei) / 2;
         }
     }
     m_graphics->ss_paintImage(x, y, display.imageSet(), display.imageNo());
@@ -403,8 +403,8 @@ void CDisplayManager::drawInventory()
             if (!proto.getOption(CProto::OPTION_INVENTORY_HIDDEN)) {
                 int imageSet = proto.m_nFrameSet;
                 int imageNo = proto.m_nFrameNo;
-                CFrame *frame = (*( m_game->m_arrFrames[imageSet]))[imageNo];
-                int x = screenLen - frame->m_nLen - 4;
+                CFrame & frame = m_game->toFrame(imageSet, imageNo);
+                int x = screenLen - frame.m_nLen - 4;
                 int y = 32 * (i + 1) + 4;
                 m_graphics->ss_paintImage(x, y, imageSet, imageNo);
                 ++i;

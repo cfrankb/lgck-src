@@ -101,7 +101,7 @@ CGame::CGame():CGameFile()
     counter("lives") = 0;
     counter("endLevel") = 0;
     m_layers = new CLevel;
-    var("pointsOBL") = 0;
+    var("pointsOBL_texture") = 0;
     m_sBK = new CScene();
     m_sFW = new CScene();
     m_sBK->setOwner( this, true );
@@ -275,11 +275,11 @@ int CGame::getScore() {
 // trigger
 
 bool CGame::wasTriggerCalled() {
-    return var("LevelTriggerCalled");
+    return var("__levelTriggerCalled");
 }
 
 void CGame::setTriggerState( bool state ) {
-    var("LevelTriggerCalled") = state;
+    var("__levelTriggerCalled") = state;
 }
 
 // timeLeft
@@ -512,23 +512,37 @@ bool CGame::calculateWorldSize(CLevel *s, int &width, int &height)
     return true;
 }
 
+void CGame::restoreDisplays(CDisplayConfig *config)
+{
+    IDisplayManager *dm = displays();
+    CDisplayConfig & conf = *config;
+    for (int i=0; i < m_displayConfig->getSize(); ++i) {
+        // copy displays from displayConf to DisplayManager
+        CDisplay * display = conf[i];
+        dm->add(*display);
+    }
+}
+
+void CGame::saveDisplays(CDisplayConfig *config)
+{
+    IDisplayManager *dm = displays();
+    CDisplayConfig & conf = *config;
+    config->forget();
+    for (int i=0; i < dm->getSize(); ++i) {
+        // copy displays from displayConf to DisplayManager
+        conf.add(dm->getAt(i));
+    }
+}
+
 bool CGame::resetDefaultDisplays()
 {   
-    qDebug("************ CGame::resetDefaultDisplays()");
-
     IDisplayManager *dm = displays();
     if (!dm) {
         qDebug("IDisplayManager not attached\n");
         return false;
     }
     clearDisplay();
-
-    CDisplayConfig & conf = *m_displayConfig;
-    for (int i=0; i < m_displayConfig->getSize(); ++i) {
-        // copy displays from displayConf to DisplayManager
-        CDisplay * display = conf[i];
-        dm->add(*display);
-    }
+    restoreDisplays(m_displayConfig);
     return true;
 }
 
@@ -632,9 +646,11 @@ bool CGame::initLevel(int n)
     m_sFW->hideSystemObject(true);
 
     setWrap(strtol(s->getSetting("wrap"), NULL, 10)) ;
-    if (!resetDefaultDisplays()) {
-        m_lastError = "Display Manager not attached!";
-        return false;
+    if (!snapshotReloading) {
+        if (!resetDefaultDisplays()) {
+            m_lastError = "Display Manager not attached!";
+            return false;
+        }
     }
     setPause(false) ;
     setDisplayState(true, 0);
@@ -1257,7 +1273,8 @@ bool CGame::initSettings()
         return false;
     }
 
-    var("pointsOBL") = m_imageManager->add( m_points );
+    var("pointsOBL_frameSet") = m_arrFrames.add(m_points);
+    var("pointsOBL_texture") = m_imageManager->add(m_points);
     return true;
 }
 
@@ -1265,9 +1282,15 @@ bool CGame::initSettings()
 
 void CGame::removePointsOBL()
 {
-    if (var("pointsOBL")) {
-        m_imageManager->removeAt( var("pointsOBL") );
-        var("pointsOBL") = 0;
+    if (var("pointsOBL_texture")) {
+        m_imageManager->removeAt( var("pointsOBL_texture") );
+        var("pointsOBL_texture") = 0;
+        m_arrFrames.removeAt(var("pointsOBL_frameSet"));
+        var("pointsOBL_frameSet") = 0;
+        if (m_points) {
+            delete m_points;
+            m_points = NULL;
+        }
     }
 }
 
@@ -1288,7 +1311,7 @@ bool CGame::initLevelTest( int level,  int skill,  bool initSound)
     }
 
     qDebug("init sound");
-    // Load sound resources
+    // Load sound re/sources
     if (initSound) {
         initSounds();
     }

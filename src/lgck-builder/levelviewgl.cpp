@@ -266,13 +266,13 @@ void CLevelViewGL::drawScreen()
 
     for (int i=0; i < layer.getSize(); ++i) {
         CLevelEntry & entry = layer[i] ;
-        CFrameSet & filter = * m_game->m_arrFrames [entry.m_nFrameSet];
-        CFrame *pFrame = filter[entry.m_nFrameNo];
+        CFrameSet & filter = m_game->toFrameSet(entry.m_nFrameSet);
+        CFrame & frame = m_game->toFrame(entry);
         int x = entry.m_nX - mx;
         int y = entry.m_nY - my;
-        if (!( (x + pFrame->m_nLen <= 0) ||
+        if (!( (x + frame.m_nLen <= 0) ||
             (x >= w) ||
-            (y + pFrame->m_nHei <= 0) ||
+            (y + frame.m_nHei <= 0) ||
             (y >= h)) ) {
             unsigned int texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo);
             if (entry.m_nTriggerKey & TRIGGER_HIDDEN){
@@ -282,8 +282,8 @@ void CLevelViewGL::drawScreen()
                 texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo, true);
             }
             glBindTexture(GL_TEXTURE_2D, texture);
-            int ix = pow2roundup(pFrame->m_nLen);
-            int iy = pow2roundup(pFrame->m_nHei);
+            int ix = pow2roundup(frame.m_nLen);
+            int iy = pow2roundup(frame.m_nHei);
             int x1 = x;
             int x2 = x + ix;
             int y1 = sz.height() - y;
@@ -350,8 +350,7 @@ void CLevelViewGL::drawItemRect()
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (int i=0; i < layer.getSelectionSize(); ++i) {
             CLevelEntry & entry = layer.getSelection(i);
-            CFrameSet & filter = * gf.m_arrFrames [entry.m_nFrameSet];
-            CFrame * pFrame = filter [entry.m_nFrameNo];
+            CFrame & frame = gf.toFrame(entry);
             int x = entry.m_nX - level.m_mx;
             int y = entry.m_nY - level.m_my;
             if ((x >= 0) &&
@@ -359,9 +358,9 @@ void CLevelViewGL::drawItemRect()
                 (x < sz.width()) &&
                 (y < sz.height())) {
                 int x1 = x;
-                int x2 = x + pFrame->m_nLen;
+                int x2 = x + frame.m_nLen;
                 int y1 = sz.height() - y;
-                int y2 = sz.height() - y -pFrame->m_nHei;
+                int y2 = sz.height() - y -frame.m_nHei;
                 glBegin(GL_LINE_LOOP);
                     glColor3f(red, green, blue);
                     glVertex3f(x1, y2, 0.0);

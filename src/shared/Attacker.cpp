@@ -18,10 +18,10 @@ void CAttacker::doManage()
 {
     CGame & game = * (CGame *) m_game;
     CProto & proto = game.m_arrProto[m_nProto];
-    CFrame *frame = game.m_arrFrames.getFrame( *this );
+    CFrame & frame = game.toFrame( *this );
     CActor & player = game.getPlayer();
-    CFrame *playerFrame = game.m_arrFrames.getFrame(player);
-    CFrame *monsterFrame = game.m_arrFrames.getFrame(*this);
+    CFrame & playerFrame = game.toFrame( player );
+    CFrame & monsterFrame = game.toFrame( *this );
     int ticks = game.getTicks();
 
     unMap();
@@ -39,7 +39,7 @@ void CAttacker::doManage()
 
                 switch ( m_nAim ) {
                 case CGame::UP:
-                    m_nY = game.BUFFERHEI - monsterFrame->m_nHei;
+                    m_nY = game.BUFFERHEI - monsterFrame.m_nHei;
                     m_nX = (::rand () % game.BUFFERLEN) & 0x7ff0;
                     break;
 
@@ -49,7 +49,7 @@ void CAttacker::doManage()
                     break;
 
                 case CGame::LEFT:
-                    m_nX = game.BUFFERLEN - monsterFrame->m_nLen;
+                    m_nX = game.BUFFERLEN - monsterFrame.m_nLen;
                     m_nY = (::rand () % game.BUFFERHEI) & 0x7ff0;
                     break;
 
@@ -83,8 +83,8 @@ void CAttacker::doManage()
 
                     if (m_propi[EXTRA_ACTIVE] == 2
                             && (m_nAim == CGame::LEFT || m_nAim == CGame::RIGHT)) {
-                        if ( ((player.m_nX <= m_nX) && (player.m_nX + playerFrame->m_nLen > m_nX))
-                             || ((player.m_nX > m_nX) && (player.m_nX < m_nX + monsterFrame->m_nLen))) {
+                        if ( ((player.m_nX <= m_nX) && (player.m_nX + playerFrame.m_nLen > m_nX))
+                             || ((player.m_nX > m_nX) && (player.m_nX < m_nX + monsterFrame.m_nLen))) {
 
                             ++m_propi[EXTRA_ACTIVE];
 
@@ -93,7 +93,6 @@ void CAttacker::doManage()
                             } else {
                                 m_nAim = CGame::DOWN;
                             }
-                            //game.m_arrSounds["pow.ogg"]->play();
                             callEvent(CObject::EO_ATTACK);
                         }
                     }
@@ -101,8 +100,8 @@ void CAttacker::doManage()
                     if (m_propi[EXTRA_ACTIVE] == 2
                             && (m_nAim == CGame::UP || m_nAim == CGame::DOWN)) {
 
-                        if ( ((player.m_nY <= m_nY) && (player.m_nY + playerFrame->m_nHei > m_nY))
-                             || ((player.m_nY > m_nY) && (player.m_nY < m_nY + monsterFrame->m_nHei))) {
+                        if ( ((player.m_nY <= m_nY) && (player.m_nY + playerFrame.m_nHei > m_nY))
+                             || ((player.m_nY > m_nY) && (player.m_nY < m_nY + monsterFrame.m_nHei))) {
 
                             ++m_propi[EXTRA_ACTIVE];
 
@@ -125,7 +124,7 @@ void CAttacker::doManage()
 
                     case CGame::DOWN:
                         m_nY += 8;
-                        if (m_nY + frame->m_nHei > game.BUFFERHEI) {
+                        if (m_nY + frame.m_nHei > game.BUFFERHEI) {
                             m_propi[EXTRA_ACTIVE] = 0;
                         }
                         break;
@@ -139,7 +138,7 @@ void CAttacker::doManage()
 
                     case CGame::RIGHT:
                         m_nX += 8;
-                        if (m_nX + frame->m_nLen > game.BUFFERLEN) {
+                        if (m_nX + frame.m_nLen > game.BUFFERLEN) {
                             m_propi[EXTRA_ACTIVE] = 0;
                         }
                         break;

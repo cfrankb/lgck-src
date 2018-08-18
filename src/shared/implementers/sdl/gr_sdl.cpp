@@ -87,28 +87,6 @@ void CGRSdl::getScreenSize(int & len, int & hei)
     //SDL_GetWindowSize(m_window, &len, &hei);
 }
 
-void CGRSdl::drawScreen()
-{ 
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX;
-    int offsetY;
-    getOffset(offsetX, offsetY);    
-    clear(m_game->var("borderColor"));
-    paint(offsetX,
-          offsetY,
-          screenLen - offsetX,
-          screenHei - offsetY,
-          m_game->var("bkColor") | 0xff000000);
-    int colorMod = m_game->var("colorMod") | 0xff000000;
-    m_colorMod.blue = (colorMod & 0xff);// << 16;
-    m_colorMod.green = (colorMod & 0xff00) >> 8;
-    m_colorMod.red = (colorMod >> 16) & 0xff;
-
-    _drawScreen();
-  }
-
 void CGRSdl::clear(unsigned int red, unsigned int green, unsigned int blue)
 {
     // Set Color
@@ -153,25 +131,20 @@ void CGRSdl::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
 
 void CGRSdl::paintImage(int x1, int y1, int frameSet, int frameNo)
 {
-    CFrame *frame = (*( m_game->m_arrFrames[frameSet]))[frameNo];
-    paintImage(x1,y1, frame, frameSet, frameNo);
-}
-
-void CGRSdl::paintImage(int x1, int y1, CFrame *frame, int frameSet, int frameNo)
-{
+    CFrame & frame = m_game->toFrame(frameSet, frameNo);
     int len;
     int hei;
     getScreenSize(len, hei);
     unsigned int id_texture = m_imageManager->getImage(frameSet, frameNo);
     SDL_Rect sRect;
     sRect.x = sRect.y = 0;
-    sRect.w = frame->m_nLen;
-    sRect.h = frame->m_nHei;
+    sRect.w = frame.m_nLen;
+    sRect.h = frame.m_nHei;
     SDL_Rect dRect;
     dRect.x = x1;
     dRect.y = hei-y1;
-    dRect.w = frame->m_nLen;
-    dRect.h = frame->m_nHei;
+    dRect.w = frame.m_nLen;
+    dRect.h = frame.m_nHei;
     SDL_Texture * texture = m_imageManager->texture(id_texture);
     SDL_SetTextureColorMod(
                 texture,

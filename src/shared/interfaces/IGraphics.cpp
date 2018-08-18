@@ -28,28 +28,26 @@ void IGraphics::drawSurface(ISurface * surface, int mx, int my)
     }
 
     int entries = surface->getSize();
-    CFrame *pFrame;
     int frameSet;
     for (int i=0; i< entries; ++i) {
         CLevelEntry & entry = surface->atIndex(i) ;
         if ((entry.m_nProto & m_game->PROTO_POINTS) == m_game->PROTO_POINTS ) {
-            pFrame = (* m_game->m_points ) [entry.m_nFrameNo];
-            frameSet = m_game->var("pointsOBL");
+            frameSet = m_game->var("pointsOBL_frameSet");
         } else {
-            pFrame = (* m_game->m_arrFrames[entry.m_nFrameSet])[entry.m_nFrameNo];
             frameSet = entry.m_nFrameSet;
         }
+        CFrame & frame = m_game->toFrame(frameSet, entry.m_nFrameNo);
         int x = entry.m_nX - mx;
         int y = entry.m_nY - my;
         if (!((entry.m_nTriggerKey & TRIGGER_HIDDEN) ||
-            (x + pFrame->m_nLen <= 0) ||
+            (x + frame.m_nLen <= 0) ||
             (x >= screenLen) ||
-            (y + pFrame->m_nHei <= 0) ||
+            (y + frame.m_nHei <= 0) ||
             (y >= screenHei) ||
             (entry.m_nFrameNo & 0x8000))) {
             x += offsetX;
             y += offsetY;
-            paintImage(x, screenHei - y, pFrame, frameSet, entry.m_nFrameNo);
+            paintImage(x, screenHei - y, frameSet, entry.m_nFrameNo);
         }
     }
 }
@@ -72,8 +70,25 @@ void IGraphics::getOffset(int & offsetX, int & offsetY)
     }
 }
 
-void IGraphics::_drawScreen()
+void IGraphics::drawScreen()
 {
+    int screenLen;
+    int screenHei;
+    getScreenSize(screenLen, screenHei);
+    int offsetX;
+    int offsetY;
+    getOffset(offsetX, offsetY);
+    clear(m_game->var("borderColor"));
+    paint(offsetX,
+          offsetY,
+          screenLen - offsetX,
+          screenHei - offsetY,
+          m_game->var("bkColor") | 0xff000000);
+    int colorMod = m_game->var("colorMod") | 0xff000000;
+    m_colorMod.blue = (colorMod & 0xff);
+    m_colorMod.green = (colorMod & 0xff00) >> 8;
+    m_colorMod.red = (colorMod >> 16) & 0xff;
+
     for (int i = 0; i < m_game->m_layers->getSize(); ++i) {
         int speeds[] = {0, 1, 2, 4, 8, 16, 32, 64, 128};
         CLayer & layer = (*(m_game->m_layers))[i];

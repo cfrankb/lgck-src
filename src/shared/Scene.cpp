@@ -194,11 +194,10 @@ int CScene::whoIs(int x, int y)
     int target = -1;
     for (int n = 0; n < m_size; ++n) {
         CActor &entry = *(m_actors[n]);
-        CFrameSet & filter = * game.m_arrFrames[entry.m_nFrameSet];
-        CFrame * pFrame = filter[entry.m_nFrameNo];
+        CFrame & frame = game.toFrame(entry);
         if (entry.m_nProto && (entry.m_nX<= x) && (entry.m_nY<= y) &&
-                (entry.m_nX+ pFrame->m_nLen) > x &&
-                (entry.m_nY+ pFrame->m_nHei) > y ) {
+                (entry.m_nX+ frame.m_nLen) > x &&
+                (entry.m_nY+ frame.m_nHei) > y ) {
             target = n;
         }
     }
@@ -220,16 +219,16 @@ void CScene::map()
     CMap & rmap = (*game.m_map);
     for (int n = 0; n < m_size; ++ n) {
         CActor & entry = *(m_actors [n]);
-        CFrame *frame = game.m_arrFrames.getFrame(entry);
+        CFrame & frame = game.toFrame(entry);
         const CProto & proto = game.m_arrProto[entry.m_nProto];
         if (proto.m_nClass) {
             if (m_bk) {
-                Size sx = rmap.size(frame);
+                Size sx = rmap.size(& frame);
                 Pos p = rmap.toMap(entry.m_nX, entry.m_nY);
                 for (int y = 0; y < sx.hei; ++y) {
                     for (int x = 0; x < sx.len; ++ x) {
                         CMapEntry & map = rmap.at(p.x + x, p.y + y);
-                        if ( proto.m_bNoSmartMap || frame->map(x,y) ) {
+                        if ( proto.m_bNoSmartMap || frame.map(x,y) ) {
                             map.m_nBkClass = proto.m_nClass;
                         }
                     }
@@ -265,9 +264,7 @@ void CScene::notifyAll(int eventId)
             entry.callEvent(eventId);
         }
     }
-
 }
-
 
 void CScene::manageAuto()
 {
@@ -279,7 +276,7 @@ void CScene::manageAuto()
         if ( (!(entry.m_nTriggerKey & TRIGGER_FROZEN))
                 && entry.isActive()) {
             const CProto & proto = game.m_arrProto[entry.m_nProto];
-            CFrame *pFrame = game.m_arrFrames.getFrame(entry);
+            CFrame & frame = game.toFrame(entry);
             int nTicksT = ticks + i * 20 + (i % 20);
             bool autoEvent = false;
             // AutoFire
@@ -310,12 +307,12 @@ void CScene::manageAuto()
                         break;
 
                     case CGame::RIGHT:
-                        bullet.m_nX += pFrame->m_nLen;
+                        bullet.m_nX += frame.m_nLen;
                         bullet.move();
                         break;
 
                     case CGame::DOWN:
-                        bullet.m_nY += pFrame->m_nHei;
+                        bullet.m_nY += frame.m_nHei;
                         bullet.move();
                         break;
 

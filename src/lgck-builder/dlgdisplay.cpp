@@ -116,8 +116,8 @@ void CDlgDisplay::load(CDisplay & d)
     // page 4
     // frame set
     setImage(d.imageSet(), d.imageNo());
-    for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
-        CFrameSet & frameSet = *gf.m_arrFrames[n];
+    for (int n=0; n < gf.frames().getSize(); ++n) {
+        CFrameSet & frameSet = *gf.frames()[n];
         UINT8 *png;
         int size;
         frameSet[0]->toPng(png, size);
@@ -232,7 +232,7 @@ void CDlgDisplay::setImage(int frameSet, int frameNo)
         return;
     }
     CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
+    CFrameSet & fs = *gf.frames()[frameSet];
 
     UINT8 *png;
     int size;
@@ -251,7 +251,7 @@ void CDlgDisplay::setImage(int frameSet, int frameNo)
 void CDlgDisplay::fillFrameCombo(int frameSet)
 {
     CGameFile & gf = *(m_gameFile);
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
+    CFrameSet & fs = *gf.frames()[frameSet];
 
     ui->cbBaseFrame->clear();
     if (!frameSet) {

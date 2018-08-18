@@ -72,29 +72,6 @@ void CGRSfml::getScreenSize(int & len, int & hei)
     hei = m_screenHeight;
 }
 
-
-void CGRSfml::drawScreen()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX;
-    int offsetY;
-    getOffset(offsetX, offsetY);    
-    clear(m_game->var("borderColor"));
-    paint(offsetX,
-          offsetY,
-          screenLen - offsetX,
-          screenHei - offsetY,
-          m_game->var("bkColor") | 0xff000000);
-    int colorMod = m_game->var("colorMod") | 0xff000000;
-    m_colorMod.blue = (colorMod & 0xff);// << 16;
-    m_colorMod.green = (colorMod & 0xff00) >> 8;
-    m_colorMod.red = (colorMod >> 16) & 0xff;
-
-    _drawScreen();
-}
-
 void CGRSfml::clear(unsigned int red, unsigned int green, unsigned int blue)
 {
     // Set Color
@@ -106,8 +83,9 @@ void CGRSfml::clear(unsigned int rgb)
     clear(rgb & 0xff, (rgb >> 8) & 0xff, (rgb >> 16) & 0xff);
 }
 
-void CGRSfml::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
+void CGRSfml::paintImage(int x1, int y1, int frameSet, int frameNo)
 {
+    CFrame *frame = (*( m_game->m_arrFrames[frameSet]))[frameNo];
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
@@ -128,12 +106,6 @@ void CGRSfml::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill
     rect.setOrigin(0,0);
     rect.setPosition(x1,y1);
     m_window->draw(rect);
-}
-
-void CGRSfml::paintImage(int x1, int y1, int frameSet, int frameNo)
-{
-    CFrame *frame = (*( m_game->m_arrFrames[frameSet]))[frameNo];
-    paintImage(x1,y1, frame, frameSet, frameNo);
 }
 
 void CGRSfml::paintImage(int x1, int y1, CFrame *frame, int frameSet, int frameNo)
