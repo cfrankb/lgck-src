@@ -139,8 +139,8 @@ SOURCES +=  mainwindow.cpp \
     ../shared/implementers/opengl/gr_opengl.cpp \
     ../shared/implementers/sdl/mu_sdl.cpp \
     ../shared/implementers/sdl/sn_sdl.cpp \
- #   ../shared/implementers/sdl/im_sdl.cpp \
-#    ../shared/implementers/sdl/gr_sdl.cpp \
+    ../shared/implementers/sdl/im_sdl.cpp \
+    ../shared/implementers/sdl/gr_sdl.cpp \
   # ../shared/implementers/sfml/mu_sfml.cpp \
   #  ../shared/implementers/sfml/sn_sfml.cpp \
     ../shared/inputs/qt/kt_qt.cpp \
@@ -161,7 +161,9 @@ SOURCES +=  mainwindow.cpp \
     dlgdisplay.cpp \
     wslider.cpp \
     ../shared/ss_build.cpp \
-    ../shared/fontmanager.cpp
+    ../shared/fontmanager.cpp \
+    ../shared/interfaces/IGraphics.cpp
+  #  dlggameconfig.cpp
 
 HEADERS  +=  mainwindow.h \
     levelviewgl.h \
@@ -274,6 +276,7 @@ HEADERS  +=  mainwindow.h \
     ../shared/ss_build.h \
     ../shared/fontmanager.h \
     ../shared/ISerial.h
+   # dlggameconfig.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \
@@ -302,4 +305,5 @@ FORMS  += mainwindow.ui \
     DlgExportSprite.ui \
     DlgDistributeGame.ui \
     dlgdisplay.ui
+#    dlggameconfig.ui
 

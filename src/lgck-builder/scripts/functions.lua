@@ -252,6 +252,9 @@ function Display:setFont(fontID)
     return display_setFont(self.id, fontID);
 end
 
+function Display:setTemplate(s)
+    return display_setTemplate(self.id, s);
+end
 
 --[[
 

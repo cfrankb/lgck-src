@@ -44,7 +44,7 @@ public:
     virtual ~CGROpenGL();
     virtual const char* signature();
     virtual void drawScreen();
-    virtual void getOffset(int & offsetX, int & offsetY);
+   // virtual void getOffset(int & offsetX, int & offsetY);
     virtual void getScreenSize(int & len, int & hei);
     virtual void clear(unsigned int red, unsigned int green, unsigned int blue);
     virtual void clear(unsigned int rgb);
@@ -58,9 +58,7 @@ public:
     virtual IImageManager *cache();
 
 protected:
-    CGame *m_game;
     CIMOpengl *m_imageManager;
-    CDisplayManager *m_displayManager;
     std::unordered_map<std::string, unsigned int> m_fonts;
     void drawSurface(ISurface * surface, int mx, int my);
     inline int pow2roundup (int x) {

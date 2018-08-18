@@ -39,7 +39,6 @@ public:
     virtual ~CGRSdl();
     virtual const char* signature();
     virtual void drawScreen();
-    virtual void getOffset(int & offsetX, int & offsetY);
     virtual void getScreenSize(int & len, int & hei);
     virtual void clear(unsigned int red, unsigned int green, unsigned int blue);
     virtual void clear(unsigned int rgb);
@@ -60,14 +59,10 @@ protected:
         SCREEN_HEIGHT = 480
     };
 
-    CGame *m_game;
     CIMSdl *m_imageManager;
-    CDisplayManager *m_displayManager;
     SDL_Window *m_window;
     SDL_Renderer *m_renderer;
     void queryDriver();
-    virtual void drawLayer (CLayer * layer, int mx, int my);
-    virtual void drawScene (CScene * layer);
     struct {
         unsigned char red;
         unsigned char green;

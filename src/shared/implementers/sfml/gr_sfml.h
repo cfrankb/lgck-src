@@ -39,7 +39,6 @@ public:
     virtual ~CGRSfml();
     virtual const char* signature();
     virtual void drawScreen();
-    virtual void getOffset(int & offsetX, int & offsetY);
     virtual void getScreenSize(int & len, int & hei);
     virtual void clear(unsigned int red, unsigned int green, unsigned int blue);
     virtual void clear(unsigned int rgb);
@@ -64,12 +63,8 @@ protected:
         unsigned char green;
         unsigned char blue;
     } m_colorMod;
-    CGame *m_game;
     CIMSfml *m_imageManager;
-    CDisplayManager *m_displayManager;
     sf::RenderWindow *m_window;
-    virtual void drawLayer (CLayer * layer, int mx, int my);
-    virtual void drawScene (CScene * layer);
     std::string m_lastError;
     int m_screenWidth;
     int m_screenHeight;

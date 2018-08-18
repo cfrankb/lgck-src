@@ -820,13 +820,13 @@ int display_new(lua_State *L)
         CGame::error("display_new", 4);
         lua_pushnumber(L, -1);
     } else {
-        int id = game.displays()->getSize();
         game.displays()->add(
                 lua_tostring(L, 1),
                 (int) lua_tonumber(L, 2),
                 (int) lua_tonumber(L, 3),
                 (int) lua_tonumber(L, 4)
         );
+        int id = game.displays()->indexOf(lua_tostring(L, 1));
         lua_pushnumber(L, id);
     }
 
@@ -3778,6 +3778,27 @@ int display_setFont(lua_State *L)
         if (manager->isValidIndex( id )) {
             CDisplay & display = manager->getAt(id);
             display.setFont((int) lua_tonumber(L, 2));
+        } else {
+            char tmp[1024];
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            CGame::debug(tmp);
+        }
+    }
+    return 0;
+}
+
+int display_setTemplate(lua_State *L)
+{
+    const char *fnName = "display_setTemplate";
+    int argc = lua_gettop(L);
+    if (argc != 2) {
+        CGame::error(fnName, 2);
+    } else {
+        int id = (int) lua_tonumber(L, 1);
+        IDisplayManager * manager = CGame::getGame().displays();
+        if (manager->isValidIndex( id )) {
+            CDisplay & display = manager->getAt(id);
+            display.setTemplate(lua_tostring(L, 2));
         } else {
             char tmp[1024];
             sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
