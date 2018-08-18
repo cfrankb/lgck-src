@@ -57,6 +57,7 @@ public:
     virtual int computeY(CDisplay & display, int sy);
     virtual int computeX(CDisplay & display, int sx);
     virtual void drawHP();
+    virtual void drawInventory();
 
 protected:
     CGame *m_game;

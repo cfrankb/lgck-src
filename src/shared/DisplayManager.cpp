@@ -26,6 +26,7 @@
 #include "Font.h"
 #include "fontmanager.h"
 #include "Actor.h"
+#include "Inventory.h"
 
 // http://www.codehead.co.uk/cbfg/
 // http://doc.qt.io/qt-5/qtwidgets-widgets-charactermap-example.html
@@ -326,6 +327,8 @@ void CDisplayManager::draw()
             }
         }
     }
+
+    drawInventory();
 }
 
 int CDisplayManager::display_sizeText(int displayId, const char *text)
@@ -384,5 +387,29 @@ void CDisplayManager::drawHP()
     if (a) {
         m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, display.rgb() + (a << 24));
         m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, 0xffffff + (a << 24), false);
+    }
+}
+
+void CDisplayManager::drawInventory()
+{
+   // glEnable(GL_TEXTURE_2D);
+    int screenLen;
+    int screenHei;
+    m_graphics->getScreenSize(screenLen, screenHei);
+    const CInventory *inventory = m_game->getInventory();
+    int i = 0;
+    for (int j=0; inventory && (j < inventory->getSize()); ++j) {
+        if ((*inventory)[j] != 0) {
+            CProto proto = m_game->m_arrProto[(*inventory)[j]];
+            if (!proto.getOption(CProto::OPTION_INVENTORY_HIDDEN)) {
+                int imageSet = proto.m_nFrameSet;
+                int imageNo = proto.m_nFrameNo;
+                CFrame *frame = (*( m_game->m_arrFrames[imageSet]))[imageNo];
+                int x = screenLen - frame->m_nLen - 4;
+                int y = 32 * (i + 1) + 4;
+                m_graphics->paintImage(x, screenHei - y, imageSet, imageNo);
+                ++i;
+            }
+        }
     }
 }

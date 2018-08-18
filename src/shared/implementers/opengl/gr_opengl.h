@@ -63,7 +63,6 @@ protected:
     std::unordered_map<std::string, unsigned int> m_fonts;
     virtual void drawLayer (CLayer * layer, int mx, int my);
     virtual void drawScene (CScene * layer);
-    virtual void drawInventory();
     inline int pow2roundup (int x) {
         --x;
         x |= x >> 1;

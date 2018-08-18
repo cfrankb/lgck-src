@@ -50,7 +50,6 @@ public:
 protected:
     virtual void drawLayer(CLayer * layer, int mx, int my)=0;
     virtual void drawScene(CScene * layer)=0;
-    virtual void drawInventory()=0;
 };
 
 inline IGraphics::~IGraphics(){}

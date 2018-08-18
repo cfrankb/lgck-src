@@ -47,6 +47,7 @@ public:
     virtual int computeY(CDisplay & display, int sy)=0;
     virtual int computeX(CDisplay & display, int sx)=0;
     virtual void drawHP()=0;
+    virtual void drawInventory()=0;
     friend class CDisplay;
 protected:
     enum {

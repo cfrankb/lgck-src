@@ -242,31 +242,7 @@ void CGRSdl::drawScreen()
             drawScene(m_game->m_sFW);
         }
     }
-    drawInventory();
     m_displayManager->draw();
-}
-
-void CGRSdl::drawInventory()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    const CInventory *inventory = m_game->getInventory();
-    int i = 0;
-    for (int j=0; inventory && (j < inventory->getSize()); ++j) {
-        if ((*inventory)[j] != 0) {
-            CProto proto = m_game->m_arrProto[(*inventory)[j]];
-            if (!proto.getOption(CProto::OPTION_INVENTORY_HIDDEN)) {
-                int imageSet = proto.m_nFrameSet;
-                int imageNo = proto.m_nFrameNo;
-                CFrame *frame = (*( m_game->m_arrFrames[imageSet]))[imageNo];
-                int x = screenLen - frame->m_nLen - 4;
-                int y = 32 * (i + 1) + 4;
-                paintImage(x, screenHei - y, imageSet, imageNo);
-                ++i;
-            }
-        }
-    }
 }
 
 void CGRSdl::clear(unsigned int red, unsigned int green, unsigned int blue)

@@ -68,7 +68,6 @@ protected:
     void queryDriver();
     virtual void drawLayer (CLayer * layer, int mx, int my);
     virtual void drawScene (CScene * layer);
-    virtual void drawInventory();
     struct {
         unsigned char red;
         unsigned char green;
