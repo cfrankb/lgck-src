@@ -58,20 +58,22 @@ CDisplayManager::~CDisplayManager()
 
 CDisplay & CDisplayManager::add(CDisplay & display)
 {
-    if (m_size == m_max) {
-        m_max += GROWBY;
-        CDisplay *t = new CDisplay [ m_max ];
-        for (int i=0; i < m_size; ++i) {
-            t[i] = m_displays[i];
+    int j = indexOf(display.name());
+    if (j == NOT_FOUND) {
+        if (m_size == m_max) {
+            m_max += GROWBY;
+            CDisplay *t = new CDisplay [ m_max ];
+            for (int i=0; i < m_size; ++i) {
+                t[i] = m_displays[i];
+            }
+            delete [] m_displays;
+            m_displays = t;
         }
-
-        delete [] m_displays;
-        m_displays = t;
+        ++ m_size;
+        j = m_size - 1;
     }
-
-    m_displays[m_size] = display;
-    ++ m_size;
-    return m_displays[m_size - 1];
+    m_displays[j] = display;
+    return m_displays[j];
 }
 
 CDisplay & CDisplayManager::add(const char *name, int x, int y, int type)
@@ -152,25 +154,12 @@ void CDisplayManager::drawImage(CDisplay & display)
     m_graphics->paintImage(x, screenHei - y, display.imageSet(), display.imageNo());
 }
 
-void CDisplayManager::drawText(CDisplay & display)
+int CDisplayManager::computeY(CDisplay & display, int sy)
 {
-    int flagX = display.flagX();
     int flagY = display.flagY();
-
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
-    CFont *font = m_game->getFonts()->at(display.font());
-    if (!font) {
-        qDebug("invalid fontID: %d", display.font());
-        font = m_game->getFonts()->at(0);
-    }
-    font->FaceSize(display.size());
-
-    std::list<std::string> & lines = display.lines();
-
-    int dy = display.size();
-    int sy = dy * lines.size();
 
     int y = display.y();
     if (y < 0) {
@@ -194,35 +183,59 @@ void CDisplayManager::drawText(CDisplay & display)
     case CDisplay::FLAG_Y_ALIGN_CENTER:
         y = (screenHei - sy) / 2;
     }
+    return y;
+}
+
+int CDisplayManager::computeX(CDisplay & display, int sx)
+{
+    int flagX = display.flagX();
+    int screenLen;
+    int screenHei;
+    m_graphics->getScreenSize(screenLen, screenHei);
+    int x = display.x();
+    if (x < 0) {
+        if ( x != -1) {
+            x = screenLen + display.x();
+        } else {
+            if (x == -1) {
+                x = (screenLen - sx) / 2;
+            } else {
+                x = screenLen - x;
+            }
+        }
+    }
+
+    switch (flagX) {
+    case CDisplay::FLAG_X_ALIGN_LEFT:
+        x = 0;
+        break;
+    case CDisplay::FLAG_X_ALIGN_RIGHT:
+        x = screenLen - sx;
+        break;
+    case CDisplay::FLAG_X_ALIGN_CENTER:
+        x = (screenLen - sx) / 2;
+    }
+    return x;
+}
+
+void CDisplayManager::drawText(CDisplay & display)
+{
+    CFont *font = m_game->getFonts()->at(display.font());
+    if (!font) {
+        qDebug("warning: invalid fontID: %d", display.font());
+        font = m_game->getFonts()->at(0);
+    }
+    font->FaceSize(display.size());
+
+    std::list<std::string> & lines = display.lines();
+    int dy = display.size();
+    int sy = dy * lines.size();
+    int y = computeY(display, sy);
 
     std::list<std::string>::iterator it;
     for (it = lines.begin(); it != lines.end(); ++it) {
         int sx = font->Advance(it->c_str());
-
-        int x = display.x();
-        if (x < 0) {
-            if ( x != -1) {
-                x = screenLen + display.x();
-            } else {
-                if (x == -1) {
-                    x = (screenLen - sx) / 2;
-                } else {
-                    x = screenLen - x;
-                }
-            }
-        }
-
-        switch (flagX) {
-        case CDisplay::FLAG_X_ALIGN_LEFT:
-            x = 0;
-            break;
-        case CDisplay::FLAG_X_ALIGN_RIGHT:
-            x = screenLen - sx;
-            break;
-        case CDisplay::FLAG_X_ALIGN_CENTER:
-            x = (screenLen - sx) / 2;
-        }
-
+        int x = computeX(display, sx);
         if (display.shadow()) {
             Color color = {(UINT8)display.shadowR(), (UINT8)display.shadowG(), (UINT8)display.shadowB(), (UINT8)display.shadowA()};
             m_graphics->render(*font, it->c_str(), x + display.shadowX(), y + display.shadowY(), color);
@@ -230,7 +243,6 @@ void CDisplayManager::drawText(CDisplay & display)
 
         Color color = { (UINT8)display.red(), (UINT8)display.green(), (UINT8)display.blue(), (UINT8)display.alpha()};
         m_graphics->render(*font, it->c_str(), x, y, color);
-
         y += dy;
     }
 }
@@ -333,4 +345,14 @@ void CDisplayManager::drawText(int x, int y, const char *text, int fontID, int f
     d.setShadow(shadowColor != 0, shadowOffset, shadowOffset);
     d.setFont(fontID);
     drawText(d);
+}
+
+int CDisplayManager::indexOf(const char *name)
+{
+    for (int i=0; i < m_size; ++i) {
+        if (std::string(m_displays[i].name()) == name) {
+            return i;
+        }
+    }
+    return NOT_FOUND;
 }

@@ -50,7 +50,8 @@ void CDlgDisplay::load(CDisplay & d)
         tr("Lives"),
         tr("Hit Points / Health"),
         tr("Debug"),
-        tr("Image")
+        tr("Image"),
+        tr("Healthbar")
     };
 
     for (unsigned int i=0; i < sizeof(types)/sizeof(QString); ++i) {

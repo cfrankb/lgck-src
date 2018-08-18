@@ -453,3 +453,10 @@ std::list<std::string> & CDisplay::lines()
 {
     return m_lines;
 }
+
+int CDisplay::rgb()
+{
+     return (geti(DI_R) & 0xff)
+             + ((geti(DI_G) & 0xff) << 8)
+             + ((geti(DI_B) & 0xff) << 16);
+}

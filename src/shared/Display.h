@@ -75,6 +75,7 @@ public:
     int flagY();
     void flip();
     int font();
+    int rgb();
 
     int geti(unsigned i);
     const char* gets(int i);
@@ -90,6 +91,7 @@ public:
         DISPLAY_HP              = 4,
         DISPLAY_DEBUGX          = 5,
         DISPLAY_IMAGE		    = 6,
+        DISPLAY_HEALTH_BAR      = 7,
         DISPLAY_SAME            = -1
     } DISPLAY_TYPE;    
     bool write(IFile &file );

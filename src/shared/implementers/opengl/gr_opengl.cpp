@@ -44,6 +44,7 @@
 #include "Inventory.h"
 #include "Level.h"
 #include "Font.h"
+#include "Display.h"
 
 #include "implementers/opengl/glhelper.h"
 
@@ -175,12 +176,18 @@ void CGROpenGL::drawHP()
     int screenHei;
     getScreenSize(screenLen, screenHei);
     CActor & player = m_game->getPlayer();
-    int x = 1;
-    int y = screenHei - 24;
+    int sy = 16;
+    int sx = player.getHP() * 2;
+
+    IDisplayManager & dm = *(m_game->displays());
+    CDisplay & display = dm["healthbar"];
+    int x = dm.computeX(display, sx);
+    int y = dm.computeY(display, sy);
+
     UINT8 a = m_game->getDisplayAlpha();
     if (a) {
-        paint(x,screenHei - y, x + player.getHP() * 2, screenHei - y - 16, 0x40ff00 + (a << 24));
-        paint(x,screenHei - y, x + player.getHP() * 2, screenHei - y - 16, 0xffffff + (a << 24), false);
+        paint(x,screenHei - y, x + sx, screenHei - y - sy, display.rgb() + (a << 24));
+        paint(x,screenHei - y, x + sx, screenHei - y - sy, 0xffffff + (a << 24), false);
     }
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
@@ -253,11 +260,11 @@ void CGROpenGL::drawScreen()
             drawScene(m_game->m_sBK);
             drawScene(m_game->m_sFW);
         }
+    };
+    IDisplayManager & dm = *(m_game->displays());
+    if (dm["healthbar"].visible()) {
+        drawHP();
     }
-//    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-//    glDisable(GL_TEXTURE_2D);
-    drawHP();
-//    glEnable(GL_TEXTURE_2D);
     drawInventory();
     m_displayManager->draw();
     glDisable(GL_TEXTURE_2D);

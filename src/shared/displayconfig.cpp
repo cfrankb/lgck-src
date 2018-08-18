@@ -140,6 +140,12 @@ void CDisplayConfig::reset()
     display5.setVisible(false);
     display5.setProtected(true);
     display5.setFlagXY(CDisplay::FLAG_X_ALIGN_CENTER, CDisplay::FLAG_Y_ALIGN_TOP);
+
+    CDisplay & display6 = add("healthbar", -1, 0, CDisplay::DISPLAY_HEALTH_BAR);
+    display6.setColor(0, 0xff, 0x40, 0xff);
+    display6.setVisible(true);
+    display6.setProtected(true);
+    display6.setFlagXY(CDisplay::FLAG_X_ALIGN_LEFT, CDisplay::FLAG_Y_ALIGN_BOTTOM);
 }
 
 bool CDisplayConfig::read(IFile & file)

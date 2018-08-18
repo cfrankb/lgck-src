@@ -52,6 +52,10 @@ public:
     virtual int getSize();
     virtual const char *signature();
     virtual int display_sizeText(int displayId, const char *text=NULL);
+    virtual int indexOf(const char *name);
+    virtual int computeY(CDisplay & display, int sy);
+    virtual int computeX(CDisplay & display, int sx);
+
 protected:
     CGame *m_game;
     IImageManager *m_imageManager;
