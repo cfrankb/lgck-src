@@ -165,23 +165,6 @@ void CGRSfml::drawScene(CScene * layer)
     }
 }
 
-void CGRSfml::drawHP()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    CActor & player = m_game->getPlayer();
-    int x1 = 1;
-    int x2 = x1 + player.getHP() * 2;
-    int y1 = screenHei - 24;
-    int y2 = screenHei - 8;
-    UINT8 a = m_game->getDisplayAlpha();
-    if (a && player.getHP()) {
-        paint(x1, y1, x2, y2, 0x40ff00 | (a << 24));
-        paint(x1, y1, x2, y2, 0xffffff | (a << 24), false);
-    }
-}
-
 void CGRSfml::getOffset(int & offsetX, int & offsetY)
 {
     int screenLen;
@@ -244,7 +227,6 @@ void CGRSfml::drawScreen()
             drawScene(m_game->m_sFW);
         }
     }
-    drawHP();
     drawInventory();
     m_displayManager->draw();
 }

@@ -169,29 +169,6 @@ void CGROpenGL::drawScene(CScene * layer)
     }
 }
 
-void CGROpenGL::drawHP()
-{
-    glDisable(GL_TEXTURE_2D);
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    CActor & player = m_game->getPlayer();
-    int sy = 16;
-    int sx = player.getHP() * 2;
-
-    IDisplayManager & dm = *(m_game->displays());
-    CDisplay & display = dm["healthbar"];
-    int x = dm.computeX(display, sx);
-    int y = dm.computeY(display, sy);
-
-    UINT8 a = m_game->getDisplayAlpha();
-    if (a) {
-        paint(x,screenHei - y, x + sx, screenHei - y - sy, display.rgb() + (a << 24));
-        paint(x,screenHei - y, x + sx, screenHei - y - sy, 0xffffff + (a << 24), false);
-    }
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-}
-
 void CGROpenGL::getOffset(int & offsetX, int & offsetY)
 {
     int screenLen;
@@ -261,10 +238,6 @@ void CGROpenGL::drawScreen()
             drawScene(m_game->m_sFW);
         }
     };
-    IDisplayManager & dm = *(m_game->displays());
-    if (dm["healthbar"].visible()) {
-        drawHP();
-    }
     drawInventory();
     m_displayManager->draw();
     glDisable(GL_TEXTURE_2D);
@@ -308,6 +281,7 @@ void CGROpenGL::clear(unsigned int rgb)
 
 void CGROpenGL::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
 {
+    glDisable(GL_TEXTURE_2D);
     unsigned int red = rgba & 0xff;
     unsigned int green = (rgba >> 8) & 0xff;
     unsigned int blue = (rgba >> 16) & 0xff;

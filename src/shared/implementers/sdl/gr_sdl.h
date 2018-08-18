@@ -69,7 +69,6 @@ protected:
     virtual void drawLayer (CLayer * layer, int mx, int my);
     virtual void drawScene (CScene * layer);
     virtual void drawInventory();
-    virtual void drawHP();
     struct {
         unsigned char red;
         unsigned char green;

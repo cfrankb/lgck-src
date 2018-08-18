@@ -25,6 +25,7 @@
 #include "FileWrap.h"
 #include "Font.h"
 #include "fontmanager.h"
+#include "Actor.h"
 
 // http://www.codehead.co.uk/cbfg/
 // http://doc.qt.io/qt-5/qtwidgets-widgets-charactermap-example.html
@@ -100,6 +101,11 @@ CDisplay & CDisplayManager::operator [] (int i)
 }
 
 CDisplay & CDisplayManager::operator [] (const char * name)
+{
+    return get(name);
+}
+
+CDisplay & CDisplayManager::get(const char * name)
 {
     for (int i=0; i < m_size; ++i) {
         if (std::string(m_displays[i].name()) == name) {
@@ -310,6 +316,10 @@ void CDisplayManager::draw()
                 drawText(m_displays[i]);
                 break;
 
+            case CDisplay::DISPLAY_HEALTH_BAR:
+                drawHP();
+                break;
+
             //case CDisplay::DISPLAY_MESSAGE:
             default:
                 drawText(m_displays[i]);
@@ -355,4 +365,24 @@ int CDisplayManager::indexOf(const char *name)
         }
     }
     return NOT_FOUND;
+}
+
+void CDisplayManager::drawHP()
+{
+    int screenLen;
+    int screenHei;
+    m_graphics->getScreenSize(screenLen, screenHei);
+    CActor & player = m_game->getPlayer();
+    int sy = 16;
+    int sx = player.getHP() * 2;
+
+    CDisplay & display = get("healthbar");
+    int x = computeX(display, sx);
+    int y = computeY(display, sy);
+
+    UINT8 a = m_game->getDisplayAlpha();
+    if (a) {
+        m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, display.rgb() + (a << 24));
+        m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, 0xffffff + (a << 24), false);
+    }
 }

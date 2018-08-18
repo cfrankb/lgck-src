@@ -64,7 +64,6 @@ protected:
     virtual void drawLayer (CLayer * layer, int mx, int my);
     virtual void drawScene (CScene * layer);
     virtual void drawInventory();
-    virtual void drawHP();
     inline int pow2roundup (int x) {
         --x;
         x |= x >> 1;

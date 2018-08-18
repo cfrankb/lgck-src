@@ -71,7 +71,6 @@ protected:
     virtual void drawLayer (CLayer * layer, int mx, int my);
     virtual void drawScene (CScene * layer);
     virtual void drawInventory();
-    virtual void drawHP();
     std::string m_lastError;
     int m_screenWidth;
     int m_screenHeight;
