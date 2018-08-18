@@ -42,7 +42,6 @@
 #include "../shared/interfaces/IImageManager.h"
 #include "../shared/interfaces/IMusic.h"
 #include "../shared/interfaces/ISound.h"
-#include "../shared/implementers/opengl/im_qtopengl.h"
 #include "../shared/implementers/sdl/mu_sdl.h"
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/GameEvents.h"

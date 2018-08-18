@@ -30,8 +30,8 @@
 #include "Path.h"
 #include "PathBlock.h"
 #include "qtgui/cheat.h"
-#include "implementers/opengl/gr_qtopengl.h"
-#include "implementers/opengl/im_qtopengl.h"
+#include "implementers/opengl/gr_opengl.h"
+#include "implementers/opengl/im_opengl.h"
 #include "inputs/qt/kt_qt.h"
 #include <QDebug>
 
