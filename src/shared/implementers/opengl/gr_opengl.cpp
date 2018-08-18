@@ -45,13 +45,8 @@
 #include "Level.h"
 #include "Font.h"
 #include "Display.h"
-
+#include "ISurface.h"
 #include "implementers/opengl/glhelper.h"
-
-// http://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Text_Rendering_01
-// http://www.opengl.org/archives/resources/features/fontsurvey/
-// http://students.cs.byu.edu/~bfish/glfontdl.php
-// http://stackoverflow.com/questions/8847899/opengl-how-to-draw-text-using-only-opengl-methods
 
 CGROpenGL::CGROpenGL(CGame *game)
 {
@@ -81,50 +76,8 @@ void CGROpenGL::getScreenSize(int & len, int & hei)
     hei = viewport[3];
 }
 
-void CGROpenGL::drawLayer(CLayer * layer, int mx, int my)
+void CGROpenGL::drawSurface(ISurface * surface, int mx, int my)
 {
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX = 0;
-    int offsetY = 0;
-    int maxX  = m_game->BUFFERLEN;
-    if (maxX < screenLen)  {
-        offsetX = (screenLen - maxX) / 2;
-    }
-    int maxY  = m_game->BUFFERHEI;
-    if (maxY < screenHei)  {
-        offsetY = (screenHei - maxY) / 2;
-    }
-    CFrame *pFrame;
-    CLayer & l = (*layer);
-    int entries = l.getSize();
-    for (int i=0; i< entries; ++i) {
-        CLevelEntry & entry = l[i] ;
-        if ((entry.m_nProto & m_game->PROTO_POINTS) == m_game->PROTO_POINTS ) {
-            pFrame = (* m_game->m_points ) [entry.m_nFrameNo];
-        } else {
-            pFrame = (* m_game->m_arrFrames[entry.m_nFrameSet])[entry.m_nFrameNo];
-        }
-        int x = entry.m_nX - mx;
-        int y = entry.m_nY - my;
-        if (!((entry.m_nTriggerKey & TRIGGER_HIDDEN) ||
-            (x + pFrame->m_nLen <= 0) ||
-            (x >= screenLen) ||
-            (y + pFrame->m_nHei <= 0) ||
-            (y >= screenHei) ||
-            (entry.m_nFrameNo & 0x8000))) {
-            x += offsetX;
-            y += offsetY;
-            paintImage(x, screenHei - y, entry.m_nFrameSet, entry.m_nFrameNo);
-        }
-    }
-}
-
-void CGROpenGL::drawScene(CScene * layer)
-{
-    int mx = m_game->m_mx;
-    int my = m_game->m_my;
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
@@ -141,12 +94,11 @@ void CGROpenGL::drawScene(CScene * layer)
         offsetY = (screenHei - maxY) / 2;
     }
 
-    CScene & scene = *layer;
-    int entries = scene.getSize();
+    int entries = surface->getSize();
     CFrame *pFrame;
     int frameSet;
     for (int i=0; i< entries; ++i) {
-        CActor & entry = scene[i] ;
+        CLevelEntry & entry = surface->atIndex(i) ;
         if ((entry.m_nProto & m_game->PROTO_POINTS) == m_game->PROTO_POINTS ) {
             pFrame = (* m_game->m_points ) [entry.m_nFrameNo];
             frameSet = m_game->var("pointsOBL");
@@ -195,7 +147,6 @@ void CGROpenGL::drawScreen()
     int offsetX;
     int offsetY;
     getOffset(offsetX, offsetY);    
-//    glDisable(GL_TEXTURE_2D);
     clear(m_game->var("borderColor"));
     paint(offsetX,
           screenHei - offsetY,
@@ -203,9 +154,7 @@ void CGROpenGL::drawScreen()
           offsetY,
           m_game->var("bkColor") | ALL_ALPHA);
     glEnable(GL_TEXTURE_2D);
-    //glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glEnable (GL_BLEND);
-    //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable (GL_BLEND);;
     glDisable(GL_MULTISAMPLE);
     int colorMod = m_game->var("colorMod") | ALL_ALPHA;
     float blue = (colorMod & 0xff);// << 16;
@@ -231,11 +180,13 @@ void CGROpenGL::drawScreen()
                     my = m_game->m_my / speeds[v];
                 }
             }
-            drawLayer(&layer, mx, my);
+            drawSurface(dynamic_cast<ISurface*>(&layer), mx, my);
         } else {
             // draw main layer
-            drawScene(m_game->m_sBK);
-            drawScene(m_game->m_sFW);
+            int mx = m_game->m_mx;
+            int my = m_game->m_my;
+            drawSurface(dynamic_cast<ISurface*>(m_game->m_sBK), mx, my);
+            drawSurface(dynamic_cast<ISurface*>(m_game->m_sFW), mx, my);
         }
     };
     m_displayManager->draw();
@@ -295,6 +246,7 @@ void CGROpenGL::paintImage(int x1, int y1, int frameSet, int frameNo)
 
 void CGROpenGL::paintImage(int x1, int y1, CFrame *frame, int frameSet, int frameNo)
 {
+    glEnable(GL_TEXTURE_2D);
     unsigned int texture = m_imageManager->getImage(frameSet, frameNo);
     glBindTexture(GL_TEXTURE_2D, texture);
     int ix = pow2roundup(frame->m_nLen);
@@ -343,10 +295,8 @@ void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color 
     unsigned int texture = font.textureId();
     ASSERT(texture);
 
-    //GLDEBUG();
     glEnable(GL_TEXTURE_2D); GLDEBUG();
     glEnable (GL_BLEND); GLDEBUG();
-    //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, texture); GLDEBUG();
     float xx = x;
     for (int i=0; text[i]; ++i) {

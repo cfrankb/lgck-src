@@ -158,7 +158,7 @@ void CDisplayManager::drawImage(CDisplay & display)
             y = (screenHei - frame->m_nHei) / 2;
         }
     }
-    m_graphics->paintImage(x, screenHei - y, display.imageSet(), display.imageNo());
+    m_graphics->ss_paintImage(x, y, display.imageSet(), display.imageNo());
 }
 
 int CDisplayManager::computeY(CDisplay & display, int sy)
@@ -392,7 +392,6 @@ void CDisplayManager::drawHP()
 
 void CDisplayManager::drawInventory()
 {
-   // glEnable(GL_TEXTURE_2D);
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
@@ -407,7 +406,7 @@ void CDisplayManager::drawInventory()
                 CFrame *frame = (*( m_game->m_arrFrames[imageSet]))[imageNo];
                 int x = screenLen - frame->m_nLen - 4;
                 int y = 32 * (i + 1) + 4;
-                m_graphics->paintImage(x, screenHei - y, imageSet, imageNo);
+                m_graphics->ss_paintImage(x, y, imageSet, imageNo);
                 ++i;
             }
         }

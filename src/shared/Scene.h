@@ -20,12 +20,13 @@
 #define SCENE_H
 
 #include "Actor.h"
+#include "ISurface.h"
 
 class CLayer;
 class CGame;
 class IFile;
 
-class CScene
+class CScene: public ISurface
 {
 public:
     CScene();
@@ -36,8 +37,9 @@ public:
     void removeAt(int i);
     void forget();
     CActor & operator [] (int i) const;
+    virtual CLevelEntry & atIndex (int i) const;
     void setOwner(CGame *game, bool bk);
-    int getSize() const;
+    virtual int getSize() const;
     int findPlayerEntry();
     void hideSystemObject(bool bHide);
     int countGoals();

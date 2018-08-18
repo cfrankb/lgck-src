@@ -28,6 +28,7 @@ class IDisplayManager;
 class CDisplayManager;
 class CDMOpengl;
 class CFont;
+class ISurface;
 
 #ifdef LGCK_QT
     #include <QOpenGLFunctions_2_0>
@@ -61,8 +62,7 @@ protected:
     CIMOpengl *m_imageManager;
     CDisplayManager *m_displayManager;
     std::unordered_map<std::string, unsigned int> m_fonts;
-    virtual void drawLayer (CLayer * layer, int mx, int my);
-    virtual void drawScene (CScene * layer);
+    void drawSurface(ISurface * surface, int mx, int my);
     inline int pow2roundup (int x) {
         --x;
         x |= x >> 1;

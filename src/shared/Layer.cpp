@@ -78,6 +78,11 @@ CLevelEntry & CLayer::operator [] (int n) const
     return (CLevelEntry &) m_arrEntries[n];
 }
 
+CLevelEntry & CLayer::atIndex(int n) const
+{
+    return (CLevelEntry &) m_arrEntries[n];
+}
+
 void CLayer::removeAt(int n)
 {
     for (int i = n; i < m_size - 1; ++i) {

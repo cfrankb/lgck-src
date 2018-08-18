@@ -122,6 +122,11 @@ CActor & CScene::operator [] (int i) const
     return *(m_actors [ i ]);
 }
 
+CLevelEntry & CScene::atIndex (int i) const
+{
+    return *(dynamic_cast<CLevelEntry*>(m_actors [ i ]));
+}
+
 void CScene::setOwner(CGame *game, bool bk)
 {
     m_game = game;

@@ -20,8 +20,6 @@
 #define IGRAPHICS_H
 
 class CFrame;
-class CScene;
-class CLayer;
 class IDisplayManager;
 class IImageManager;
 class CFont;
@@ -46,10 +44,6 @@ public:
     virtual void ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true)=0;
     virtual void ss_paintImage(int x1, int y1, int frameSet, int frameNo)=0;
     virtual IImageManager *cache()=0;
-
-protected:
-    virtual void drawLayer(CLayer * layer, int mx, int my)=0;
-    virtual void drawScene(CScene * layer)=0;
 };
 
 inline IGraphics::~IGraphics(){}
