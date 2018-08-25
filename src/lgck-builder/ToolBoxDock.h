@@ -68,6 +68,10 @@ protected:
     void closeEvent(QCloseEvent *event);
     void checkFrameSetUses(int frameSet);
 
+    enum {
+        TOOLBAR_WIDTH = 250
+    };
+
 private slots:
     void on_btnDeleteSprite_clicked();
     void on_btnAddSprite_clicked();
@@ -119,6 +123,7 @@ private slots:
     void on_btnAddFont_clicked();
     void on_btnDeleteFont_clicked();
     void editFont();
+    void docked(Qt::DockWidgetArea area);
 
 signals:
     void levelSelection(int index);

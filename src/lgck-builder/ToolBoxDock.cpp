@@ -61,6 +61,8 @@ CToolBoxDock::CToolBoxDock(QWidget *parent) :
     m_ui->setupUi(this);
     m_index = NULL;
     m_ui->tabWidget->setCurrentIndex(0);
+    connect(this, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),
+            this, SLOT(docked(Qt::DockWidgetArea)));
 }
 
 CToolBoxDock::~CToolBoxDock()
@@ -82,6 +84,21 @@ void CToolBoxDock::changeEvent(QEvent *e)
         break;
     default:
         break;
+    }
+}
+
+void CToolBoxDock::docked(Qt::DockWidgetArea area)
+{
+    setMinimumWidth(TOOLBAR_WIDTH);
+    switch (area) {
+    case Qt::DockWidgetArea::TopDockWidgetArea:
+    case Qt::DockWidgetArea::BottomDockWidgetArea:
+        m_ui->tabWidget->setTabPosition(QTabWidget::North);
+        setMaximumWidth(640);
+        break;
+    default:
+         m_ui->tabWidget->setTabPosition(QTabWidget::West);
+         setMaximumWidth(TOOLBAR_WIDTH);
     }
 }
 

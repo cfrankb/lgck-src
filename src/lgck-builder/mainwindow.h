@@ -128,7 +128,6 @@ private:
         MaxRecentFiles      = 4,
         TICK_MAX_RATE       = 200,
         TICK_SCALE          = 1000 / 35,
-        TOOLBAR_WIDTH       = 250,
         LABEL0_SIZE         = 500,
         VM_EDITOR           = 0,
         VM_GAME             = 1,
@@ -138,7 +137,6 @@ private:
     };
     QLabel *m_labels[3];
     QAction *m_recentFileActs[MaxRecentFiles];
-    QFileSystemWatcher * m_watcher;
     virtual void closeEvent(QCloseEvent *event);
     virtual void setVisible ( bool visible );
     virtual void resizeEvent (QResizeEvent *event);

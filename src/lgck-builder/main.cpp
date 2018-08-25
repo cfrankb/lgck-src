@@ -28,6 +28,7 @@
 #include "ss_build.h"
 #include <ctime>
 #include <QMessageBox>
+#include <QDesktopWidget>
 
 static char appName[] = "LGCK builder";
 static char author[] = "cfrankb";
@@ -66,7 +67,11 @@ int main(int argc, char *argv[])
             CDlgSelect * dlg = new CDlgSelect(&w);
             dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
             dlg->raise();
-            dlg->setWindowState(Qt::WindowActive) ;
+            dlg->setWindowState(Qt::WindowActive);
+            QRect screenGeometry = QApplication::desktop()->screenGeometry();
+            int x = (screenGeometry.width() - dlg->width()) / 2;
+            int y = (screenGeometry.height() - dlg->height()) / 2;
+            dlg->move(x, y);
             dlg->exec();
             CWizGame *wiz;
             switch(dlg->getState()) {

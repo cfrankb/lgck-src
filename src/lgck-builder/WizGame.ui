@@ -60,7 +60,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Welcome to the Game Wizard</string>
+     <string>Welcome to the Project Wizard</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -73,7 +73,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>This wizard will guide you the process of creating a new game.</string>
+     <string>This wizard will guide you the process of creating a new game project.</string>
     </property>
     <property name="wordWrap">
      <bool>true</bool>
@@ -622,7 +622,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Congratulation, you have just created a new game. Click to the finish button to complete the process.</string>
+     <string>Congratulation, you have just created a new game project. Click to the finish button to complete the process.</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

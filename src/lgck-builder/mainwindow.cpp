@@ -166,8 +166,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_toolBox->hide();
     m_toolBox->setGameDB(&m_doc);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_toolBox);
-    m_toolBox->setMaximumWidth(TOOLBAR_WIDTH);
-    m_toolBox->setMinimumWidth(TOOLBAR_WIDTH);
 
     connect(this, SIGNAL(frameSetChanged(int)),
             m_toolBox, SLOT(updateFrameSet(int)));
@@ -249,10 +247,6 @@ MainWindow::MainWindow(QWidget *parent)
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
         //checkVersion();
     }
-
-    // TODO: implement watcher
-    // https://stackoverflow.com/questions/10044853/how-to-use-qfilesystemwatcher-to-monitor-a-folder-for-change
-    m_watcher = new QFileSystemWatcher(this);
 }
 
 void MainWindow::createEventEditor()
