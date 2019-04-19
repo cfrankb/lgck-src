@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LGCK builder"
-#define MyAppVersion "0.6.0.8"
+#define MyAppVersion "0.6.0.9"
 #define MyAppPublisher "Francois Blanchette"
 #define MyAppURL "https://cfrankb.com/lgck"
 #define MyAppExeName "lgck-builder.exe"

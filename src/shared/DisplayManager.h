@@ -58,12 +58,13 @@ public:
     virtual int computeX(CDisplay & display, int sx);
     virtual void drawHP();
     virtual void drawInventory();
+    void drawDisplay(CDisplay & display);
 
 protected:
     CGame *m_game;
     IImageManager *m_imageManager;
     IGraphics *m_graphics;
-   // CFont *m_font;
+
 };
 
 #endif

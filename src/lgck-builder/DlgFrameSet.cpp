@@ -36,6 +36,7 @@ CDlgFrameSet::CDlgFrameSet(QWidget *parent) :
 {
     m_ui->setupUi(this);
     m_frameSet = NULL;
+    m_ui->sUUID->setText("UUID: -");
 }
 
 CDlgFrameSet::~CDlgFrameSet()
@@ -92,6 +93,7 @@ void CDlgFrameSet::init(CFrameSet * frameSet)
 
     CFrameSet * fs = (CFrameSet *) m_frameSet;
     m_ui->eName->setText(fs->getName());
+    m_ui->sUUID->setText(QString("UUID: ") + QString(fs->tag("UUID").c_str()));
 
     emit refill();
     updateButtons();
@@ -178,7 +180,9 @@ void CDlgFrameSet::on_btnEdit_clicked()
         } else {
             // reload the changes
             if (file.open(q2c(tmp.fileName()),"r")) {
-               m_frameSet->read(file);
+                std::string uuid = m_frameSet->tag("UUID");
+                m_frameSet->read(file);
+                m_frameSet->setTag("UUID", uuid.c_str());
                 file.close();
                 emit refill();
             } else {

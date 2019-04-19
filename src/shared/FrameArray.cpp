@@ -84,6 +84,7 @@ int CFrameArray::add(CFrameSet *pFilter)
     }
 
     m_arrFilters[m_nSize] = pFilter;
+   // m_arrFilters[m_nSize]->copyTags(*pFilter);
     ++m_nSize;
     return m_nSize - 1;
 }
@@ -118,7 +119,7 @@ int CFrameArray::getNameIndex (const char *str)
             return i;
     }
 
-    return -1;
+    return NOT_FOUND;
 }
 
 CFrameSet * CFrameArray::operator [] (const char* name)
@@ -132,3 +133,14 @@ CFrameSet * CFrameArray::operator [] (const char* name)
 
     return NULL;
 }
+
+ int CFrameArray::indexOfUUID(const char *uuid)
+ {
+     for (int i=0; i < getSize(); i++) {
+         CFrameSet * fs = m_arrFilters[i];
+         if (!strcmp(fs->tag("UUID").c_str(), uuid)) {
+             return i;
+         }
+     }
+     return NOT_FOUND;
+ }

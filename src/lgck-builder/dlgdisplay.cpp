@@ -15,7 +15,7 @@
 #include "Frame.h"
 
 #define STR(__INT__) QString().sprintf("%d", __INT__)
-#define TEXT(__CX__) q2c(__CX__->text().trimmed())
+#define TEXT1(__CX__) q2c(__CX__->text().trimmed())
 #define COLOR(RGB) (RGB & 0xff0000) >> 16, (RGB & 0xff00) >> 8, (RGB & 0xff)
 #define TOINT(__E__) __E__->text().toInt()
 
@@ -148,7 +148,7 @@ void CDlgDisplay::load(CDisplay & d)
 void CDlgDisplay::save(CDisplay & d)
 {
     // page 1
-    d.setName(TEXT(ui->eName));
+    d.setName(TEXT1(ui->eName));
     d.setText(q2c(ui->eText->toPlainText()));
     d.setType(ui->cbType->currentIndex());
     d.setVisible(ui->cVisible->isChecked());
@@ -162,7 +162,7 @@ void CDlgDisplay::save(CDisplay & d)
     d.setShadow(ui->cShadowVisible->isChecked(), TOINT(ui->eShadowX), TOINT(ui->eShadowY));
 
     // page 3
-    d.setTemplate(TEXT(ui->eTemplate));
+    d.setTemplate(TEXT1(ui->eTemplate));
     d.setFont(ui->cbFont->currentIndex());
 
     // page 4

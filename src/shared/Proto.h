@@ -50,6 +50,7 @@ public:
 public:
     void read(IFile & file, int nSize=0);
     void write(IFile & file);
+    void resetUUID();
     ~CProto();
 
     UINT8 m_nClass;
@@ -99,6 +100,7 @@ public:
 
     UINT8 m_extra[2];
     UINT16 m_bulletSound;
+    char m_uuid[40];
 
     enum {
         OPTION_NO_GRAVITY       = 0x0001,  // antigravity flag

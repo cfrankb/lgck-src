@@ -28,14 +28,9 @@
 #include "Actor.h"
 #include "Inventory.h"
 
-// http://www.codehead.co.uk/cbfg/
-// http://doc.qt.io/qt-5/qtwidgets-widgets-charactermap-example.html
-// http://devcry.heiho.net/2012/01/opengl-font-rendering-with-ftgl.html
-// https://www.google.ca/search?client=opera&q=opengl+text+rendering+library&sourceid=opera&ie=utf-8&oe=utf-8&channel=suggest
-// https://www.google.ca/search?q=ftgl&btnG=Search&safe=off&client=opera&channel=suggest
-// http://devcry.heiho.net/2012/01/ftgl-font-rendering-in-multiple-colors.html
-
 #define RGBA(rgba) rgba & 0xff, (rgba & 0xff00) >> 8, (rgba & 0xff0000) >> 16, (rgba & 0xff000000) >> 24
+
+// https://stackoverflow.com/questions/12157646/how-to-render-offscreen-on-opengl
 
 /////////////////////////////////////////////////////////////////////
 // CDisplayManager
@@ -284,50 +279,11 @@ bool CDisplayManager::isValidIndex(int i)
 
 void CDisplayManager::draw()
 {
-    char tmp[256];
-    int score;
     for (int i=0; i < m_size; ++i) {
         if (m_displays[i].visible()) {
-            switch (m_displays[i].type()) {
-            case CDisplay::DISPLAY_TIME_LEFT:
-                if (m_game->getTimeLeft()  > 0) {
-                    sprintf(tmp, m_displays[i].templateStr(), m_game->getTimeLeft());
-                    m_displays[i].setText(tmp, CDisplay::DISPLAY_SAME);
-                    drawText(m_displays[i]);
-                }
-                break;
-
-            case CDisplay::DISPLAY_LIVES:
-                drawLives(m_displays[i]);
-                break;
-
-            case CDisplay::DISPLAY_DEBUGX:
-                m_displays[i].setText(m_game->m_lua.getDebugText(), CDisplay::DISPLAY_SAME);
-                drawText(m_displays[i]);
-                break;
-
-            case CDisplay::DISPLAY_IMAGE:
-                drawImage(m_displays[i]);
-                break;
-
-            case CDisplay::DISPLAY_SCORE:
-                score = m_game->getScore();
-                sprintf(tmp, m_displays[i].templateStr(), score);
-                m_displays[i].setText(tmp, CDisplay::DISPLAY_SAME);
-                drawText(m_displays[i]);
-                break;
-
-            case CDisplay::DISPLAY_HEALTH_BAR:
-                drawHP();
-                break;
-
-            //case CDisplay::DISPLAY_MESSAGE:
-            default:
-                drawText(m_displays[i]);
-            }
+            drawDisplay(m_displays[i]);
         }
     }
-
     drawInventory();
 }
 
@@ -410,5 +366,49 @@ void CDisplayManager::drawInventory()
                 ++i;
             }
         }
+    }
+}
+
+void CDisplayManager::drawDisplay(CDisplay & display)
+{
+    char tmp[256];
+    int score;
+
+    switch (display.type()) {
+    case CDisplay::DISPLAY_TIME_LEFT:
+        if (m_game->getTimeLeft()  > 0) {
+            sprintf(tmp, display.templateStr(), m_game->getTimeLeft());
+            display.setText(tmp, CDisplay::DISPLAY_SAME);
+            drawText(display);
+        }
+        break;
+
+    case CDisplay::DISPLAY_LIVES:
+        drawLives(display);
+        break;
+
+    case CDisplay::DISPLAY_DEBUGX:
+        display.setText(m_game->m_lua.getDebugText(), CDisplay::DISPLAY_SAME);
+        drawText(display);
+        break;
+
+    case CDisplay::DISPLAY_IMAGE:
+        drawImage(display);
+        break;
+
+    case CDisplay::DISPLAY_SCORE:
+        score = m_game->getScore();
+        sprintf(tmp, display.templateStr(), score);
+        display.setText(tmp, CDisplay::DISPLAY_SAME);
+        drawText(display);
+        break;
+
+    case CDisplay::DISPLAY_HEALTH_BAR:
+        drawHP();
+        break;
+
+    //case CDisplay::DISPLAY_MESSAGE:
+    default:
+        drawText(display);
     }
 }

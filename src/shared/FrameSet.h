@@ -71,6 +71,9 @@ public:
     void setLastError(const char *error);
     void toPng(unsigned char * &data, int &size);
     std::string & tag(const char *tag);
+    void setTag(const char *tag, const char *v);
+    void copyTags(CFrameSet & src);
+    void assignNewUUID();
 
     // Implementation
 public:

@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Game Wizard</string>
+   <string>Project Wizard</string>
   </property>
   <property name="windowIcon">
    <iconset resource="lgck-builder.qrc">

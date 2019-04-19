@@ -39,6 +39,7 @@ CFrameSet::CFrameSet()
     m_arrFrames = new CFrame* [m_max] ;
     m_name = "";
     m_size = 0;
+    assignNewUUID();
 }
 
 CFrameSet::CFrameSet(CFrameSet *s)
@@ -53,6 +54,16 @@ CFrameSet::CFrameSet(CFrameSet *s)
     }
 
     m_name = s->getName();
+    copyTags(*s);
+    std::string uuid = m_tags["UUID"];
+    if (uuid.empty()) {
+       assignNewUUID();
+    }
+}
+
+void CFrameSet::assignNewUUID()
+{
+    m_tags["UUID"] = getUUID();
 }
 
 CFrameSet::~CFrameSet()
@@ -106,13 +117,22 @@ void CFrameSet::write0x501(IFile & file)
     file.write(dest, destSize);
 
     // TAG COUNT
-    int count = m_tags.size();
+    int count = 0;
+    for(auto kv : m_tags) {
+        const std::string val = kv.second;
+        if (!val.empty()) {
+            ++ count;
+        }
+    }
+
     file.write(&count, sizeof(UINT32));
     for(auto kv : m_tags) {
         const std::string key = kv.first;
         const std::string val = kv.second;
-        file << key;
-        file << val;
+        if (!val.empty()) {
+            file << key;
+            file << val;
+        }
     }
 
     delete[] buffer;
@@ -210,6 +230,7 @@ bool CFrameSet::read0x501(IFile &file, int size)
     // TAG COUNT
     int count = 0;
     file.read(&count, sizeof(UINT32));
+    m_tags.clear();
     for (int i=0; i < count; ++i) {
         std::string key;
         std::string val;
@@ -227,6 +248,7 @@ bool CFrameSet::read0x501(IFile &file, int size)
 
 bool CFrameSet::read(IFile & file)
 {
+    bool result;
     char signature[5];
     signature[4]=0;
     file.read(signature, 4);
@@ -257,19 +279,25 @@ bool CFrameSet::read(IFile & file)
             temp->updateMap();
             add (temp);
         }
+        result = true;
     break;
 
     case 0x501:
-        return read0x501(file, size);
+        result = read0x501(file, size);
+    break;
 
     default:
         char tmp[128];
         sprintf(tmp, "unknown OBL5 version: %x", version);
         m_lastError = tmp;
-        return false;
+        result = false;
     }
 
-    return true;
+    std::string & uuid = m_tags["UUID"];
+    if (uuid.empty()) {
+        assignNewUUID();
+    }
+    return result;
 }
 
 CFrame * CFrameSet::operator[](int n) const
@@ -282,6 +310,16 @@ CFrame * CFrameSet::operator[](int n) const
     }
 }
 
+ void CFrameSet::copyTags(CFrameSet & src)
+ {
+     qDebug("copytags");
+     // copy tags
+     m_tags.clear();
+     for(auto kv : src.m_tags) {
+         m_tags[kv.first] = kv.second;
+     }
+ }
+
 CFrameSet & CFrameSet::operator = (CFrameSet & s)
 {
     forget();
@@ -289,7 +327,7 @@ CFrameSet & CFrameSet::operator = (CFrameSet & s)
         CFrame *frame = new CFrame(s[i]);
         add(frame);
     }
-
+    copyTags(s);
     m_name = s.getName();
 
     return * this;
@@ -867,4 +905,9 @@ void CFrameSet::setLastError(const char *error)
 std::string & CFrameSet::tag(const char *tag)
 {
     return m_tags[tag];
+}
+
+void CFrameSet::setTag(const char *tag, const char *v)
+{
+    m_tags[tag] = v;
 }

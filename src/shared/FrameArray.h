@@ -51,10 +51,14 @@ public:
     int add(CFrameSet *pFilter);
     void removeAt(int n);
     void forget();
+    int indexOfUUID(const char *uuid);
 
     // Implementation
 public:
     ~CFrameArray();
+    enum {
+        NOT_FOUND = -1
+    };
 
 private:
     int m_nMax;

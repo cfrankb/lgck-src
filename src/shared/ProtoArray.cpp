@@ -29,6 +29,7 @@
 #include "Game.h"
 #include "../shared/IFile.h"
 #include "../shared/FileWrap.h"
+#include "helper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CProtoArray
@@ -108,11 +109,11 @@ bool CProtoArray::read(IFile &file)
     file.read(&nEntrySize, sizeof(nEntrySize));
     //qDebug("entrySize:%d [%ld]\n", nEntrySize, sizeof(CProto));
     char *t = new char [ std::max(nEntrySize, (int)sizeof(CProto)) ];
-    memset(t, 0, sizeof(CProto));
 
     CProto* proto = (CProto*)t;
     // all the proto data
     while (i) {
+        memset(t, 0, sizeof(CProto));
         file.read(t, nEntrySize);
         if (version < 4) {
             // Fix-up this issue
@@ -122,6 +123,7 @@ bool CProtoArray::read(IFile &file)
         --i;
     }
 
+    fixUUIDs();
     delete [] t ;
 
     bool result = false;
@@ -142,8 +144,28 @@ bool CProtoArray::read(IFile &file)
             qDebug("unknown proto.dat version (0x%.8x)\n", version);
         break;
     }
-
     return result;
+}
+
+void CProtoArray::fixUUIDs()
+{
+    for (int i = 0; i < m_nSize; ++i)	{
+        CProto & proto = m_objects[i].proto();
+        if (!proto.m_uuid[0]) {
+            proto.resetUUID();
+        }
+    }
+}
+
+int CProtoArray::indexOfUUID(const char *uuid)
+{
+    for (int i = 0; i < m_nSize; ++i)	{
+        CProto & proto = m_objects[i].proto();
+        if (!strcmp(proto.m_uuid, uuid)) {
+            return i;
+        }
+    }
+    return NOT_FOUND;
 }
 
 bool CProtoArray::readEx(IFile &file, int version)
@@ -189,6 +211,7 @@ bool CProtoArray::readEx(IFile &file, int version)
             m_objects[i].readPaths(file);
         }
     }
+
     return true;
 }
 
@@ -729,12 +752,14 @@ bool CProto::operator != (const CProto proto) const
 CProto::CProto (const CProto & proto)
 {
     memcpy (this, &proto, sizeof (CProto));
+   // resetUUID();
 }
 
 CProto::CProto (const char* s)
 {
     memset (this, 0, sizeof(CProto));
     strcpy (m_szName, s);
+    resetUUID();
 }
 
 void CProto::read(IFile &file, int nSize)
@@ -805,4 +830,9 @@ bool CProto::isFkClass() const
 bool CProto::isAcClass() const
 {
     return m_nClass >= CLASS_GENERIC_COS;
+}
+
+void CProto::resetUUID()
+{
+    strcpy(m_uuid, getUUID());
 }

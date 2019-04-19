@@ -75,6 +75,7 @@ public:
         void debugIndex();
         void debugIndex(CFileWrap & file);
         int getIndexSize();
+        int indexOfUUID(const char *uuid);
 
         CProtoIndex * createIndex(int pattern = 0);
 
@@ -85,24 +86,20 @@ public:
 protected:
         void forgetIndex();
         bool readEx (IFile & file, int version);
+        void fixUUIDs();
 
         int *m_index;
         int m_indexSize;
 
         CObject * m_objects;
-	int m_nMax;
+        int m_nMax;
         int m_nSize;
-
         static std::string m_eventList[];
-
         static CProto m_protoTmp;
-
         enum {
-//            PROTO_VERSION = 0x1,
-//            PROTO_VERSION = 0x2,
-//            PROTO_VERSION = 0x3,
             PROTO_VERSION = 0x4,
-            GROWBY = 16
+            GROWBY = 16,
+            NOT_FOUND = -1
         };
 };
 

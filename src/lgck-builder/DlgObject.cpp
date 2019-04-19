@@ -103,7 +103,7 @@ void CDlgObject::load(const int index)
     m_objectIndex = index;
     CProto & proto = gf.m_arrProto[index];
     CObject & object = gf.m_arrProto.getObject( index );
-    QString title = QString(tr("Properties for \"%1\"")).arg(proto.m_szName);
+    QString title = QString(tr("Properties for \"%1\" [%2]")).arg(proto.m_szName).arg(proto.m_uuid);
     setWindowTitle(title);
 
     // name

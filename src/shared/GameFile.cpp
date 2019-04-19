@@ -461,7 +461,7 @@ bool CGameFile::read(const char *filepath)
         CFolder *obl = fs["obldata"];
         if (!obl) {
             qDebug("missing `obldata` folder\n");
-            m_lastError = "damaged database:\nmissing `obldata` folder";
+            m_lastError = "damaged database: missing `obldata` folder";
             return false;
         }
 
@@ -600,6 +600,8 @@ bool CGameFile::read(const char *filepath)
             m_fontManager->reset();
         }
 
+
+        qDebug("FS[0] %s", m_arrFrames[0]->tag("UUID").c_str());
         qDebug("read done ;) \n");
         return true;
     }
