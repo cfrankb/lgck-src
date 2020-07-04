@@ -13,6 +13,7 @@ CStep::~CStep()
 
 void CStep::read(CFileWrap & file, int version)
 {
+    Q_UNUSED(version);
     file >> m_name;
     file >> m_code;
     file.read(&m_conditionCount, sizeof(m_conditionCount));

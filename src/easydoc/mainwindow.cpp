@@ -180,21 +180,18 @@ bool MainWindow::saveAs()
         fileName += ".edoc";
     }
 
-
     m_doc.setFileName(fileName);
     return true;
 }
 
 void MainWindow::warningMessage(const QString message)
 {
-    QMessageBox msgBox(QMessageBox::Warning, m_appName, message, 0, this);
-    msgBox.exec();
+    QMessageBox::warning(this, m_appName, message);
 }
 
 void MainWindow::infoMessage(const QString message)
 {
-    QMessageBox msgBox(QMessageBox::Information, m_appName, message, 0, this);
-    msgBox.exec();
+    QMessageBox::information(this, m_appName, message);
 }
 
 bool MainWindow::updateTitle()

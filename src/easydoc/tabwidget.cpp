@@ -19,6 +19,7 @@
 #include "tabwidget.h"
 #include "ui_tabwidget.h"
 #include <QMessageBox>
+#include <QAbstractItemView>
 #include "stdafx.h"
 #include "DlgFunction.h"
 #include "DlgClass.h"
@@ -35,7 +36,7 @@ TabWidget::TabWidget(QWidget *parent) :
     m_ui->treeFn->setColumnCount(3);
     m_ui->treeFn->setColumnWidth(0, 16);
     m_ui->treeFn->setColumnWidth(1, 128);
-    m_ui->treeFn->setEditTriggers(0);
+    m_ui->treeFn->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeFn->setWordWrap(false);
     m_ui->treeFn->setRootIsDecorated(false);
     m_ui->treeFn->setAlternatingRowColors(true);

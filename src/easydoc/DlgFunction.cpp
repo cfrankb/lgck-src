@@ -94,7 +94,7 @@ void CDlgFunction::load(CFunction *fn)
 
     // IN
     m_ui->treeIn->setColumnCount(2);
-    m_ui->treeIn->setEditTriggers(0);
+    m_ui->treeIn->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeIn->setWordWrap(false);
     m_ui->treeIn->setRootIsDecorated(false);
     updateInTree();
@@ -102,7 +102,7 @@ void CDlgFunction::load(CFunction *fn)
 
     // OUT
     m_ui->treeOut->setColumnCount(2);
-    m_ui->treeOut->setEditTriggers(0);
+    m_ui->treeOut->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeOut->setWordWrap(false);
     m_ui->treeOut->setRootIsDecorated(false);
     for (int i = 0; i < fn->Out().getSize(); ++i) {
@@ -141,7 +141,7 @@ void CDlgFunction::load(CFunction *fn)
 
     // Test Case
     m_ui->treeTestCase->setColumnCount(2);
-    m_ui->treeTestCase->setEditTriggers(0);
+    m_ui->treeTestCase->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeTestCase->setWordWrap(false);
     m_ui->treeTestCase->setRootIsDecorated(false);
     updateTestCaseTree();
@@ -379,7 +379,7 @@ void CDlgFunction::updateTestCaseCombo()
 
 void CDlgFunction::on_treeTestCase_clicked(const QModelIndex &index)
 {
-
+    Q_UNUSED(index);
 }
 
 void CDlgFunction::on_btnAdd_Step_clicked()
