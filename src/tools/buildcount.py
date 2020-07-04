@@ -1,14 +1,15 @@
 import uuid
 import re
 import os
-from os.path import join
+from os.path import join, isfile
 
 path = os.path.dirname(os.path.realpath(__file__))
 DATA = join(path, 'buildcount.dat')
 
 build_no = 0
-with open(DATA, 'r') as s:
-    build_no = s.read().strip()
+if isfile(DATA):
+    with open(DATA, 'r') as s:
+        build_no = s.read().strip()
 
 if not build_no:
     build_no = 0
@@ -32,7 +33,7 @@ build = '{version} - build {build_no}'.format(version=version, build_no=build_no
 print (build)
 
 target = "../shared/ss_build.h"
-with open(target, 'wb') as t:
+with open(target, 'w') as t:
     t.write('#define SS_BUILD "{}"\n'.format(build_no))
     t.write('#define SS_BUILD_STR "{}"'.format(build))
-    
+
