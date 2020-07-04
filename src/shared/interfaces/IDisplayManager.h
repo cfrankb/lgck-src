@@ -34,7 +34,7 @@ public:
     virtual void drawText(int x, int y, const char *text, int fontID=0, int fontSize=10, unsigned int rgba=0xffffff, int shadowOffset=0, unsigned int shadowColor=0)=0;
     virtual CDisplay & operator [] (int i)=0;
     virtual CDisplay & operator [] (const char* s)=0;
-    virtual CDisplay & get(const char* s);
+    virtual CDisplay & get(const char* s)=0;
     virtual CDisplay & getAt(int i)=0;
     virtual int findDisplay(const char * name)=0;
     virtual bool isValidIndex(int i)=0;
@@ -42,7 +42,7 @@ public:
     virtual void removeAt(int i)=0;
     virtual int getSize()=0;
     virtual const char *signature()=0;
-    virtual int display_sizeText(int displayId, const char *text=NULL)=0;
+    virtual int display_sizeText(int displayId, const char *text=nullptr)=0;
     virtual int indexOf(const char *name)=0;
     virtual int computeY(CDisplay & display, int sy)=0;
     virtual int computeX(CDisplay & display, int sx)=0;

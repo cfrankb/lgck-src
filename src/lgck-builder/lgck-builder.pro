@@ -13,7 +13,8 @@ PRE_TARGETDEPS += build_nr
 win32:CONFIG        += no_lflags_merge
 win32:INCLUDEPATH   += ../../../redist/include
 INCLUDEPATH         += ../shared
-unix:INCLUDEPATH    += /usr/include/x86_64-linux-gnu/qt5
+unix:INCLUDEPATH    += /usr/include/x86_64-linux-gnu/qt5 \
+                       /usr/include/qt
 win32:RC_FILE       = lgck-builder.rc
 #win32:DEFINES       += STATIC
 #win32:DEFINES       += QT_STATIC_BUILD
@@ -40,26 +41,17 @@ CONFIG( debug, debug|release ) {
     win32:LIBS      += -lqscintilla2_qt5
 }
 
-unix:LIBS += -lqt5scintilla2 \
+unix:LIBS += -lqscintilla2_qt5 \
     -llua5.2 \
-    -lSDL2_mixer-2.0 \
+    -lSDL2_mixer \
     -lSDL2-2.0 \
     -lz
 
 win32:LIBS += -llua \
     -lmingw32 \
-   # -lSDL2_mixer \
-   # -lFLAC -lvorbisfile -lvorbis -logg \
     -lSDL2_mixer \
     -lSDL2 \
- #   -lsfml-audio \
-    #-lSDL2_mixer.dll \
- #   -ldinput8 -ldxguid -ldxerr8 -luser32 \
- #   -lgdi32 -lwinmm -limm32 -lole32 \
- #   -loleaut32 -lshell32 -lversion -luuid \
     -lz \
-   # -lQt5OpenGLExtensions \
-   # -lQt5OpenGL \
     -lopengl32
 
 SOURCES +=  mainwindow.cpp \
@@ -163,7 +155,6 @@ SOURCES +=  mainwindow.cpp \
     ../shared/ss_build.cpp \
     ../shared/fontmanager.cpp \
     ../shared/interfaces/IGraphics.cpp
-  #  dlggameconfig.cpp
 
 HEADERS  +=  mainwindow.h \
     levelviewgl.h \
@@ -276,7 +267,6 @@ HEADERS  +=  mainwindow.h \
     ../shared/ss_build.h \
     ../shared/fontmanager.h \
     ../shared/ISerial.h
-   # dlggameconfig.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \
@@ -305,5 +295,3 @@ FORMS  += mainwindow.ui \
     DlgExportSprite.ui \
     DlgDistributeGame.ui \
     dlgdisplay.ui
-#    dlggameconfig.ui
-

@@ -21,9 +21,9 @@
 
 #include <qobject.h>
 
-#include <qt5/Qsci/qsciglobal.h>
-#include <qt5/Qsci/qscilexer.h>
-#include <qt5/Qsci/qscilexerlua.h>
+#include <qt/Qsci/qsciglobal.h>
+#include <qt/Qsci/qscilexer.h>
+#include <qt/Qsci/qscilexerlua.h>
 
 class QSCINTILLA_EXPORT CLexer : public QsciLexerLua
 {

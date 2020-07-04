@@ -17,9 +17,9 @@
 */
 
 #include "WEdit.h"
-#include <qt5/Qsci/qsciscintilla.h>
+#include <qt/Qsci/qsciscintilla.h>
 #include "Lexer.h"
-#include <qt5/Qsci/qsciapis.h>
+#include <qt/Qsci/qsciapis.h>
 #include <QCompleter>
 #include <QStringListModel>
 #include <QKeyEvent>

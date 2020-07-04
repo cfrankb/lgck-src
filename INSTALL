@@ -29,6 +29,12 @@ build dependencies:
     libsdl2-mixer-dev,
     freeglut3-dev
 
+    archlinux:
+
+    sdl2
+    sdl2_mixer
+    qscintilla-qt5
+
 runtime dependencies:
 
     libqt5gui5,

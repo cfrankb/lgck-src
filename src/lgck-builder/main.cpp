@@ -29,6 +29,7 @@
 #include <ctime>
 #include <QMessageBox>
 #include <QDesktopWidget>
+#include <QGuiApplication>
 
 static char appName[] = "LGCK builder";
 static char author[] = "cfrankb";

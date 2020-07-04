@@ -31,6 +31,7 @@
 #include <QScrollArea>
 #include <QFileSystemWatcher>
 #include <QByteArray>
+#include <QOperatingSystemVersion>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -74,7 +75,7 @@
 #include "levelscroll.h"
 #include "helper.h"
 #include "DlgDistributeGame.h"
-#include "ExportGame.h"
+#include "exportgame.h"
 
 char MainWindow::m_appName[] = "LGCK builder";
 char MainWindow::m_author[] = "cfrankb";
@@ -142,12 +143,12 @@ MainWindow::MainWindow(QWidget *parent)
             m_scroll, SLOT(leaveEditPath()));
     setMinimumHeight(this->maximumHeight());
 
-    m_labels[0] = new QLabel("", ui->statusBar, 0);
+    m_labels[0] = new QLabel("", ui->statusBar);
     ui->statusBar->addWidget(m_labels[0], LABEL0_SIZE);
-    m_labels[2] = new QLabel("", ui->statusBar, 0);
+    m_labels[2] = new QLabel("", ui->statusBar);
     ui->statusBar->addWidget(m_labels[2], 150);
     m_labels[2]->setAlignment(Qt::AlignRight);
-    m_labels[1] = new QLabel("", ui->statusBar, 0);
+    m_labels[1] = new QLabel("", ui->statusBar);
     m_labels[1]->setAlignment(Qt::AlignRight);
     ui->statusBar->addWidget(m_labels[1], 640 - LABEL0_SIZE);
 
@@ -2625,21 +2626,6 @@ void MainWindow::updateEditor(const QString &url, const QString &ver)
 }
 
 
-const char *getWindowsVersion()
-{
-    switch(QSysInfo::windowsVersion())
-    {
-    case QSysInfo::WV_2000: return "Windows 2000";
-    case QSysInfo::WV_XP: return "Windows XP";
-    case QSysInfo::WV_VISTA: return "Windows Vista";
-    case QSysInfo::WV_WINDOWS7: return "Windows 7";
-    case QSysInfo::WV_WINDOWS8: return "Windows 8";
-    case QSysInfo::WV_WINDOWS8_1:	return "Windows 8.1";
-    case QSysInfo::WV_WINDOWS10: return "Windows 10";
-    default: return "Windows";
-    }
-}
-
 void MainWindow::checkVersion()
 {
     int version = SS_LGCK_VERSION;
@@ -2649,25 +2635,15 @@ void MainWindow::checkVersion()
         version /= 256;
     }
 
-    QString os = "";
-#ifdef Q_OS_LINUX
-    os = "Linux";
-#elif defined(Q_OS_WIN32)
-    os = getWindowsVersion();
-#elif define(Q_OS_UNIX)
-    os = "Unix";
-#elif define(Q_OS_DARWIN)
-    os = "Mac";
-#endif
-    os.replace(" ", "+");
+    QOperatingSystemVersion os = QOperatingSystemVersion::current();
     QString productVersion = QSysInfo::productVersion();
     QString productType = QSysInfo::productType();
-    QString ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+    QString ver = QString().asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
     QString driver = QGuiApplication::platformName();
-    QString url = QString().sprintf(q2c(m_updateURL),
+    QString url = QString().asprintf(q2c(m_updateURL),
                                     q2c(ver),
                                     q2c(driver),
-                                    q2c(os),
+                                    q2c(os.name().replace(" ", "+")),
                                     q2c(m_uuid),
                                     q2c(QString(productType + "+" + productVersion)));
     while (m_updater->isRunning());

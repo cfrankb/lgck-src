@@ -19,7 +19,7 @@
 #ifndef WEDIT_H
 #define WEDIT_H
 
-#include <qt5/Qsci/qsciscintilla.h>
+#include <qt/Qsci/qsciscintilla.h>
 #include <qstringlist.h>
 
 class CLexer;
