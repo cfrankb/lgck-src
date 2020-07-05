@@ -136,7 +136,7 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
         for (int i=0; data[i].name != ""; ++i) {
             CProto & proto = gf.m_arrProto[i];
             CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
-            UINT8 *png;
+            uint8_t *png;
             int size;
             frameSet[0]->toPng(png, size);
             QImage img;
@@ -166,7 +166,7 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
         CONST_DATA *data = gf.getImageList();
         for (int i=0; data[i].name != ""; ++i) {
             CFrameSet & frameSet = gf.toFrameSet(i);
-            UINT8 *png;
+            uint8_t *png;
             int size;
             frameSet[0]->toPng(png, size);
             QImage img;

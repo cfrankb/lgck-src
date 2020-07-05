@@ -39,8 +39,7 @@ void CWBtnColor::click()
     int result = d->exec();
     if (result == QDialog::Accepted) {
         QColor color = d->selectedColor();//d->currentColor();
-        QString newColor;
-        newColor.sprintf("%.2x%.2x%.2x", color.red(), color.green(), color.blue());
+        QString newColor = QString::asprintf("%.2x%.2x%.2x", color.red(), color.green(), color.blue());
         m_red = color.red();
         m_green = color.green();
         m_blue = color.blue();

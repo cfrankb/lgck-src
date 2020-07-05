@@ -59,6 +59,7 @@ private slots:
     void on_btnWorldSize_clicked();
     void on_btnColorMod_clicked();
     void on_pushButton_clicked();
+    void on_btnMusic_clicked();
 };
 
 #endif // DLGEDITLEVEL_H

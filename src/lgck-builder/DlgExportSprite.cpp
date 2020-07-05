@@ -31,7 +31,7 @@ void CDlgExportSprite::reloadSprites()
     ui->treeObjects->geometry().getRect(&x, &y, &w, &h);
     ui->treeObjects->setColumnWidth(0, 32);
     ui->treeObjects->setColumnWidth(1, 96);
-    ui->treeObjects->setEditTriggers(0);
+    ui->treeObjects->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->treeObjects->setWordWrap(true);
     ui->treeObjects->setRootIsDecorated(false);
     ui->treeObjects->setIconSize(QSize(32,32));
@@ -73,7 +73,7 @@ void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
     CGameFile & gf = *m_gameFile;
     CProto & proto = gf.m_arrProto[ protoId ];
 
-    UINT8 *png;
+    uint8_t *png;
     int size;
     gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
 

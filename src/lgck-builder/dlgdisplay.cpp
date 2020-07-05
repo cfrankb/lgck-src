@@ -14,7 +14,7 @@
 #include "GameFile.h"
 #include "Frame.h"
 
-#define STR(__INT__) QString().sprintf("%d", __INT__)
+#define STR(__INT__) QString::asprintf("%d", __INT__)
 #define TEXT1(__CX__) q2c(__CX__->text().trimmed())
 #define COLOR(RGB) (RGB & 0xff0000) >> 16, (RGB & 0xff00) >> 8, (RGB & 0xff)
 #define TOINT(__E__) __E__->text().toInt()
@@ -85,7 +85,7 @@ void CDlgDisplay::load(CDisplay & d)
     ui->cbType->setCurrentIndex(d.type());
     ui->cVisible->setChecked(d.visible());
     ui->btnColor->setBuddy(ui->eColor);
-    ui->eColor->setText(QString().sprintf("%.2X%.2X%.2X", d.red(), d.green(), d.blue()));
+    ui->eColor->setText(QString::asprintf("%.2X%.2X%.2X", d.red(), d.green(), d.blue()));
     ui->eFontSize->setText(STR(d.size()));
     ui->eX->setText(STR(d.x()));
     ui->eY->setText(STR(d.y()));
@@ -96,7 +96,7 @@ void CDlgDisplay::load(CDisplay & d)
 
     // page 2
     ui->btnShadowColor->setBuddy(ui->eShadowColor);
-    ui->eShadowColor->setText(QString().sprintf("%.2X%.2X%.2X", d.shadowR(), d.shadowG(), d.shadowB()));
+    ui->eShadowColor->setText(QString::asprintf("%.2X%.2X%.2X", d.shadowR(), d.shadowG(), d.shadowB()));
     ui->sShadowAlpha->setBuddy(ui->eShadowAlpha);
     ui->sShadowAlpha->setSliderPosition(d.shadowA(
                                             ));
@@ -118,7 +118,7 @@ void CDlgDisplay::load(CDisplay & d)
     setImage(d.imageSet(), d.imageNo());
     for (int n=0; n < gf.frames().getSize(); ++n) {
         CFrameSet & frameSet = *gf.frames()[n];
-        UINT8 *png;
+        uint8_t *png;
         int size;
         frameSet[0]->toPng(png, size);
 
@@ -234,7 +234,7 @@ void CDlgDisplay::setImage(int frameSet, int frameNo)
     CGameFile & gf = *m_gameFile;
     CFrameSet & fs = *gf.frames()[frameSet];
 
-    UINT8 *png;
+    uint8_t *png;
     int size;
     fs[frameNo]->toPng(png, size);
 
@@ -259,7 +259,7 @@ void CDlgDisplay::fillFrameCombo(int frameSet)
     }
 
     int imgCount = fs.getSize();
-    unsigned char **imgPng = new UINT8 *[imgCount];
+    unsigned char **imgPng = new uint8_t *[imgCount];
     int *imgSize = new int [imgCount];
 
     for (int i=0; i < imgCount; ++i) {
@@ -280,7 +280,7 @@ void CDlgDisplay::fillFrameCombo(int frameSet)
 QIcon CDlgDisplay::makeIcon(void *png, int size)
 {
     QImage img;
-    if (!img.loadFromData( (UINT8*)png, size )) {
+    if (!img.loadFromData( (uint8_t*)png, size )) {
         qDebug("failed to load png");
     }
 

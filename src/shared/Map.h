@@ -20,6 +20,7 @@
 #define MAP_H
 
 #include <unordered_map>
+#include "stdafx.h"
 
 class CFrame;
 
@@ -37,18 +38,18 @@ public:
         MAX_FW = 4
     };
 
-    UINT8 m_nBkClass;
-    UINT8 m_nAcClass;
-    UINT8 m_bPlayer;
-    UINT8 m_fwCount;
-    UINT8 m_nFwClass[MAX_FW];
-    UINT16 m_nFwEntry[MAX_FW];
-    UINT16 m_nAcEntry;
-    void mapFw(UINT8 fwClass, UINT16 fwEntry);
-    void unMapFw(UINT16 fwEntry);
-    void mapAc(UINT8 acClass, UINT16 acEntry);
-    void unMapAc(UINT16 acEntry);
-    void getFw(int index, UINT8 & fwClass, UINT16 & fwEntry);
+    uint8_t m_nBkClass;
+    uint8_t m_nAcClass;
+    uint8_t m_bPlayer;
+    uint8_t m_fwCount;
+    uint8_t m_nFwClass[MAX_FW];
+    uint16_t m_nFwEntry[MAX_FW];
+    uint16_t m_nAcEntry;
+    void mapFw(uint8_t fwClass, uint16_t fwEntry);
+    void unMapFw(uint16_t fwEntry);
+    void mapAc(uint8_t acClass, uint16_t acEntry);
+    void unMapAc(uint16_t acEntry);
+    void getFw(int index, uint8_t & fwClass, uint16_t & fwEntry);
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -99,15 +100,15 @@ public:
     } PLAYER_STATE;
 
     void add (const CMapEntry & entry);
-    void addBk(const UINT8 bkC );
-    void addFw(const UINT8 fwC, const UINT16 fwE ) ;
-    void addAc(const UINT8 acC, const UINT16 acE ) ;
+    void addBk(const uint8_t bkC );
+    void addFw(const uint8_t fwC, const uint16_t fwE ) ;
+    void addAc(const uint8_t acC, const uint16_t acE ) ;
 
-    UINT8 bkClass[ MAX_TOUCH ];
-    UINT8 fwClass[ MAX_TOUCH ];
-    UINT8 acClass[ MAX_TOUCH ];
-    UINT16 fwEntry[ MAX_TOUCH ];
-    UINT16 acEntry[ MAX_TOUCH ];
+    uint8_t bkClass[ MAX_TOUCH ];
+    uint8_t fwClass[ MAX_TOUCH ];
+    uint8_t acClass[ MAX_TOUCH ];
+    uint16_t fwEntry[ MAX_TOUCH ];
+    uint16_t acEntry[ MAX_TOUCH ];
 
     int flags;
     bool player;

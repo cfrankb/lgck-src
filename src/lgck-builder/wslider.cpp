@@ -17,7 +17,7 @@ void CWSlider::setBuddy(QLineEdit *q)
 
 void CWSlider::setValue(int i)
 {
-    QString s = QString().sprintf("%d", i);
+    QString s = QString::asprintf("%d", i);
     emit valueChanged(s);
 }
 

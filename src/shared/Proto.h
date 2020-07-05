@@ -25,6 +25,8 @@
 class IFile;
 class QString;
 
+#include "stdafx.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CProto
 
@@ -53,53 +55,53 @@ public:
     void resetUUID();
     ~CProto();
 
-    UINT8 m_nClass;
-    UINT8 m_bNoSmartMap;
-    UINT8 m_nJumpMode;
-    UINT8 m_nMaxFall;           // TBA
+    uint8_t m_nClass;
+    uint8_t m_bNoSmartMap;
+    uint8_t m_nJumpMode;
+    uint8_t m_nMaxFall;           // TBA
 
     char  m_szName[32];
 
-    INT16 m_nFrameSet;
-    INT16 m_nFrameNo;
+    int16_t m_nFrameSet;
+    int16_t m_nFrameNo;
 
-    UINT8 m_nMoveSpeed;
-    UINT8 m_nAniSpeed;
-    UINT8 m_nDefaultAim;
-    UINT8 m_nPoints;
+    uint8_t m_nMoveSpeed;
+    uint8_t m_nAniSpeed;
+    uint8_t m_nDefaultAim;
+    uint8_t m_nPoints;
 
-    INT16 m_nProtoBuddy;
-    UINT16 m_options;
+    int16_t m_nProtoBuddy;
+    uint16_t m_options;
 
-    INT16 m_nChProto;
-    INT16 m_nChSound;
+    int16_t m_nChProto;
+    int16_t m_nChSound;
 
-    UINT8 m_nFallSpeed;       // how fast this object falls
-    UINT8 m_nDamages;
-    UINT8 m_nBonusHP;         // hp bonus
-    UINT8 m_nPowerLevel;
+    uint8_t m_nFallSpeed;       // how fast this object falls
+    uint8_t m_nDamages;
+    uint8_t m_nBonusHP;         // hp bonus
+    uint8_t m_nPowerLevel;
 
-    UINT8 m_nRbDelay;
-    UINT8 m_nRebirths;
+    uint8_t m_nRbDelay;
+    uint8_t m_nRebirths;
 
-    INT16 m_nAutoProto;
-    INT16 m_nAutoBullet;
-    INT16 m_nAutoSound;
-    UINT8 m_bAutoTrigger;
-    UINT8 m_nHP;            // TBA
+    int16_t m_nAutoProto;
+    int16_t m_nAutoBullet;
+    int16_t m_nAutoSound;
+    uint8_t m_bAutoTrigger;
+    uint8_t m_nHP;            // TBA
 
-    UINT8 m_nAutoProtoTime;
-    UINT8 m_nAutoBulletTime;
-    UINT8 m_nAutoSoundTime;
-    UINT8 m_nAutoTriggerTime;
+    uint8_t m_nAutoProtoTime;
+    uint8_t m_nAutoBulletTime;
+    uint8_t m_nAutoSoundTime;
+    uint8_t m_nAutoTriggerTime;
 
-    UINT8 m_nMaxBullets;     // max actve bullets
-    UINT8 m_nFireRate;   
-    UINT8 m_rebirthLocation;
-    UINT8 m_solidState;     // flag see SOLID_XXXX
+    uint8_t m_nMaxBullets;     // max actve bullets
+    uint8_t m_nFireRate;
+    uint8_t m_rebirthLocation;
+    uint8_t m_solidState;     // flag see SOLID_XXXX
 
-    UINT8 m_extra[2];
-    UINT16 m_bulletSound;
+    uint8_t m_extra[2];
+    uint16_t m_bulletSound;
     char m_uuid[40];
 
     enum {

@@ -42,7 +42,7 @@ void CDotArray::add(const Dot &dot)
     add(dot.color, dot.x, dot.y);
 }
 
-void CDotArray::add(UINT32 color, int x, int y)
+void CDotArray::add(uint32_t color, int x, int y)
 {
     if (x >= 0 && y >= 0 && (x < m_maxX || m_maxX ==-1)
             && (y < m_maxY || m_maxY ==-1)) {
@@ -86,7 +86,7 @@ int CDotArray::getSize()
     return m_size;
 }
 
-int CDotArray::lineTab(const UINT32 color, const Dot dot1, const Dot dot2, bool clear)
+int CDotArray::lineTab(const uint32_t color, const Dot dot1, const Dot dot2, bool clear)
 {
     if (clear) {
         flush();
@@ -150,7 +150,7 @@ int CDotArray::lineTab(const UINT32 color, const Dot dot1, const Dot dot2, bool 
     return getSize();
 }
 
-int CDotArray::circle(const UINT32 color, const Dot dot1, const Dot dot2, bool clear)
+int CDotArray::circle(const uint32_t color, const Dot dot1, const Dot dot2, bool clear)
 {
     if (clear){
         flush();

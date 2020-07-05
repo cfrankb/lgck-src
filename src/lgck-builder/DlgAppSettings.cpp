@@ -116,9 +116,8 @@ void CDlgAppSettings::on_btnGridColor_clicked()
     QColorDialog *d = new QColorDialog(QColor(red,green,blue), this);
     int result = d->exec();
     if (result == QDialog::Accepted) {
-        QString s;
         QColor color = d->currentColor();
-        s.sprintf("%.2x%.2x%.2x", color.red(), color.green(), color.blue() );
+        QString s = QString::asprintf("%.2x%.2x%.2x", color.red(), color.green(), color.blue() );
         m_ui->eGridColor->setText(s);
     }
     delete d;

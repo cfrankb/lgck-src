@@ -95,7 +95,7 @@ bool CExportGame::copyRuntime(QString & runtimeSource, QStringList & depList, QS
                 QString data = buf;
                 data.replace("\r\n", "\n");
                 delete [] buf;
-                depList = data.split("\n", QString::SkipEmptyParts);
+                depList = data.split("\n", Qt::SkipEmptyParts);
                 return copyList(depList, appDir, outMsg);
             } else {
                 qDebug() << QString("cannot read: %1").arg(deps);
@@ -186,8 +186,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
                 listMusic.append(QString(music));
             } else {
                 QString msgText = dlg.tr("File path not supported %1.").arg(music);
-                QMessageBox msgBox(QMessageBox::Warning, QString(appName), msgText, 0, parent);
-                msgBox.exec();
+                QMessageBox::warning(parent, appName, msgText);
             }
 
         }
@@ -205,7 +204,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
 
     QString gameOut = m_tmpPath + "/" + outName;
     QString finalOut = gameOut;
-    QStringList list = args.split(" ", QString::SkipEmptyParts);
+    QStringList list = args.split(" ", Qt::SkipEmptyParts);
     replace(list, "%game%", gameFile);
     replace(list, "%stub%", m_stub);
     replace(list, "%out%", gameOut);
@@ -250,8 +249,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
             return false;
         }
         QString msgText = dlg.tr("Export successful.");
-        QMessageBox msgBox(QMessageBox::Information, QString(appName), msgText, 0, parent);
-        msgBox.exec();
+        QMessageBox::information(parent, appName, msgText);
     }
     return true;
 }

@@ -36,8 +36,6 @@ static char author[] = "cfrankb";
 
 int main(int argc, char *argv[])
 {
-    //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL, false);
-    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
     srand( time( NULL ) );
     QApplication app(argc, argv);
     QFileInfo fi(app.applicationDirPath());
@@ -64,7 +62,7 @@ int main(int argc, char *argv[])
 
     if (!skipSplash && fileName.isEmpty()) {
         do {
-            QString ver = SS_BUILD_STR;//QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+            QString ver = SS_BUILD_STR;
             CDlgSelect * dlg = new CDlgSelect(&w);
             dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
             dlg->raise();
@@ -99,6 +97,8 @@ int main(int argc, char *argv[])
 
             case CDlgSelect::NO_SHOW:
                 skipSplash = true;
+                done = true;
+                break;
 
             case CDlgSelect::SKIP:
                 done = true;
@@ -118,8 +118,7 @@ int main(int argc, char *argv[])
             w.open(fileName);
         } else {
             QString errMsg = QObject::tr("Invalid file: %1").arg(fileName);
-            QMessageBox msgBox(QMessageBox::Critical, QString(appName), errMsg, 0, &w);
-            msgBox.exec();
+            QMessageBox::warning(&w, QString(appName), errMsg);
         }
     }
     return app.exec();

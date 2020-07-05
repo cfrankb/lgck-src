@@ -32,7 +32,7 @@ class CDlgDistributeGame;
 class QFileSystemWatcher;
 
 #include <QTimer>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QMainWindow>
 #include <QGLFunctions>
 #include "../shared/stdafx.h"
@@ -50,7 +50,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    QTime & getTime();
+    QElapsedTimer &getTime();
     void open(QString fileName);
     void initToolBox();
     CGame *getGame();
@@ -74,7 +74,7 @@ private:
     QToolBar *m_layerToolbar;
     CGame m_doc;
     QTimer m_timer;
-    QTime m_time;
+    QElapsedTimer m_time;
     int m_nextTick;
     bool m_bShowGrid;
     char m_gridColor[8];

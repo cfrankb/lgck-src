@@ -19,6 +19,7 @@
 #include <QColorDialog>
 #include <QMessageBox>
 #include <QFile>
+#include <QFileDialog>
 #include <QClipboard>
 #include "DlgEditLevel.h"
 #include "DlgSource.h"
@@ -161,7 +162,7 @@ void CDlgEditLevel::load(CLevel *s)
     m_ui->treeEvents->setColumnCount(2);
     m_ui->treeEvents->setColumnWidth(0, 128);
     m_ui->treeEvents->setColumnWidth(1, 128);
-    m_ui->treeEvents->setEditTriggers(0);
+    m_ui->treeEvents->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeEvents->setWordWrap(false);
     m_ui->treeEvents->setRootIsDecorated(false);
     m_ui->treeEvents->setAlternatingRowColors(true);
@@ -313,4 +314,24 @@ void CDlgEditLevel::on_pushButton_clicked()
 {
     QClipboard *clip = QApplication::clipboard();
     clip->setText(m_ui->eUUID->text());
+}
+
+void CDlgEditLevel::on_btnMusic_clicked()
+{
+    QString fileFilter = "Music files (*.ogg)";
+    QString fileName = m_gameFile->m_path.c_str();
+    fileName = QFileDialog::getOpenFileName(this, tr("Select Music File"), fileName, fileFilter);
+    if (!fileName.isEmpty()) {
+#ifdef Q_OS_WIN32
+        fileName = fileName.replace("\\", "/");
+#endif
+        int len = m_gameFile->m_path.length();
+        qDebug("sub: %s", q2c(fileName.mid(0, len)));
+        qDebug("name: %s", q2c(fileName.mid(len)));
+        if (fileName.mid(0, len) == m_gameFile->m_path.c_str()) {
+            m_ui->eMusic->setText(fileName.mid(len));
+        } else {
+
+        }
+    }
 }

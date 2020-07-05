@@ -94,7 +94,7 @@ void CIMOpengl::cacheInverse(int i, CFrameSet *filter)
     for (int i=0; i < filter->getSize(); ++i) {
         CFrame frame;
         frame.copy((*filter)[i]);
-        UINT32 *t = frame.getRGB();
+        uint32_t *t = frame.getRGB();
         for (int j=0; j < frame.m_nLen * frame.m_nHei; ++j) {
             t[j] = (t[j] & 0x00ffffff) + (t[j] & 0xff000000) / 2;
         }

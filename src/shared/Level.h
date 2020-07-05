@@ -154,7 +154,7 @@ protected:
     int m_size;
     int m_max;
     CLayer **m_layers;
-    UINT64 m_guid;
+    uint64_t m_guid;
     int getVersion();
     enum {
         GROWBY = 1,

@@ -48,8 +48,8 @@ protected:
         MAX_NAME           = 32
     };
     typedef struct {
-        UINT16 itemProto;
-        UINT16 count;
+        uint16_t itemProto;
+        uint16_t count;
     } ITEM;
 
     char m_name [ MAX_NAME ];

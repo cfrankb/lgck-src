@@ -140,8 +140,8 @@ public:
 
     std::string m_className [ MAX_CLASSES ];
     std::string m_classInfo [ MAX_CLASSES ];
-    UINT8 m_classType [ MAX_CLASSES ];
-    UINT8 m_classLock [ MAX_CLASSES ];
+    uint8_t m_classType [ MAX_CLASSES ];
+    uint8_t m_classLock [ MAX_CLASSES ];
 
     static unsigned int getVersion();
     bool isUntitled ();
@@ -204,9 +204,9 @@ protected:
         std::string src;
     } SOUND;
     typedef struct {
-        UINT32 id;
-        UINT32 game_uid;
-        UINT32 filler[2];
+        uint32_t id;
+        uint32_t game_uid;
+        uint32_t filler[2];
     } VERSION;
     std::string m_lastError;
     CSelection *m_clipboard;

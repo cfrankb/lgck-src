@@ -196,7 +196,7 @@ void CObject::readAnimations(IFile & file)
     int j = 0;
 
     // count of initiated animation sequences
-    file.read(&j, sizeof(UINT8));
+    file.read(&j, sizeof(uint8_t));
 
     for (int i=0; i < j; ++i) {
         m_animations[i].read(file);
@@ -220,7 +220,7 @@ void CObject::writeAnimations(IFile &file)
     }
 
     // count of active animation sequences
-    file.write(&j, sizeof(UINT8));
+    file.write(&j, sizeof(uint8_t));
 
     for (int i=0; i < j; ++i) {
         m_animations[i].write(file);
@@ -295,7 +295,7 @@ void CObject::readPaths(IFile &file)
     int j = 0;
 
     // count of initiated path sequences
-    file.read(&j, sizeof(UINT8));
+    file.read(&j, sizeof(uint8_t));
 
     for (int i=0; i < j; ++i) {
         m_paths[i].read(file);
@@ -319,7 +319,7 @@ void CObject::writePaths(IFile &file)
     }
 
     // count of active paths
-    file.write(&j, sizeof(UINT8));
+    file.write(&j, sizeof(uint8_t));
 
     for (int i=0; i < j; ++i) {
         m_paths[i].write(file);

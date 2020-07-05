@@ -176,12 +176,12 @@ void CGame::updateJoyState()
 /////////////////////////////////////////////////////////////////////
 // bkColor
 
-UINT32 CGame::getBkColor()
+uint32_t CGame::getBkColor()
 {
     return var("bkColor");
 }
 
-void CGame::setBkColor(UINT32 bkColor)
+void CGame::setBkColor(uint32_t bkColor)
 {
     var("bkColor") = bkColor;
 }
@@ -358,7 +358,7 @@ void CGame::nextTick()
 
 // joyState
 
-UINT32 CGame::getJoyState() {
+uint32_t CGame::getJoyState() {
     return var("joyState");
 }
 
@@ -898,7 +898,7 @@ bool CGame::centerOnPlayer(CActor & player)
 
 void CGame::managePlyTimerOutCounter(CActor & player)
 {
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     // Check hit - Dec TimeOutDelay
     if (!player.getState(CHitData::STATE_BEGINNING)) {
         if (player.get(EXTRA_TIMEOUT) == 0) {
@@ -915,7 +915,7 @@ void CGame::managePlyTimerOutCounter(CActor & player)
 
 void CGame::managePlayerJump()
 {
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     CActor & player = getPlayer();
     const CProto & proto = player.proto();
     if (gravity()) {
@@ -977,7 +977,7 @@ void CGame::managePlayerJump()
 
 void CGame::managePlayerMovements(CActor & player)
 {
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     bool lookup = false;
     // vla3 disallows control of movement during paths and fall
     CProto & proto = m_arrProto[player.m_nProto];
@@ -1117,7 +1117,7 @@ void CGame::managePlayerMovements(CActor & player)
 bool CGame::managePlayerFiring(CActor & player)
 {
     // Manage Player Firing
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     if (joyState & JOY_FIRE)  {
         player.setState(CHitData::STATE_FIRING, true);
     }  else  {

@@ -21,6 +21,7 @@
 
 #include "Actor.h"
 #include "ISurface.h"
+#include "../shared/stdafx.h"
 
 class CLayer;
 class CGame;
@@ -48,7 +49,7 @@ public:
     int whoIs(int x, int y);
     void map();
     void manageAuto();
-    int findBySeed(UINT32 seed);
+    int findBySeed(uint32_t seed);
     const CScene & operator = (const CLayer & layer);
     void read(IFile &file);
     void write(IFile & file);

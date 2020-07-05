@@ -22,6 +22,8 @@
 class IFile;
 class CProto;
 
+#include "stdafx.h"
+
 // LevelEntry.h : header file
 //
 
@@ -70,29 +72,29 @@ public:
     bool operator != (CLevelEntry & s);
     bool operator == (CLevelEntry & s);
 
-    UINT8 m_nAim;
-    UINT8 m_nStateFlag; // user by player at runtime
-    UINT16 m_string;
+    uint8_t m_nAim;
+    uint8_t m_nStateFlag; // user by player at runtime
+    uint16_t m_string;
 
-    INT16 m_nX;
-    INT16 m_nY;
-    UINT16 m_nFrameSet;
-    UINT16 m_nFrameNo;
-    UINT8 m_nActionMask; // used by player at runtime
+    int16_t m_nX;
+    int16_t m_nY;
+    uint16_t m_nFrameSet;
+    uint16_t m_nFrameNo;
+    uint8_t m_nActionMask; // used by player at runtime
     // 01 normal        10 extra 1
     // 02 nightmare     20 goal
     // 04 hell          40 frozen
     // 08 insane        80 hidden
 
-    UINT8 m_nTriggerKey;
+    uint8_t m_nTriggerKey;
     // 01,02,04,08,10  trigger
     // 20              goal
     // 40              frozen
     // 80              hidden
 
-    INT16 m_nProto;     // sprite type id
-    UINT16 m_path;
-    UINT16 m_playback;
+    int16_t m_nProto;     // sprite type id
+    uint16_t m_path;
+    uint16_t m_playback;
 };
 
 /////////////////////////////////////////////////////////////////////////////

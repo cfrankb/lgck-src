@@ -438,7 +438,7 @@ bool CActor::canMove(int nAim, bool bActor)
     case CGame::UP:
         if (m_nY == 0) {
             if (m_game->getWrap() & CLevel::WRAP_UP) {
-                CActor t = *this;
+                CActor & t = *this;
                 t.moveTo(m_nX, m_game->BUFFERHEI);
                 if (t.canMove(CGame::UP, bActor)) {
                     return true;
@@ -964,11 +964,12 @@ void CActor::managePath()
 
     switch (nAim) {
     case CGame::UP:
-        if (m_nY>=0) {
+        bcanWalk = m_nY >=0 ? bcanWalk : true;
+        /*if (m_nY>=0) {
             bcanWalk = bcanWalk;
         } else {
             bcanWalk = true;
-        }
+        }*/
         break;
 
     case CGame::DOWN:
@@ -1264,7 +1265,7 @@ void CActor::animate()
                 if (m_propi[EXTRA_DEATHINDICATOR]) {
                     m_propi[EXTRA_DEATHINDICATOR] = CGame::DI_REMOVAL;
                 }
-                if (animation.getOptions() && CObject::ASO_REPETE
+                if (animation.getOptions() & CObject::ASO_REPETE
                     && !getState( CHitData::STATE_DEAD)) {
                     m_propi[EXTRA_ANIMPTR] = 0;
                 } else {
@@ -1599,6 +1600,7 @@ int CActor::checkHit()
             if (inventory) {
                 inventory->addItem(object.m_nProto);
             }
+            break;
         case CLASS_PICKUP_TRIGGERS:
             object.unMap();
             if (triggerKey) {

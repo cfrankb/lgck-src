@@ -96,21 +96,21 @@ void CFrameSet::write0x501(IFile & file)
         ptr += 4 * frame->m_nLen *  frame->m_nHei;
     }
 
-    ULONG destSize;
-    UINT8 *dest;
-    int err = compressData((UINT8 *)buffer, (ULONG) totalSize, &dest, destSize);
+    uint64_t destSize;
+    uint8_t *dest;
+    int err = compressData((uint8_t *)buffer, (uint64_t) totalSize, &dest, destSize);
     if (err != Z_OK) {
         qDebug("CFrameSet::write0x501 error: %d", err);
     }
 
     // OBL5 IMAGESET HEADER
-    file.write(&destSize, sizeof(UINT32));
+    file.write(&destSize, sizeof(uint32_t));
 
     // IMAGE HEADER [0..n]
     for (int n = 0; n < getSize(); ++n) {
         CFrame *frame = m_arrFrames[n];
-        file.write(& frame->m_nLen, sizeof(UINT16));
-        file.write(& frame->m_nHei, sizeof(UINT16));
+        file.write(& frame->m_nLen, sizeof(uint16_t));
+        file.write(& frame->m_nHei, sizeof(uint16_t));
     }
 
     // OBL5 DATA
@@ -125,7 +125,7 @@ void CFrameSet::write0x501(IFile & file)
         }
     }
 
-    file.write(&count, sizeof(UINT32));
+    file.write(&count, sizeof(uint32_t));
     for(auto kv : m_tags) {
         const std::string key = kv.first;
         const std::string val = kv.second;
@@ -174,7 +174,7 @@ bool CFrameSet::read0x501(IFile &file, int size)
 {
     // OBL5 IMAGESET HEADER
     long srcSize = 0;
-    file.read(&srcSize, sizeof(UINT32));
+    file.read(&srcSize, sizeof(uint32_t));
 
     long totalSize = 0;
     int *len = new int[size];
@@ -185,8 +185,8 @@ bool CFrameSet::read0x501(IFile &file, int size)
     for (int n = 0; n < size; ++n) {
         len[n] = 0;
         hei[n] = 0;
-        file.read(&len[n], sizeof(UINT16));
-        file.read(&hei[n], sizeof(UINT16));
+        file.read(&len[n], sizeof(uint16_t));
+        file.read(&hei[n], sizeof(uint16_t));
         totalSize +=  4 * len[n] * hei[n];
     }
 
@@ -197,14 +197,14 @@ bool CFrameSet::read0x501(IFile &file, int size)
 
     // read OBL5Data (compressed)
 
-    UINT8 * srcBuffer = new UINT8 [ srcSize ] ;
+    uint8_t * srcBuffer = new uint8_t [ srcSize ] ;
     file.read(srcBuffer, srcSize);
 
     int err = uncompress(
-            (UINT8 *)buffer,
-            (ULONG *)& totalSize,
-            (UINT8 *)srcBuffer,
-            (ULONG)srcSize);
+            (uint8_t *)buffer,
+            (uint64_t *)& totalSize,
+            (uint8_t *)srcBuffer,
+            (uint64_t)srcSize);
 
     if (err) {
         printf("err: %d\n", err);
@@ -219,7 +219,7 @@ bool CFrameSet::read0x501(IFile &file, int size)
 
         frame->m_nLen = len[n];
         frame->m_nHei = hei[n];
-        frame->setRGB( new UINT32 [ frame->m_nLen * frame->m_nHei ] );
+        frame->setRGB( new uint32_t [ frame->m_nLen * frame->m_nHei ] );
         memcpy(frame->getRGB(), ptr, 4 * frame->m_nLen *  frame->m_nHei );
         //frame->resize(frame->m_nLen, frame->m_nHei);
         frame->updateMap();
@@ -229,7 +229,7 @@ bool CFrameSet::read0x501(IFile &file, int size)
 
     // TAG COUNT
     int count = 0;
-    file.read(&count, sizeof(UINT32));
+    file.read(&count, sizeof(uint32_t));
     m_tags.clear();
     for (int i=0; i < count; ++i) {
         std::string key;
@@ -260,8 +260,8 @@ bool CFrameSet::read(IFile & file)
         return false;
     }
 
-    UINT32 size;
-    UINT32 version;
+    uint32_t size;
+    uint32_t version;
     file.read(&size, sizeof (size));
     file.read(&version, sizeof (version));
 
@@ -271,7 +271,7 @@ bool CFrameSet::read(IFile & file)
 
     case 0x500:
 
-        for (UINT32 n=0; n<size; ++n) {
+        for (uint32_t n=0; n<size; ++n) {
             CFrame * temp = new CFrame;
             if (!temp->read(file, version)) {
                 return false;
@@ -462,10 +462,10 @@ char * CFrameSet::ima2bitmap(char *ImaData, int len, int hei)
     return dest;
 }
 
-void CFrameSet::bitmap2rgb(char *bitmap, UINT32 *rgb, int len, int hei, int err)
+void CFrameSet::bitmap2rgb(char *bitmap, uint32_t *rgb, int len, int hei, int err)
 {
     // original color palette
-    const UINT32 colors[] =    {
+    const uint32_t colors[] =    {
         0xff000000,0xffab0303,0xff03ab03,0xffabab03,0xff0303ab,0xffab03ab,0xff0357ab,0xffababab,
         0xff575757,0xffff5757,0xff57ff57,0xffffff57,0xff5757ff,0xffff57ff,0xff57ffff,0xffffffff,
         0xff000000,0xff171717,0xff232323,0xff2f2f2f,0xff3b3b3b,0xff474747,0xff535353,0xff636363,
@@ -532,8 +532,8 @@ bool CFrameSet::extract(IFile &file, char *out_format)
     // MCX_FORMAT
     typedef struct
     {
-        UINT32 PtrPrev;
-        UINT32 PtrNext;
+        uint32_t PtrPrev;
+        uint32_t PtrNext;
         char  Name [30];
         short Class;
         char ImageData[32][32];
@@ -547,66 +547,66 @@ bool CFrameSet::extract(IFile &file, char *out_format)
         int  NbrImages;
         int  LastViewed;
         char Palette[256][3];
-        UINT32 PtrFirst;
+        uint32_t PtrFirst;
     } USER_MCXHEADER;
 
     // USER_OBL3UNDO............................................
     typedef struct {
-        UINT32 PtrUndo[ 10 ];
+        uint32_t PtrUndo[ 10 ];
         int Bidon[2];
-        UINT32 PtrRedo[ 10 ];
-        UINT16 iNbUndo;
-        UINT16 iNbRedo;
+        uint32_t PtrRedo[ 10 ];
+        uint16_t iNbUndo;
+        uint16_t iNbRedo;
     } USER_OBL3UNDO;
 
     // USER_OBL3...............................................
     typedef struct {
-        UINT32 PtrPrev;
-        UINT32 PtrNext;
-        UINT32 PtrBits;
-        UINT32 PtrMap;
-        UINT32 filler;
+        uint32_t PtrPrev;
+        uint32_t PtrNext;
+        uint32_t PtrBits;
+        uint32_t PtrMap;
+        uint32_t filler;
         char ExtraInfo[4];
     } USER_OBL3;
 
     // USER_OBL3HEADER..........................................
     typedef struct {
         char Id[4];             // "OBL3"
-        UINT32 LastViewed;
+        uint32_t LastViewed;
 
-        UINT32 iNbrImages;
-        UINT32 iDefaultImage;
+        uint32_t iNbrImages;
+        uint32_t iDefaultImage;
 
-        UINT8 bClassInfo;
-        UINT8 bDisplayInfo;
-        UINT8 bActAsInfo;
-        UINT8 bItemProps;
-        UINT16 wU1;
-        UINT16 wU2;
-        UINT16 wRebirthTime;
-        UINT16 wMaxJump;
+        uint8_t bClassInfo;
+        uint8_t bDisplayInfo;
+        uint8_t bActAsInfo;
+        uint8_t bItemProps;
+        uint16_t wU1;
+        uint16_t wU2;
+        uint16_t wRebirthTime;
+        uint16_t wMaxJump;
 
-        UINT16 wFireRate;
-        UINT16 wLifeForce;
-        UINT16 wLives;
-        UINT16 wOxygen;
+        uint16_t wFireRate;
+        uint16_t wLifeForce;
+        uint16_t wLives;
+        uint16_t wOxygen;
 
-        UINT16 wSpeed;
-        UINT16 wFallSpeed;
-        UINT16 wAniSpeed;
-        UINT16 wTimeOut;
+        uint16_t wSpeed;
+        uint16_t wFallSpeed;
+        uint16_t wAniSpeed;
+        uint16_t wTimeOut;
 
-        UINT16 wDomages;
-        UINT16 wFiller;
-        UINT32 iLen;
-        UINT32 iHei;
+        uint16_t wDomages;
+        uint16_t wFiller;
+        uint32_t iLen;
+        uint32_t iHei;
 
-        UINT8  bU1;
-        UINT8  bU2;
-        UINT8  bU3;
-        UINT8  bCompilerOptions;
+        uint8_t  bU1;
+        uint8_t  bU2;
+        uint8_t  bU3;
+        uint8_t  bCompilerOptions;
 
-        UINT32 filler;
+        uint32_t filler;
         char szFilename[256];
         char szName[256];
         char szCopyrights[1024];
@@ -626,7 +626,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
             CFrame *frame = new CFrame();
             frame->m_nLen = oblHead.iLen * 16;
             frame->m_nHei = oblHead.iHei * 16;
-            frame->setRGB( new UINT32 [ frame->m_nLen * frame->m_nHei ] );
+            frame->setRGB( new uint32_t [ frame->m_nLen * frame->m_nHei ] );
             char *bitmap = new char [ oblHead.iLen * 16 * oblHead.iHei * 16 ];
             USER_OBL3 obl;
             file.read(&obl, sizeof(USER_OBL3));
@@ -655,22 +655,22 @@ bool CFrameSet::extract(IFile &file, char *out_format)
             if (mode != CFrame::MODE_ZLIB_ALPHA) {
                 file.read(bitmap, frame->m_nLen * frame->m_nHei);
             } else {
-                ULONG nSrcLen = 0;
+                uint64_t nSrcLen = 0;
                 file.read(&nSrcLen,4);
-                UINT8 *pSrc = new UINT8 [ nSrcLen ];
+                uint8_t *pSrc = new uint8_t [ nSrcLen ];
                 file.read(pSrc, nSrcLen);
-                ULONG nDestLen = frame->m_nLen * frame->m_nHei;
+                uint64_t nDestLen = frame->m_nLen * frame->m_nHei;
                 int err = uncompress(
-                        (UINT8 *)bitmap,
-                        (ULONG *)& nDestLen,
-                        (UINT8 *)pSrc,
-                        (ULONG)nSrcLen);
+                        (uint8_t *)bitmap,
+                        (uint64_t *)& nDestLen,
+                        (uint8_t *)pSrc,
+                        (uint64_t)nSrcLen);
                 if (err) {
                     m_lastError = "CFrameSet::extract zlib error";
                 }
                 delete [] pSrc;
             }
-            frame->setRGB( new UINT32 [ frame->m_nLen * frame->m_nHei ] );
+            frame->setRGB( new uint32_t [ frame->m_nLen * frame->m_nHei ] );
             bitmap2rgb(bitmap, frame->getRGB(), frame->m_nLen, frame->m_nHei, - 16);
             frame->updateMap();
             add(frame);
@@ -709,7 +709,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
             CFrame *frame = new CFrame();
             frame->m_nLen = 32;
             frame->m_nHei = 32;
-            frame->setRGB( new UINT32 [ frame->m_nLen * frame->m_nHei ] );
+            frame->setRGB( new uint32_t [ frame->m_nLen * frame->m_nHei ] );
             char *bitmap = new char [ 32 * 32 ];
             USER_MCX mcx;
             file.read(&mcx, sizeof(USER_MCX));
@@ -731,12 +731,12 @@ bool CFrameSet::extract(IFile &file, char *out_format)
         // IMC1 structure doesn't align properly in 32bits
         file.read(&imc1Head, 6);
         file.read(&imc1Head.SizeData, 4);
-        UINT8 *ptrIMC1 = new UINT8 [ imc1Head.SizeData ];
+        uint8_t *ptrIMC1 = new uint8_t [ imc1Head.SizeData ];
         file.read(ptrIMC1, imc1Head.SizeData);
-        UINT8 *ptr = new UINT8 [ imc1Head.len * imc1Head.hei * 64 ];
+        uint8_t *ptr = new uint8_t [ imc1Head.len * imc1Head.hei * 64 ];
         memset(ptr, 0, imc1Head.len * imc1Head.hei * 64);
-        UINT8 *xptr = ptr;
-        UINT8 *xptrIMC1 = ptrIMC1;
+        uint8_t *xptr = ptr;
+        uint8_t *xptrIMC1 = ptrIMC1;
         for (int cpt = 0; cpt < imc1Head.SizeData - 1 ;) {
             if (*ptrIMC1 == 0xff) {
                 for (int loop = ptrIMC1[2] + ptrIMC1[3] * 256; loop; loop--, ptr++) {
@@ -754,7 +754,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
         CFrame * frame = new CFrame();
         frame->m_nLen = imc1Head.len * 8 ;
         frame->m_nHei = imc1Head.hei * 8 ;
-        frame->setRGB( new UINT32 [ frame->m_nLen * frame->m_nHei ] );
+        frame->setRGB( new uint32_t [ frame->m_nLen * frame->m_nHei ] );
         char *bitmap = ima2bitmap((char*)xptr, imc1Head.len, imc1Head.hei);
         bitmap2rgb(bitmap, frame->getRGB(), frame->m_nLen, frame->m_nHei, 0);
         frame->updateMap();
@@ -764,7 +764,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
         delete [] bitmap;
     }
 
-    UINT8 pngSig [] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+    uint8_t pngSig [] = { 137, 80, 78, 71, 13, 10, 26, 10 };
     if (memcmp(id, pngSig, 8) == 0) {
         isUnknown = false;
         strcpy(format, "PNG");
@@ -790,7 +790,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
         file.read(pIMA, dataSize);
         frame->m_nLen = imaHead.len * 8  ;
         frame->m_nHei = imaHead.hei * 8  ;
-        frame->setRGB( new UINT32 [ frame->m_nLen * frame->m_nHei ] );
+        frame->setRGB( new uint32_t [ frame->m_nLen * frame->m_nHei ] );
         char *bitmap = ima2bitmap(pIMA, imaHead.len, imaHead.hei);
         bitmap2rgb(bitmap, frame->getRGB(), frame->m_nLen, frame->m_nHei, 0);
         frame->updateMap();
@@ -870,7 +870,7 @@ void CFrameSet::toPng(unsigned char * &data, int &size)
 
         // prepare custom data to be injected
         int t_size = sizeof(CFrame::png_OBL5) + m_size * 2 * sizeof(short) + sizeof(int);
-        UINT8 *buf = new UINT8[t_size];
+        uint8_t *buf = new uint8_t[t_size];
         memset(buf, 0, t_size);
         CFrame::png_OBL5 *obl5data = (CFrame::png_OBL5 *)buf;
         obl5data->Length = CFrame::toNet(t_size - 12);

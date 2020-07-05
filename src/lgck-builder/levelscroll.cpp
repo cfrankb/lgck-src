@@ -72,7 +72,6 @@ void CLevelScroll::paintEvent(QPaintEvent *event)
 
 void CLevelScroll::updateScrollbars(int w, int h)
 {
-    qDebug("updateScrollbars(%d, %d)", w,h);
     horizontalScrollBar()->setPageStep(m_zoom);
     verticalScrollBar()->setPageStep(m_zoom);
 
@@ -81,13 +80,11 @@ void CLevelScroll::updateScrollbars(int w, int h)
         horizontalScrollBar()->setRange(0, 0);
     } else {
         horizontalScrollBar()->setRange(0, (w - sz.width())/m_zoom + 1);
-        qDebug("hrange: %d", w - sz.width());
     }
     if (sz.height() >= h) {
         verticalScrollBar()->setRange(0, 0);
     } else {
         verticalScrollBar()->setRange(0, (h - sz.height())/m_zoom + 1);
-        qDebug("vrange: %d", h - sz.height());
     }
 }
 

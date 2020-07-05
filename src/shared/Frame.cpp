@@ -32,6 +32,7 @@
 #include "IFile.h"
 #include "FileWrap.h"
 #include "helper.h"
+#include "../shared/stdafx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFrame
@@ -52,7 +53,7 @@ CFrame::CFrame(int p_nLen, int p_nHei)
     m_nHei = p_nHei;
 
     // generate blank bitmap
-    m_rgb = new UINT32 [m_nLen * m_nHei ]  ;
+    m_rgb = new uint32_t [m_nLen * m_nHei ]  ;
     memset(m_rgb, 0, m_nLen * m_nHei * 4);
 
     // generate blank map
@@ -69,15 +70,15 @@ CFrame::CFrame(CFrame* src)
      if (src) {
         m_nHei = src->m_nHei;
         m_nLen = src->m_nLen;
-        m_rgb = new UINT32 [ m_nLen * m_nHei ];
+        m_rgb = new uint32_t [ m_nLen * m_nHei ];
         m_map.resize(src->m_nLen , src->m_nHei );
         m_bCustomMap = src->m_bCustomMap;
 
         if (src->m_rgb) {
-            memcpy( m_rgb, src->m_rgb, m_nLen* m_nHei * sizeof(UINT32));
+            memcpy( m_rgb, src->m_rgb, m_nLen* m_nHei * sizeof(uint32_t));
         } else {
             // generate blank bitmap
-            memset(m_rgb, 0, m_nLen * m_nHei * sizeof(UINT32));
+            memset(m_rgb, 0, m_nLen * m_nHei * sizeof(uint32_t));
         }
 
         m_map = src->getMap();
@@ -94,12 +95,12 @@ CFrame & CFrame::operator = (const CFrame & src)
 {
     m_nHei = src.m_nHei;
     m_nLen = src.m_nLen;
-    m_rgb = new UINT32 [ m_nLen * m_nHei ];
+    m_rgb = new uint32_t [ m_nLen * m_nHei ];
     m_map = src.getMap();
     if (src.getRGB()) {
-        memcpy( m_rgb, src.getRGB(), m_nLen* m_nHei * sizeof(UINT32));
+        memcpy( m_rgb, src.getRGB(), m_nLen* m_nHei * sizeof(uint32_t));
     } else {
-        memset(m_rgb, 0, m_nLen * m_nHei * sizeof(UINT32));
+        memset(m_rgb, 0, m_nLen * m_nHei * sizeof(uint32_t));
     }
 
     m_bCustomMap = src.m_bCustomMap;
@@ -147,9 +148,9 @@ void CFrame::write(IFile & file)
     file.write(&m_bCustomMap,4);
 
     if ((m_nLen>0) && (m_nHei>0)) {
-        ULONG nDestLen;
-        UINT8 *pDest;
-        int err = compressData((UINT8 *)m_rgb, 4 * m_nLen * m_nHei, &pDest, nDestLen);
+        uint64_t nDestLen;
+        uint8_t *pDest;
+        int err = compressData((uint8_t *)m_rgb, 4 * m_nLen * m_nHei, &pDest, nDestLen);
         if (err != Z_OK) {
             qDebug("CFrame::write error: %d", err);
         }
@@ -186,22 +187,22 @@ bool CFrame::read(IFile &file, int version)
         if ((m_nLen>0) && (m_nHei>0)) {
             // this image is not zero-length
 
-            UINT32 nSrcLen;
+            uint32_t nSrcLen;
             file.read(&nSrcLen, 4);
 
-            UINT8 *pSrc = new UINT8 [ nSrcLen ];
+            uint8_t *pSrc = new uint8_t [ nSrcLen ];
             file.read(pSrc, nSrcLen);
 
-            ULONG nDestLen = m_nLen * m_nHei * 4;
+            uint64_t nDestLen = m_nLen * m_nHei * 4;
 
             // create a new bitmap
-            m_rgb = new UINT32 [ m_nLen * m_nHei ] ;
+            m_rgb = new uint32_t [ m_nLen * m_nHei ] ;
 
             int err = uncompress(
-                    (UINT8 *)m_rgb,
-                    (ULONG *)& nDestLen,
-                    (UINT8 *)pSrc,
-                    (ULONG)nSrcLen);
+                    (uint8_t *)m_rgb,
+                    (uint64_t *)& nDestLen,
+                    (uint8_t *)pSrc,
+                    (uint64_t)nSrcLen);
 
             delete [] pSrc;
 
@@ -225,28 +226,28 @@ bool CFrame::read(IFile &file, int version)
     return true;
 }
 
-void CFrame::toBmp(UINT8 * & bmp, int & totalSize)
+void CFrame::toBmp(uint8_t * & bmp, int & totalSize)
 {
     // BM was read separatly
     typedef struct {
-        //UINT8 m_sig;        // "BM"
-        UINT32 m_nTotalSize;// 3a 00 00 00
-        UINT32 m_nZero;     // 00 00 00 00 ???
-        UINT32 m_nDiff;     // 36 00 00 00 TotalSize - ImageSize
-        UINT32 m_n28;       // 28 00 00 00 ???
+        //uint8_t m_sig;        // "BM"
+        uint32_t m_nTotalSize;// 3a 00 00 00
+        uint32_t m_nZero;     // 00 00 00 00 ???
+        uint32_t m_nDiff;     // 36 00 00 00 TotalSize - ImageSize
+        uint32_t m_n28;       // 28 00 00 00 ???
 
-        UINT32 m_nLen;      // 80 00 00 00
-        UINT32 m_nHei;      // 80 00 00 00
-        INT16 m_nPlanes;    // 01 00
-        INT16 m_nBitCount;  // 18 00
-        UINT32 m_nCompress; // 00 00 00 00
+        uint32_t m_nLen;      // 80 00 00 00
+        uint32_t m_nHei;      // 80 00 00 00
+        int16_t m_nPlanes;    // 01 00
+        int16_t m_nBitCount;  // 18 00
+        uint32_t m_nCompress; // 00 00 00 00
 
-        UINT32 m_nImageSize;// c0 00 00 00
-        UINT32 m_nXPix;     // 00 00 00 00 X pix/m
-        UINT32 m_nYPix;     // 00 00 00 00 Y pix/m
-        UINT32 m_nClrUsed;  // 00 00 00 00 ClrUsed
+        uint32_t m_nImageSize;// c0 00 00 00
+        uint32_t m_nXPix;     // 00 00 00 00 X pix/m
+        uint32_t m_nYPix;     // 00 00 00 00 Y pix/m
+        uint32_t m_nClrUsed;  // 00 00 00 00 ClrUsed
 
-        UINT32 m_nClrImpt;  // 00 00 00 00 ClrImportant
+        uint32_t m_nClrImpt;  // 00 00 00 00 ClrImportant
     } USER_BMPHEADER;
 
     int pitch = m_nLen * 3;
@@ -256,7 +257,7 @@ void CFrame::toBmp(UINT8 * & bmp, int & totalSize)
 
     totalSize = bmpDataOffset + pitch * m_nHei;
 
-    bmp = new UINT8 [totalSize];
+    bmp = new uint8_t [totalSize];
     bmp[0] = 'B';
     bmp[1] = 'M';
 
@@ -280,8 +281,8 @@ void CFrame::toBmp(UINT8 * & bmp, int & totalSize)
 
     for (int y=0; y < m_nHei; ++y) {
         for (int x=0; x < m_nLen; ++x) {
-            UINT8 *s = (UINT8*) & point(x, m_nHei - y - 1);
-            UINT8 *d = bmp + bmpDataOffset + x * 3 + y * pitch;
+            uint8_t *s = (uint8_t*) & point(x, m_nHei - y - 1);
+            uint8_t *d = bmp + bmpDataOffset + x * 3 + y * pitch;
             d[0] = s[2];
             d[1] = s[1];
             d[2] = s[0];
@@ -289,11 +290,11 @@ void CFrame::toBmp(UINT8 * & bmp, int & totalSize)
     }
 }
 
-UINT32 CFrame::toNet (const UINT32 a)
+uint32_t CFrame::toNet (const uint32_t a)
 {
-    UINT32 b;
-    UINT8 *s = (UINT8*) &a;
-    UINT8 *d = (UINT8*) &b;
+    uint32_t b;
+    uint8_t *s = (uint8_t*) &a;
+    uint8_t *d = (uint8_t*) &b;
 
     d[0] = s[3];
     d[1] = s[2];
@@ -303,22 +304,22 @@ UINT32 CFrame::toNet (const UINT32 a)
     return b;
 }
 
-void CFrame::toPng(UINT8 * & png, int & totalSize, UINT8 *obl5data, int obl5size)
+void CFrame::toPng(uint8_t * & png, int & totalSize, uint8_t *obl5data, int obl5size)
 {
     CCRC crc;
 
     // compress the data ....................................
     int scanLine = m_nLen * 4;
-    ULONG dataSize = (scanLine + 1) * m_nHei;
-    UINT8 * data = new UINT8 [ dataSize ];
+    uint64_t dataSize = (scanLine + 1) * m_nHei;
+    uint8_t * data = new uint8_t [ dataSize ];
     for (int y=0; y < m_nHei; ++y) {
-        UINT8 * d = data + y * (scanLine + 1);
+        uint8_t * d = data + y * (scanLine + 1);
         *d = 0;
         memcpy(d + 1, m_rgb + y * m_nLen, scanLine);
     }
 
-    UINT8 * cData;
-    ULONG cDataSize;
+    uint8_t * cData;
+    uint64_t cDataSize;
     int err = compressData(data, dataSize, &cData, cDataSize);
     if (err != Z_OK) {
         qDebug("CFrame::toPng error: %d", err);
@@ -335,14 +336,14 @@ void CFrame::toPng(UINT8 * & png, int & totalSize, UINT8 *obl5data, int obl5size
                 + sizeof(png_IEND)
                 + obl5size;
 
-    png = new UINT8 [ totalSize ];
-    UINT8 *t = png;
+    png = new uint8_t [ totalSize ];
+    uint8_t *t = png;
 
     // png signature ---------------------------------------
-    UINT8 sig [] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+    uint8_t sig [] = { 137, 80, 78, 71, 13, 10, 26, 10 };
     memcpy(t, sig, 8); t += 8;
 
-    UINT32 crc32;
+    uint32_t crc32;
 
     // png_IHDR ---------------------------------------------
     png_IHDR & ihdr = * ((png_IHDR *) t);
@@ -357,12 +358,12 @@ void CFrame::toPng(UINT8 * & png, int & totalSize, UINT8 *obl5data, int obl5size
     ihdr.Interlace = 0;
     //ihdr.CRC = 0;
     t += png_IHDR_Size;
-    crc32 = toNet( crc.crc( ((UINT8 *)&ihdr) + 4, png_IHDR_Size - 4) );
+    crc32 = toNet( crc.crc( ((uint8_t *)&ihdr) + 4, png_IHDR_Size - 4) );
     memcpy (t, &crc32, 4); t+= 4;
 
     // png_IDAT ....................................................
-    UINT32 cDataOffset = 0;
-    UINT32 cDataLeft = cDataSize;
+    uint32_t cDataOffset = 0;
+    uint32_t cDataLeft = cDataSize;
     do {
         int chunkSize;
         if (cDataLeft > pngChunkLimit) {
@@ -371,9 +372,9 @@ void CFrame::toPng(UINT8 * & png, int & totalSize, UINT8 *obl5data, int obl5size
             chunkSize = cDataLeft;
         }
 
-        UINT32 cDataSizeNet = toNet(chunkSize);
+        uint32_t cDataSizeNet = toNet(chunkSize);
         memcpy (t, &cDataSizeNet, 4); t+= 4;
-        UINT8 *chunkData = t;
+        uint8_t *chunkData = t;
         memcpy (t, "IDAT", 4); t+= 4;
         memcpy (t, cData + cDataOffset, chunkSize); t+= chunkSize;
         crc32 = toNet ( crc.crc(chunkData, chunkSize + 4) );
@@ -388,7 +389,7 @@ void CFrame::toPng(UINT8 * & png, int & totalSize, UINT8 *obl5data, int obl5size
         memcpy(t, obl5data, obl5size);
         png_OBL5 & obl5 = * ((png_OBL5 *) t);
         obl5.Length = toNet(obl5size-12);        
-        UINT32 iCrc = toNet ( crc.crc( t +4, obl5size-8) );
+        uint32_t iCrc = toNet ( crc.crc( t +4, obl5size-8) );
         memcpy(t + obl5size-4, &iCrc, 4);
         t += obl5size;
     }
@@ -397,7 +398,7 @@ void CFrame::toPng(UINT8 * & png, int & totalSize, UINT8 *obl5data, int obl5size
     png_IEND & iend = * ((png_IEND *) t);
     iend.Lenght = 0;
     memcpy(iend.ChunkType, "IEND", 4);
-    iend.CRC = toNet ( crc.crc( (UINT8*)"IEND", 4) );
+    iend.CRC = toNet ( crc.crc( (uint8_t*)"IEND", 4) );
     t += sizeof(png_IEND);
 
     delete [] cData;
@@ -426,7 +427,7 @@ void CFrame::resize( int len, int hei )
     m_map.resize(m_nLen,  m_nHei );
 }
 
-void CFrame::setTransparency( UINT32 color )
+void CFrame::setTransparency(uint32_t color )
 {
     color &= COLOR_MASK;
     for (int i=0; i < m_nLen * m_nHei; ++i) {
@@ -494,11 +495,11 @@ CFrameSet *CFrame::split(int pxSize, bool whole)
             } else {
                 frame = new CFrame(std::min(pxSize, m_nLen - x), std::min(pxSize, m_nHei - y));
             }
-            UINT32 *ni_rgb = frame->getRGB();
+            uint32_t *ni_rgb = frame->getRGB();
             for (int z = 0; z < std::min(pxSize, m_nHei - y); ++z ) {
                 memcpy(& ni_rgb[z * frame->m_nLen],//pxSize],
                        & m_rgb[x + (y + z) * m_nLen],
-                       std::min(pxSize, m_nLen - x) * sizeof(UINT32)
+                       std::min(pxSize, m_nLen - x) * sizeof(uint32_t)
                        );
             }
             frameSet->add(frame);
@@ -532,10 +533,10 @@ void CFrame::debug()
     outputDebug("\n");
 }
 
-const UINT32* CFrame::dosPal()
+const uint32_t* CFrame::dosPal()
 {
     // original color palette
-    static const UINT32 colors[] =    {
+    static const uint32_t colors[] =    {
         0xff000000,0xffab0303,0xff03ab03,0xffabab03,0xff0303ab,0xffab03ab,0xff0357ab,0xffababab,
         0xff575757,0xffff5757,0xff57ff57,0xffffff57,0xff5757ff,0xffff57ff,0xff57ffff,0xffffffff,
         0xff000000,0xff171717,0xff232323,0xff2f2f2f,0xff3b3b3b,0xff474747,0xff535353,0xff636363,
@@ -592,8 +593,8 @@ bool CFrame::draw(CDotArray *dots, int size, int mode)
 
                     case MODE_COLOR_ONLY:
                         if ( (at(dot.x +x, dot.y + y) & 0xffffff) != (dot.color & 0xffffff)) {
-                            UINT8 *p = (UINT8*) & at(dot.x +x, dot.y + y);
-                            UINT8 a = p[3];
+                            uint8_t *p = (uint8_t*) & at(dot.x +x, dot.y + y);
+                            uint8_t a = p[3];
                             at(dot.x +x, dot.y + y) = dot.color;
                             p[3] = a;
                             changed = true;
@@ -602,7 +603,7 @@ bool CFrame::draw(CDotArray *dots, int size, int mode)
 
                     case MODE_ALPHA_ONLY:
                         if (alphaAt(dot.x +x, dot.y + y) != (dot.color >> 24)) {
-                            UINT8 *p = (UINT8*) & at(dot.x +x, dot.y + y);
+                            uint8_t *p = (uint8_t*) & at(dot.x +x, dot.y + y);
                             p[3] = dot.color >> 24;
                             changed = true;
                         }
@@ -631,7 +632,7 @@ void CFrame::save(CDotArray * dots, CDotArray * dotsOrg, int size)
     }
 }
 
-void CFrame::floodFill(int x, int y, UINT32 bOldColor, UINT32 bNewColor)
+void CFrame::floodFill(int x, int y, uint32_t bOldColor, uint32_t bNewColor)
 {
     if (!isValid(x,y)) {
         return;
@@ -666,7 +667,7 @@ void CFrame::floodFill(int x, int y, UINT32 bOldColor, UINT32 bNewColor)
     }
 }
 
-void CFrame::floodFillAlpha(int x, int y, UINT8 oldAlpha, UINT8 newAlpha)
+void CFrame::floodFillAlpha(int x, int y, uint8_t oldAlpha, uint8_t newAlpha)
 {
     if (!isValid(x,y)) {
         return;
@@ -674,7 +675,7 @@ void CFrame::floodFillAlpha(int x, int y, UINT8 oldAlpha, UINT8 newAlpha)
 
     int ex = x;
     for (; (x>=0) && alphaAt(x,y)== oldAlpha; --x) {
-        UINT8 * p = (UINT8*)& point(x,y);
+        uint8_t * p = (uint8_t*)& point(x,y);
         p[3] = newAlpha;
         if ((y>0) && (alphaAt (x, y-1) == oldAlpha)) {
             floodFillAlpha (x, y-1, oldAlpha, newAlpha);
@@ -691,7 +692,7 @@ void CFrame::floodFillAlpha(int x, int y, UINT8 oldAlpha, UINT8 newAlpha)
     }
 
     for (; (x<m_nLen) && alphaAt(x,y)== oldAlpha; ++x) {
-        UINT8 * p = (UINT8*)& point(x,y);
+        uint8_t * p = (uint8_t*)& point(x,y);
         p[3] = newAlpha;
         if ((y>0) && (alphaAt (x, y-1) == oldAlpha)) {
             floodFillAlpha(x,y-1, oldAlpha, newAlpha);
@@ -751,7 +752,7 @@ void CFrame::flipV()
 {
     for (int y=0; y < m_nHei / 2; ++y) {
         for (int x=0; x < m_nLen; ++x) {
-            UINT32 c = at(x,y);
+            uint32_t c = at(x,y);
             at(x,y) = at(x, m_nHei - y - 1) ;
             at(x, m_nHei - y - 1) = c;
         }
@@ -763,7 +764,7 @@ void CFrame::flipH()
 {
     for (int y=0; y < m_nHei; ++y) {
         for (int x=0; x < m_nLen / 2; ++x) {
-            UINT32 c = at(x,y);
+            uint32_t c = at(x,y);
             at(x,y) = at(m_nLen - x -1, y) ;
             at(m_nLen - x -1, y) = c;
         }
@@ -793,16 +794,16 @@ void CFrame::rotate()
 
 void CFrame::spreadH()
 {
-    UINT32 *rgb = new UINT32[m_nLen * m_nHei * 2];
+    uint32_t *rgb = new uint32_t[m_nLen * m_nHei * 2];
 
     for (int y=0; y < m_nHei; ++y) {
         memcpy(rgb + y * m_nLen * 2 ,
                & at(0,y),
-               m_nLen * sizeof(UINT32) );
+               m_nLen * sizeof(uint32_t) );
 
         memcpy(rgb + y * m_nLen * 2 + m_nLen,
                & at(0,y),
-               m_nLen * sizeof(UINT32) );
+               m_nLen * sizeof(uint32_t) );
     }
 
 
@@ -815,16 +816,16 @@ void CFrame::spreadH()
 
 void CFrame::spreadV()
 {
-    UINT32 *rgb = new UINT32[m_nLen * m_nHei * 2];
+    uint32_t *rgb = new uint32_t[m_nLen * m_nHei * 2];
 
     for (int y=0; y < m_nHei; ++y) {
         memcpy(rgb + y * m_nLen  ,
                & at(0,y),
-               m_nLen * sizeof(UINT32) );
+               m_nLen * sizeof(uint32_t) );
 
         memcpy(rgb + y * m_nLen + m_nHei * m_nLen,
                & at(0,y),
-               m_nLen * sizeof(UINT32) );
+               m_nLen * sizeof(uint32_t) );
     }
 
     m_nHei *=2;
@@ -871,7 +872,7 @@ void CFrame::enlarge()
     CFrame *newFrame = new CFrame(m_nLen * 2, m_nHei * 2);
     for(int y=0; y < m_nHei; ++y ) {
         for(int x=0; x < m_nLen; ++x ) {
-            UINT32 c = at(x,y);
+            uint32_t c = at(x,y);
             newFrame->at(x * 2, y * 2) = c;
             newFrame->at(x * 2 +1 , y * 2) = c;
             newFrame->at(x * 2, y * 2 + 1) = c;
@@ -895,40 +896,40 @@ void CFrame::enlarge()
 
 void CFrame::shiftUP()
 {
-    UINT32 t[m_nLen];
+    uint32_t t[m_nLen];
 
     // copy first line to buffer
-    memcpy(t, m_rgb, sizeof(UINT32) * m_nLen);
+    memcpy(t, m_rgb, sizeof(uint32_t) * m_nLen);
 
     // shift
     for (int y=0; y < m_nHei -1; ++y) {
-        memcpy( & at(0, y), & at(0, y + 1), m_nLen * sizeof(UINT32));
+        memcpy( & at(0, y), & at(0, y + 1), m_nLen * sizeof(uint32_t));
     }
 
     // copy first line to last
-    memcpy(& at(0, m_nHei - 1), t, sizeof(UINT32) * m_nLen);
+    memcpy(& at(0, m_nHei - 1), t, sizeof(uint32_t) * m_nLen);
 }
 
 void CFrame::shiftDOWN()
 {
-    UINT32 t[m_nLen];
+    uint32_t t[m_nLen];
 
     // copy first line to buffer
-    memcpy(t, & at(0, m_nHei -1), sizeof(UINT32) * m_nLen);
+    memcpy(t, & at(0, m_nHei -1), sizeof(uint32_t) * m_nLen);
 
     // shift
     for (int y=0; y < m_nHei -1; ++y) {
-        memcpy( & at(0, m_nHei - y - 1), & at(0, m_nHei - y - 2), m_nLen * sizeof(UINT32));
+        memcpy( & at(0, m_nHei - y - 1), & at(0, m_nHei - y - 2), m_nLen * sizeof(uint32_t));
     }
 
     // copy first line to last
-    memcpy(m_rgb, t, sizeof(UINT32) * m_nLen);
+    memcpy(m_rgb, t, sizeof(uint32_t) * m_nLen);
 }
 
 void CFrame::shiftLEFT()
 {
     for (int y=0; y < m_nHei; ++y) {
-        UINT32 c = at(0, y);
+        uint32_t c = at(0, y);
         for (int x=0; x < m_nLen-1; ++x) {
             at(x,y) = at(x+1,y);
         }
@@ -939,7 +940,7 @@ void CFrame::shiftLEFT()
 void CFrame::shiftRIGHT()
 {
     for (int y=0; y < m_nHei; ++y) {
-        UINT32 c = at(m_nLen - 1, y);
+        uint32_t c = at(m_nLen - 1, y);
         for (int x=0; x < m_nLen-1; ++x) {
             at(m_nLen - 1 - x,y) = at(m_nLen - 2 - x,y);
         }
@@ -1084,7 +1085,7 @@ void CFrame::abgr2argb()
 {
     // swap blue/red
     for (int i=0; i < m_nLen * m_nHei;++i) {
-        UINT32 t= (m_rgb[i] & 0xff00ff00);
+        uint32_t t= (m_rgb[i] & 0xff00ff00);
         if (t & 0xff000000) {
             t+= ((m_rgb[i] & 0xff) << 16)
                     + ((m_rgb[i] & 0xff0000) >> 16);
@@ -1097,7 +1098,7 @@ void CFrame::argb2arbg()
 {
     // swap green/blue
     for (int i=0; i < m_nLen * m_nHei;++i) {
-        UINT32 t= (m_rgb[i] & 0xff0000ff);
+        uint32_t t= (m_rgb[i] & 0xff0000ff);
         if (t & 0xff000000) {
             t+= ((m_rgb[i] & 0xff00) << 8)
                     + ((m_rgb[i] & 0xff0000) >> 8);

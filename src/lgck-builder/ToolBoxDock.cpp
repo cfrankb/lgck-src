@@ -375,7 +375,7 @@ void CToolBoxDock::updateIcon(QTreeWidgetItem *itm, int protoId)
     CProto & proto = gf.m_arrProto[ protoId ];
 
     CFrameSet & filter = *gf.frames()[proto.m_nFrameSet];
-    UINT8 *png;
+    uint8_t *png;
     int size;
     filter[proto.m_nFrameNo]->toPng(png, size);
 
@@ -488,7 +488,7 @@ void CToolBoxDock::reloadSprites()
     m_ui->treeObjects->geometry().getRect(&x, &y, &w, &h);
     m_ui->treeObjects->setColumnWidth(0, 32);
     m_ui->treeObjects->setColumnWidth(1, 96);
-    m_ui->treeObjects->setEditTriggers(0);
+    m_ui->treeObjects->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeObjects->setWordWrap(true);
     m_ui->treeObjects->setRootIsDecorated(false);
     m_ui->treeObjects->setIconSize(QSize(32,32));
@@ -513,7 +513,7 @@ void CToolBoxDock::reloadSounds()
     m_ui->treeSounds->setColumnCount(2);
     m_ui->treeSounds->setColumnWidth(0, 128);
     m_ui->treeSounds->setColumnWidth(1, 64);
-    m_ui->treeSounds->setEditTriggers(0);
+    m_ui->treeSounds->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeSounds->setWordWrap(false);
     m_ui->treeSounds->setRootIsDecorated(false);
     m_ui->treeSounds->setAlternatingRowColors(true);
@@ -541,15 +541,14 @@ void CToolBoxDock::reloadLevels()
     m_ui->treeLevels->setColumnCount(2);
     m_ui->treeLevels->setColumnWidth(0, 32);
     m_ui->treeLevels->setColumnWidth(1, 70);
-    m_ui->treeLevels->setEditTriggers(0);
+    m_ui->treeLevels->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeLevels->setWordWrap(false);
     m_ui->treeLevels->setRootIsDecorated(false);
     m_ui->treeLevels->setAlternatingRowColors(true);
 
     for (int i = 0; i < gf.getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        QString s;
-        s.sprintf("%.3d", i + 1);
+        QString s = QString::asprintf("%.3d", i + 1);
         item->setText(0, s);
         item->setText(1, gf[i]->getSetting("title"));
         m_ui->treeLevels->addTopLevelItem(item);
@@ -922,8 +921,7 @@ void CToolBoxDock::deleteLevel(int index)
     for (int i = index; i > 0  && i < m_gameFile->getSize(); ++i) {
         QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( i );
         if (item) {
-            QString s;
-            s.sprintf("%.3d", i + 1);
+            QString s = QString::asprintf("%.3d", i + 1);
             item->setText(0, s);
         }
     }
@@ -939,8 +937,7 @@ void CToolBoxDock::addLevel()
     QTreeWidgetItem *item = new QTreeWidgetItem(0);
     int index = m_gameFile->getSize() - 1;
     CLevel & level =  *(m_gameFile->m_arrLevels[ index ]);
-    QString s;
-    s.sprintf("%.3d", index + 1);
+    QString s = QString::asprintf("%.3d", index + 1);
     item->setText(0, s);
     item->setText(1, level.getSetting("title"));
     m_ui->treeLevels->addTopLevelItem(item);
@@ -960,8 +957,7 @@ void CToolBoxDock::editLevel(int index)
     QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( index );
     if (item) {
         CLevel & levelObj =  *(m_gameFile->m_arrLevels[ index ]);
-        QString s;
-        s.sprintf("%.3d", index + 1);
+        QString s = QString::asprintf("%.3d", index + 1);
         item->setText(0, s);
         item->setText(1, levelObj.getSetting("title"));
         selectLevel(index);
@@ -974,15 +970,13 @@ void CToolBoxDock::moveLevel(int fromIndex, int toIndex)
     m_ui->treeLevels->model()->insertRow(toIndex);
     QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( toIndex );
     CLevel & levelObj =  *(m_gameFile->m_arrLevels[ toIndex ]);
-    QString s;
-    s.sprintf("%.3d", toIndex + 1);
+    QString s = QString::asprintf("%.3d", toIndex + 1);
     item->setText(0, s);
     item->setText(1, levelObj.getSetting("title"));
 
     for (int i = 0; i < m_gameFile->getSize(); ++i) {
         QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( i );
-        QString s;
-        s.sprintf("%.3d", i + 1);
+        QString s = QString::asprintf("%.3d", i + 1);
         item->setText(0, s);
     }
 
@@ -1468,7 +1462,7 @@ void CToolBoxDock::initTree(QTreeWidget *tree)
     tree->model()->removeRows(0, count);
     tree->setColumnCount(1);
     tree->setColumnWidth(0, 128);
-    tree->setEditTriggers(0);
+    tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tree->setWordWrap(false);
     tree->setRootIsDecorated(false);
     tree->setAlternatingRowColors(true);

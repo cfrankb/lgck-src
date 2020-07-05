@@ -91,18 +91,18 @@ const char *CProtoArray::getEventName(int i)
 
 bool CProtoArray::read(IFile &file)
 {
-    INT32 nEntrySize = 0;
-    INT32 i = 0;
-    INT32 version = 0;
+    int32_t nEntrySize = 0;
+    int32_t i = 0;
+    int32_t version = 0;
 
     // clear array
     forget();
 
     // read file version
-    file.read(&i, sizeof(INT32));
+    file.read(&i, sizeof(int32_t));
     if (i == -1) {
-        file.read(&version, sizeof(INT32));
-        file.read(&i, sizeof(INT32));
+        file.read(&version, sizeof(int32_t));
+        file.read(&i, sizeof(int32_t));
     }
 
     // read entry size
@@ -176,8 +176,8 @@ bool CProtoArray::readEx(IFile &file, int version)
     }
 
     // read eventCount
-    INT32 eventCount = 0;
-    file.read(&eventCount, sizeof(INT32));
+    int32_t eventCount = 0;
+    file.read(&eventCount, sizeof(int32_t));
 
     std::string eventNames[eventCount];
     // read eventList
@@ -217,9 +217,9 @@ bool CProtoArray::readEx(IFile &file, int version)
 
 bool CProtoArray::write(IFile &file)
 {
-    INT32 nEntrySize = sizeof(CProto);
-    INT32 version = PROTO_VERSION;
-    INT32 marker = -1;
+    int32_t nEntrySize = sizeof(CProto);
+    int32_t version = PROTO_VERSION;
+    int32_t marker = -1;
 
     file.write(&marker, 4);
     file.write(&version, 4);
@@ -232,8 +232,8 @@ bool CProtoArray::write(IFile &file)
     }
 
     // write eventCount
-    INT32 eventCount = getEventCount();
-    file.write(&eventCount, sizeof(INT32));
+    int32_t eventCount = getEventCount();
+    file.write(&eventCount, sizeof(int32_t));
 
     // write eventList
     for (int i=0; i < eventCount; ++i) {
@@ -271,7 +271,6 @@ void CProtoArray::forget()
 void CProtoArray::add (const CProto proto)
 {
     if (m_nSize == m_nMax) {
-
         m_nMax += GROWBY;
         CObject *t = new CObject[m_nMax];
         for (int i=0; i < m_nSize; i++) {
@@ -346,14 +345,14 @@ void CProtoArray::killFrameSet (int nFrameSet)
 void CProtoArray::killProto (int nProto)
 {
     for (int i = 0; i < getSize(); ++i) {
-        INT16 * vars [] = {
+        int16_t * vars [] = {
             & m_objects[i].proto().m_nChProto,
             & m_objects[i].proto().m_nAutoBullet,
             & m_objects[i].proto().m_nAutoProto,
             & m_objects[i].proto().m_nProtoBuddy
         };
 
-        for (int j = 0; j < (int)(sizeof (vars) / sizeof(INT16*)); ++j) {
+        for (int j = 0; j < (int)(sizeof (vars) / sizeof(int16_t*)); ++j) {
             if ( *(vars[j]) == nProto ) {
                 *(vars[j]) = 0;
             }

@@ -186,7 +186,7 @@ void CDlgPath::updateIcon(QTreeWidgetItem *item, int aim)
     if (file.open(q2c(QString(":/images/%1").arg(m_iconNames[i])))) {
 
         int size = file.getSize();
-        UINT8 *png = new UINT8 [ size ];
+        uint8_t *png = new uint8_t [ size ];
         file.read(png, size);
         file.close();
 
@@ -214,12 +214,10 @@ void CDlgPath::on_btnRaw_clicked()
     CPath & path = * ((CPath*) m_path);
 
     for (int i=0; i < path.getSize(); ++i) {
-
         if (i) {
             s += " ";
         }
-
-        tmp.sprintf("%2.2x", path[i]);
+        QString tmp = QString::asprintf("%2.2x", path[i]);
         s += tmp.mid(0,2);
     }
 

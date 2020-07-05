@@ -18,7 +18,6 @@
 
 #include "WizSprite.h"
 #include <QMessageBox>
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QTreeWidgetItem>
 #include "ui_WizSprite.h"
@@ -134,7 +133,7 @@ void CWizSprite::load(const int index)
 
     for (int n=0; n < gf.frames().getSize(); ++n) {
         CFrameSet & frameSet = *gf.frames()[n];
-        UINT8 *png;
+        uint8_t *png;
         int size;
         frameSet[0]->toPng(png, size);
 
@@ -291,7 +290,7 @@ void CWizSprite::load(const int index)
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
         CProto & proto = gf.m_arrProto[i];
         CFrameSet & frameSet = *gf.frames()[proto.m_nFrameSet];
-        UINT8 *png;
+        uint8_t *png;
         int size;
         frameSet[proto.m_nFrameNo]->toPng(png, size);
 

@@ -215,7 +215,7 @@ public:
     void managePlayerMovements (CActor & player);
     void managePlyTimerOutCounter (CActor & player);
     bool managePlayerFiring (CActor & player);
-    void autoCenter (CActor & player, UINT32 nAim);
+    void autoCenter (CActor & player, uint32_t nAim);
     bool centerOnPlayer (CActor & player);
     bool playerZKey();
     int manageKeyEvents();
@@ -234,8 +234,8 @@ public:
     void getVitals(int & hp, int & lives, int & score);
 
     // background color
-    UINT32 getBkColor();
-    void setBkColor(UINT32 bkColor);
+    uint32_t getBkColor();
+    void setBkColor(uint32_t bkColor);
 
     // lookup
     void setLookUp(bool set);
@@ -262,7 +262,7 @@ public:
 
     bool keyPressed();
     void updateJoyState();
-    UINT32 getJoyState();
+    uint32_t getJoyState();
     int whoIs(int x, int y);
 
     /////////////////////////////////////////////////////////////////

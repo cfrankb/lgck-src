@@ -145,11 +145,11 @@ bool MainWindow::save()
         CFileWrap file;
         QString fileName = m_doc.getFileName();
         const char EDOC[] = ".edoc";
-        if (fileName.endsWith(EDOC)) {
+        if (fileName.toLower().endsWith(EDOC)) {
             fileName = fileName.mid(0, fileName.length() - strlen(EDOC));
         }
         const char HTML[] = ".html";
-        if (!fileName.endsWith(HTML)) {
+        if (!fileName.toLower().endsWith(HTML)) {
             fileName += HTML;
         }
         if (file.open(fileName, QIODevice::WriteOnly)) {
@@ -176,7 +176,7 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr(m_fileFilter));
     if (fileName.isEmpty())
         return false;
-    if (!fileName.endsWith(".edoc")) {
+    if (!fileName.toLower().endsWith(".edoc")) {
         fileName += ".edoc";
     }
 
@@ -292,11 +292,11 @@ void MainWindow::on_actionSave_as_triggered()
 
 void MainWindow::on_actionHTML_triggered()
 {
-    const char fileFilter[] = "html documents (*.html)";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export as HTML document..."), g_fileNameHTML, tr(fileFilter));
+    QString fileFilter = tr("html documents (*.html)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export as HTML document..."), g_fileNameHTML, fileFilter);
     if (!fileName.isEmpty()) {
         CFileWrap file;
-        if (!fileName.endsWith(".html")) {
+        if (!fileName.toLower().endsWith(".html")) {
             fileName += ".html";
         }
         if (file.open(fileName, QIODevice::WriteOnly)) {
@@ -330,10 +330,10 @@ void MainWindow::on_actionNew_triggered()
 
 void MainWindow::on_actionFunctionList_triggered()
 {
-    const char fileFilter[] = "text files (*.txt)";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Function List..."), "", tr(fileFilter));
+    QString fileFilter = tr("text files (*.txt)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Function List..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(".txt")) {
+        if (!fileName.toLower().endsWith(".txt")) {
             fileName += ".txt";
         }
         CFileWrap file;
@@ -377,8 +377,8 @@ void MainWindow::exportWiki(const char *path)
 
 void MainWindow::on_actionGameLua_triggered()
 {
-    const char fileFilter[] = "GameLua.h (GameLua.h)";
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Import..."), "", tr(fileFilter));
+    QString fileFilter = tr("GameLua.h (GameLua.h)");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import..."), "", fileFilter);
     if (!fileName.isEmpty()) {
         CFileWrap file;
         if (file.open(fileName, QIODevice::ReadOnly)) {

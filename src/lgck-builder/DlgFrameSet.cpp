@@ -19,7 +19,6 @@
 #include "DlgFrameSet.h"
 #include "ui_DlgFrameSet.h"
 #include <QMessageBox>
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QPushButton>
 #include <QStringList>
@@ -175,8 +174,7 @@ void CDlgFrameSet::on_btnEdit_clicked()
             QString outMsg = QString(tr("An error occured: %1\nCode: %2"))
                            .arg(path + " " + list.join(" ")).arg(result);
             qDebug() << outMsg;
-            QMessageBox msgBox(QMessageBox::Critical, "", outMsg, 0, this);
-            msgBox.exec();
+            QMessageBox::critical(this, "", outMsg);
         } else {
             // reload the changes
             if (file.open(q2c(tmp.fileName()),"r")) {
@@ -187,8 +185,7 @@ void CDlgFrameSet::on_btnEdit_clicked()
                 emit refill();
             } else {
                 QString outMsg = QString("Failed to read %1").arg(tmp.fileName());
-                QMessageBox msgBox(QMessageBox::Critical, "", outMsg, 0, this);
-                msgBox.exec();
+                QMessageBox::critical(this, "", outMsg);
             }
         }
         tmp.setAutoRemove(true);

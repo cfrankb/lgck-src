@@ -239,11 +239,11 @@ void CDisplayManager::drawText(CDisplay & display)
         int sx = font->Advance(it->c_str());
         int x = computeX(display, sx);
         if (display.shadow()) {
-            Color color = {(UINT8)display.shadowR(), (UINT8)display.shadowG(), (UINT8)display.shadowB(), (UINT8)display.shadowA()};
+            Color color = {(uint8_t)display.shadowR(), (uint8_t)display.shadowG(), (uint8_t)display.shadowB(), (uint8_t)display.shadowA()};
             m_graphics->render(*font, it->c_str(), x + display.shadowX(), y + display.shadowY(), color);
         }
 
-        Color color = { (UINT8)display.red(), (UINT8)display.green(), (UINT8)display.blue(), (UINT8)display.alpha()};
+        Color color = { (uint8_t)display.red(), (uint8_t)display.green(), (uint8_t)display.blue(), (uint8_t)display.alpha()};
         m_graphics->render(*font, it->c_str(), x, y, color);
         y += dy;
     }
@@ -339,7 +339,7 @@ void CDisplayManager::drawHP()
     int x = computeX(display, sx);
     int y = computeY(display, sy);
 
-    UINT8 a = m_game->getDisplayAlpha();
+    uint8_t a = m_game->getDisplayAlpha();
     if (a) {
         m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, display.rgb() + (a << 24));
         m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, 0xffffff + (a << 24), false);

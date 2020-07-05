@@ -53,9 +53,9 @@ void CDlgObject::freeImageSet()
 {
     if (m_imgPng) {
         for (int i=0; i< m_imgCount; ++i) {
-            delete [] ((UINT8**) m_imgPng) [i];
+            delete [] ((uint8_t**) m_imgPng) [i];
         }
-        delete [] (UINT8**) m_imgPng;
+        delete [] (uint8_t**) m_imgPng;
         m_imgPng = NULL;
     }
 
@@ -118,7 +118,7 @@ void CDlgObject::load(const int index)
 
     for (int n=0; n < gf.frames().getSize(); ++n) {
         CFrameSet & frameSet = gf.toFrameSet(n);
-        UINT8 *png;
+        uint8_t *png;
         int size;
         gf.toFrame(n, 0).toPng(png, size);
 
@@ -342,7 +342,7 @@ void CDlgObject::load(const int index)
 
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
         CProto & proto = gf.m_arrProto[i];
-        UINT8 *png;
+        uint8_t *png;
         int size;
         gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
 
@@ -479,7 +479,7 @@ void CDlgObject::load(const int index)
     m_ui->treeEvents->setColumnCount(2);
     m_ui->treeEvents->setColumnWidth(0, 128);
     m_ui->treeEvents->setColumnWidth(1, 128);
-    m_ui->treeEvents->setEditTriggers(0);
+    m_ui->treeEvents->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeEvents->setWordWrap(false);
     m_ui->treeEvents->setRootIsDecorated(false);
     m_ui->treeEvents->setAlternatingRowColors(true);
@@ -502,7 +502,7 @@ void CDlgObject::load(const int index)
     for (int i = 1; i < MAX_DISPLAY_ICONS + 2; ++i) {
         m_ui->treeAnimations->setColumnWidth(i, 16);
     }
-    m_ui->treeAnimations->setEditTriggers(0);
+    m_ui->treeAnimations->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeAnimations->setWordWrap(false);
     m_ui->treeAnimations->setRootIsDecorated(false);
     m_ui->treeAnimations->setAlternatingRowColors(true);
@@ -746,7 +746,7 @@ void CDlgObject::save(const int index)
 void CDlgObject::setImage(int frameSet, int frameNo)
 {
     CGameFile & gf = *m_gameFile;
-    UINT8 *png;
+    uint8_t *png;
     int size;
     gf.toFrame(frameSet, frameNo).toPng(png, size);
 
@@ -771,11 +771,11 @@ void CDlgObject::fillFrameCombo(int frameSet)
     freeImageSet();
 
     m_imgCount = fs.getSize();
-    m_imgPng = (void**)new  UINT8 ** [m_imgCount];
+    m_imgPng = (void**)new  uint8_t ** [m_imgCount];
     m_imgSize = new int [m_imgCount];
 
     for (int i=0; i < m_imgCount; ++i) {
-        fs[i]->toPng( ((UINT8**)m_imgPng)[i], m_imgSize[i]);
+        fs[i]->toPng( ((uint8_t**)m_imgPng)[i], m_imgSize[i]);
         QIcon icon = makeIcon(m_imgPng[i], m_imgSize[i]);
         m_ui->cbBaseFrame->addItem(icon, QString("%1").arg(i + 1));
     }
@@ -964,7 +964,7 @@ void CDlgObject::updateAnimation(QTreeWidgetItem * item, int animationId)
 QIcon CDlgObject::makeIcon(void *png, int size)
 {
     QImage img;
-    if (!img.loadFromData( (UINT8*)png, size )) {
+    if (!img.loadFromData( (uint8_t*)png, size )) {
         qDebug("failed to load png");
     }
 
@@ -1028,7 +1028,7 @@ void CDlgObject::on_btnAddObject_clicked()
 
         // add new ImageSet UI
 
-        UINT8 *png;
+        uint8_t *png;
         int size;
         fs[0]->toPng(png, size);
 
@@ -1172,7 +1172,7 @@ void CDlgObject::reloadPaths()
     m_ui->treePaths->setColumnCount( 2);
     m_ui->treePaths->setColumnWidth(0, 100);
     m_ui->treePaths->setColumnWidth(1, 70);
-    m_ui->treePaths->setEditTriggers(0);
+    m_ui->treePaths->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treePaths->setWordWrap(false);
     m_ui->treePaths->setRootIsDecorated(false);
     m_ui->treePaths->setAlternatingRowColors(true);

@@ -53,8 +53,7 @@ void CDlgGotoLevel::init()
     CGameFile &gf = *((CGameFile*)m_gameFile);
 
     for (int i = 0; i < gf.getSize(); ++i) {
-        QString s;
-        s.sprintf("%.3d - %s", i + 1, gf[i]->getSetting("title"));
+        QString s = QString::asprintf("%.3d - %s", i + 1, gf[i]->getSetting("title"));
         m_ui->cbLevel->addItem(s);
     }
 }
@@ -66,8 +65,7 @@ void CDlgGotoLevel::initLayers(int levelId)
 
     for (int i = 0; i < level->getSize(); ++i) {
         CLayer & layer = (*level) [i];
-        QString s;
-        s.sprintf("%.3d - %s", i + 1, layer.getName());
+        QString s = QString::asprintf("%.3d - %s", i + 1, layer.getName());
         m_ui->cbLevel->addItem(s);
     }
 }
@@ -80,8 +78,7 @@ void CDlgGotoLevel::initSizes(int px)
 
     for (unsigned int i = 0; i < sizeof(sizes)/sizeof(int)
          && sizes[i] < px; ++i) {
-        QString s;
-        s.sprintf(q2c(tr("%d x %d pixels")), sizes[i], sizes[i]);
+        QString s = QString::asprintf(q2c(tr("%d x %d pixels")), sizes[i], sizes[i]);
         m_ui->cbLevel->addItem(s);
     }
 }

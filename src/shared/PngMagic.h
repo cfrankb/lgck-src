@@ -15,35 +15,35 @@ public:
 protected:
 
     typedef struct {
-        UINT32 Lenght;      // 4 UINT8s
-        UINT8 ChunkType[4];
-        UINT32 Width;       //: 4 UINT8s
-        UINT32 Height;      //: 4 UINT8s
-        UINT8 BitDepth;     //: 1 UINT8
-        UINT8 ColorType;    //: 1 UINT8
-        UINT8 Compression;  //: 1 UINT8
-        UINT8 Filter;       //: 1 UINT8
-        UINT8 Interlace;    //: 1 UINT8
+        uint32_t Lenght;      // 4 UINT8s
+        uint8_t ChunkType[4];
+        uint32_t Width;       //: 4 uint8_ts
+        uint32_t Height;      //: 4 uint8_ts
+        uint8_t BitDepth;     //: 1 uint8_t
+        uint8_t ColorType;    //: 1 uint8_t
+        uint8_t Compression;  //: 1 uint8_t
+        uint8_t Filter;       //: 1 uint8_t
+        uint8_t Interlace;    //: 1 uint8_t
     } png_IHDR;
 
-    static UINT8 PaethPredictor(UINT8 a, UINT8 b, UINT8 c);
+    static uint8_t PaethPredictor(uint8_t a, uint8_t b, uint8_t c);
     bool _8bpp(
             CFrame *& frame,
-            UINT8* cData,
+            uint8_t* cData,
             int cDataSize,
             const png_IHDR & ihdr,
-            const UINT8 plte[][3],
+            const uint8_t plte[][3],
             const bool trns_found,
-            const UINT8 trns[],
+            const uint8_t trns[],
             int offsetY);
     bool _4bpp(
             CFrame *& frame,
-            UINT8* cData,
+            uint8_t* cData,
             int cDataSize,
             const png_IHDR & ihdr,
-            const UINT8 plte[][3],
+            const uint8_t plte[][3],
             const bool trns_found,
-            const UINT8 trns[],
+            const uint8_t trns[],
             int offsetY);
 };
 

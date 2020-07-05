@@ -176,8 +176,8 @@ bool CLayer::read(IFile & file, bool compr)
     int ver = LAYER_VER;
     int size = 0;
     int entrySize = 0;
-    ULONG nTotalSize = 0;
-    ULONG nCompressSize = 0;
+    uint64_t nTotalSize = 0;
+    uint64_t nCompressSize = 0;
     forget();
     file.read (&ver, sizeof (ver));
     file.read (&m_size, sizeof (size));
@@ -200,13 +200,13 @@ bool CLayer::read(IFile & file, bool compr)
     }
     m_arrEntries = new CLevelEntry [ m_max ] ;
     if (compr) {
-        UINT8 *pCompressData = new UINT8 [ nCompressSize ];
+        uint8_t *pCompressData = new uint8_t [ nCompressSize ];
         if (nTotalSize != (m_size * sizeof(CLevelEntry))) {
             qDebug("CLayer() : total uncompressed size doesn't match array size\n");
             return false;
         }
         file.read(pCompressData, nCompressSize);
-        int err = uncompress((UINT8*)m_arrEntries,
+        int err = uncompress((uint8_t*)m_arrEntries,
                              &nTotalSize,
                              pCompressData,
                              nCompressSize);
@@ -236,9 +236,9 @@ bool CLayer::read(IFile & file, bool compr)
 bool CLayer::write(IFile &file, bool compr)
 {
     int version = LAYER_VER;
-    ULONG nTotalSize = 0;
-    ULONG nCompressSize = 0;
-    UINT8 *pCompressData = NULL;
+    uint64_t nTotalSize = 0;
+    uint64_t nCompressSize = 0;
+    uint8_t *pCompressData = NULL;
     file.write(&version,4);           // layer version
     file.write(&m_size,4);
     file << m_name;
@@ -248,7 +248,7 @@ bool CLayer::write(IFile &file, bool compr)
     file << (int) sizeof (CLevelEntry);
     nTotalSize = m_size * sizeof (CLevelEntry);
     if (compr) {
-        int err = compressData((UINT8 *)m_arrEntries, (ULONG)nTotalSize, &pCompressData, nCompressSize);
+        int err = compressData((uint8_t *)m_arrEntries, (uint64_t)nTotalSize, &pCompressData, nCompressSize);
         if (err != Z_OK) {
             qDebug("CLayer::Write error: %d", err);
         }

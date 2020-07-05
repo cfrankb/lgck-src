@@ -76,6 +76,7 @@
 #include "helper.h"
 #include "DlgDistributeGame.h"
 #include "exportgame.h"
+#include "hotfix.h"
 
 char MainWindow::m_appName[] = "LGCK builder";
 char MainWindow::m_author[] = "cfrankb";
@@ -91,7 +92,6 @@ char MainWindow::m_author[] = "cfrankb";
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-
     QString s;
     QString appVersion;
     int version = SS_LGCK_VERSION;
@@ -293,7 +293,7 @@ void MainWindow::createEventEditor()
     emit fontSizeChanged(m_fontSize);
 }
 
-QTime & MainWindow::getTime()
+QElapsedTimer & MainWindow::getTime()
 {
     return m_time;
 }
@@ -357,15 +357,17 @@ bool MainWindow::maybeSave()
 
 void MainWindow::open(QString fileName)
 {
+    HIDE_WINDOW
     commitAll();
     if (maybeSave()) {
         if (fileName.isEmpty()) {
-            fileName = QFileDialog::getOpenFileName(this, "", fileName, tr("LGCK games (*.lgckdb)"));
+            fileName = QFileDialog::getOpenFileName(nullptr, tr("Open"), fileName, tr("LGCK games (*.lgckdb)"));
         }
         loadFileName(fileName);
     }
     updateMenus();
     m_doc.initFonts();
+    SHOW_WINDOW
 }
 
 void MainWindow::loadFileName(const QString & fileName)
@@ -384,7 +386,6 @@ void MainWindow::loadFileName(const QString & fileName)
             QStringList files = settings.value("recentFileList").toStringList();
             files.removeAll(fileName);
             settings.setValue("recentFileList", files);
-
         }
         qDebug("MakeCurrent()");
 
@@ -428,19 +429,20 @@ bool MainWindow::save()
 
 bool MainWindow::saveAs()
 {
+    HIDE_WINDOW
     commitAll();
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
     //qDebug("picked : %s\n", q2c(fileName));
     if (fileName.isEmpty())
         return false;
     m_doc.setFileName(q2c(fileName));
+    SHOW_WINDOW
     return true;
 }
 
 void MainWindow::warningMessage(const QString message)
 {
-    QMessageBox msgBox(QMessageBox::Warning, m_appName, message, 0, this);
-    msgBox.exec();
+    QMessageBox::warning(this, m_appName, message);
 }
 
 bool MainWindow::updateTitle()
@@ -616,12 +618,13 @@ void MainWindow::on_actionLast_level_triggered()
 
 void MainWindow::on_actionEdit_Level_triggered()
 {
+    HIDE_WINDOW
+
     if (m_doc.getSize()) {
         CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
         CDlgEditLevel *dlg = new CDlgEditLevel(this);
         dlg->setGameDB(&m_doc);
-        QString s;
-        s.sprintf(q2c(tr("Edit level %.3d")), m_doc.m_nCurrLevel + 1);
+        QString s = QString::asprintf(q2c(tr("Edit level %.3d")), m_doc.m_nCurrLevel + 1);
         dlg->setWindowTitle(s);
         dlg->load(& level);
         if (dlg->exec() == QDialog::Accepted) {
@@ -631,6 +634,8 @@ void MainWindow::on_actionEdit_Level_triggered()
         delete dlg;
         emit levelEdited( m_doc.m_nCurrLevel );
     }
+
+    SHOW_WINDOW
 }
 
 void MainWindow::on_actionEdit_Game_Info_triggered()
@@ -823,7 +828,6 @@ void MainWindow::updateMenus()
     }
 
     ui->actionScriptWizard->setEnabled(m_viewMode == VM_SPRITE_EVENTS);
-    //ui->actionScriptWizard->setEnabled(true);
 }
 
 void MainWindow::on_actionCreate_Level_triggered()
@@ -1149,8 +1153,7 @@ void MainWindow::on_actionTest_Level_triggered()
                     testLevel(true);
                 }
             } else {
-                 QMessageBox msgBox(QMessageBox::Warning, QString(m_appName), errMsg, 0, this);
-                 msgBox.exec();
+                 QMessageBox::warning(this, m_appName, errMsg);
             }
         }
         delete dlg;
@@ -1213,8 +1216,8 @@ void MainWindow::handleGameEvents()
             if (!m_bContinue) {
                 QMessageBox::information(this, tr(m_appName),
                                      tr("You ran out of time."));
-                break;
             }
+            break;
 
         case CGame::EVENT_PLAYER_DIED:
             --m_doc.counter("lives");
@@ -1288,13 +1291,15 @@ void MainWindow::on_actionConfigure_LGCK_Builder_triggered()
 
 void MainWindow::showAppSettings(int tab)
 {
+    HIDE_WINDOW
+
     CDlgAppSettings *d = new CDlgAppSettings(this);
     connect(d, SIGNAL(versionCheck()), this, SLOT(checkVersion()));
     QString s = QString(tr("%1 Settings").arg(m_appName));
     d->setWindowTitle(s);
     d->showGrid(m_bShowGrid);
     d->setGridColor(QString(m_gridColor));
-    d->setGridSize(m_gridSize);         
+    d->setGridSize(m_gridSize);
     d->setUpdater(m_bUpdate, m_updateURL);
     d->setFontSize(m_fontSize);
     d->setCurrentTab(tab);
@@ -1341,6 +1346,8 @@ void MainWindow::showAppSettings(int tab)
         m_skipSplash = d->getSkipSplashScreen();
     }
     delete d;
+
+    SHOW_WINDOW
 }
 
 void MainWindow::showToolBox(bool show)
@@ -1536,8 +1543,9 @@ void MainWindow::on_actionEdit_layer_triggered()
 
 void MainWindow::on_actionC_declarations_triggered()
 {
-    QString fileFilter = tr("Text files (*.txt)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(q2c(fileFilter)));
+    HIDE_WINDOW
+    QString fileFilter = tr("Header files (*.h)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
         CFileWrap file;
         if (file.open(q2c(fileName), "wb")) {
@@ -1551,8 +1559,7 @@ void MainWindow::on_actionC_declarations_triggered()
                         name[i] = '_';
                     }
                 }
-                QString s;
-                s.sprintf("#define OBJECT_%-40s %d \r\n", q2c(name), n);
+                QString s = QString::asprintf("#define OBJECT_%-40s %d \r\n", q2c(name), n);
                 file += q2c(s);
             }
             file += "\r\n// *** OBJECT CLASSES\r\n\r\n" ;
@@ -1564,8 +1571,7 @@ void MainWindow::on_actionC_declarations_triggered()
                             name[i] = '_';
                         }
                     }
-                    QString s;
-                    s.sprintf("#define CLASS_%-40s0x%.2x\r\n",  q2c(name), n);
+                    QString s = QString::asprintf("#define CLASS_%-40s0x%.2x\r\n",  q2c(name), n);
                     file += q2c(s);
                 }
             }
@@ -1575,12 +1581,14 @@ void MainWindow::on_actionC_declarations_triggered()
             warningMessage( QString(tr("can't write to %1")).arg(fileName) );
         }
     }
+    SHOW_WINDOW
 }
 
 void MainWindow::on_actionRuntime_Lua_triggered()
 {
+    SHOW_WINDOW
     QString fileFilter = tr("Lua script (*.lua)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(q2c(fileFilter)));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
         CFileWrap file;
         if (file.open(q2c(fileName), "wb")) {
@@ -1593,6 +1601,7 @@ void MainWindow::on_actionRuntime_Lua_triggered()
             warningMessage(QString(tr("can't write to %1")).arg(fileName) );
         }
     }
+    HIDE_WINDOW
 }
 
 void MainWindow::initToolBar()
@@ -1682,14 +1691,14 @@ void MainWindow::comboChanged(int v)
 
 void MainWindow::on_actionPause_triggered()
 {
-    if ((m_viewMode == VM_GAME)) {
+    if (m_viewMode == VM_GAME) {
         m_doc.flipPause();
     }
 }
 
 void MainWindow::on_actionQuit_Game_triggered()
 {
-    if ((m_viewMode == VM_GAME)) {
+    if (m_viewMode == VM_GAME) {
         setViewMode(VM_EDITOR);
         m_doc.removePointsOBL();
         updateMenus();
@@ -1700,7 +1709,7 @@ void MainWindow::on_actionQuit_Game_triggered()
 
 void MainWindow::on_actionDebug_triggered()
 {
-    //if ((m_viewMode == VM_GAME)) {
+    //if (m_viewMode == VM_GAME) {
       //  m_doc.flipDebugConsole();
     //}
 }
@@ -1733,15 +1742,14 @@ void MainWindow::on_actionEdit_Object_triggered()
     if (m_doc.getSize()) {
         CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
         CLayer & layer = * level.getCurrentLayer();
-        if (layer.isSingleSelection()) { //.m_currEntry != -1) {
-            CLevelEntry entry = layer.getSelection(0);//[layer.m_currEntry];
+        if (layer.isSingleSelection()) {
+            CLevelEntry entry = layer.getSelection(0);
             const CProto proto = m_doc.m_arrProto[entry.m_nProto];
             CDlgObject *d = new CDlgObject (this);
             d->setGameDB(&m_doc);
             d->load( entry.m_nProto );
             if (d->exec() == QDialog::Accepted) {
                 d->save( entry.m_nProto );
-                //    if (gf.m_arrProto.getObject( m_proto ) != object) {
                 if (proto != m_doc.m_arrProto[ entry.m_nProto ]) {
                     m_doc.setDirty(true);
                 }
@@ -1934,8 +1942,12 @@ void MainWindow::selectLevel(int index)
 
 void MainWindow::editLevel(int index)
 {
+    HIDE_WINDOW
+
     m_doc.m_nCurrLevel = index;
     on_actionEdit_Level_triggered();
+
+    SHOW_WINDOW
 }
 
 void MainWindow::deleteLevel(int index)
@@ -1946,7 +1958,11 @@ void MainWindow::deleteLevel(int index)
 
 void MainWindow::addLevel()
 {
+    HIDE_WINDOW
+
     on_actionCreate_Level_triggered();
+
+    SHOW_WINDOW
 }
 
 void MainWindow::notifyKeyEvent(int keyCode, int state)
@@ -2406,7 +2422,7 @@ void MainWindow::formatVersion(QString &ver)
         vv[i] = version & 0xff;
         version /= 256;
     }
-    ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+    ver = QString::asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
 }
 
 void MainWindow::reloadSettings()
@@ -2638,9 +2654,9 @@ void MainWindow::checkVersion()
     QOperatingSystemVersion os = QOperatingSystemVersion::current();
     QString productVersion = QSysInfo::productVersion();
     QString productType = QSysInfo::productType();
-    QString ver = QString().asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+    QString ver = QString::asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
     QString driver = QGuiApplication::platformName();
-    QString url = QString().asprintf(q2c(m_updateURL),
+    QString url = QString::asprintf(q2c(m_updateURL),
                                     q2c(ver),
                                     q2c(driver),
                                     q2c(os.name().replace(" ", "+")),
@@ -2695,6 +2711,8 @@ void MainWindow::on_actionReset_Font_Size_triggered()
 
 void MainWindow::on_actionEdit_Images_triggered()
 {
+    HIDE_WINDOW
+
     if (m_doc.getSize()) {
         CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
         CLayer & layer = * level.getCurrentLayer();
@@ -2721,6 +2739,8 @@ void MainWindow::on_actionEdit_Images_triggered()
             delete d;
         }
     }
+
+    SHOW_WINDOW
 }
 
 bool MainWindow::checkExecutible(const QString exec, QString & errMsg)
@@ -2749,7 +2769,7 @@ void MainWindow::goExternalRuntime()
 {
     QString filename = m_doc.getFileName();
     QStringList list;
-    QStringList tmp = m_runtimeArgs.split(" ", QString::SkipEmptyParts);
+    QStringList tmp = m_runtimeArgs.split(" ", Qt::SkipEmptyParts);
     QListIterator<QString> itr(tmp);
     while (itr.hasNext()) {
         QString current = itr.next().trimmed();
@@ -2787,7 +2807,7 @@ void MainWindow::on_actionSprite_Editor_triggered()
     QString cmd = "obl5edit";
 #endif
     QString runtime = "\"" + appDir + "/" + cmd + "\"";
-    bool result = QProcess::startDetached(runtime);
+    bool result = QProcess::startDetached(runtime, QStringList());
     if (!result) {
         QString errMsg = tr("Running external editor failed: %1").arg(runtime);
         warningMessage(errMsg);

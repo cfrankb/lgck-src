@@ -155,8 +155,7 @@ void CDlgEntry::load(const int entryPos)
        m_ui->eHint->setPlainText(table->get(entry.m_string));
     }
 
-    char pathId[8];
-    sprintf(pathId, "0x%.4x", entry.m_path);
+    QString pathId = QString::asprintf("0x%.4x", entry.m_path);
     QString s = QString(tr("path: %1").arg(pathId));
     m_ui->sPath->setText(s);
     CPathBlock & paths = *(gf.getPaths());
@@ -351,7 +350,7 @@ void CDlgEntry::on_btnObject_clicked()
 void CDlgEntry::setImage(int frameSet, int frameNo)
 {
     CFrameSet & fs = m_gameFile->toFrameSet(frameSet);
-    UINT8 *png;
+    uint8_t *png;
     int size;
     fs[frameNo]->toPng(png, size);
     QImage img;
@@ -404,11 +403,10 @@ void CDlgEntry::on_btnRawPath_clicked()
     QString s;
     CPath & path = *m_path;
     for (int i=0; i < path.getSize(); ++i) {
-        QString tmp;
         if (i) {
             s += " ";
         }
-        tmp.sprintf("%2.2x", path[i]);
+        QString tmp = QString::asprintf("%2.2x", path[i]);
         s += tmp.mid(0,2);
     }
 

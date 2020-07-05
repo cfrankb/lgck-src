@@ -60,7 +60,7 @@ CDlgPathDir::CDlgPathDir(QWidget *parent) :
         if (file.open(q2c(QString(":/images/%1").arg(m_iconNames[i])))) {
 
             int size = file.getSize();
-            UINT8 *png = new UINT8 [ size ];
+            uint8_t *png = new uint8_t [ size ];
             file.read(png, size);
             file.close();
 

@@ -63,7 +63,7 @@ public:
     bool extractPNG(IFile & file);
 
     static char *ima2bitmap(char *ImaData, int len, int hei);
-    static void bitmap2rgb(char *bitmap, UINT32 *rgb, int len, int hei, int err);
+    static void bitmap2rgb(char *bitmap, uint32_t *rgb, int len, int hei, int err);
     static bool isFriendFormat(const char *format);
     void move(int s, int t);
 

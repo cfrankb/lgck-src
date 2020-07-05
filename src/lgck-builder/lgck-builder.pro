@@ -157,6 +157,7 @@ SOURCES +=  mainwindow.cpp \
     ../shared/interfaces/IGraphics.cpp
 
 HEADERS  +=  mainwindow.h \
+    hotfix.h \
     levelviewgl.h \
     levelscroll.h \
     DlgSource.h \

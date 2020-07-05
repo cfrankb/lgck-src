@@ -256,7 +256,7 @@ void CDlgGame::updateIcon(QTreeWidgetItem * itm, int protoId)
     CGameFile & gf = *m_gameFile;
     CProto & proto = gf.m_arrProto[ protoId ];
 
-    UINT8 *png;
+    uint8_t *png;
     int size;
     gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
 
@@ -562,7 +562,7 @@ void CDlgGame::updateIconFrameSet(QTreeWidgetItem * itm, int fs)
     QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
 
     CFrameSet & frameSet = gf.toFrameSet(fs);
-    UINT8 *png;
+    uint8_t *png;
     int size;
     gf.toFrame(fs, 0).toPng(png, size);
 
@@ -603,15 +603,14 @@ void CDlgGame::on_treeLevels_doubleClicked(QModelIndex index)
     CLevel & levelObj = *gf.m_arrLevels[ level ];
     CDlgEditLevel *dlg = new CDlgEditLevel(this);
     dlg->setGameDB(m_gameFile);
-    QString s;
-    s.sprintf(q2c(tr("Edit level %.3d")), level + 1);
+    QString s = QString::asprintf(q2c(tr("Edit level %.3d")), level + 1);
     dlg->setWindowTitle(s);
     dlg->load(& levelObj);
     if (dlg->exec() == QDialog::Accepted) {
         dlg->save(& levelObj);
         gf.setDirty( true );
         QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( level );
-        s.sprintf("%.3d", level + 1);
+        s = QString::asprintf("%.3d", level + 1);
         item->setText(0, s);
         item->setText(1, levelObj.getSetting("title"));
     }
@@ -639,8 +638,7 @@ void CDlgGame::on_btnAddLevel_clicked()
         gf.addLevel( level );
         gf.setDirty( true );
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        QString s;
-        s.sprintf("%.3d", gf.getSize());
+        QString s = QString::asprintf("%.3d", gf.getSize());
         item->setText(0, s);
         item->setText(1, level->getSetting("title"));
         m_ui->treeLevels->addTopLevelItem(item);
@@ -671,8 +669,7 @@ void CDlgGame::on_btnDeleteLevel_clicked()
 
         for (int i = level; i < gf.getSize(); ++i) {
             QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( i );
-            QString s;
-            s.sprintf("%.3d", i + 1);
+            QString s = QString::asprintf("%.3d", i + 1);
             item->setText(0, s);
             item->setText(1, gf[i]->getSetting("title"));
         }
@@ -769,7 +766,7 @@ void CDlgGame::init()
 
     m_ui->treeSettings->setColumnCount(2);
     m_ui->treeSettings->setColumnWidth(0, 128);
-    m_ui->treeSettings->setEditTriggers(0);
+    m_ui->treeSettings->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeSettings->setWordWrap(false);
     m_ui->treeSettings->setRootIsDecorated(false);
     m_ui->treeSettings->setAlternatingRowColors(true);
@@ -780,7 +777,7 @@ void CDlgGame::init()
 
     m_ui->treeObjects->setColumnCount(2);
     m_ui->treeObjects->setColumnWidth(0, 128);
-    m_ui->treeObjects->setEditTriggers(0);
+    m_ui->treeObjects->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeObjects->setWordWrap(false);
     m_ui->treeObjects->setRootIsDecorated(false);
     m_ui->treeObjects->setAlternatingRowColors(true);
@@ -800,7 +797,7 @@ void CDlgGame::init()
     m_ui->treeSounds->setColumnCount(2);
     m_ui->treeSounds->setColumnWidth(0, 128);
     m_ui->treeSounds->setColumnWidth(1, 64);
-    m_ui->treeSounds->setEditTriggers(0);
+    m_ui->treeSounds->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeSounds->setWordWrap(false);
     m_ui->treeSounds->setRootIsDecorated(false);
     m_ui->treeSounds->setAlternatingRowColors(true);
@@ -825,7 +822,7 @@ void CDlgGame::init()
     m_ui->treeFrameSets->setColumnCount(3);
     m_ui->treeFrameSets->setColumnWidth(0, 128);
     m_ui->treeFrameSets->setColumnWidth(1, 96);
-    m_ui->treeFrameSets->setEditTriggers(0);
+    m_ui->treeFrameSets->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeFrameSets->setWordWrap(false);
     m_ui->treeFrameSets->setRootIsDecorated(false);
     m_ui->treeFrameSets->setAlternatingRowColors(true);
@@ -842,15 +839,14 @@ void CDlgGame::init()
     m_ui->treeLevels->setColumnCount(2);
     m_ui->treeLevels->setColumnWidth(0, 48);
     m_ui->treeLevels->setColumnWidth(1, 128);
-    m_ui->treeLevels->setEditTriggers(0);
+    m_ui->treeLevels->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeLevels->setWordWrap(false);
     m_ui->treeLevels->setRootIsDecorated(false);
     m_ui->treeLevels->setAlternatingRowColors(true);
 
     for (int i = 0; i < gf.getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        QString s;
-        s.sprintf("%.3d", i + 1);
+        QString s = QString::asprintf("%.3d", i + 1);
         item->setText(0, s);
         item->setText(1, gf[i]->getSetting("title"));
         m_ui->treeLevels->addTopLevelItem(item);
@@ -861,7 +857,7 @@ void CDlgGame::init()
     m_ui->treeEvents->setColumnCount(2);
     m_ui->treeEvents->setColumnWidth(0, 128);
     m_ui->treeEvents->setColumnWidth(1, 96);
-    m_ui->treeEvents->setEditTriggers(0);
+    m_ui->treeEvents->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeEvents->setWordWrap(false);
     m_ui->treeEvents->setRootIsDecorated(false);
     m_ui->treeEvents->setAlternatingRowColors(true);

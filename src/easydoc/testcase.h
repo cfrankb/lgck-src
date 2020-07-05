@@ -14,6 +14,7 @@ enum ConditionType:int {
 
 enum ConditionOperator:int {
     equal,
+    not_equal,
     greater,
     smaller,
     greater_equal,

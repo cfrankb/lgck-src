@@ -29,24 +29,6 @@
 // Select the target QT or GCC
 // 
 
-#ifndef ALL_TYPES
-#define ALL_TYPES
-typedef unsigned long ULONG;
-typedef uint64_t UINT64;
-typedef short INT16;
-typedef unsigned char UINT8;
-typedef unsigned short UINT16;
-typedef unsigned int UINT32;
-typedef int INT32;
-#endif
-
-#ifdef _WIN32
-typedef unsigned __int64 UINT64,  *PUINT64;
-#else
-typedef unsigned long UINT64;
-typedef char INT8;
-#endif
-
 #define microtime(___time) struct timeval tm_time; \
     gettimeofday(&tm_time, NULL); \
     *___time = tm_time.tv_usec / 1000 + tm_time.tv_sec * 1000;

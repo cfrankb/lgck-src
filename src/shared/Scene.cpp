@@ -240,7 +240,7 @@ void CScene::map()
     }
 }
 
-int CScene::findBySeed(UINT32 seed)
+int CScene::findBySeed(uint32_t seed)
 {
     for (int n = 0; n < m_size; ++ n) {
         if ( (m_actors[n]->m_seed == seed)

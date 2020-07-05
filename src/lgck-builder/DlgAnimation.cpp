@@ -72,21 +72,21 @@ CDlgAnimation::CDlgAnimation(QWidget *parent) :
 
     ui->treeIcons->setColumnCount(1);
     ui->treeIcons->setColumnWidth(0, 64);
-    ui->treeIcons->setEditTriggers(0);
+    ui->treeIcons->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->treeIcons->setWordWrap(false);
     ui->treeIcons->setRootIsDecorated(false);
     ui->treeIcons->setAlternatingRowColors(true);
 
     ui->treeSequence->setColumnCount(1);
     ui->treeSequence->setColumnWidth(0, 64);
-    ui->treeSequence->setEditTriggers(0);
+    ui->treeSequence->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->treeSequence->setWordWrap(false);
     ui->treeSequence->setRootIsDecorated(false);
     ui->treeSequence->setAlternatingRowColors(true);
 
     m_iconMax = GROWBY;
     m_iconCount = 0;
-    m_icons = (void **) new UINT8 * [m_iconMax];
+    m_icons = (void **) new uint8_t * [m_iconMax];
     m_iconSizes = new int[m_iconMax];
     m_animation = new CAnimation;
 }
@@ -95,7 +95,7 @@ CDlgAnimation::~CDlgAnimation()
 {
     delete ui;
     delete m_animation;
-    delete [] (UINT8**)m_icons;
+    delete [] (uint8_t**)m_icons;
     delete [] m_iconSizes;
 }
 
@@ -114,7 +114,7 @@ void CDlgAnimation::changeEvent(QEvent *e)
 void CDlgAnimation::addIcon(void *png, int size)
 {
     QImage img;
-    if (!img.loadFromData( (UINT8*)png, size )) {
+    if (!img.loadFromData( (uint8_t*)png, size )) {
         qDebug("failed to load png\n");
     }
 
@@ -126,16 +126,16 @@ void CDlgAnimation::addIcon(void *png, int size)
     item->setIcon(0, icon);
     ui->treeIcons->addTopLevelItem(item);
 
-    m_icons[m_iconCount] = (UINT8*)png;
+    m_icons[m_iconCount] = (uint8_t*)png;
     m_iconSizes[m_iconCount] = size;
     ++m_iconCount;
 
     if (m_iconCount == m_iconMax) {
         m_iconMax += GROWBY;
-        UINT8 ** t = new UINT8* [ m_iconMax ];
+        uint8_t ** t = new uint8_t* [ m_iconMax ];
         int * tt = new int [ m_iconMax];
         for (int i=0; i < m_iconCount; ++i) {
-            t [ i ] = (UINT8*)m_icons[i];
+            t [ i ] = (uint8_t*)m_icons[i];
             tt [ i ] = m_iconSizes [ i ];
         }
 
@@ -148,7 +148,7 @@ void CDlgAnimation::addIcon(void *png, int size)
 
 void CDlgAnimation::addToSeq(int iconId, bool visualOnly)
 {
-    UINT8 * png = (UINT8*) m_icons[iconId];
+    uint8_t * png = (uint8_t*) m_icons[iconId];
 
     QImage img;
     if (!img.loadFromData( png, m_iconSizes[iconId] )) {

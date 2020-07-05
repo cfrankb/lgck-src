@@ -111,21 +111,21 @@ bool CLevel::readLegacyV1(IFile & file)
     // legacy "level" w/o layer support
     int size = 0;
     int entrySize = 0;
-    ULONG totalSize = 0;
-    ULONG compressSize = 0;
+    uint64_t totalSize = 0;
+    uint64_t compressSize = 0;
 
     file.read(&size, sizeof (size));
     std::string t;
     m_settings << file;
     file >> t;                      // dummy marker (used to be description)
 
-    UINT8 t1;                       // dummy marker
+    uint8_t t1;                       // dummy marker
     file.read (&t1, sizeof (t1));   // used to be color palette index
     file.read (&entrySize, sizeof(entrySize));
     file.read (&totalSize, 4);
     file.read (&compressSize,4);
 
-    UINT8 *pCompressData = new UINT8 [ compressSize ];
+    uint8_t *pCompressData = new uint8_t [ compressSize ];
 
     if (totalSize != (size * sizeof(CLevelEntry))) {
         qDebug("CLevel() : total uncompressed size doesn't match array size\n");
@@ -134,7 +134,7 @@ bool CLevel::readLegacyV1(IFile & file)
 
     CLevelEntry *entries = new CLevelEntry [ size ] ;
     file.read(pCompressData, compressSize);
-    int err = uncompress((UINT8*)entries,
+    int err = uncompress((uint8_t*)entries,
                          &totalSize,
                          pCompressData,
                          compressSize);

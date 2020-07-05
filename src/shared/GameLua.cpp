@@ -1594,7 +1594,7 @@ int getBkColor(lua_State *L)
 //#getBkColorC
 {
     CGame & game = CGame::getGame();
-    UINT32 bkColor = game.getBkColor();
+    uint32_t bkColor = game.getBkColor();
     int red =  bkColor & 0xff;
     int green = (bkColor & 0xff00) >> 8;
     int blue = (bkColor & 0xff0000) >> 16;
@@ -1616,7 +1616,7 @@ int setBkColor(lua_State *L)
         int red =  ((int)lua_tonumber(L, 1)) & 0xff;
         int green =  ((int)lua_tonumber(L, 2)) & 0xff;
         int blue =  ((int)lua_tonumber(L, 3)) & 0xff;
-        UINT32 bkColor = red + (green << 8) + (blue << 16) + 0xff000000;
+        uint32_t bkColor = red + (green << 8) + (blue << 16) + 0xff000000;
         game.setBkColor(bkColor);
     }
     return 0;
@@ -3167,7 +3167,7 @@ int setBorderColor(lua_State *L)
         int red =  ((int)lua_tonumber(L, 1)) & 0xff;
         int green =  ((int)lua_tonumber(L, 2)) & 0xff;
         int blue =  ((int)lua_tonumber(L, 3)) & 0xff;
-        UINT32 color = red + (green << 8) + (blue << 16) + 0xff000000;
+        uint32_t color = red + (green << 8) + (blue << 16) + 0xff000000;
         game.var("borderColor") = color;
     }
     return 0;
