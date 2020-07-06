@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QDesktopWidget>
 #include <QGuiApplication>
+#include <QScreen>
 
 static char appName[] = "LGCK builder";
 static char author[] = "cfrankb";
@@ -67,7 +68,8 @@ int main(int argc, char *argv[])
             dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
             dlg->raise();
             dlg->setWindowState(Qt::WindowActive);
-            QRect screenGeometry = QApplication::desktop()->screenGeometry();
+            QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            //QRect screenGeometry = QApplication::desktop()->screenGeometry();
             int x = (screenGeometry.width() - dlg->width()) / 2;
             int y = (screenGeometry.height() - dlg->height()) / 2;
             dlg->move(x, y);

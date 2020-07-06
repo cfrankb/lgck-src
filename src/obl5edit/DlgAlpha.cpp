@@ -23,7 +23,7 @@ CDlgAlpha::CDlgAlpha(QWidget *parent) :
     }
 
     int pngSize;
-    UINT8 *png;
+    uint8_t *png;
     frame->toPng(png, pngSize);
     QImage img;
     if (!img.loadFromData( png, pngSize )) {

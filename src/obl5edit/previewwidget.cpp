@@ -244,10 +244,12 @@ void CPreviewWidget::mousePressEvent(QMouseEvent * event)
     if (m_mouse.oldX != m_mouse.x
             || m_mouse.oldY != m_mouse.y) {
         if (m_mouse.lButton) {
-            m_zoom = std::min(10, ++m_zoom);
+            ++m_zoom;
+            m_zoom = std::min(10, m_zoom);
         }
         if (m_mouse.rButton) {
-            m_zoom = std::max(1, --m_zoom);
+            --m_zoom;
+            m_zoom = std::max(1, m_zoom);
         }
         changeFrame(m_frame);
         emit zoomChanged(m_zoom);

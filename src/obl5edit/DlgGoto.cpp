@@ -49,14 +49,13 @@ void CDlgGoto::changeEvent(QEvent *e)
 
 void CDlgGoto::initSizes(int px)
 {
-    int sizes[] = {
+    const int sizes[] = {
         16, 24, 32, 48, 64, 96, 128, 256
     };
 
     for (unsigned int i = 0; i < sizeof(sizes)/sizeof(int)
          && sizes[i] < px; ++i) {
-        QString s;
-        s.sprintf(q2c(tr("%d x %d pixels")), sizes[i], sizes[i]);
+        const QString s = QString::asprintf(q2c(tr("%d x %d pixels")), sizes[i], sizes[i]);
         m_ui->cbLevel->addItem(s);
     }
 }
@@ -94,7 +93,7 @@ void CDlgGoto::on_buttonBox_rejected()
 void CDlgGoto::initAlpha(int alpha)
 {
     for (int i = 0; i < 256; ++i) {
-        QString s = QString().sprintf("0x%.2x - %d%%", i, 100*i/255);
+        const QString s = QString::asprintf("0x%.2x - %d%%", i, 100*i/255);
         m_ui->cbLevel->addItem(s);
     }
     m_ui->cbLevel->setCurrentIndex(alpha);

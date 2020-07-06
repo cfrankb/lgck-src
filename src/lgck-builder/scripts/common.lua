@@ -188,6 +188,17 @@
     DISPLAY_DEBUG	    = 5;
     DISPLAY_IMAGE	    = 6;
 
+-- SECTION: Flags for Display X/Y alignment
+    FLAG_X_NONE         = 0;
+    FLAG_X_ALIGN_LEFT   = 1;
+    FLAG_X_ALIGN_RIGHT  = 2;
+    FLAG_X_ALIGN_CENTER = 3;
+
+    FLAG_Y_NONE         = 0;
+    FLAG_Y_ALIGN_TOP    = 1;
+    FLAG_Y_ALIGN_BOTTOM = 2;
+    FLAG_Y_ALIGN_CENTER = 3;
+
 ----------------------------------------------------------------------
 -- SECTION: Skills
 

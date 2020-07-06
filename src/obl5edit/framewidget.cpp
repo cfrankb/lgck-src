@@ -423,22 +423,22 @@ int CFrameWidget::viewMode()
     return m_mode;
 }
 
-void CFrameWidget::setBkColor(UINT32 color)
+void CFrameWidget::setBkColor(uint32_t color)
 {
     m_bkColor = color;
 }
 
-void CFrameWidget::setGridColor(UINT32 color)
+void CFrameWidget::setGridColor(uint32_t color)
 {
     m_gridColor = color;
 }
 
-void CFrameWidget::setBorderColor(UINT32 color)
+void CFrameWidget::setBorderColor(uint32_t color)
 {
     m_borderColor = color;
 }
 
-void CFrameWidget::setPenColor(UINT32 penColor)
+void CFrameWidget::setPenColor(uint32_t penColor)
 {
     m_penColor = penColor;
 }
@@ -533,12 +533,12 @@ void CFrameWidget::handleTool(int x, int y, bool lButton, bool rButton)
     bool changed = false;
     if (m_frame && x < m_frame->m_nLen && y < m_frame->m_nHei) {
         // TODO: set doc Dirty
-        UINT32 oldColor = m_frame->at(x,y);
+        uint32_t oldColor = m_frame->at(x,y);
         uchar oldAlpha = (uchar) (m_frame->at(x,y) >> 24);
         Dot org;
         Dot dot;
         uchar alpha = m_alpha;
-        UINT32 penColor = (m_penColor & 0xffffff)+ (m_alpha << 24);
+        uint32_t penColor = (m_penColor & 0xffffff)+ (m_alpha << 24);
         if (rButton) {
             penColor = 0;
             alpha = 0;
@@ -549,6 +549,7 @@ void CFrameWidget::handleTool(int x, int y, bool lButton, bool rButton)
         case TOOL_ERASER:
             penColor = 0;
             alpha = 0;
+            break;
 
         case TOOL_PEN:
             if (m_dots->getSize()) {

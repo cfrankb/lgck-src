@@ -180,16 +180,10 @@ void CDlgObject::load(const int index)
     // speeds
 
     for (int n = 0; n < 16; ++n) {
-        if (n != 0) {
-            QString s = QString(tr("Speed %1")).arg(n);
-            m_ui->cbAnimateSpeed->addItem(s);
-            m_ui->cbMoveSpeed->addItem(s);
-            m_ui->cbFallSpeed->addItem(s);
-        } else {
-            m_ui->cbAnimateSpeed->addItem(tr("(fast)"));
-            m_ui->cbMoveSpeed->addItem(tr("(fast)"));
-            m_ui->cbFallSpeed->addItem(tr("(fast)"));
-        }
+        QString s = n ? tr("Speed %1").arg(n) : tr("(fast)");
+        m_ui->cbAnimateSpeed->addItem(s);
+        m_ui->cbMoveSpeed->addItem(s);
+        m_ui->cbFallSpeed->addItem(s);
     }
 
     for (int n = 0; n < 256; ++n) {
@@ -226,7 +220,7 @@ void CDlgObject::load(const int index)
 
     for (int n = 0; n < 255; ++n) {
         if (n != 0) {
-            m_ui->cbDamages->addItem(QString(tr("%1 pts")).arg(n));
+            m_ui->cbDamages->addItem(tr("%1 pts").arg(n));
         } else {
             m_ui->cbDamages->addItem(tr("(none)"));
         }
@@ -238,8 +232,8 @@ void CDlgObject::load(const int index)
 
     for (int n = 0; n < 255; ++n) {
         if (n != 0) {
-            m_ui->cbBonusHP->addItem(QString(tr("%1 pts")).arg(n));
-            m_ui->cbHP->addItem(QString(tr("%1 pts")).arg(n));
+            m_ui->cbBonusHP->addItem(tr("%1 pts").arg(n));
+            m_ui->cbHP->addItem(tr("%1 pts").arg(n));
         }
         else {
             m_ui->cbBonusHP->addItem(tr("(none)"));
@@ -254,7 +248,7 @@ void CDlgObject::load(const int index)
 
     for (int n = 0; n < 255; ++n) {
         if (n != 0) {
-            m_ui->cbPowerLevel->addItem(QString(tr("Level %1")).arg(n));
+            m_ui->cbPowerLevel->addItem(tr("Level %1").arg(n));
         } else {
             m_ui->cbPowerLevel->addItem(tr("(ignored)"));
         }
@@ -385,11 +379,11 @@ void CDlgObject::load(const int index)
 
     for (int n = 0; n < 255; ++ n) {
         if (n == 1) {
-            m_ui->cbRebirths->addItem(QString("%1 time").arg(n));
+            m_ui->cbRebirths->addItem(tr("%1 time").arg(n));
         } else if (n > 1) {
-            m_ui->cbRebirths->addItem(QString("%1 times").arg(n));
+            m_ui->cbRebirths->addItem(tr("%1 times").arg(n));
         } else {
-            m_ui->cbRebirths->addItem(QString(tr("(none)")));
+            m_ui->cbRebirths->addItem(tr("(none)"));
         }
     }
 
@@ -399,14 +393,13 @@ void CDlgObject::load(const int index)
 
     for (int n = 0; n < 255; ++n) {
         if (n != 0) {
-            m_ui->cbRebirthDelay->addItem(QString(tr("Speed %1")).arg(n));
+            m_ui->cbRebirthDelay->addItem(tr("Speed %1").arg(n));
         } else {
-            m_ui->cbRebirthDelay->addItem(QString(tr("(fast)")));
+            m_ui->cbRebirthDelay->addItem(tr("(fast)"));
         }
     }
 
     m_ui->cbRebirthDelay->setCurrentIndex( proto.m_nRbDelay );
-
 
     // rebirth location
     const QString locations[] = {
@@ -449,12 +442,7 @@ void CDlgObject::load(const int index)
     // timers
 
     for (int n = 0; n < 256; ++n) {
-        QString s = QString(tr("Speed %1").arg(n));
-
-        if (n == 0) {
-            s = tr("(never)");
-        }
-
+        QString s = n ? tr("Speed %1").arg(n) : tr("(never)");
         m_ui->cbAutoSoundDelay->addItem(s);
         m_ui->cbAutoBulletDelay->addItem(s);
         m_ui->cbAutoChangeToDelay->addItem(s);
@@ -470,8 +458,6 @@ void CDlgObject::load(const int index)
     m_ui->cAutoTrigger->setChecked(proto.m_bAutoTrigger != 0);
 
     // trigger
-
-//    m_ui->cTrigger->setChecked( proto.m_bNoTrigger != 0 );
     m_ui->cTrigger->setChecked( proto.getOption(CProto::OPTION_NO_TRIGGER) );
 
     // page 5 ****************************************************************
@@ -699,12 +685,6 @@ void CDlgObject::save(const int index)
     }
 
     // trigger
-
-//    if (m_ui->cTrigger->checkState () == Qt::Checked) {
-  //      proto.m_bNoTrigger = 1;
-   // } else {
-   //     proto.m_bNoTrigger = 0;
-   // }
     proto.setOption(CProto::OPTION_NO_TRIGGER, m_ui->cTrigger->checkState () == Qt::Checked);
 
     // set autoGoal
@@ -841,13 +821,9 @@ void CDlgObject::on_treeEvents_doubleClicked(QModelIndex index)
     CDlgSource *d = new CDlgSource ( (QWidget*) parent());
     d->init(m_gameFile);
     d->setWindowTitle(tr("Edit Event `%1`").arg(CProtoArray::getEventName(index.row())));
-
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    //CObject & object = gf.m_arrProto.getObject(m_objectIndex);
-//    d->setText(object.getEvent(index.row()));
     d->setText(m_events[index.row()]);
     if (d->exec()) {
-        //object.setEvent(index.row(), d->getText());
         m_events[ index.row() ] = d->getText();
         QTreeWidgetItem * item = m_ui->treeEvents->topLevelItem( index.row() );
         if (d->getText().isEmpty()) {
@@ -857,7 +833,6 @@ void CDlgObject::on_treeEvents_doubleClicked(QModelIndex index)
         }
         gf.setDirty( true );
     }
-
     delete d;
 }
 
@@ -869,7 +844,6 @@ void CDlgObject::on_btnClearAll_clicked()
                              QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok) {
 
         CGameFile & gf = *((CGameFile*)m_gameFile);
-
         for (int i=0; i < CProtoArray::getEventCount(); ++i) {
             if (m_events[i] != "") {
                 m_events[i] = "";
@@ -902,7 +876,6 @@ void CDlgObject::editAnimation(int idx)
         CFrameSet & fs = gf.toFrameSet(frameSet);
 
         int count = fs.getSize();
-
         for (int i=0; i < count; ++i) {
             dlg->addIcon((void*)m_imgPng[i], m_imgSize[i]);
         }
@@ -1009,7 +982,6 @@ void CDlgObject::on_cNoChangeAtDeath_clicked()
 void CDlgObject::on_btnAddObject_clicked()
 {
     CDlgFrameSet * d = new CDlgFrameSet (this);
-    //d->setGameDB( m_gameFile );
     d->setWindowTitle ( tr("New Image Set") );
     CFrameSet fs;
     d->init(& fs);

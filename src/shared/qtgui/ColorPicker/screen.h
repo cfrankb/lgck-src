@@ -27,13 +27,13 @@ This file is part of colorPickerWidget.
 #include <QMouseEvent>
 
 
-class screen : public QWidget
+class CScreen : public QWidget
 {
 
     Q_OBJECT
 
 public:
-    screen();
+    CScreen();
 
 private:
     QLabel *label;

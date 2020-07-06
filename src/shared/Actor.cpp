@@ -965,11 +965,6 @@ void CActor::managePath()
     switch (nAim) {
     case CGame::UP:
         bcanWalk = m_nY >=0 ? bcanWalk : true;
-        /*if (m_nY>=0) {
-            bcanWalk = bcanWalk;
-        } else {
-            bcanWalk = true;
-        }*/
         break;
 
     case CGame::DOWN:
@@ -1600,7 +1595,6 @@ int CActor::checkHit()
             if (inventory) {
                 inventory->addItem(object.m_nProto);
             }
-            break;
         case CLASS_PICKUP_TRIGGERS:
             object.unMap();
             if (triggerKey) {

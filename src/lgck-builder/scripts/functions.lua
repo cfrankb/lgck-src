@@ -256,6 +256,18 @@ function Display:setTemplate(s)
     return display_setTemplate(self.id, s);
 end
 
+function Display:new(name, x, y, displayType)
+    local display = {};
+    setmetatable(display, Display);
+    display.id = display_new(name, x, y, displayType);
+    display.name = name;
+    return display;
+end
+
+function Display:setImage(imageSet, imageNo)
+    displaySetImage(self.id, imageSet, imageNo );
+end
+
 --[[
 
     Extra ------------------------------------------------------------
@@ -377,6 +389,14 @@ end
 
 function Layer:delete()
   layer_delete( self.id);
+end
+
+function Layer:new(name, layerType, hSpeed, vSpeed)
+  local layer = {};
+  setmetatable(layer, Layer);
+  layer.id = layer_new(name, layerType, hSpeed, vSpeed);
+  layer.name = name;
+  return layer;
 end
 
 --[[

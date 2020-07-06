@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="lgck-builder.qrc">
+    <normaloff>:/images/lgckbuilder64ronnie2.png</normaloff>:/images/lgckbuilder64ronnie2.png</iconset>
+  </property>
   <property name="toolTip">
    <string>Overlay properties</string>
   </property>
@@ -181,8 +185,8 @@
       <rect>
        <x>10</x>
        <y>90</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -378,8 +382,8 @@
       <rect>
        <x>10</x>
        <y>150</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -417,8 +421,8 @@
       <rect>
        <x>10</x>
        <y>110</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -575,7 +579,7 @@
       <rect>
        <x>10</x>
        <y>217</y>
-       <width>47</width>
+       <width>71</width>
        <height>20</height>
       </rect>
      </property>
@@ -656,7 +660,7 @@
     <widget class="QComboBox" name="cbFrameSet">
      <property name="geometry">
       <rect>
-       <x>89</x>
+       <x>120</x>
        <y>15</y>
        <width>161</width>
        <height>25</height>
@@ -687,7 +691,7 @@
     <widget class="QComboBox" name="cbBaseFrame">
      <property name="geometry">
       <rect>
-       <x>89</x>
+       <x>120</x>
        <y>45</y>
        <width>63</width>
        <height>25</height>
@@ -778,7 +782,9 @@
   <tabstop>tabWidget</tabstop>
   <tabstop>btnShadowColor</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="lgck-builder.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

@@ -228,7 +228,7 @@ Qt::Key_AsciiTilde	0x7e*/
 
     if (key>= Qt::Key_Exclam
             && key<= Qt::Key_AsciiTilde){
-        keyS = QString("").sprintf("%c", key).toUpper();
+        keyS = QString::asprintf("%c", key).toUpper();
     }
 
     for (uint i=0; i < sizeof(keys)/sizeof(KEY);++i) {

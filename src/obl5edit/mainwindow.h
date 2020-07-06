@@ -77,7 +77,7 @@ private:
     void initToolbar();
     void initActionGroups();
     void setPenSize(int size);
-    void updateColorButton(const UINT32 color);
+    void updateColorButton(const uint32_t color);
     QAction** actionShortcuts();
     QStringList & defaultShortcuts();
 

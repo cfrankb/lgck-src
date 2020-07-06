@@ -76,11 +76,10 @@ void CDlgSelect::on_btnSpriteEditor_clicked()
     QString cmd = "obl5edit";
 #endif
     QString runtime = "\"" + appDir + "/" + cmd + "\"";
-    bool result = QProcess::startDetached(runtime);
+    bool result = QProcess::startDetached(runtime, QStringList());
     if (!result) {
         QString errMsg = tr("Running external editor failed: %1").arg(runtime);
-        QMessageBox msgBox(QMessageBox::Warning, "m_appName", errMsg, 0, this);
-        msgBox.exec();
+        QMessageBox::warning(this, "", errMsg);
     }
 }
 

@@ -110,11 +110,13 @@ void CPreviewScroll::mousePressEvent(QMouseEvent * event)
 
         int zoom = m_widget->m_zoom;
         if (m_mouse.lButton) {
-            zoom = std::min(10, ++zoom);
+            ++zoom;
+            zoom = std::min(10, zoom);
         }
 
         if (m_mouse.rButton) {
-            zoom = std::max(1, --zoom);
+            --zoom;
+            zoom = std::max(1, zoom);
         }
         emit zoomChanged(zoom);
         update();
