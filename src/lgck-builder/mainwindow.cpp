@@ -76,7 +76,6 @@
 #include "helper.h"
 #include "DlgDistributeGame.h"
 #include "exportgame.h"
-#include "hotfix.h"
 
 char MainWindow::m_appName[] = "LGCK builder";
 char MainWindow::m_author[] = "cfrankb";
@@ -357,7 +356,6 @@ bool MainWindow::maybeSave()
 
 void MainWindow::open(QString fileName)
 {
-    HIDE_WINDOW
     commitAll();
     if (maybeSave()) {
         if (fileName.isEmpty()) {
@@ -367,7 +365,6 @@ void MainWindow::open(QString fileName)
     }
     updateMenus();
     m_doc.initFonts();
-    SHOW_WINDOW
 }
 
 void MainWindow::loadFileName(const QString & fileName)
@@ -429,14 +426,12 @@ bool MainWindow::save()
 
 bool MainWindow::saveAs()
 {
-    HIDE_WINDOW
     commitAll();
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
     //qDebug("picked : %s\n", q2c(fileName));
     if (fileName.isEmpty())
         return false;
     m_doc.setFileName(q2c(fileName));
-    SHOW_WINDOW
     return true;
 }
 
@@ -618,8 +613,6 @@ void MainWindow::on_actionLast_level_triggered()
 
 void MainWindow::on_actionEdit_Level_triggered()
 {
-    HIDE_WINDOW
-
     if (m_doc.getSize()) {
         CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
         CDlgEditLevel *dlg = new CDlgEditLevel(this);
@@ -634,8 +627,6 @@ void MainWindow::on_actionEdit_Level_triggered()
         delete dlg;
         emit levelEdited( m_doc.m_nCurrLevel );
     }
-
-    SHOW_WINDOW
 }
 
 void MainWindow::on_actionEdit_Game_Info_triggered()
@@ -1291,8 +1282,6 @@ void MainWindow::on_actionConfigure_LGCK_Builder_triggered()
 
 void MainWindow::showAppSettings(int tab)
 {
-    HIDE_WINDOW
-
     CDlgAppSettings *d = new CDlgAppSettings(this);
     connect(d, SIGNAL(versionCheck()), this, SLOT(checkVersion()));
     QString s = QString(tr("%1 Settings").arg(m_appName));
@@ -1346,8 +1335,6 @@ void MainWindow::showAppSettings(int tab)
         m_skipSplash = d->getSkipSplashScreen();
     }
     delete d;
-
-    SHOW_WINDOW
 }
 
 void MainWindow::showToolBox(bool show)
@@ -1543,7 +1530,6 @@ void MainWindow::on_actionEdit_layer_triggered()
 
 void MainWindow::on_actionC_declarations_triggered()
 {
-    HIDE_WINDOW
     QString fileFilter = tr("Header files (*.h)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
@@ -1581,12 +1567,10 @@ void MainWindow::on_actionC_declarations_triggered()
             warningMessage( QString(tr("can't write to %1")).arg(fileName) );
         }
     }
-    SHOW_WINDOW
 }
 
 void MainWindow::on_actionRuntime_Lua_triggered()
 {
-    SHOW_WINDOW
     QString fileFilter = tr("Lua script (*.lua)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
@@ -1601,7 +1585,6 @@ void MainWindow::on_actionRuntime_Lua_triggered()
             warningMessage(QString(tr("can't write to %1")).arg(fileName) );
         }
     }
-    HIDE_WINDOW
 }
 
 void MainWindow::initToolBar()
@@ -1942,12 +1925,8 @@ void MainWindow::selectLevel(int index)
 
 void MainWindow::editLevel(int index)
 {
-    HIDE_WINDOW
-
     m_doc.m_nCurrLevel = index;
     on_actionEdit_Level_triggered();
-
-    SHOW_WINDOW
 }
 
 void MainWindow::deleteLevel(int index)
@@ -1958,11 +1937,7 @@ void MainWindow::deleteLevel(int index)
 
 void MainWindow::addLevel()
 {
-    HIDE_WINDOW
-
     on_actionCreate_Level_triggered();
-
-    SHOW_WINDOW
 }
 
 void MainWindow::notifyKeyEvent(int keyCode, int state)
@@ -2711,8 +2686,6 @@ void MainWindow::on_actionReset_Font_Size_triggered()
 
 void MainWindow::on_actionEdit_Images_triggered()
 {
-    HIDE_WINDOW
-
     if (m_doc.getSize()) {
         CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
         CLayer & layer = * level.getCurrentLayer();
@@ -2739,8 +2712,6 @@ void MainWindow::on_actionEdit_Images_triggered()
             delete d;
         }
     }
-
-    SHOW_WINDOW
 }
 
 bool MainWindow::checkExecutible(const QString exec, QString & errMsg)

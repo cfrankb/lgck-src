@@ -43,24 +43,16 @@
 CLevelViewGL::CLevelViewGL(QWidget* parent, CGame *game):
     QOpenGLWidget(parent)
 {
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
     m_gridSize = 32;
     m_showGrid = true;
     m_gridColor = 0x60c0b0a0;
     m_hasFocus = false;
-    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
     m_game = game;
-    QSurfaceFormat format;
-    format.setDepthBufferSize(24);
-    format.setStencilBufferSize(8);
-    format.setMajorVersion( 2 );
-    format.setMinorVersion( 0 );
-    //format.setSamples(1);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    QSurfaceFormat::setDefaultFormat(format);
+
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(this, SIGNAL(versionCheck()),
             parent->parent(), SLOT(checkVersion()));
-
 }
 
 CLevelViewGL::~CLevelViewGL()

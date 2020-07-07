@@ -37,7 +37,7 @@ public:
     CFrameWidget(QWidget *parent);
     virtual ~CFrameWidget();
     enum {
-        TICK_RATE = 60
+        TICK_RATE = 30
     };
     enum {
         MODE_NORMAL ,

@@ -31,12 +31,21 @@
 #include <QDesktopWidget>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QSurfaceFormat>
 
 static char appName[] = "LGCK builder";
 static char author[] = "cfrankb";
 
 int main(int argc, char *argv[])
 {
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setMajorVersion( 2 );
+    format.setMinorVersion( 0 );
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
+
     srand( time( NULL ) );
     QApplication app(argc, argv);
     QFileInfo fi(app.applicationDirPath());

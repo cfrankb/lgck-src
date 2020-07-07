@@ -45,7 +45,7 @@ public:
         PATH_SCROLL = 8,
         MOUSE_POS_MASK = 0xfffffff8,
         TICK_SCALE   = 1000 / 35,
-        TICK_MAX_RATE       = 200
+        TICK_MAX_RATE = 30 // 200
     };
 
 protected:
