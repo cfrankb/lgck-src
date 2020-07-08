@@ -199,7 +199,6 @@ void CFont::FaceSize(int size)
     ASSERT(m_pxRef);
     m_face = size;
     m_scale = (float)size / (float)m_pxRef * fixup();
-   //qDebug("m_scale: %f %d/%d",m_scale, size, m_pxRef);
 }
 
 int CFont::Advance(const char *text)

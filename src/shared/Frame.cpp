@@ -47,7 +47,6 @@ CFrame::~CFrame()
 
 CFrame::CFrame(int p_nLen, int p_nHei)
 {
-    //qDebug("CFrame::CFrame(int, int)");
     m_bCustomMap = false;
     m_nLen = p_nLen;
     m_nHei = p_nHei;
@@ -183,7 +182,6 @@ bool CFrame::read(IFile &file, int version)
         //    int filler; // OBL5 0x500 expects this field to be 0
         file.read (&m_bCustomMap, sizeof (m_bCustomMap));
 
-        //qDebug("size = (%d, %d); filler= %d\n", m_nLen, m_nHei, filler);
         if ((m_nLen>0) && (m_nHei>0)) {
             // this image is not zero-length
 
@@ -207,7 +205,6 @@ bool CFrame::read(IFile &file, int version)
             delete [] pSrc;
 
             if (err) {
-                //qDebug("CFrame::Read err=%d\n", err);
                 return false;
             }
 

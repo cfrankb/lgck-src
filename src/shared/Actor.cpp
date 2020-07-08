@@ -109,9 +109,8 @@ void CActor::write(IFile & file)
 
 CActor & CActor::operator = (const CActor &s)
 {
-    //qDebug("CActor & CActor::operator = (const CActor &s)");    
     int size = sizeof(CLevelEntry);
-    memcpy(this, &s, size);
+    memcpy(static_cast<void*>(this), &s, size);
     m_id = s.m_id;
     m_seed = s.m_seed;
     m_props.clear();
@@ -274,7 +273,7 @@ void CActor::kill()
             && m_propi[EXTRA_LIVES]) {
         --m_propi[EXTRA_LIVES];
         CTask * task = new CTask;
-        CActor actor = *this;
+        CActor & actor = *this;
         actor.setTag(TAG_REBORN);
         switch (p.m_rebirthLocation) {
             case CProto::REBIRTH_ORIGIN:
@@ -664,6 +663,7 @@ void CActor::move(const int aim)
 
     case CGame::LEAP_LEFT:
         moveBy(0, - CMap::GRID);
+        /* fall through */
     case CGame::LEFT:
         if (m_nY < 0) {
             moveBy(-CMap::GRID, 0);
@@ -675,6 +675,7 @@ void CActor::move(const int aim)
 
     case CGame::LEAP_RIGHT:
         moveBy(0, - CMap::GRID);
+        /* fall through */
     case CGame::RIGHT:
         if (m_nY < 0) {
             moveBy(CMap::GRID, 0);
@@ -1249,7 +1250,7 @@ void CActor::animate()
             && !isFrozen()
             && m_propi[EXTRA_ANIMPTR]!= CGame::INVALID
             && m_propi[EXTRA_ANIMSEQ]!= CGame::INVALID) {
-            const CAnimation animation = object().getAnimation(m_propi[EXTRA_ANIMSEQ]);
+            CAnimation & animation = object().getAnimation(m_propi[EXTRA_ANIMSEQ]);
             if (m_propi[EXTRA_ANIMPTR] >= animation.getSize()) {
                 switch ( p.m_nClass ) {
                 case CLASS_ANIMATE_ONCE:
@@ -1571,7 +1572,7 @@ int CActor::checkHit()
             }
         }
     }
-    memset(&data, 0, sizeof(CHitData));
+    memset(static_cast<void*>(&data), 0, sizeof(CHitData));
     hitTest(CGame::HERE, data);
     for (int i = 0; i < data.fwCount; ++i) {
         CActor & object = scene[ data.fwEntry[i] ];
@@ -1595,6 +1596,7 @@ int CActor::checkHit()
             if (inventory) {
                 inventory->addItem(object.m_nProto);
             }
+            /* fall through */
         case CLASS_PICKUP_TRIGGERS:
             object.unMap();
             if (triggerKey) {

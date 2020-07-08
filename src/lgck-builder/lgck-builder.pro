@@ -55,6 +55,7 @@ win32:LIBS += -llua \
     -lopengl32
 
 SOURCES +=  mainwindow.cpp \
+    infodock.cpp \
     main.cpp \
     levelviewgl.cpp \
     levelscroll.cpp \
@@ -157,6 +158,7 @@ SOURCES +=  mainwindow.cpp \
     ../shared/interfaces/IGraphics.cpp
 
 HEADERS  +=  mainwindow.h \
+    infodock.h \
     levelviewgl.h \
     levelscroll.h \
     DlgSource.h \
@@ -294,4 +296,5 @@ FORMS  += mainwindow.ui \
     WizFont.ui \
     DlgExportSprite.ui \
     DlgDistributeGame.ui \
-    dlgdisplay.ui
+    dlgdisplay.ui \
+    infodock.ui

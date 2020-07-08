@@ -388,7 +388,8 @@ void CDisplayManager::drawDisplay(CDisplay & display)
         break;
 
     case CDisplay::DISPLAY_DEBUGX:
-        display.setText(m_game->m_lua.getDebugText(), CDisplay::DISPLAY_SAME);
+        // DEPRECATED
+        //display.setText(m_game->m_lua.getDebugText(), CDisplay::DISPLAY_SAME);
         drawText(display);
         break;
 

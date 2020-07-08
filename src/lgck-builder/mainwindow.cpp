@@ -76,6 +76,7 @@
 #include "helper.h"
 #include "DlgDistributeGame.h"
 #include "exportgame.h"
+#include "infodock.h"
 
 char MainWindow::m_appName[] = "LGCK builder";
 char MainWindow::m_author[] = "cfrankb";
@@ -88,9 +89,12 @@ char MainWindow::m_author[] = "cfrankb";
 #define DEFAULT_FONT_SIZE MIN_FONT_SIZE
 #define RUNTIME_DEFAULT_ARGS "%1"
 
+MainWindow *me = nullptr;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    me = this;
     QString s;
     QString appVersion;
     int version = SS_LGCK_VERSION;
@@ -247,6 +251,14 @@ MainWindow::MainWindow(QWidget *parent)
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
         //checkVersion();
     }
+
+    m_infoDock = new CInfoDock(this);
+    this->addDockWidget(Qt::BottomDockWidgetArea, m_infoDock);
+    connect(this, SIGNAL(debugText(QString)),
+            m_infoDock, SLOT(appendText(QString)));
+
+    CLuaVM::setCallback(newDebugString);
+    emit debugText(QString("hello world\n"));
 }
 
 void MainWindow::createEventEditor()
@@ -2909,4 +2921,9 @@ void MainWindow::on_actionMark_All_as_Goals_triggered()
 void MainWindow::on_actionUnmark_All_as_Goals_triggered()
 {
     markAsGoal( false );
+}
+
+void MainWindow::newDebugString(const char *s)
+{
+    emit me->debugText(QString(s));
 }

@@ -98,8 +98,6 @@ CSnd t_Snd;
 CSnd * CSndArray::operator [](int n)
 {
     if (n < 0 || n >= m_nSize) {
-        //qDebug("CSnd: Warning value \"%d\" is out of bound.\n",
-          //     n);
         return &t_Snd;
     }
     else {
@@ -114,9 +112,6 @@ CSnd * CSndArray::operator [](const char *name)
             return m_arrSnds[n];
         }
     }
-
-    //qDebug("CSnd: Warning no such sound (\"%s\") in array .\n",
-      //     name);
     return &t_Snd;
 }
 

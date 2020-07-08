@@ -50,7 +50,6 @@
 #include "Font.h"
 #include "WizFont.h"
 
-static const char g_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
 static const char g_oblFilter[] = "Object Blocks (*.obl *.obl5)";
 static const char g_pngFilter[] = "PNG Images (*.png)";
 

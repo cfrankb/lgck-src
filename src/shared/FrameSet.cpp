@@ -253,7 +253,6 @@ bool CFrameSet::read(IFile & file)
     signature[4]=0;
     file.read(signature, 4);
     if (memcmp(signature, "OBL5", 4) != 0) {
-        //qDebug("bad signature: %s\n", signature);
         char tmp[128];
         sprintf(tmp, "bad signature: %s", signature);
         m_lastError = tmp;

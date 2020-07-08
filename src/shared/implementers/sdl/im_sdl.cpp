@@ -105,7 +105,6 @@ void CIMSdl::cacheInverse(int i, CFrameSet *filter)
 
 void CIMSdl::removeAt(int i)
 {
-   // qDebug("removeAt: %d",i);
     deleteImageSet(* m_imageSets [i]);
     for (int j=i; j < m_size - 1; ++j) {
         m_imageSets[j] = m_imageSets[j + 1];
@@ -146,7 +145,6 @@ void CIMSdl::replace(int i, CFrameSet *filter)
 
 int CIMSdl::insertAt(int i, CFrameSet *filter)
 {
-    //qDebug("%d %s", i, filter->getName());
     if (m_size == m_max) {
         m_max += GROWBY;
         ImageSet ** t = new ImageSet * [m_max];

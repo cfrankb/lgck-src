@@ -406,7 +406,7 @@
      <rect>
       <x>60</x>
       <y>260</y>
-      <width>191</width>
+      <width>321</width>
       <height>16</height>
      </rect>
     </property>
@@ -449,7 +449,7 @@
      <rect>
       <x>90</x>
       <y>231</y>
-      <width>121</width>
+      <width>141</width>
       <height>23</height>
      </rect>
     </property>
@@ -529,7 +529,7 @@
      <rect>
       <x>90</x>
       <y>200</y>
-      <width>211</width>
+      <width>271</width>
       <height>23</height>
      </rect>
     </property>
@@ -722,7 +722,7 @@
      <rect>
       <x>230</x>
       <y>210</y>
-      <width>181</width>
+      <width>231</width>
       <height>16</height>
      </rect>
     </property>
@@ -1103,7 +1103,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>230</x>
       <y>10</y>
-      <width>221</width>
+      <width>231</width>
       <height>21</height>
      </rect>
     </property>
@@ -1402,7 +1402,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QComboBox" name="cbBonusHP">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>300</x>
       <y>130</y>
       <width>81</width>
       <height>25</height>
@@ -1436,7 +1436,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>200</x>
       <y>213</y>
-      <width>91</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
@@ -1462,7 +1462,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>200</x>
       <y>134</y>
-      <width>71</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -1486,7 +1486,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QComboBox" name="cbRebirthDelay">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>300</x>
       <y>209</y>
       <width>81</width>
       <height>25</height>
@@ -1601,7 +1601,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>10</x>
       <y>100</y>
-      <width>181</width>
+      <width>221</width>
       <height>16</height>
      </rect>
     </property>
@@ -1626,7 +1626,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>10</x>
       <y>52</y>
-      <width>71</width>
+      <width>81</width>
       <height>16</height>
      </rect>
     </property>
@@ -1669,7 +1669,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>120</x>
       <y>220</y>
-      <width>221</width>
+      <width>251</width>
       <height>21</height>
      </rect>
     </property>
@@ -1682,7 +1682,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>10</x>
       <y>93</y>
-      <width>81</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -1695,7 +1695,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>11</x>
       <y>133</y>
-      <width>81</width>
+      <width>91</width>
       <height>20</height>
      </rect>
     </property>
@@ -1899,7 +1899,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>291</width>
+      <width>331</width>
       <height>16</height>
      </rect>
     </property>
@@ -1972,7 +1972,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>30</x>
       <y>190</y>
-      <width>121</width>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
@@ -2001,7 +2001,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>200</x>
       <y>70</y>
-      <width>111</width>
+      <width>131</width>
       <height>21</height>
      </rect>
     </property>
@@ -2040,7 +2040,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>200</x>
       <y>190</y>
-      <width>121</width>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>

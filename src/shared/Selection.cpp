@@ -44,7 +44,7 @@ void CSelection::addEntry(const CLevelEntry & entry, int index)
     if (m_size == m_max) {
         m_max += GROWBY;
         CLevelEntry *tmp = new CLevelEntry[m_max];
-        memcpy(tmp, m_entries, sizeof(CLevelEntry) * m_size);
+        memcpy(static_cast<void*>(tmp), m_entries, sizeof(CLevelEntry) * m_size);
         delete [] m_entries;
         m_entries = tmp;
 

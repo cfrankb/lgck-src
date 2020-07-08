@@ -155,7 +155,6 @@ int findWidget(lua_State *L)
         error(fn, 1);
     } else {
         const char *s = lua_tostring(L, 1);
-        //qDebug("findWidget %s => %d", s, g_bindings[s]);
         lua_pushinteger(L, g_bindings[s]);
         return 1;
     }

@@ -273,8 +273,6 @@ CSettings::SETTING & CSettings::operator [] (const char *param)
             return m_settings[i];
         }
     }
-
-    //qDebug("no param named `%s` found\n", q2c(param));
     return m_settings[i]; // return dummy placeholder
 }
 

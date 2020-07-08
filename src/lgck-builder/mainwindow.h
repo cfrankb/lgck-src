@@ -30,6 +30,7 @@ class CThreadUpdater;
 class QScrollArea;
 class CDlgDistributeGame;
 class QFileSystemWatcher;
+class CInfoDock;
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -65,10 +66,10 @@ private:
     Ui::MainWindow *ui;
     QComboBox *m_comboEvents;
     QComboBox *m_comboLayers;
-    //QScrollArea *m_scroll
     CLevelScroll *m_scroll;
     CLevelViewGL *m_lview;
     CToolBoxDock *m_toolBox;
+    CInfoDock *m_infoDock;
     CWEditEvents *m_editEvents;
     QToolBar *m_levelToolbar;
     QToolBar *m_layerToolbar;
@@ -150,6 +151,8 @@ private:
     void formatVersion(QString &ver);
     void loadFileName(const QString &fileName);
     void markAsGoal(bool isGoal);
+
+    static void newDebugString(const char *s);
 
 protected:
     void initializeGL();
@@ -282,6 +285,7 @@ signals:
     void fontSizeChanged(int);
     void frameSetChanged(int fs);
     void spriteUpdated(int protoId);
+    void debugText(const QString & text);
 };
 
 #endif // MAINWINDOW_H

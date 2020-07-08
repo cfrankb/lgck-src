@@ -107,7 +107,6 @@ bool CProtoArray::read(IFile &file)
 
     // read entry size
     file.read(&nEntrySize, sizeof(nEntrySize));
-    //qDebug("entrySize:%d [%ld]\n", nEntrySize, sizeof(CProto));
     char *t = new char [ std::max(nEntrySize, (int)sizeof(CProto)) ];
 
     CProto* proto = (CProto*)t;

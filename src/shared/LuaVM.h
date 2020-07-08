@@ -20,6 +20,7 @@
 #define _LUAVM_H__
 
 #include <stdio.h>
+#include <functional>
 
 extern "C" {
 #include <lua5.2/lauxlib.h>
@@ -47,19 +48,12 @@ public:
     void reportErrors( int status, const char *fnName );
 
     // lua interface
-
+    static void setCallback(std::function<void(const char *)> callback);
     static int debug(lua_State *L);
-    static int test(lua_State *L);
 
 protected:
-
-    static void addDebugString(const char *s);
-    static void addDebugLine(char *line, int size);
-
+    static std::function<void(const char *)> m_callback;
     lua_State *m_luaState;
-    static char *m_debug;
-    static int m_debugLines;
-    static int m_debugSize;
 };
 
 #endif

@@ -93,17 +93,17 @@ public:
     // constants
 
     enum {
-        STATE_VERSION      = 0
+        STATE_VERSION       = 0,
+        INVALID             = -1
     };
 
-    enum {
+    enum : uint16_t {
         MAX_HP              = 255,
         PROTO_SPECIAL_MASK  = 0x8000,
         PROTO_POINTS        = 0xffff,
         PROTO_DEAD_PLAYER   = 0xfffe,
         PROTO_DEAD_WOOD     = 0xfffd,
-        DEFAULT_TICK_RATE   = 90,
-        INVALID             = -1
+        DEFAULT_TICK_RATE   = 90
     };
 
     enum {

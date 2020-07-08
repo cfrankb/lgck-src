@@ -462,9 +462,9 @@ void CGame::splitLevel(CLevel *level, CScene *sBK, CScene *sFW)
         return;
     }
 
-    int skill_mask[] = {1, 2, 4, 8};
-    int mask = skill_mask[getSkill()];
-    //qDebug("SKILL:%d MASK(%d)",getSkill(), mask);
+    // skill mask is 1, 2, 4 or 8
+    int mask = 1 << getSkill();
+
     // insert dummy entry at pos 0
     CActor tmp;
     sFW->add(tmp);
@@ -2017,7 +2017,6 @@ void CGame::saveGame(IFile & file)
         char tmp[key.length()+1];
         strcpy(tmp, key.c_str());
         file << key;
-//        qDebug("%s %d", tmp, val);
         file.write(&val, sizeof(int));
     }
 
@@ -2032,7 +2031,6 @@ void CGame::saveGame(IFile & file)
         char tmp[key.length()+1];
         strcpy(tmp, key.c_str());
         file << key;
-  //      qDebug("%s %llu", tmp, val);
         file.write(&val, sizeof(unsigned long long));
     }
 

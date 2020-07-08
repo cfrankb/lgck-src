@@ -1,4 +1,3 @@
-
 /*
     LGCK Builder Runtime
     Copyright (C) 1999, 2011  Francois Blanchette
@@ -24,9 +23,7 @@
 #include "FileWrap.h"
 #include "../shared/qtgui/cheat.h"
 
-char *CLuaVM::m_debug = NULL;
-int CLuaVM::m_debugLines = 0;
-int CLuaVM::m_debugSize = 0;
+std::function<void(const char *)> CLuaVM::m_callback = nullptr;
 
 void CLuaVM::registerInt(const char *name, int value)
 {
@@ -76,10 +73,9 @@ void CLuaVM::reportErrors( int status, const char *fnName )
 
 void CLuaVM::debug(const char *s)
 {
-    if (s) {
-        addDebugString( s );
+    if (s && m_callback) {
+        m_callback(s);
     }
-    qDebug("%s", s);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,81 +84,19 @@ void CLuaVM::debug(const char *s)
 int CLuaVM::debug(lua_State *L)
 {
     int argc = lua_gettop(L);
-    for ( int n=1; n <= argc; ++n ) {
+    for (int n=1; n <= argc; ++n) {
         const char *s = lua_tostring(L, n);
-        if (s) {
-            addDebugString( s );
+        if (s && m_callback) {
+            m_callback(s);
         }
-        qDebug("%s", s);
     }
-
     return 0;
-}
-
-#define MAX_LINES 30
-
-void CLuaVM::addDebugLine(char *line, int size)
-{
-    if (m_debugLines == MAX_LINES) {
-        strcpy(m_debug, strstr(m_debug, "\n") + 1);
-        m_debugSize = strlen(m_debug);
-        --m_debugLines;
-    }
-
-    if (m_debug) {
-        char *t = new char [ m_debugSize + size + 2 ];
-        strcpy(t, m_debug);
-        strcat(t, "\n");
-        strcat(t, line);
-        m_debugSize += size + 1;
-        delete [] m_debug;
-        m_debug = t;
-
-    } else {
-        m_debug = new char [ size + 1];
-        strcpy(m_debug, line);
-        m_debugSize = size;
-    }
-
-    ++m_debugLines;
-}
-
-void CLuaVM::addDebugString(const char *s)
-{
-    char *t = new char[ strlen(s) + 1];
-    strcpy(t, s);
-
-    char *lineStart = t;
-    char *lineEnd = strstr(lineStart, "\n");
-    while (lineEnd) {
-        if ((lineEnd != lineStart) && (lineEnd[-1] == '\r')) {
-            lineEnd[-1] = 0;
-        }
-        *lineEnd = 0;
-        addDebugLine( lineStart , strlen(lineStart));
-        lineStart = lineEnd + 1;
-        lineEnd = strstr(lineStart, "\n");
-    }
-
-    if (*lineStart) {
-        addDebugLine(lineStart, strlen(lineStart));
-    }
-
-    delete [] t;
 }
 
 void CLuaVM::clearLog()
 {
-    if (m_debug) {
-        delete [] m_debug;
-        m_debug = NULL;
-    }
-
-    m_debug = new char[1];
-    m_debug[0] = 0;
-    m_debugSize = 0;
+    // TODO: implement this
 }
-
 
 CLuaVM::CLuaVM()
 {
@@ -179,10 +113,6 @@ CLuaVM::~CLuaVM() {
     if (m_luaState) {
         m_luaState = NULL;
     }
-}
-
-char * CLuaVM::getDebugText() {
-    return m_debug;
 }
 
 // lua interface
@@ -202,4 +132,9 @@ int CLuaVM::exec(const char *luaCode)
 void CLuaVM::registerFn(const char * fnName, lua_CFunction fn)
 {
     lua_register(m_luaState, fnName, fn);
+}
+
+void CLuaVM::setCallback(std::function<void(const char *)> callback)
+{
+    m_callback = callback;
 }

@@ -6,7 +6,9 @@ HISTORY OF LGCK BUILDER
 - EDITOR: FontWizard lets you import system fonts
 - ENGINE: overlays now support multiline text
 - ENGINE: overlays can have custom fonts
+- ENGINE: major code clean up
 - EDITOR: mark/unmark all goals matching a sprite 
+- EDITOR: added debug output window
 - LUA: display_setFlagXY, display_setFont
 
 

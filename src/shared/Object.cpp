@@ -54,7 +54,6 @@ CObject::~CObject()
 
 CObject & CObject::operator = (CObject & s)
 {
-    //qDebug("CObject::operator =\n");
     m_proto = s.proto();
 
     resizeEventList( s.getEventCount() );

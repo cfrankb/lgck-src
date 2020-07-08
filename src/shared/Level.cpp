@@ -417,8 +417,6 @@ CLevel & CLevel::operator = (CLevel & s)
 {
     // TODO: redo this function
 
-    //qDebug("CLevel::operator = (CLevel & s)\n");
-
     if (m_layers) {
         delete [] m_layers;
         m_layers = NULL;

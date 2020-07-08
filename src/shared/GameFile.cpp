@@ -130,7 +130,6 @@ CGameFile::~CGameFile()
 
 void CGameFile::parseClassList()
 {
-    //qDebug("parseClassList()");
     typedef struct
     {
         int id;
@@ -232,7 +231,6 @@ void CGameFile::initDefaultSounds()
                 file.close();
                 m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), data, size));
             } else {
-                //qDebug("can't find snd: `%s`\n", q2c(fileName));
                 m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), NULL, 0));
             }
         } else {
@@ -526,7 +524,6 @@ bool CGameFile::read(const char *filepath)
                 char *data = new char [  entry->getSize() ];
                 file.read( data, entry->getSize());
                 CSnd * snd = new CSnd(entry->getName(), data, entry->getSize());
-             //   qDebug("Sound:%s", entry->getName());
                 m_arrSounds.add(snd);
             }
         }
