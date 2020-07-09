@@ -1729,7 +1729,7 @@ bool CGame::readScript( const char *scriptName, std::string &out )
     } else {
         char tmp[128];
         const char fmt2[] = "-- failed to load `%s`\n";
-        sprintf( tmp, fmt2, scriptName);
+        sprintf(tmp, fmt2, scriptName);
         m_lua.debug(tmp);
         qDebug(fmt2, tmp);
     }

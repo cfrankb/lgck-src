@@ -18,3 +18,10 @@ void CInfoDock::appendText(const QString & text)
 {
     ui->plainTextEdit->appendPlainText(text);
 }
+
+void CInfoDock::closeEvent(QCloseEvent *event)
+{
+    event->ignore();
+    hide();
+    emit visibilityChanged(false);
+}

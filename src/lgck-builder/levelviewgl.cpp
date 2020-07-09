@@ -381,16 +381,3 @@ void CLevelViewGL::setGridColor(const QString & gridColor)
     m_gridColor = 0x60000000 | strtol(q2c(gridColor), NULL, 16);
 }
 
-void CLevelViewGL::sceneUpdated()
-{
-//    qDebug("IN CLevelView::sceneUpdated()");
-    update();
-  //  qDebug("OUT CLevelView::sceneUpdated()");
-}
-
-
-void CLevelViewGL::needRefresh()
-{
-    //qDebug("need refresh");
-    m_refresh = true;
-}

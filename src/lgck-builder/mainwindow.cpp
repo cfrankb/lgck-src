@@ -32,6 +32,8 @@
 #include <QFileSystemWatcher>
 #include <QByteArray>
 #include <QOperatingSystemVersion>
+#include <QFlags>
+#include <QSysInfo>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -46,6 +48,7 @@
 #include "../shared/implementers/sdl/mu_sdl.h"
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/GameEvents.h"
+#include "../shared/ss_version.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "DlgEditLevel.h"
@@ -69,8 +72,6 @@
 #include "Snapshot.h"
 #include "ToolBoxDock.h"
 #include "thread_updater.h"
-#include "../shared/ss_version.h"
-#include <QSysInfo>
 #include "levelviewgl.h"
 #include "levelscroll.h"
 #include "helper.h"
@@ -240,6 +241,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(levelSelected(int)),
             m_scroll, SLOT(changeLevel(int)));
 
+    // debugOutput
+    m_infoDock = new CInfoDock(this);
+    m_infoDock->setWindowTitle(tr("Debug output"));
+    m_infoDock->setAllowedAreas(Qt::DockWidgetAreas(Qt::BottomDockWidgetArea));
+    this->addDockWidget(Qt::BottomDockWidgetArea, m_infoDock);
+    connect(this, SIGNAL(debugText(QString)),
+            m_infoDock, SLOT(appendText(QString)));
+    connect(m_infoDock, SIGNAL(visibilityChanged(bool)),
+                     ui->actionDebugOutput, SLOT(setChecked(bool)));
+
+    CLuaVM::setCallback(newDebugString);
+    emit debugText(QString("hello world\n"));
+
     // reload settings
     reloadSettings();
     CSndSDL *sn = new CSndSDL();
@@ -251,14 +265,6 @@ MainWindow::MainWindow(QWidget *parent)
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
         //checkVersion();
     }
-
-    m_infoDock = new CInfoDock(this);
-    this->addDockWidget(Qt::BottomDockWidgetArea, m_infoDock);
-    connect(this, SIGNAL(debugText(QString)),
-            m_infoDock, SLOT(appendText(QString)));
-
-    CLuaVM::setCallback(newDebugString);
-    emit debugText(QString("hello world\n"));
 }
 
 void MainWindow::createEventEditor()
@@ -440,7 +446,6 @@ bool MainWindow::saveAs()
 {
     commitAll();
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
-    //qDebug("picked : %s\n", q2c(fileName));
     if (fileName.isEmpty())
         return false;
     m_doc.setFileName(q2c(fileName));
@@ -503,6 +508,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->ignore();
     }
     saveSettings();
+    CLuaVM::setCallback(nullptr);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -1601,6 +1607,7 @@ void MainWindow::on_actionRuntime_Lua_triggered()
 
 void MainWindow::initToolBar()
 {
+    // main toolbar
     ui->toolBar->setObjectName("mainToolbar");
     ui->toolBar->setWindowTitle(tr("Main"));
     ui->toolBar->setIconSize( QSize(16,16) );
@@ -1617,6 +1624,8 @@ void MainWindow::initToolBar()
     ui->toolBar->addAction(ui->actionGo_to_level);
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->actionSprite_Editor);
+
+    // layer toolbar
     m_comboLayers = new QComboBox(this);
     m_comboLayers->setDisabled(true);
     m_layerToolbar = new QToolBar("Layer", this);
@@ -1627,11 +1636,13 @@ void MainWindow::initToolBar()
     m_layerToolbar->addAction(ui->actionEdit_layer);
     m_layerToolbar->addAction(ui->actionDelete_layer);
     addToolBar(m_layerToolbar);
-    m_levelToolbar = new QToolBar("Level", this);
-    m_levelToolbar->setIconSize( QSize(16,16) );
-    m_levelToolbar->setObjectName("toolbar1");
+
+    // level toolbar
     m_comboEvents = new QComboBox(this);
     reloadEventCombo();
+    m_levelToolbar = new QToolBar(tr("Level"), this);
+    m_levelToolbar->setIconSize( QSize(16,16) );
+    m_levelToolbar->setObjectName("toolbar1");
     m_levelToolbar->addWidget(m_comboEvents);
     m_levelToolbar->addAction(ui->actionScriptWizard);
     m_levelToolbar->addAction(ui->actionEdit_Object);
@@ -1642,14 +1653,14 @@ void MainWindow::initToolBar()
     m_levelToolbar->addAction(ui->actionCut);
     m_levelToolbar->addAction(ui->actionPaste);
     m_levelToolbar->addAction(ui->actionDelete);
+    addToolBar(m_levelToolbar);
+
     connect(m_comboEvents, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
     connect(m_comboLayers, SIGNAL(currentIndexChanged(int)), this, SLOT(layerChanged(int)));
     connect(m_comboEvents, SIGNAL(highlighted(int)), this, SLOT(reloadEventCombo()));
-    addToolBar(m_levelToolbar);
+
     connect(ui->toolBar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionMainToolbar_toggled(bool)));
-
-
     connect(m_levelToolbar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionLevelToolbar_toggled(bool)));
     connect(m_layerToolbar, SIGNAL(visibilityChanged(bool)),
@@ -2127,7 +2138,6 @@ void MainWindow::on_actionCut_triggered()
                 clipboard->addEntry(entry, j);
             }
             clipboard->applyDelta(script->m_mx, script->m_my);
-      //      qDebug("mx=%d my=%d",script->m_mx, script->m_my);
             layer->removeSelectedSprites();
             m_doc.setDirty(true);
             m_lview->repaint();
@@ -2148,13 +2158,11 @@ void MainWindow::on_actionCopy_triggered()
             CSelection *clipboard = m_doc.getClipboard();
             clipboard->clear();
             for (int i=0; i < layer->getSelectionSize(); ++i) {
-    //            qDebug("copy select %d", i);
                 CLevelEntry & entry = layer->getSelection(i);
                 int j = layer->getSelectionIndex(i);
                 clipboard->addEntry(entry,j);
             }
             clipboard->applyDelta(script->m_mx, script->m_my);
-  //          qDebug("clipboard size: %d", clipboard->getSize());
             updateMenus();
         }
     }
@@ -2335,7 +2343,8 @@ QAction** MainWindow::actionShortcuts()
         ui->actionScriptWizard,
         ui->actionLayer_ToolBar,
         ui->actionEdit_Images,
-        NULL
+        ui->actionDebugOutput,
+        nullptr
     };
     return actions;
 }
@@ -2363,6 +2372,7 @@ void MainWindow::saveSettings()
         settings.setValue("levelToolbar", ui->actionLevelToolbar->isChecked());
         settings.setValue("layerToolbar", ui->actionLayer_ToolBar->isChecked());
         settings.setValue("statusbar", ui->actionStatus_bar->isChecked());
+        settings.setValue("debugOutput", ui->actionDebugOutput->isChecked());
         settings.setValue("toolBox", m_bShowToolBox);
         settings.endGroup();
         settings.beginGroup("UI_Components");
@@ -2462,6 +2472,8 @@ void MainWindow::reloadSettings()
     levelToolbar ? m_levelToolbar->show() : m_levelToolbar->hide();
     layerToolbar ? m_layerToolbar->show() : m_layerToolbar->hide();
     statusBar ? ui->statusBar->show() : ui->statusBar->hide();
+    bool debugOutput = settings.value("debugOutput", false).toBool();
+    debugOutput ? m_infoDock->show() : m_infoDock->hide();
     // toolbox
     m_bShowToolBox = settings.value("toolBox", true).toBool();
     showToolBox(m_bShowToolBox);
@@ -2628,7 +2640,6 @@ void MainWindow::updateEditor(const QString &url, const QString &ver)
     }
 }
 
-
 void MainWindow::checkVersion()
 {
     int version = SS_LGCK_VERSION;
@@ -2789,7 +2800,7 @@ void MainWindow::on_actionSprite_Editor_triggered()
 #else
     QString cmd = "obl5edit";
 #endif
-    QString runtime = "\"" + appDir + "/" + cmd + "\"";
+    QString runtime = QString("\"%1/%2\"").arg(appDir).arg(cmd);
     bool result = QProcess::startDetached(runtime, QStringList());
     if (!result) {
         QString errMsg = tr("Running external editor failed: %1").arg(runtime);
@@ -2926,4 +2937,10 @@ void MainWindow::on_actionUnmark_All_as_Goals_triggered()
 void MainWindow::newDebugString(const char *s)
 {
     emit me->debugText(QString(s));
+}
+
+void MainWindow::on_actionDebugOutput_toggled(bool arg1)
+{
+    ui->actionDebugOutput->setChecked(arg1);
+    arg1 ? m_infoDock->show() : m_infoDock->hide();
 }

@@ -251,9 +251,12 @@ void CDisplayManager::drawText(CDisplay & display)
 
 void CDisplayManager::drawLives(CDisplay & display)
 {
-    char tmp[256];
-    sprintf(tmp, display.templateStr(), m_game->getLives());
+    char *tmp = nullptr;
+    if (asprintf(&tmp, display.templateStr(), m_game->getLives()) == -1) {
+        qDebug("asprintf alloc failure in CDisplayManager::drawLives");
+    }
     display.setText(tmp, CDisplay::DISPLAY_SAME);
+    free(tmp);
     drawText(display);
 }
 
@@ -371,15 +374,19 @@ void CDisplayManager::drawInventory()
 
 void CDisplayManager::drawDisplay(CDisplay & display)
 {
-    char tmp[256];
+    char *tmp = nullptr;
     int score;
 
     switch (display.type()) {
     case CDisplay::DISPLAY_TIME_LEFT:
         if (m_game->getTimeLeft()  > 0) {
-            sprintf(tmp, display.templateStr(), m_game->getTimeLeft());
-            display.setText(tmp, CDisplay::DISPLAY_SAME);
-            drawText(display);
+            if (asprintf(&tmp, display.templateStr(), m_game->getTimeLeft())==-1) {
+                qDebug("malloc failure in CDisplayManager::drawDisplay(CDisplay & display)");
+            } else {
+                display.setText(tmp, CDisplay::DISPLAY_SAME);
+                free(tmp);
+                drawText(display);
+            }
         }
         break;
 
@@ -388,7 +395,7 @@ void CDisplayManager::drawDisplay(CDisplay & display)
         break;
 
     case CDisplay::DISPLAY_DEBUGX:
-        // DEPRECATED
+        // TODO: DEPRECATED fix this function
         //display.setText(m_game->m_lua.getDebugText(), CDisplay::DISPLAY_SAME);
         drawText(display);
         break;
@@ -399,17 +406,25 @@ void CDisplayManager::drawDisplay(CDisplay & display)
 
     case CDisplay::DISPLAY_SCORE:
         score = m_game->getScore();
-        sprintf(tmp, display.templateStr(), score);
-        display.setText(tmp, CDisplay::DISPLAY_SAME);
-        drawText(display);
+        if (asprintf(&tmp, display.templateStr(), score) == -1) {
+            qDebug("malloc failure in CDisplayManager::drawDisplay(CDisplay & display)");
+        } else {
+            display.setText(tmp, CDisplay::DISPLAY_SAME);
+            free(tmp);
+            drawText(display);
+        }
         break;
 
     case CDisplay::DISPLAY_HEALTH_BAR:
         drawHP();
         break;
 
-    //case CDisplay::DISPLAY_MESSAGE:
+    case CDisplay::DISPLAY_MESSAGE:
+        drawText(display);
+        break;
+
     default:
+        qDebug("unknown DisplayType: %d", display.type());
         drawText(display);
     }
 }

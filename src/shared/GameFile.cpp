@@ -597,7 +597,6 @@ bool CGameFile::read(const char *filepath)
             m_fontManager->reset();
         }
 
-
         qDebug("FS[0] %s", m_arrFrames[0]->tag("UUID").c_str());
         qDebug("read done ;) \n");
         return true;

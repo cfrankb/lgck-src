@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include <cstring>
 #include <string>
+#include <stdio.h>
 #include "LuaVM.h"
 #include "FileWrap.h"
 #include "../shared/qtgui/cheat.h"
@@ -43,30 +44,19 @@ void CLuaVM::registerBool(const char* name, bool value)
     lua_setglobal(m_luaState, name);
 }
 
-void CLuaVM::reportErrors( int status )
+void CLuaVM::reportErrors(int status, const char *fnName)
 {
-    if ( status ) {
+    if (status) {
         const char *s =  lua_tostring(m_luaState, -1);
-        char *t = new char[ strlen( s ) + 16 ];
-        const char fmt [] = "-- [%d] %s\n";
-        sprintf(t, fmt, status, s);
-        debug(t);
-        qDebug(fmt,status, s);
-        delete []t;
-        lua_pop(m_luaState, 1); // remove error message
-    }
-}
-
-void CLuaVM::reportErrors( int status, const char *fnName )
-{
-    if ( status ) {
-        const char *s =  lua_tostring(m_luaState, -1);
-        char *t = new char[ strlen( s ) + strlen(fnName) + 16 ];
-        const char fmt[] = "-- [%d] %s in %s\n";
-        sprintf(t, fmt, status, s, fnName);
-        debug(t);
-        qDebug(fmt,status, s, fnName);
-        delete []t;
+        char *t = nullptr;
+        const char *fmt = fnName ? "-- [%d] %s in %s\n" : "-- [%d] %s\n";
+        if (asprintf(&t, fmt, status, s, fnName) == -1) {
+            qDebug("allocation error with asprintf().");
+        } else {
+            debug(t);
+            free(t);
+        }
+        qDebug(fmt, status, s, fnName);
         lua_pop(m_luaState, 1); // remove error message
     }
 }

@@ -34,7 +34,6 @@ public:
 
     CLuaVM();
     ~CLuaVM();
-    char *getDebugText();
     lua_State * getState();
     int exec(const char *luaCode);
 
@@ -44,8 +43,7 @@ public:
     void registerInt(const char *name, int value);
     void registerString(const char *name, const char *value);
     void registerBool(const char* name, bool value);
-    void reportErrors( int status );
-    void reportErrors( int status, const char *fnName );
+    void reportErrors( int status, const char *fnName = nullptr);
 
     // lua interface
     static void setCallback(std::function<void(const char *)> callback);

@@ -66,7 +66,6 @@ protected:
     unsigned int m_gridColor;
     CGame *m_game;
     bool m_hasFocus;
-    bool m_refresh;
     QTimer m_timer;
 
     virtual void initializeGL();
@@ -88,11 +87,9 @@ Q_SIGNALS:
     void versionCheck();
 
 protected slots:
-    void needRefresh();
     void showGrid(bool show);
     void setGridSize(int size);
     void setGridColor(const QString & gridColor);
-    void sceneUpdated();
     friend class CLevelScroll;
 };
 

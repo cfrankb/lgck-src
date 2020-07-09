@@ -59,7 +59,6 @@ void CIMSdl::forget()
 {
     qDebug("CIMSdl::forget()");
     for (int i = 0; i < m_size; ++i) {
-     //   qDebug("CIMSdl::forget() %d",i);
         deleteImageSet(* m_imageSets[i]);
     }
     m_size = 0;

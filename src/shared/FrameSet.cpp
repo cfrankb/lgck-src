@@ -549,15 +549,6 @@ bool CFrameSet::extract(IFile &file, char *out_format)
         uint32_t PtrFirst;
     } USER_MCXHEADER;
 
-    // USER_OBL3UNDO............................................
-    typedef struct {
-        uint32_t PtrUndo[ 10 ];
-        int Bidon[2];
-        uint32_t PtrRedo[ 10 ];
-        uint16_t iNbUndo;
-        uint16_t iNbRedo;
-    } USER_OBL3UNDO;
-
     // USER_OBL3...............................................
     typedef struct {
         uint32_t PtrPrev;

@@ -87,6 +87,7 @@ private:
     int m_start_level;
     bool m_bContinue;
     bool m_bShowToolBox;
+    bool m_bDebugOutput;
     int m_viewMode;
     int m_proto;
     int m_event;    
@@ -257,6 +258,7 @@ private slots:
     void updateFrameSet(const QString & fileName);
     void on_actionMark_All_as_Goals_triggered();
     void on_actionUnmark_All_as_Goals_triggered();
+    void on_actionDebugOutput_toggled(bool arg1);
 
 signals:
     void levelDeleted(int index);
