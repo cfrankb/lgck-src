@@ -10,6 +10,7 @@ public:
 
     CLevelEntry & operator[] (int i);
     void operator = (CSelection & src);
+    void operator += (CSelection & src);
     void addEntry(const CLevelEntry & entry, int index=-1);
     void clear();
     bool isSingle();

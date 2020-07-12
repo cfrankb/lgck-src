@@ -83,5 +83,8 @@
         <file>images/pd/copy.png</file>
         <file>images/pd/gesloten_slot.png</file>
         <file>images/pd/1393320584.png</file>
+        <file>images/strawberrypntbrush.png</file>
+        <file>images/mouse-cursor.png</file>
+        <file>images/ftview-grid.png</file>
     </qresource>
 </RCC>

@@ -155,6 +155,9 @@ public:
 
     CLevel * operator [] (int n);
     CLevel * getLevel(int i);
+    CLevel & getLevelObject(int i);
+    CLevel & getCurrentLevel();
+
     int getLevelByUUID(const char *uuid);
     void insertLevel(int n, CLevel *level);
     void addLevel(CLevel *level);

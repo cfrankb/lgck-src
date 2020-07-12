@@ -83,14 +83,14 @@ void CDlgGotoLevel::initSizes(int px)
     }
 }
 
-int CDlgGotoLevel::getLevel()
+int CDlgGotoLevel::getLevelId()
 {
     return m_ui->cbLevel->currentIndex();
 }
 
-void CDlgGotoLevel::setLevel(int level)
+void CDlgGotoLevel::setLevelId(int levelId)
 {
-    m_ui->cbLevel->setCurrentIndex( level );
+    m_ui->cbLevel->setCurrentIndex( levelId );
 }
 
 void CDlgGotoLevel::on_buttonBox_accepted()

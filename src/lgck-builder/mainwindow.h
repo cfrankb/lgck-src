@@ -87,6 +87,7 @@ private:
     int m_start_level;
     bool m_bContinue;
     bool m_bShowToolBox;
+    bool m_bSpritePaint;
     bool m_bDebugOutput;
     int m_viewMode;
     int m_proto;
@@ -259,6 +260,7 @@ private slots:
     void on_actionMark_All_as_Goals_triggered();
     void on_actionUnmark_All_as_Goals_triggered();
     void on_actionDebugOutput_toggled(bool arg1);
+    void on_actionSprite_Paint_toggled(bool checked);
 
 signals:
     void levelDeleted(int index);

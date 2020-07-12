@@ -62,6 +62,7 @@ public:
     void clearSelection();
     void selectSingle(int i);
     void select(int i);
+    void select(CSelection & selection);
     int getSelectionSize();
     bool isInSelection(int index);
     void removeFromSelection(int index);

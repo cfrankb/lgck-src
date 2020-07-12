@@ -252,7 +252,7 @@ MainWindow::MainWindow(QWidget *parent)
                      ui->actionDebugOutput, SLOT(setChecked(bool)));
 
     CLuaVM::setCallback(newDebugString);
-    emit debugText(QString("hello world\n"));
+    emit debugText(tr("LuaVM ready.\n"));
 
     // reload settings
     reloadSettings();
@@ -338,7 +338,7 @@ void MainWindow::hideView(bool hide)
 
 void MainWindow::focusInEvent ( QFocusEvent * event )
 {
-    m_lview->setFocus();
+   // m_lview->setFocus();
     event->ignore();
 }
 
@@ -473,7 +473,7 @@ void MainWindow::on_actionPrevious_triggered()
 {
     if (m_doc.m_nCurrLevel) {
         --m_doc.m_nCurrLevel;
-        m_lview->setFocus();
+       // m_lview->setFocus();
         repaint();
         updateMenus();
         showLayerName();
@@ -486,7 +486,7 @@ void MainWindow::on_actionNext_triggered()
 {
     if (m_doc.m_nCurrLevel < m_doc.getSize() - 1 ) {
         ++m_doc.m_nCurrLevel;
-        m_lview->setFocus();
+      //  m_lview->setFocus();
         repaint();
         updateMenus();
         showLayerName();
@@ -514,14 +514,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::on_actionOpen_triggered()
 {
     open("");
-    m_lview->setFocus();
+    //m_lview->setFocus();
     updateMenus();
 }
 
 void MainWindow::on_actionSave_triggered()
 {
     save();
-    m_lview->setFocus();
+   // m_lview->setFocus();
 }
 
 void MainWindow::on_actionSave_as_triggered()
@@ -529,7 +529,7 @@ void MainWindow::on_actionSave_as_triggered()
     if (saveAs()) {
         save();
     }
-    m_lview->setFocus();
+   // m_lview->setFocus();
 }
 
 void MainWindow::on_actionRevert_triggered()
@@ -553,7 +553,7 @@ void MainWindow::openRecentFile()
     if (action) {
         open(action->data().toString());
     }
-    m_lview->setFocus();
+  //  m_lview->setFocus();
     updateMenus();
 }
 
@@ -632,7 +632,7 @@ void MainWindow::on_actionLast_level_triggered()
 void MainWindow::on_actionEdit_Level_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CDlgEditLevel *dlg = new CDlgEditLevel(this);
         dlg->setGameDB(&m_doc);
         QString s = QString::asprintf(q2c(tr("Edit level %.3d")), m_doc.m_nCurrLevel + 1);
@@ -654,7 +654,7 @@ void MainWindow::on_actionEdit_Game_Info_triggered()
     d->init();
     d->exec();
     m_toolBox->reload();
-    m_lview->setFocus();
+   // m_lview->setFocus();
     showLayerName();
     reloadLayerCombo();
     delete d;
@@ -761,7 +761,7 @@ void MainWindow::updateMenus()
         bool resultSingle = result;
         bool resultMulti = result;
         if (result) {
-            CLevel & level = * m_doc[m_doc.m_nCurrLevel];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             resultSingle = layer.isSingleSelection();
             resultMulti = layer.getSelectionSize();
@@ -811,7 +811,7 @@ void MainWindow::updateMenus()
         ui->actionEdit_Images->setEnabled( enable );
         ui->actionEdit_Path->setEnabled( enable );
         if (result && m_doc.getSize()) {
-            CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             result = false;
             if (layer.isSingleSelection()) {
@@ -875,7 +875,7 @@ void MainWindow::on_actionDelete_Level_triggered()
         if (ret == QMessageBox::Ok) {
             m_doc.setDirty( true );
             int index = m_doc.m_nCurrLevel;
-            delete m_doc[ m_doc.m_nCurrLevel ] ;
+            delete & m_doc.getCurrentLevel();//m_doc[ m_doc.m_nCurrLevel ] ;
             m_doc.removeLevel ( m_doc.m_nCurrLevel );
             if ( m_doc.m_nCurrLevel > m_doc.getSize() - 1) {
                 -- m_doc.m_nCurrLevel ;
@@ -899,9 +899,9 @@ void MainWindow::on_actionGo_to_level_triggered()
         dlg->setWindowTitle(tr("Go to level..."));
         dlg->setGameDB(& m_doc);
         dlg->init();
-        dlg->setLevel( m_doc.m_nCurrLevel );
+        dlg->setLevelId( m_doc.m_nCurrLevel );
         if (dlg->exec() == QDialog::Accepted) {
-            m_doc.m_nCurrLevel = dlg->getLevel();
+            m_doc.m_nCurrLevel = dlg->getLevelId();
             updateMenus();
             showLayerName();
             reloadLayerCombo();
@@ -918,20 +918,20 @@ void MainWindow::on_actionMove_Level_triggered()
         dlg->setWindowTitle(tr("Move level to..."));
         dlg->setGameDB(& m_doc);
         dlg->init();
-        dlg->setLevel( m_doc.m_nCurrLevel );
+        dlg->setLevelId( m_doc.m_nCurrLevel );
         int indexFrom = m_doc.m_nCurrLevel;
         if (dlg->exec() == QDialog::Accepted
-            && m_doc.m_nCurrLevel != dlg->getLevel()) {
-            int level = dlg->getLevel();
-            CLevel *levelObj = m_doc [ m_doc.m_nCurrLevel ];
-            m_doc.removeLevel( m_doc.m_nCurrLevel );
-            m_doc.insertLevel( level, levelObj );
-            m_doc.m_nCurrLevel = level;
+            && m_doc.m_nCurrLevel != dlg->getLevelId()) {
+            int levelId = dlg->getLevelId();
+            CLevel & level = m_doc.getCurrentLevel();
+            m_doc.removeLevel(m_doc.m_nCurrLevel);
+            m_doc.insertLevel(levelId, &level);
+            m_doc.m_nCurrLevel = levelId;
             m_doc.setDirty( true );
             updateMenus();
             showLayerName();
             reloadLayerCombo();
-            emit levelMoved(indexFrom, level);
+            emit levelMoved(indexFrom, levelId);
         }
         delete dlg;
     }
@@ -941,8 +941,8 @@ void MainWindow::on_actionDelete_Object_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             layer->removeSelectedSprites();
@@ -957,8 +957,8 @@ void MainWindow::on_actionRemove_All_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *level = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer & layer =  * (level->getCurrentLayer());
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer & layer = *(level.getCurrentLayer());
         if (layer.getSelectionSize()) {
             QString msg;
             if (layer.isSingleSelection()) {
@@ -998,7 +998,7 @@ void MainWindow::on_actionSend_to_back_triggered()
     // TODO: implement multi select
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc [ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         int selCount = layer.getSelectionSize();
         if (selCount) {
@@ -1036,7 +1036,7 @@ void MainWindow::on_actionBrint_to_front_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc [ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         int selCount = layer.getSelectionSize();
         if (selCount) {
@@ -1115,8 +1115,8 @@ void MainWindow::on_actionTest_Level_triggered()
         dlg->setContinue(m_bContinue);
         dlg->setExternal(m_runtimeExternal);
         dlg->setRez(m_rez);
-        CLevel * level = m_doc [ m_doc.m_nCurrLevel ];
-        dlg->analyseLevel(level);
+        CLevel & level = m_doc.getCurrentLevel();
+        dlg->analyseLevel(&level);
         if (dlg->exec()) {
             m_skill = dlg->getSkill();
             m_start_hp = dlg->getHP();
@@ -1167,7 +1167,7 @@ void MainWindow::on_actionTest_Level_triggered()
         }
         delete dlg;
     }
-    m_lview->setFocus();
+    //m_lview->setFocus();
 }
 
 void MainWindow::testLevel(bool initSound)
@@ -1272,7 +1272,7 @@ void MainWindow::handleGameEvents()
 
 void MainWindow::viewEvent()
 {
-    m_lview->setFocus();
+   // m_lview->setFocus();
     switch (m_viewMode) {
     case VM_GAME:
         handleGameEvents();
@@ -1366,7 +1366,7 @@ void MainWindow::showLayerName()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         QString s = QString("%1: %2").arg(m_doc.m_nCurrLevel+1)
                     .arg(layer.getName());
@@ -1385,8 +1385,8 @@ void MainWindow::on_actionGo_to_layer_triggered()
         dlg->setGameDB(&m_doc);
         dlg->initLayers(m_doc.m_nCurrLevel);
         if (dlg->exec()) {
-            CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
-            int layerId = dlg->getLevel();
+            CLevel & level = m_doc.getCurrentLevel();
+            int layerId = dlg->getLevelId();
             level.setCurrentLayerById(layerId);
             showLayerName();
             reloadLayerCombo();
@@ -1405,8 +1405,8 @@ void MainWindow::on_actionMove_Layer_triggered()
         dlg->setGameDB(&m_doc);
         dlg->initLayers(m_doc.m_nCurrLevel);
         if (dlg->exec()) {
-            CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
-            int to = dlg->getLevel();
+            CLevel & level = m_doc.getCurrentLevel();
+            int to = dlg->getLevelId();
             int from = level.getCurrentLayerById();
             if (to != from) {
                 CLayer * layer = level.removeLayerById(from);
@@ -1427,7 +1427,7 @@ void MainWindow::on_actionCreate_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CDlgLayer * dlg = new CDlgLayer(this);
         dlg->setWindowTitle(tr("Create new layer"));
         if (dlg->exec()) {
@@ -1459,7 +1459,7 @@ void MainWindow::on_actionDelete_layer_triggered()
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
 
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int layerId = level.getCurrentLayerById();
         CLayer * layer = level.getCurrentLayer();
         // TODO: detect main layer by type
@@ -1487,7 +1487,7 @@ void MainWindow::on_actionPrevious_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int layerId = level.getCurrentLayerById();
         if (layerId) {
             level.setCurrentLayerById(--layerId);
@@ -1502,7 +1502,7 @@ void MainWindow::on_actionNext_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int layerId = level.getCurrentLayerById();
         if (layerId < level.getSize() - 1) {
             level.setCurrentLayerById(++layerId);
@@ -1517,7 +1517,7 @@ void MainWindow::on_actionEdit_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         // TODO: detect main layer by type
         CLayer * layer = level.getCurrentLayer();
         if (layer->getType() != CLayer::LAYER_MAIN) {
@@ -1653,6 +1653,9 @@ void MainWindow::initToolBar()
     m_levelToolbar->addAction(ui->actionCut);
     m_levelToolbar->addAction(ui->actionPaste);
     m_levelToolbar->addAction(ui->actionDelete);
+    m_levelToolbar->addSeparator();
+    m_levelToolbar->addAction(ui->actionSprite_Paint);
+    ui->actionSprite_Paint->setIcon(QIcon(":/images/strawberrypntbrush.png"));
     addToolBar(m_levelToolbar);
 
     connect(m_comboEvents, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
@@ -1672,7 +1675,7 @@ void MainWindow::comboChanged(int v)
     if (v != 0){
         --v;
         if (m_viewMode == VM_EDITOR && m_doc.getSize()) {
-            CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             if (layer.isSingleSelection()) {
                 CLevelEntry entry = layer.getSelection(0);
@@ -1746,7 +1749,7 @@ void MainWindow::on_actionView_Source_triggered()
 void MainWindow::on_actionEdit_Object_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             CLevelEntry entry = layer.getSelection(0);
@@ -1769,7 +1772,7 @@ void MainWindow::on_actionEdit_Object_triggered()
 void MainWindow::on_actionCustomize_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             CDlgEntry *d = new CDlgEntry(this);
@@ -1819,7 +1822,7 @@ void MainWindow::showContextMenu(const QPoint& pos)
     // TODO: disable in game mode
     if (!(m_viewMode == VM_GAME)) {
         if (m_doc.getSize()) {
-            CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             int x = pos.x() & 0xfff8;
             int y = pos.y() & 0xfff8;
@@ -1882,7 +1885,7 @@ void MainWindow::reloadLayerCombo()
     bool enable = false;
     m_comboLayers->clear();
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int currLayer = level.getCurrentLayerById();
         for (int i=0; i < level.getSize(); ++i) {
             CLayer & layer = level[i];
@@ -1904,7 +1907,7 @@ void MainWindow::reloadEventCombo()
     }
     bool set = false;
     if (m_doc.getSize() && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             CLevelEntry & entry = layer.getSelection(0);
@@ -2070,7 +2073,7 @@ void MainWindow::changeViewMode()
 void MainWindow::on_actionView_Code_triggered()
 {
     if (m_doc.getSize() && (m_viewMode == VM_EDITOR)) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             if (m_viewMode != VM_SPRITE_EVENTS) {
@@ -2125,8 +2128,8 @@ void MainWindow::on_actionCut_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             // copy sprites to clippy
@@ -2137,7 +2140,7 @@ void MainWindow::on_actionCut_triggered()
                 int j = layer->getSelectionIndex(i);
                 clipboard->addEntry(entry, j);
             }
-            clipboard->applyDelta(script->m_mx, script->m_my);
+            clipboard->applyDelta(level.m_mx, level.m_my);
             layer->removeSelectedSprites();
             m_doc.setDirty(true);
             m_lview->repaint();
@@ -2150,8 +2153,8 @@ void MainWindow::on_actionCopy_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             // copy sprites tp clippy
@@ -2162,7 +2165,7 @@ void MainWindow::on_actionCopy_triggered()
                 int j = layer->getSelectionIndex(i);
                 clipboard->addEntry(entry,j);
             }
-            clipboard->applyDelta(script->m_mx, script->m_my);
+            clipboard->applyDelta(level.m_mx, level.m_my);
             updateMenus();
         }
     }
@@ -2171,7 +2174,7 @@ void MainWindow::on_actionCopy_triggered()
 void MainWindow::on_actionPaste_triggered()
 {
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         CSelection *clipboard = m_doc.getClipboard();
         int selCount = clipboard->getSize();
@@ -2197,8 +2200,8 @@ void MainWindow::on_actionDelete_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             int selCount = layer->getSelectionSize();
@@ -2219,7 +2222,7 @@ void MainWindow::on_actionDelete_triggered()
 void MainWindow::on_actionCopy_Object_triggered()
 {
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         int selCount = layer.getSelectionSize();
         if (selCount) {
@@ -2533,7 +2536,7 @@ void MainWindow::setVisible(bool visible)
 void MainWindow::on_actionEdit_Path_triggered()
 {
     if (m_doc.getSize() && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         CPathBlock & paths = *(m_doc.getPaths());
         int selCount = layer.getSelectionSize();
@@ -2588,7 +2591,7 @@ void MainWindow::layerChanged(int layerId)
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()
         && layerId != -1) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         level.setCurrentLayerById(layerId);
         showLayerName();
     }
@@ -2604,7 +2607,7 @@ void MainWindow::on_actionLayer_ToolBar_toggled(bool arg1)
 void MainWindow::closePath()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         CLevelEntry & entry = layer[m_pathEntry];
         CPathBlock & paths = *(m_doc.getPaths());
@@ -2710,7 +2713,7 @@ void MainWindow::on_actionReset_Font_Size_triggered()
 void MainWindow::on_actionEdit_Images_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             CLevelEntry entry = layer.getSelection(0);
@@ -2879,8 +2882,8 @@ void MainWindow::changeEvent(QEvent* e)
  {
      if (m_doc.getSize()
              && m_viewMode == VM_EDITOR) {
-         CLevel *level = m_doc [ m_doc.m_nCurrLevel ];
-         CLayer & layer =  * (level->getCurrentLayer());
+         CLevel & level = m_doc.getCurrentLevel();
+         CLayer & layer = *(level.getCurrentLayer());
          if (layer.getSelectionSize()) {
              QString msg;
              if (layer.isSingleSelection()) {
@@ -2943,4 +2946,9 @@ void MainWindow::on_actionDebugOutput_toggled(bool arg1)
 {
     ui->actionDebugOutput->setChecked(arg1);
     arg1 ? m_infoDock->show() : m_infoDock->hide();
+}
+
+void MainWindow::on_actionSprite_Paint_toggled(bool checked)
+{
+    m_bSpritePaint = checked;
 }

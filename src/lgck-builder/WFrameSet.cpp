@@ -323,12 +323,12 @@ void CWFrameSet::sliceImage()
         int j = index;
         CFrame *frame = (*m_frameSet)[j];
         dlg->initSizes(std::max(frame->m_nLen, frame->m_nHei));
-        dlg->setLevel( 0 );
+        dlg->setLevelId( 0 );
         if (dlg->exec() == QDialog::Accepted) {
             int sizes[] = {
                 16, 24, 32, 48, 64, 96, 128, 256
             };
-            int pxSize = sizes[dlg->getLevel()];
+            int pxSize = sizes[dlg->getLevelId()];
             CFrameSet *frames = frame->split(pxSize);
             model()->removeRow(j);
             m_frameSet->removeAt(j);

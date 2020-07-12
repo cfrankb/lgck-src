@@ -149,9 +149,24 @@ void CSelection::operator =(CSelection & s)
         delete [] m_entries;
     }
 
+    if (m_index) {
+        delete [] m_index;
+    }
+
     m_entries = new CLevelEntry[s.getSize()];
+    m_index = new int[s.getSize()];
+    m_size = s.getSize();
+    m_max = m_size;
     for (int i=0; i < s.getSize(); ++i) {
         m_entries[i] = s[i];
+        m_index[i] = s.getIndex(i);
+    }
+}
+
+void CSelection::operator +=(CSelection & s)
+{
+    for (int i=0; i < s.getSize(); ++i) {
+        addEntry(s[i], s.getIndex(i));
     }
 }
 

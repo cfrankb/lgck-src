@@ -216,9 +216,9 @@ bool CLevelViewGL::isGameMode()
 
 void CLevelViewGL::drawScreen()
 {
-    CLevel & level = * (*m_game)[m_game->m_nCurrLevel];
-    int mx = 0;//horizontalScrollBar()->value();
-    int my = 0;//verticalScrollBar()->value();
+    CLevel & level = m_game->getCurrentLevel();
+    int mx = 0;
+    int my = 0;
     emit scrollStatusResync(mx, my);
 
     QSize sz = size();
@@ -330,9 +330,9 @@ void CLevelViewGL::drawGrid()
 void CLevelViewGL::drawItemRect()
 {
     QSize sz = size();
-    if (m_game && m_game->m_nLevels) {
+    if (m_game && m_game->getSize()) {
         CGame & gf = *m_game;
-        CLevel & level = *(gf[gf.m_nCurrLevel]);
+        CLevel & level = m_game->getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         float red = (rand() & 255) / 255.0f;
         float green = (rand() & 255) / 255.0f;

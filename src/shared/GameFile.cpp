@@ -861,3 +861,13 @@ CFrameArray & CGameFile::frames()
 {
     return m_arrFrames;
 }
+
+CLevel & CGameFile::getLevelObject(int i)
+{
+    return * m_arrLevels[i];
+}
+
+CLevel & CGameFile::getCurrentLevel()
+{
+    return getLevelObject(m_nCurrLevel);
+}

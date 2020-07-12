@@ -197,7 +197,6 @@ public:
 
     bool initFonts();
     bool initSounds();
-    char *m_keys;
     void attach(IImageManager *im);
     void attach(IGraphics *gr);
     void attach(IMusic *mu);
@@ -297,8 +296,6 @@ public:
 
     //////////////////////////////////////////////////////////////////
     // Game variables
-    int m_screenLen;
-    int m_screenHei;
     int BUFFERLEN;
     int BUFFERHEI;
     unsigned long long m_startTime;
@@ -310,6 +307,7 @@ public:
     int m_mx;
     int m_my;
     CInventoryTable *m_inventoryTable;
+    char *m_keys;
 
     /////////////////////////////////////////////////////////////////
     // static
@@ -352,6 +350,9 @@ protected:
     ISound *m_sound;
     CSnapshot *m_snapshot;
     CTasks *m_tasks;
+
+    int m_screenLen;
+    int m_screenHei;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -14,6 +14,7 @@
 #include "Path.h"
 #include "PathBlock.h"
 #include "Frame.h"
+#include "Selection.h"
 #include "inputs/qt/kt_qt.h"
 #include "qtgui/cheat.h"
 
@@ -115,10 +116,10 @@ void CLevelScroll::mousePressEvent ( QMouseEvent * event )
             gf.triggerMouseEvent(m_mouse.x, m_mouse.y, event->button());
         }
     } else {
-        if (m_game && m_game->m_nLevels && m_mouse.lButton
+        if (m_game && m_game->getSize() && m_mouse.lButton
                 && !m_editPath) {
             CGameFile & gf = *m_game;
-            CLevel & level = *(gf[gf.m_nCurrLevel]);
+            CLevel & level = m_game->getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             if (m_mouse.lButton || m_mouse.rButton) {
                 int oldCurrEntry = layer.getSelectionIndex(0);
@@ -167,7 +168,6 @@ void CLevelScroll::mousePressEvent ( QMouseEvent * event )
 void CLevelScroll::mouseReleaseEvent ( QMouseEvent * event )
 {
     //qDebug("mouseReleaseEvent");
-
     switch (event->button())
     {
     case Qt::LeftButton:
@@ -186,10 +186,9 @@ void CLevelScroll::mouseReleaseEvent ( QMouseEvent * event )
     if (!m_mouse.lButton) {
         m_mouse.drag = false;
     }
-    if (!this->isGameMode() && m_game && m_game->m_nLevels
+    if (!this->isGameMode() && m_game && m_game->getSize()
             && !m_editPath) {
-        CGameFile & gf = *m_game;
-        CLevel & level = *(gf[gf.m_nCurrLevel]);
+        CLevel & level = m_game->getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (!layer.getSelectionSize()
                 && !m_mouse.lButton
@@ -197,13 +196,18 @@ void CLevelScroll::mouseReleaseEvent ( QMouseEvent * event )
                 && m_mouse.orgY != -1) {
             QPoint pointS (m_mouse.orgX, m_mouse.orgY);
             QPoint pointE (m_mouse.destX, m_mouse.destY);
-            int x1 = std::min(pointS.x(), pointE.x());
-            int x2 = std::max(pointS.x(), pointE.x());
-            int y1 = std::min(pointS.y(), pointE.y());
-            int y2 = std::max(pointS.y(), pointE.y());
-            select(x1,y1,x2,y2);
+            int x1 = std::min(pointS.x(), pointE.x()) + level.m_mx;
+            int x2 = std::max(pointS.x(), pointE.x()) + level.m_mx;
+            int y1 = std::min(pointS.y(), pointE.y()) + level.m_my;
+            int y2 = std::max(pointS.y(), pointE.y()) + level.m_my;
+            CSelection selection;
+            select(x1, y1, x2, y2, selection);
             m_mouse.orgX = -1;
             m_mouse.orgY = -1;
+            if (selection.getSize()) {
+                emit menuChanged();
+                layer.select(selection);
+            }
         }
     }
 }
@@ -219,12 +223,12 @@ void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
     if (!this->isGameMode() && !m_editPath) {
         QString s = "";
         if (m_mouse.x >= 0 && m_mouse.y >= 0) {
-           s = tr("x=%1 y=%2").arg(m_mouse.x).arg(m_mouse.y);
+           s = tr("x = %1 y = %2").arg(m_mouse.x).arg(m_mouse.y);
         }
         emit statusChanged(0, s);
-        if (m_game && m_game->m_nLevels) {
+        if (m_game && m_game->getSize()) {
             CGame & gf = *m_game;
-            CLevel & level = *(gf[gf.m_nCurrLevel]);
+            CLevel & level = m_game->getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             if (layer.getSelectionSize()) {
                 for (int i=0; i < layer.getSelectionSize(); ++i) {
@@ -277,9 +281,9 @@ void CLevelScroll::editPath()
     emit statusChanged(0, tr("Editing Path : SPACE to Save / ESC to Cancel"));
     ++m_ticks;
     //setFocus();
-    if (m_game && m_game->m_nLevels) {
+    if (m_game && m_game->getSize()) {
         CGame & gf = *m_game;
-        CLevel & level = *(gf[gf.m_nCurrLevel]);
+        CLevel & level = m_game->getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         bool endPath = false;
         // if single selection
@@ -397,7 +401,7 @@ void CLevelScroll::dropEvent(QDropEvent *event)
 
     QPoint pos = event->pos();
     if (event->source() && gf.getSize()
-            && !memcmp(q2c(t), "LGCK:", 5)) {
+            && t.mid(0, 5) == "LGCK:") {
 
         int offsetX = 0x10;
         int offsetY = 0x10;
@@ -406,7 +410,7 @@ void CLevelScroll::dropEvent(QDropEvent *event)
         int protoId = s.toInt( &ok, 10 );
 
         CProto & proto = gf.m_arrProto[protoId];
-        CLevel & level = * gf[ gf.m_nCurrLevel ];
+        CLevel & level = m_game->getCurrentLevel();
         CLevelEntry entry;
         entry.m_nProto = protoId;
         entry.m_nX = level.m_mx + (pos.x() & 0xfff8) + offsetX;
@@ -472,200 +476,221 @@ void CLevelScroll::leaveEditPath()
     m_editPath = false;
 }
 
+void CLevelScroll::scrollFastMargin(int & mx, int & my)
+{
+    const QSize sz = size();
+
+    // this is conditional to the mouse
+    // being inside the view's margin
+    if (m_mouse.lButton) {
+        if (m_mouse.x < MARGIN && m_mouse.x >= 0) {
+            if (mx > FAST_SCROLL) {
+                mx -= FAST_SCROLL;
+            } else {
+                mx = 0;
+            }
+        }
+
+        if (m_mouse.x >= sz.width() - MARGIN
+            && m_mouse.x < sz.width()) {
+            mx += FAST_SCROLL;
+        }
+
+        if (m_mouse.y < MARGIN && m_mouse.y >= 0) {
+            if (my > FAST_SCROLL) {
+                my -= FAST_SCROLL;
+            } else {
+                my = 0;
+            }
+        }
+
+        if (m_mouse.y >= sz.height() - MARGIN
+            && m_mouse.y < sz.height()) {
+            my += FAST_SCROLL;
+        }
+    }
+}
+
+void CLevelScroll::scrollFastByKeys(int & mx, int & my)
+{
+    // scroll using keyboard arrow keys
+    if (m_game->testKey(lgck::Key::Up) && my) {
+        if (my > FAST_SCROLL) {
+            my -= FAST_SCROLL;
+        } else {
+            my = 0;
+        }
+    }
+
+    if (m_game->testKey(lgck::Key::Down)) {
+        my += FAST_SCROLL;
+    }
+
+    if (m_game->testKey(lgck::Key::Left) && mx) {
+        if (mx > FAST_SCROLL) {
+            mx -= FAST_SCROLL;
+        } else {
+            mx = 0;
+        }
+    }
+
+    if (m_game->testKey(lgck::Key::Right)) {
+        mx += FAST_SCROLL;
+    }
+}
+
+void CLevelScroll::slowPrecisionPlacement(int & mx, int & my, CLevelEntry & entry)
+{
+    const QSize sz = size();
+    CGame & gf = *m_game;
+    CFrameSet & filter = gf.toFrameSet(entry.m_nFrameSet);
+    CFrame & frame = gf.toFrame(entry);
+
+    // change frame ++
+    if (m_game->testKey(lgck::Key::RBracket) ) {
+        if (entry.m_nFrameNo < filter.getSize() -1){
+            ++entry.m_nFrameNo;
+            gf.setDirty(true);
+        }
+    }
+
+    // change frame --
+    if (m_game->testKey(lgck::Key::LBracket)) {
+        if (entry.m_nFrameNo >0){
+            --entry.m_nFrameNo;
+            gf.setDirty(true);
+        }
+    }
+
+    // precision scrolling
+    int scroll = OBJ_SCROLL;
+    if (m_game->testKey(lgck::Key::LShift)) {
+        scroll /= 2;
+    }
+
+    // move up
+    if (m_game->testKey(lgck::Key::Up) && entry.m_nY) {
+        if (entry.m_nY > scroll)
+            entry.m_nY -= scroll;
+        else
+            entry.m_nY = 0;
+
+        if (entry.m_nY < my) {
+            my = entry.m_nY;
+        }
+        gf.setDirty(true);
+    }
+
+    // move down
+    if (m_game->testKey(lgck::Key::Down)) {
+        entry.m_nY += scroll;
+        gf.setDirty(true);
+    }
+
+    if (entry.m_nY + frame.m_nHei > my + sz.height() - scroll) {
+        my += scroll;
+    }
+
+    // move left
+    if (m_game->testKey(lgck::Key::Left) && entry.m_nX) {
+        if (entry.m_nX > scroll)
+            entry.m_nX -= scroll;
+        else
+            entry.m_nX = 0;
+
+        if (entry.m_nX < mx) {
+            mx = entry.m_nX;
+        }
+        gf.setDirty(true);
+    }
+
+    // move right
+    if (m_game->testKey(lgck::Key::Right)) {
+        entry.m_nX += scroll;
+        gf.setDirty(true);
+    }
+
+    if (entry.m_nX + frame.m_nLen > mx + sz.width()) {
+        mx += scroll;
+    }
+}
+
+void CLevelScroll::alignEntry(CLevelEntry & entry)
+{
+    CGame & gf = *m_game;
+    if (entry.m_nX & 15 ||
+            entry.m_nY & 15) {
+        gf.setDirty(true);
+    }
+
+    entry.m_nX &= 0xfff0;
+    entry.m_nY &= 0xfff0;
+}
+
+void CLevelScroll::changeOriginFromEntry(int & mx, int & my, const CLevelEntry& entry)
+{
+    if (entry.m_nY < my) {
+        if (my < FAST_SCROLL) {
+            my = 0;
+        } else {
+            my -= FAST_SCROLL;
+        }
+    }
+
+    if (entry.m_nX < mx) {
+        if (mx < FAST_SCROLL) {
+            mx = 0;
+        } else {
+            mx -= FAST_SCROLL;
+        }
+    }
+}
+
 void CLevelScroll::eventHandler()
 {
-    QSize sz = size();
     int mx = horizontalScrollBar()->value();
     int my = verticalScrollBar()->value();
     int oldMX = mx;
     int oldMY = my;
-    ++m_ticks;
+    ++ m_ticks;
     //setFocus();
-    if (m_game && m_game->m_nLevels) {
-        CGame & gf = *m_game;
-        CLevel & level = *(gf[gf.m_nCurrLevel]);
+    if (m_game && m_game->getSize()) {
+        CLevel & level = m_game->getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         // scroll the screen when the mouse is
-        // within the page margin
-        // return home
+        // within the page margin return home
         if (m_game->testKey(lgck::Key::Home)) {
             layer.clearSelection();
             my = mx = 0;
         }
+        scrollFastMargin(mx, my);
 
-        if (!m_mouse.noScroll
-            && m_mouse.lButton) {
-            // this is conditional to the mouse
-            // being inside the view
-            if (m_mouse.x < MARGIN && m_mouse.x >= 0) {
-                if (mx > FAST_SCROLL) {
-                    mx -= FAST_SCROLL;
-                } else {
-                    mx = 0;
-                }
-            }
-
-            if (m_mouse.x >= sz.width() - MARGIN
-                && m_mouse.x < sz.width()) {
-                mx += FAST_SCROLL;
-            }
-
-            if (m_mouse.y < MARGIN && m_mouse.y >= 0) {
-                if (my > FAST_SCROLL) {
-                    my -= FAST_SCROLL;
-                } else {
-                    my = 0;
-                }
-            }
-
-            if (m_mouse.y >= sz.height() - MARGIN
-                && m_mouse.y < sz.height()) {
-                my += FAST_SCROLL;
-            }
-        }
-
-        // apply screen translations to the selected
-        // object
-
+        // compute screen translations for the selected
+        // sprites
         int tX = mx - oldMX;
         int tY = my - oldMY;
 
-        // if no object is selected
+        // if no sprite is selected
         if (layer.getSelectionSize() == 0) {
-            if (m_game->testKey(lgck::Key::Up) && my) {
-                if (my > FAST_SCROLL) {
-                    my -= FAST_SCROLL;
-                } else {
-                    my = 0;
-                }
-            }
-
-            if (m_game->testKey(lgck::Key::Down)) {
-                my += FAST_SCROLL;
-            }
-
-            if (m_game->testKey(lgck::Key::Left) && mx) {
-                if (mx > FAST_SCROLL) {
-                    mx -= FAST_SCROLL;
-                } else {
-                    mx = 0;
-                }
-            }
-
-            if (m_game->testKey(lgck::Key::Right)) {
-                mx += FAST_SCROLL;
-            }
-
-            ///////////////////////////////
-
-            QString s = QString(tr("topX=%1 topY=%2")).arg(mx).arg(my);
+            scrollFastByKeys(mx, my);
+            QString s = QString(tr("topX = %1 topY = %2")).arg(mx).arg(my);
             emit statusChanged(1, s);
-
         } else {
-            // manage this one object
+            // manage the selection
             CLayer & layer = * level.getCurrentLayer();
-            for (int z=0; z < layer.getSelectionSize(); ++z) {
-                CLevelEntry & entry = layer.getSelection(z);//layer[layer.m_currEntry];
-                CFrameSet & filter = gf.toFrameSet(entry.m_nFrameSet);
-                CFrame & frame = gf.toFrame(entry);
-                if (entry.m_nY < my) {
-                    if (my < FAST_SCROLL) {
-                        my = 0;
-                    } else {
-                        my -= FAST_SCROLL;
-                    }
-                }
+            for (int z = 0; z < layer.getSelectionSize(); ++z) {
+                CLevelEntry & entry = layer.getSelection(z);
+                changeOriginFromEntry(mx, my, entry);
 
-                if (entry.m_nX < mx) {
-                    if (mx < FAST_SCROLL) {
-                        mx = 0;
-                    } else {
-                        mx -= FAST_SCROLL;
-                    }
-                }
-
-                // align object
+                // align sprite
                 if (m_game->testKey(lgck::Key::LControl)
                         && m_game->testKey(lgck::Key::A)) {
-                    if (entry.m_nX & 15 ||
-                            entry.m_nY & 15) {
-                        gf.setDirty(true);
-                    }
-
-                    entry.m_nX &= 0xfff0;
-                    entry.m_nY &= 0xfff0;
+                    alignEntry(entry);
                 }
 
-                // slowdown editor for precision
-                // placement
+                // slowdown editor for precision placement
                 if (m_ticks % 2 == 0) {
-                    // change frame ++
-                    if (m_game->testKey(lgck::Key::RBracket) ) {
-                        if (entry.m_nFrameNo < filter.getSize() -1){
-                            ++entry.m_nFrameNo;
-                            gf.setDirty(true);
-                        }
-                    }
-
-                    // change frame --
-                    if (m_game->testKey(lgck::Key::LBracket)) {
-                        if (entry.m_nFrameNo >0){
-                            --entry.m_nFrameNo;
-                            gf.setDirty(true);
-                        }
-                    }
-
-                    // precision scrolling
-                    int scroll = OBJ_SCROLL;
-                    if (m_game->testKey(lgck::Key::LShift)) {
-                        scroll /= 2;
-                    }
-
-                    // move up
-                    if (m_game->testKey(lgck::Key::Up) && entry.m_nY) {
-                        if (entry.m_nY > scroll)
-                            entry.m_nY -= scroll;
-                        else
-                            entry.m_nY = 0;
-
-                        if (entry.m_nY < my) {
-                            my = entry.m_nY;
-                        }
-                        gf.setDirty(true);
-                    }
-
-                    // move down
-                    if (m_game->testKey(lgck::Key::Down)) {
-                        entry.m_nY += scroll;
-                        gf.setDirty(true);
-                    }
-
-                    if (entry.m_nY + frame.m_nHei > my + sz.height() - scroll) {
-                        my += scroll;
-                    }
-
-                    // move left
-                    if (m_game->testKey(lgck::Key::Left) && entry.m_nX) {
-                        if (entry.m_nX > scroll)
-                            entry.m_nX -= scroll;
-                        else
-                            entry.m_nX = 0;
-
-                        if (entry.m_nX < mx) {
-                            mx = entry.m_nX;
-                        }
-                        gf.setDirty(true);
-                    }
-
-                    // move right
-                    if (m_game->testKey(lgck::Key::Right)) {
-                        entry.m_nX += scroll;
-                        gf.setDirty(true);
-                    }
-
-                    if (entry.m_nX + frame.m_nLen > mx + sz.width()) {
-                        mx += scroll;
-                    }
+                    slowPrecisionPlacement(mx, my, entry);
                 }
 
                 // de-select object
@@ -674,20 +699,21 @@ void CLevelScroll::eventHandler()
                     layer.clearSelection();
                     emit menuChanged();
                 }
-
-                QString s;
-                if (!layer.isMultiSelection()) {
-                    s = QString(tr("Object: x=%1 y=%2")).arg(entry.m_nX).arg(entry.m_nY);
-                } else {
-                    s = tr("multiple selection");
-                }
-                emit statusChanged(1, s);
             }
+            QString s;
+            if (!layer.isMultiSelection()) {
+                CLevelEntry & entry = layer.getSelection(0);
+                s = QString(tr("Sprite: x = %1 y = %2")).arg(entry.m_nX).arg(entry.m_nY);
+            } else {
+                s = tr("Multiple selections");
+            }
+            emit statusChanged(1, s);
         }
 
         // ensures that screen is within valid
         // worldview coordonates
 
+        const QSize sz = size();
         int maxMX = MAX_PIXEL - sz.width();
         int maxMY = MAX_PIXEL - sz.height();
 
@@ -702,10 +728,10 @@ void CLevelScroll::eventHandler()
         if (layer.getSelectionSize()
             && m_mouse.drag) {
             //TODO: revisit this code
-            for (int i=0; i<layer.getSelectionSize(); ++i) {
+            for (int i = 0; i < layer.getSelectionSize(); ++i) {
                 CLevelEntry & entry = layer.getSelection(i);
-                entry.m_nX = std::max ( entry.m_nX + tX, 0);
-                entry.m_nY = std::max ( entry.m_nY + tY, 0);
+                entry.m_nX = std::max(entry.m_nX + tX, 0);
+                entry.m_nY = std::max(entry.m_nY + tY, 0);
             }
         }
 
@@ -720,16 +746,10 @@ void CLevelScroll::eventHandler()
     }
 }
 
-void CLevelScroll::select(int x1, int y1, int x2, int y2)
+void CLevelScroll::select(int x1, int y1, int x2, int y2, CSelection & selection)
 {
-    CGameFile & gf = *m_game;
-    CLevel & level = *(gf[gf.m_nCurrLevel]);
+    CLevel & level = m_game->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
-    x1 += level.m_mx;
-    x2 += level.m_mx;
-    y1 += level.m_my;
-    y2 += level.m_my;
-    bool hasSelected = false;
     for (int i=0; i < layer.getSize(); ++i) {
         CLevelEntry & entry = layer[i];
         CFrame & frame = m_game->toFrame(entry);
@@ -741,12 +761,8 @@ void CLevelScroll::select(int x1, int y1, int x2, int y2)
                  || (entry.m_nY <= y1 && entry.m_nY + frame.m_nHei >= y1)
                  || (entry.m_nY <= y2 && entry.m_nY + frame.m_nHei >= y2))
                 ) {
-            layer.select(i);
-            hasSelected = true;
+            selection.addEntry(entry, i);
         }
-    }
-    if (hasSelected) {
-        emit menuChanged();
     }
 }
 
@@ -754,8 +770,8 @@ void CLevelScroll::changeLevel(int i)
 {
     qDebug("IN  changeLevel(int) %d **************", i);
     CLevel * level = NULL;
-    if (m_game && m_game->m_nLevels) {
-        level = (*m_game)[m_game->m_nCurrLevel];
+    if (m_game && m_game->getSize()) {
+        level = & m_game->getCurrentLevel();
     }
     updateScrollbars(level ? MAX_PIXEL : 1, level ? MAX_PIXEL : 1);
     update();
@@ -768,10 +784,8 @@ void CLevelScroll::changeLevel(int i)
 
 void CLevelScroll::showScrollbars(bool show)
 {
-    qDebug("IN showScrollbars()--------");
     updateScrollbars(show ? MAX_PIXEL : 1, show ? MAX_PIXEL : 1);
     update();
-    qDebug("OUT showScrollbars()--------");
 }
 
 void CLevelScroll::mousePos(int &orgX, int &orgY, int &destX, int &destY)
@@ -784,19 +798,17 @@ void CLevelScroll::mousePos(int &orgX, int &orgY, int &destX, int &destY)
 
 void CLevelScroll::mxChanged(int mx)
 {
-    //qDebug("mxChanged");
-    if (m_game && m_game->m_nLevels) {
-        CLevel * level = (*m_game)[m_game->m_nCurrLevel];
-        level->m_mx = mx;
+    if (m_game && m_game->getSize()) {
+        CLevel & level = m_game->getCurrentLevel();
+        level.m_mx = mx;
     }
 }
 
 void CLevelScroll::myChanged(int my)
 {
-    //qDebug("myChanged");
-    if (m_game && m_game->m_nLevels) {
-        CLevel * level = (*m_game)[m_game->m_nCurrLevel];
-        level->m_my = my;
+    if (m_game && m_game->getSize()) {
+        CLevel & level = m_game->getCurrentLevel();
+        level.m_my = my;
     }
 }
 
@@ -823,13 +835,11 @@ void CLevelScroll::keyReflector(const QKeyEvent *event, bool pressed)
 
 void CLevelScroll::keyPressEvent ( QKeyEvent * event )
 {
-    //qDebug("keyPressedEvent");
     keyReflector(event, true);
 }
 
 void CLevelScroll::keyReleaseEvent ( QKeyEvent * event )
 {
-    //qDebug("keyPressedReleased");
     keyReflector(event, false);
 }
 

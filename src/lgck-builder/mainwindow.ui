@@ -1077,6 +1077,33 @@
     <string>Show/hide Debug Output Window.</string>
    </property>
   </action>
+  <action name="actionSprite_Select">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/images/mouse-cursor.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Sprite Select</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Sprite Select</string>
+   </property>
+  </action>
+  <action name="actionSprite_Paint">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sprite Paint</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Sprite Paint</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

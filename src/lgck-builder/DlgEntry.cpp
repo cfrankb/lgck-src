@@ -88,7 +88,7 @@ void CDlgEntry::load(const int entryPos)
 {
     m_entry = entryPos;
     CGameFile &gf = *((CGameFile*)m_gameFile);
-    CLevel & level = (* gf[gf.m_nCurrLevel]);
+    CLevel & level = m_gameFile->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];
     m_ui->cbTriggerKey->setCurrentIndex( entry.m_nTriggerKey & TRIGGER_KEYS );
@@ -230,8 +230,7 @@ void CDlgEntry::enableCheckboxes()
 void CDlgEntry::save(const int entryPos)
 {
     CGameFile &gf = *((CGameFile*)m_gameFile);
-
-    CLevel & level = (* gf[gf.m_nCurrLevel]);
+    CLevel & level = m_gameFile->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];
     entry.m_nTriggerKey = m_ui->cbTriggerKey->currentIndex();

@@ -360,6 +360,11 @@ void CLayer::select(int i)
     m_selection.addEntry(m_arrEntries[i], i);
 }
 
+void CLayer::select(CSelection & selection)
+{
+    m_selection += selection;
+}
+
 int CLayer::getSelectionSize()
 {
     return m_selection.getSize();

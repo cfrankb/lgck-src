@@ -36,8 +36,8 @@ public:
         m_gameFile = p;
     }
 
-    int getLevel();
-    void setLevel(int level);
+    int getLevelId();
+    void setLevelId(int levelId);
 
     void init();
     void initLayers(int levelId);

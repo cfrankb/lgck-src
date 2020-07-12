@@ -599,18 +599,18 @@ void CDlgGame::on_treeFrameSets_itemSelectionChanged()
 void CDlgGame::on_treeLevels_doubleClicked(QModelIndex index)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    int level = index.row();
-    CLevel & levelObj = *gf.m_arrLevels[ level ];
+    int levelId = index.row();
+    CLevel & levelObj = gf.getLevelObject(levelId);
     CDlgEditLevel *dlg = new CDlgEditLevel(this);
     dlg->setGameDB(m_gameFile);
-    QString s = QString::asprintf(q2c(tr("Edit level %.3d")), level + 1);
+    QString s = QString::asprintf(q2c(tr("Edit level %.3d")), levelId + 1);
     dlg->setWindowTitle(s);
     dlg->load(& levelObj);
     if (dlg->exec() == QDialog::Accepted) {
         dlg->save(& levelObj);
         gf.setDirty( true );
-        QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( level );
-        s = QString::asprintf("%.3d", level + 1);
+        QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( levelId );
+        s = QString::asprintf("%.3d", levelId + 1);
         item->setText(0, s);
         item->setText(1, levelObj.getSetting("title"));
     }

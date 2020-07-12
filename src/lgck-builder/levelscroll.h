@@ -3,6 +3,8 @@
 
 #include <QAbstractScrollArea>
 class CGame;
+class CLevelEntry;
+class CSelection;
 
 class CLevelScroll : public QAbstractScrollArea
 {
@@ -30,14 +32,13 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent* event);
 
     void initMouse();
-    void select(int x1, int y1, int x2, int y2);
+    void select(int x1, int y1, int x2, int y2, CSelection & selection);
     bool isGameMode() {
         return m_gameMode;
     }
     void keyReflector(const QKeyEvent *event, bool pressed);
 
     typedef struct {
-        bool noScroll;
         bool drag;
         int x;
         int y;
@@ -58,6 +59,12 @@ protected:
     bool m_editPath;
     int m_ticks;
     bool m_gameMode;
+
+    void scrollFastMargin(int & mx, int & my);
+    void scrollFastByKeys(int & mx, int & my);
+    void slowPrecisionPlacement(int & mx, int & my, CLevelEntry & entry);
+    void alignEntry(CLevelEntry & entry);
+    void changeOriginFromEntry(int &mx, int &my, const CLevelEntry &entry);
 
 Q_SIGNALS:
     void pathEnded();
