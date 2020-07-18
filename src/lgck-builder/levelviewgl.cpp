@@ -75,7 +75,7 @@ void CLevelViewGL::initializeGL()
         m_game->attach((IGraphics*)gr);
         m_game->attach(gr->cache());
     } else {
-        qWarning("Game object not set. Implementors not attached");
+        qFatal("Game object not set. Implementors not attached");
     }
     // set refresh rate
     m_timer.setInterval(1000 / TICK_MAX_RATE);
@@ -139,7 +139,6 @@ void CLevelViewGL::drawSelection()
 void CLevelViewGL::drawCheckers()
 {
     QSize sz = size();
-    //qDebug("w=%d, h=%d", sz.width(), sz.height());
     int gridSize = 32;
     for (int y=0; y * gridSize < sz.height(); ++y) {
         for (int x=0; x * gridSize < sz.width(); ++x) {
@@ -380,4 +379,3 @@ void CLevelViewGL::setGridColor(const QString & gridColor)
 {
     m_gridColor = 0x60000000 | strtol(q2c(gridColor), NULL, 16);
 }
-

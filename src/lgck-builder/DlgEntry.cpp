@@ -354,7 +354,7 @@ void CDlgEntry::setImage(int frameSet, int frameNo)
     fs[frameNo]->toPng(png, size);
     QImage img;
     if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png $$\n");
+        qWarning("failed to load png $$\n");
     }
     delete [] png;
     QPixmap pm = QPixmap::fromImage(img);

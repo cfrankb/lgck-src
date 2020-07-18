@@ -82,13 +82,10 @@ void CDlgPath::load(void *p)
     CPath *d = (CPath *)m_path;
 
     *d = *s;
-
-    //qDebug("CDlgPath::load() >> path size: %d", d->getSize());
     for (int i=0; i < d->getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIcon(item, (*d)[i]);
         ui->treeWidget->addTopLevelItem(item);
-    //    qDebug(">> item added");
     }
 }
 
@@ -135,12 +132,8 @@ void CDlgPath::on_btnDelete_clicked()
     if (i != -1) {
         QAbstractItemModel * model =  ui->treeWidget->model();
         model->removeRow( index.row() );
-        //path.debug();
         path.removeAt(i);
-        //qDebug("path removeAt(%d)", i);
-        //path.debug();
     }
-
     updateButtons();
 }
 
@@ -192,7 +185,7 @@ void CDlgPath::updateIcon(QTreeWidgetItem *item, int aim)
 
         QImage img;
         if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png\n");
+            qWarning("failed to load png\n");
         }
 
         QPixmap pm = QPixmap::fromImage(img);
@@ -200,7 +193,7 @@ void CDlgPath::updateIcon(QTreeWidgetItem *item, int aim)
 
         delete [] png;
     } else {
-        qDebug("failed to load resource icon: %s\n", q2c(m_iconNames[i]));
+        qWarning("failed to load resource icon: %s\n", q2c(m_iconNames[i]));
     }
 
     item->setIcon(0, icon);
@@ -268,14 +261,9 @@ void CDlgPath::on_btnDuplicate_clicked()
     if (i != -1) {
         QAbstractItemModel * model =  ui->treeWidget->model();
         model->insertRow(i);
-//        model->removeRow( index.row() );
-//        path.debug();
         QTreeWidgetItem *item = ui->treeWidget->topLevelItem( i ) ;
         int aim = path[i];
         path.insertAt(i, aim);
         updateIcon(item, path[i]);
-        //path.removeAt(i);
-//        qDebug("path removeAt(%d)", i);
-//        path.debug();
     }
 }

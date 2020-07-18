@@ -175,8 +175,10 @@ public:
     CFrame & toFrame(int frameSet, int frameNo);
     CFrame & toFrame(CLevelEntry &entry);
     CFrame & toFrame(CActor & actor);
+    CFrame & toFrame(CProto & proto);
     CFrameSet & toFrameSet(int frameSet);
     CFrameArray & frames();
+    CProto & toProto(int protoId);
 
     /////////////////////////////////////////////////////////////////
     // i/o

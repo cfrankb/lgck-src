@@ -31,6 +31,7 @@ class QScrollArea;
 class CDlgDistributeGame;
 class QFileSystemWatcher;
 class CInfoDock;
+class QLabel;
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -87,7 +88,6 @@ private:
     int m_start_level;
     bool m_bContinue;
     bool m_bShowToolBox;
-    bool m_bSpritePaint;
     bool m_bDebugOutput;
     int m_viewMode;
     int m_proto;
@@ -124,8 +124,10 @@ private:
     void adjustViewPort();
     void commitAll();
     void exportGame();
-    QAction** actionShortcuts();
+    QAction **actionShortcuts();
+    QAction *m_actionEraser;
     QStringList & defaultShortcuts();
+    QLabel *m_protoIcon;
     void saveSettings();
     enum {
         MaxRecentFiles      = 4,
@@ -136,7 +138,8 @@ private:
         VM_GAME             = 1,
         VM_SPRITE_EVENTS    = 2,
         VM_EDIT_PATH        = 3,
-        UI_VERSION          = 0
+        UI_VERSION          = 0,
+        TOOLBAR_ICON_SIZE   = 16
     };
     QLabel *m_labels[3];
     QAction *m_recentFileActs[MaxRecentFiles];
@@ -153,7 +156,6 @@ private:
     void formatVersion(QString &ver);
     void loadFileName(const QString &fileName);
     void markAsGoal(bool isGoal);
-
     static void newDebugString(const char *s);
 
 protected:
@@ -261,6 +263,8 @@ private slots:
     void on_actionUnmark_All_as_Goals_triggered();
     void on_actionDebugOutput_toggled(bool arg1);
     void on_actionSprite_Paint_toggled(bool checked);
+    void eraserToggled(bool checked);
+    void changeProtoIcon(int protoId);
 
 signals:
     void levelDeleted(int index);
@@ -290,6 +294,8 @@ signals:
     void frameSetChanged(int fs);
     void spriteUpdated(int protoId);
     void debugText(const QString & text);
+    void spritePaintStateChanged(bool state);
+    void eraserStateChanged(bool state);
 };
 
 #endif // MAINWINDOW_H

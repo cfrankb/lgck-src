@@ -124,7 +124,7 @@ void CDlgObject::load(const int index)
 
         QImage img;
         if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png (%d)\n", n);
+            qWarning("failed to load png (%d)\n", n);
         }
         delete [] png;
 
@@ -342,7 +342,7 @@ void CDlgObject::load(const int index)
 
         QImage img;
         if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png $\n");
+            qWarning("failed to load png $\n");
         }
         delete [] png;
 
@@ -710,7 +710,6 @@ void CDlgObject::save(const int index)
     CPath *paths = (CPath *) m_paths;
     for (int i=0; i < CObject::getPathCount(); ++i) {
         object.getPath(i) = paths [ i ];
-        //qDebug("saving path %d; size = %d", i, object.getPath(i).getSize());
     }
 
     // solidity ***************************************************************
@@ -732,7 +731,7 @@ void CDlgObject::setImage(int frameSet, int frameNo)
 
     QImage img;
     if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png $$\n");
+        qWarning("failed to load png $$\n");
     }
     delete [] png;
 
@@ -938,7 +937,7 @@ QIcon CDlgObject::makeIcon(void *png, int size)
 {
     QImage img;
     if (!img.loadFromData( (uint8_t*)png, size )) {
-        qDebug("failed to load png");
+        qWarning("failed to load png");
     }
 
     QPixmap pm = QPixmap::fromImage(img);
@@ -1006,7 +1005,7 @@ void CDlgObject::on_btnAddObject_clicked()
 
         QImage img;
         if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png");
+            qWarning("failed to load png");
         }
         delete [] png;
 

@@ -76,7 +76,7 @@ void CWizScript::on_cbAction_currentIndexChanged(int index)
 void CWizScript::loadScript(int id)
 {
     if (!m_gameFile) {
-        qDebug("gameFile not defined");
+        qCritical("gameFile not defined");
         return;
     }
     if (m_actions[id].loader[0]) {
@@ -124,11 +124,10 @@ std::string CWizScript::getScript()
 void CWizScript::initComboBox(QComboBox* combo, const char *type)
 {
     if (!m_gameFile) {
-        qDebug("m_gameFile is NULL");
+        qCritical("m_gameFile is NULL");
         return;
     }
 
-    //qDebug("type:%s", type);
     CGameFile & gf = *m_gameFile;
     if (strcmp(type, "sprite") == 0) {
         qDebug(">>sprite");
@@ -141,7 +140,7 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
             frameSet[0]->toPng(png, size);
             QImage img;
             if (!img.loadFromData( png, size )) {
-                qDebug("failed to load png (%d)\n", i);
+                qWarning("failed to load png (%d)\n", i);
             }
             delete [] png;
             QPixmap pm = QPixmap::fromImage(img);
@@ -171,7 +170,7 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
             frameSet[0]->toPng(png, size);
             QImage img;
             if (!img.loadFromData( png, size )) {
-                qDebug("failed to load png (%d)\n", i);
+                qWarning("failed to load png (%d)\n", i);
             }
             delete [] png;
             QPixmap pm = QPixmap::fromImage(img);

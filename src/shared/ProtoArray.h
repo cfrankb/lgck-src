@@ -57,6 +57,7 @@ public:
         void removeAt (int n);
         CObject & getObject(int i);
         CProto & operator [] (int n);
+        CProto & get(int i);
 
         // remove references
         void killProto (int nProto);

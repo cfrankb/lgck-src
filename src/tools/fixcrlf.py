@@ -22,15 +22,15 @@ def process_files(files, update):
             break
         with open(f, 'rb') as s:
             data = s.read()
-        if '\r\n' in data:
+        if b'\r\n' in data:
             b = len(data)
-            data = data.replace('\r\n', '\n')
+            data = data.replace(b'\r\n', b'\n')
             a = len(data)
             print("{0} {1} {2}".format(f, a, b))
             if update:
                 with open(f, 'wb') as t:
                     t.write(data)
-                print 'UPDATED'
+                print('UPDATED')
 
 def main():
     parser = argparse.ArgumentParser(description='utility')

@@ -66,7 +66,7 @@ CDlgPathDir::CDlgPathDir(QWidget *parent) :
 
             QImage img;
             if (!img.loadFromData( png, size )) {
-                qDebug("failed to load png\n");
+                qWarning("failed to load png\n");
             }
 
             QPixmap pm = QPixmap::fromImage(img);
@@ -78,7 +78,7 @@ CDlgPathDir::CDlgPathDir(QWidget *parent) :
 
         } else {
             ui->cbAim->addItem(QIcon(), m_iconText[i]);
-            qDebug("failed to load icon: %s\n", q2c(m_iconNames[i]));
+            qWarning("failed to load icon: %s\n", q2c(m_iconNames[i]));
         }
     }
 }

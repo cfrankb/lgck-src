@@ -124,7 +124,7 @@ void CDlgDisplay::load(CDisplay & d)
 
         QImage img;
         if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png (%d)\n", n);
+            qWarning("failed to load png (%d)\n", n);
         }
         delete [] png;
 
@@ -240,7 +240,7 @@ void CDlgDisplay::setImage(int frameSet, int frameNo)
 
     QImage img;
     if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png $$\n");
+        qWarning("failed to load png $$\n");
     }
     delete [] png;
 
@@ -281,7 +281,7 @@ QIcon CDlgDisplay::makeIcon(void *png, int size)
 {
     QImage img;
     if (!img.loadFromData( (uint8_t*)png, size )) {
-        qDebug("failed to load png");
+        qWarning("failed to load png");
     }
 
     QPixmap pm = QPixmap::fromImage(img);

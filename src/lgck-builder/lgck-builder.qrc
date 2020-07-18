@@ -86,5 +86,6 @@
         <file>images/strawberrypntbrush.png</file>
         <file>images/mouse-cursor.png</file>
         <file>images/ftview-grid.png</file>
+        <file>images/icons8-erase-40.png</file>
     </qresource>
 </RCC>

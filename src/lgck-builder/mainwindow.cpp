@@ -49,6 +49,7 @@
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/GameEvents.h"
 #include "../shared/ss_version.h"
+#include "../shared/Frame.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "DlgEditLevel.h"
@@ -238,8 +239,23 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(gridSizeChanged(int)),
             m_lview, SLOT(setGridSize(int)));
 
+    connect(this, SIGNAL(gridSizeChanged(int)),
+            m_scroll, SLOT(setGridSize(int)));
+
     connect(this, SIGNAL(levelSelected(int)),
             m_scroll, SLOT(changeLevel(int)));
+
+    connect(this, SIGNAL(spritePaintStateChanged(bool)),
+            m_scroll, SLOT(setPaintState(bool)));
+
+    connect(m_toolBox, SIGNAL(currentProtoChanged(int)),
+            m_scroll, SLOT(changeProto(int)));
+
+    connect(m_toolBox, SIGNAL(currentProtoChanged(int)),
+            this, SLOT(changeProtoIcon(int)));
+
+    connect(this, SIGNAL(eraserStateChanged(bool)),
+            m_scroll, SLOT(setEraserState(bool)));
 
     // debugOutput
     m_infoDock = new CInfoDock(this);
@@ -263,7 +279,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_updater = new CThreadUpdater();
     if (m_bUpdate) {
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
-        //checkVersion();
     }
 }
 
@@ -403,12 +418,9 @@ void MainWindow::loadFileName(const QString & fileName)
             settings.setValue("recentFileList", files);
         }
         qDebug("MakeCurrent()");
-
         QApplication::restoreOverrideCursor();
-
         updateRecentFileActions();
         reloadRecentFileActions();
-
     }
     updateTitle();
     m_lview->makeCurrent();
@@ -1226,7 +1238,7 @@ void MainWindow::handleGameEvents()
                 QMessageBox::information(this, tr(m_appName),
                                      tr("You ran out of time."));
             }
-            break;
+            /* fall through */
 
         case CGame::EVENT_PLAYER_DIED:
             --m_doc.counter("lives");
@@ -1607,10 +1619,12 @@ void MainWindow::on_actionRuntime_Lua_triggered()
 
 void MainWindow::initToolBar()
 {
+    QSize size = QSize(TOOLBAR_ICON_SIZE,TOOLBAR_ICON_SIZE);
+
     // main toolbar
     ui->toolBar->setObjectName("mainToolbar");
     ui->toolBar->setWindowTitle(tr("Main"));
-    ui->toolBar->setIconSize( QSize(16,16) );
+    ui->toolBar->setIconSize(size);
     ui->toolBar->addAction(ui->actionNew_file);
     ui->toolBar->addAction(ui->actionOpen);
     ui->toolBar->addAction(ui->actionSave);
@@ -1629,7 +1643,7 @@ void MainWindow::initToolBar()
     m_comboLayers = new QComboBox(this);
     m_comboLayers->setDisabled(true);
     m_layerToolbar = new QToolBar("Layer", this);
-    m_layerToolbar->setIconSize( QSize(16,16) );
+    m_layerToolbar->setIconSize(size);
     m_layerToolbar->setObjectName("toolbar2");
     m_layerToolbar->addWidget(m_comboLayers);
     m_layerToolbar->addAction(ui->actionCreate_layer);
@@ -1641,7 +1655,7 @@ void MainWindow::initToolBar()
     m_comboEvents = new QComboBox(this);
     reloadEventCombo();
     m_levelToolbar = new QToolBar(tr("Level"), this);
-    m_levelToolbar->setIconSize( QSize(16,16) );
+    m_levelToolbar->setIconSize(size);
     m_levelToolbar->setObjectName("toolbar1");
     m_levelToolbar->addWidget(m_comboEvents);
     m_levelToolbar->addAction(ui->actionScriptWizard);
@@ -1654,9 +1668,22 @@ void MainWindow::initToolBar()
     m_levelToolbar->addAction(ui->actionPaste);
     m_levelToolbar->addAction(ui->actionDelete);
     m_levelToolbar->addSeparator();
+    //m_levelToolbar->addAction(ui->action_ShowGrid);
+    //actionShowGrid = m_levelToolbar->addAction(QIcon(":/images/ftview-grid.png"), tr("grid"), this, "gridTriggered");
+    //actionShowGrid->setCheckable(true);
+    //ui->action_ShowGrid->setIcon(QIcon(":/images/ftview-grid.png"));
     m_levelToolbar->addAction(ui->actionSprite_Paint);
     ui->actionSprite_Paint->setIcon(QIcon(":/images/strawberrypntbrush.png"));
+    ui->actionSprite_Paint->setStatusTip(tr("Paint the tile under the cursor with the given sprite"));
+    m_actionEraser = m_levelToolbar->addAction(QIcon(":/images/icons8-erase-40.png"), tr("Erase"));
+    m_actionEraser->setCheckable(true);
+    m_actionEraser->setStatusTip(tr("Erase the sprite under the cursor"));
+    connect(m_actionEraser, SIGNAL(toggled(bool)), this, SLOT(eraserToggled(bool)));
     addToolBar(m_levelToolbar);
+    m_protoIcon = new QLabel();
+    m_protoIcon->setToolTip(tr("Sprite painter"));
+    m_protoIcon->setStatusTip(tr("Current Sprite selected for painting"));
+    m_levelToolbar->addWidget(m_protoIcon);
 
     connect(m_comboEvents, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
     connect(m_comboLayers, SIGNAL(currentIndexChanged(int)), this, SLOT(layerChanged(int)));
@@ -2378,6 +2405,12 @@ void MainWindow::saveSettings()
         settings.setValue("debugOutput", ui->actionDebugOutput->isChecked());
         settings.setValue("toolBox", m_bShowToolBox);
         settings.endGroup();
+
+        settings.beginGroup("Tools");
+        settings.setValue("eraserTool", m_actionEraser->isChecked());
+        settings.setValue("paintTool", ui->actionSprite_Paint->isChecked());
+        settings.endGroup();
+
         settings.beginGroup("UI_Components");
         settings.setValue("mainWindow:geometry", this->saveGeometry());
         settings.setValue("mainWindow:state", this->saveState());
@@ -2509,6 +2542,12 @@ void MainWindow::reloadSettings()
     m_fontSize = settings.value("fontSize", DEFAULT_FONT_SIZE).toInt();
     m_skipSplash = settings.value("skipSplash", false).toBool();
     emit fontSizeChanged(m_fontSize);
+    settings.endGroup();
+
+    // Tools
+    settings.beginGroup("Tools");
+    m_actionEraser->setChecked(settings.value("eraserTool", false).toBool());
+    ui->actionSprite_Paint->setChecked(settings.value("paintTool", false).toBool());
     settings.endGroup();
 }
 
@@ -2950,5 +2989,29 @@ void MainWindow::on_actionDebugOutput_toggled(bool arg1)
 
 void MainWindow::on_actionSprite_Paint_toggled(bool checked)
 {
-    m_bSpritePaint = checked;
+    ui->actionSprite_Paint->setChecked(checked);
+    emit spritePaintStateChanged(checked);
+}
+
+void MainWindow::eraserToggled(bool checked)
+{
+    qDebug("eraserToggled()");
+    m_actionEraser->setChecked(checked);
+    emit eraserStateChanged(checked);
+}
+
+void MainWindow::changeProtoIcon(int protoId)
+{
+    uint8_t *png;
+    int size;
+    m_doc.toFrame(m_doc.toProto(protoId > 0 ? protoId : 0)).toPng(png, size);
+
+    QImage img;
+    if (!img.loadFromData(png, size)) {
+        qWarning("failed to load png");
+    }
+    delete [] png;
+
+    QPixmap pm = QPixmap::fromImage(img);
+    m_protoIcon->setPixmap(pm.scaled(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE, Qt::IgnoreAspectRatio));
 }

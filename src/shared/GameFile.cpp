@@ -852,6 +852,11 @@ CFrame & CGameFile::toFrame(CActor & actor)
     return *(m_arrFrames.getFrame(* dynamic_cast<CLevelEntry*>(&actor)));
 }
 
+CFrame & CGameFile::toFrame(CProto & proto)
+{
+    return *(m_arrFrames.getFrame(proto.m_nFrameSet, proto.m_nFrameNo));
+}
+
 CFrameSet & CGameFile::toFrameSet(int frameSet)
 {
     return *(m_arrFrames[frameSet]);
@@ -870,4 +875,9 @@ CLevel & CGameFile::getLevelObject(int i)
 CLevel & CGameFile::getCurrentLevel()
 {
     return getLevelObject(m_nCurrLevel);
+}
+
+CProto & CGameFile::toProto(int protoId)
+{
+    return m_arrProto[protoId];
 }

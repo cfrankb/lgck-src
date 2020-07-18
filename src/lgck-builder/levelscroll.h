@@ -5,6 +5,8 @@
 class CGame;
 class CLevelEntry;
 class CSelection;
+class CProto;
+class CLevelEntry;
 
 class CLevelScroll : public QAbstractScrollArea
 {
@@ -33,6 +35,7 @@ protected:
 
     void initMouse();
     void select(int x1, int y1, int x2, int y2, CSelection & selection);
+    void insideTile(int x1, int y1, int x2, int y2, CSelection & selection);
     bool isGameMode() {
         return m_gameMode;
     }
@@ -59,12 +62,19 @@ protected:
     bool m_editPath;
     int m_ticks;
     bool m_gameMode;
+    bool m_paintSprite;
+    int m_proto;
+    int m_gridSize;
+    bool m_bErase;
 
     void scrollFastMargin(int & mx, int & my);
     void scrollFastByKeys(int & mx, int & my);
     void slowPrecisionPlacement(int & mx, int & my, CLevelEntry & entry);
     void alignEntry(CLevelEntry & entry);
     void changeOriginFromEntry(int &mx, int &my, const CLevelEntry &entry);
+    int gridMask();
+    void entryFromProto(const int protoId, CLevelEntry &entry);
+    void paintSprite();
 
 Q_SIGNALS:
     void pathEnded();
@@ -88,6 +98,10 @@ protected slots:
     void mxChanged(int);
     void myChanged(int);
     void scrollStatus(int &, int &);
+    void setPaintState(bool state);
+    void changeProto(int proto);
+    void setGridSize(int size);
+    void setEraserState(bool state);
 };
 
 #endif // CLEVELSCROLL_H

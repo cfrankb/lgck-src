@@ -298,14 +298,18 @@ void CProtoArray::removeAt (int n)
     --m_nSize;
 }
 
-
-CProto & CProtoArray::operator [] (int n)
+CProto & CProtoArray::get(int n)
 {
     if ((n < 0) || (n >= m_nSize)) {
         return m_protoTmp;
     } else {
         return m_objects[n].proto();
     }
+}
+
+CProto & CProtoArray::operator [] (int n)
+{
+    return get(n);
 }
 
 int CProtoArray::getSize()
@@ -431,7 +435,7 @@ int CProtoArray::findIndexPos( int protoId )
     int i = 0;
     int min = 0;
     int max = m_indexSize - 1;
-    char *newName = m_objects[protoId].proto().getName();
+    const char *newName = m_objects[protoId].proto().getName();
     while (max >= min) {
         i = min + (max - min) / 2;
         int result = strcasecmp( m_objects[m_index[i]].proto().getName(), newName );
@@ -620,7 +624,7 @@ int CProtoIndex::findPos(int protoId)
     int i = 0;
     int min = 0;
     int max = m_size - 1;
-    char *newName = m_protoArray->getObject(protoId).proto().getName();
+    const char *newName = m_protoArray->getObject(protoId).proto().getName();
     while (max >= min) {
         i = min + (max - min) / 2;
         int result = strcasecmp( m_protoArray->getObject(m_index[i]).proto().getName(), newName );
@@ -774,7 +778,7 @@ void CProto::write(IFile &file)
     file.write(this, sizeof (CProto));
 }
 
-char *CProto::getName()
+const char *CProto::getName() const
 {
     return m_szName;
 }

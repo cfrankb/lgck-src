@@ -79,7 +79,7 @@ void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
 
     QImage img;
     if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
     delete [] png;
 

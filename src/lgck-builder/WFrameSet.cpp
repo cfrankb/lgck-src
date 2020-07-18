@@ -182,7 +182,7 @@ void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
 
     QImage img;
     if (!img.loadFromData( png, pngSize )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
     delete [] png;
 

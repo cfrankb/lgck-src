@@ -139,7 +139,7 @@ void CWizSprite::load(const int index)
 
         QImage img;
         if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png (%d)\n", n);
+            qWarning("failed to load png (%d)\n", n);
         }
         delete [] png;
 
@@ -296,7 +296,7 @@ void CWizSprite::load(const int index)
 
         QImage img;
         if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png $\n");
+            qWarning("failed to load png $\n");
         }
         delete [] png;
 
@@ -699,7 +699,7 @@ void CWizSprite::save(const int index)
             object.setEvent(CObject::EO_FIRE, buf);
             delete[]buf;
         } else {
-            qDebug("can't open");
+            qWarning("can't open");
         }
     }
 
@@ -722,7 +722,7 @@ void CWizSprite::save(const int index)
             object.setEvent(event, buf);
             delete[]buf;
         } else {
-            qDebug("can't open");
+            qWarning("can't open");
         }
     }
 }

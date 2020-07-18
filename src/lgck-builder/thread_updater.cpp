@@ -64,14 +64,12 @@ void CThreadUpdater::sendRequest()
         if (exp.indexIn(result)!=-1) {
             QStringList list = exp.capturedTexts();
             dwUrl = list[0].mid(strlen("download: "));
-            //qDebug() << "download url:" << dwUrl;
         }
         exp = QRegExp("version: [0-9a-z\\.]+");
         QString dwVersion = "";
         if (exp.indexIn(result)!=-1) {
             QStringList list = exp.capturedTexts();
             dwVersion = list[0].mid(strlen("version: "));
-            //qDebug() << "download version:" << dwVersion;
         }
         if (!dwUrl.isEmpty()) {
             emit newVersion(dwUrl, dwVersion);

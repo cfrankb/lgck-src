@@ -47,7 +47,7 @@ CDlgSource::~CDlgSource()
 void CDlgSource::init(CGameFile *gf)
 {
     if (!gf) {
-        qDebug("gf is NULL");
+        qCritical("gf is NULL");
     }
     m_gameFile = gf;
 }

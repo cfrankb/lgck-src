@@ -106,7 +106,6 @@ void CDlgGame::on_btnDefaults_clicked()
         gf.restoreDefaults();
         QAbstractItemModel * model =  m_ui->treeSettings->model();
         int totalRows = model->rowCount();
-        //qDebug("totalRows: %d\n", totalRows);
         model->removeRows(0, totalRows);
         fillTreeSettings();
         gf.setDirty( true );
@@ -262,7 +261,7 @@ void CDlgGame::updateIcon(QTreeWidgetItem * itm, int protoId)
 
     QImage img;
     if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
     delete [] png;
 
@@ -475,10 +474,7 @@ void CDlgGame::on_treeFrameSets_doubleClicked(QModelIndex index)
     d->init(frameSet);    
     if (d->exec() == QDialog::Accepted) {
         d->save();
-
-        qDebug("on_treeFrameSets_doubleClicked(QModelIndex index) save\n");
         gf.setDirty( true );
-
         delete gf.frames()[ index.row() ];
         gf.frames().setAt( index.row(), frameSet);
 
@@ -568,7 +564,7 @@ void CDlgGame::updateIconFrameSet(QTreeWidgetItem * itm, int fs)
 
     QImage img;
     if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
     delete [] png;
 

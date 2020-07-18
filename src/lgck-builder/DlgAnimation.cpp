@@ -115,7 +115,7 @@ void CDlgAnimation::addIcon(void *png, int size)
 {
     QImage img;
     if (!img.loadFromData( (uint8_t*)png, size )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
 
     QPixmap pm = QPixmap::fromImage(img);
@@ -152,7 +152,7 @@ void CDlgAnimation::addToSeq(int iconId, bool visualOnly)
 
     QImage img;
     if (!img.loadFromData( png, m_iconSizes[iconId] )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
 
     QPixmap pm = QPixmap::fromImage(img);

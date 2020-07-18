@@ -133,6 +133,7 @@ signals:
     void menuSeekingItems(QMenu *, int);
     void spriteDeleted(int sprite);
     void spriteChanged(int sprite);
+    void currentProtoChanged(int protoId);
 };
 
 #endif // TOOLBARDOCK_H

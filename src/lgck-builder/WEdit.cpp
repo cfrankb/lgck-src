@@ -164,6 +164,7 @@ void CWEdit::keyPressEvent(QKeyEvent *e)
        switch (e->key()) {
        case Qt::Key_Escape:
            m_currentWord = "";
+           /* fall through */
        case Qt::Key_Enter:
        case Qt::Key_Return:
        case Qt::Key_Backtab:
@@ -233,7 +234,6 @@ void CWEdit::keyPressEvent(QKeyEvent *e)
          word = word.mid(0, word.length()-1);
      }
 
-     //qDebug() << word << " : " << m_completer->completionPrefix();
      m_currentWord =word;
      if (m_completer && m_completer->popup()->isVisible()
              && word != m_completer->completionPrefix()) {
@@ -252,7 +252,6 @@ void CWEdit::keyPressEvent(QKeyEvent *e)
 
 void CWEdit::keyReleaseEvent(QKeyEvent *e)
 {     
-    // qDebug() << m_currentWord << " : " << m_completer->completionPrefix();
     if (m_currentWord != m_completer->completionPrefix()) {
         m_completer->setCompletionPrefix(m_currentWord);
         m_completer->popup()->setCurrentIndex(m_completer->completionModel()->index(0, 0));
@@ -268,7 +267,6 @@ void CWEdit::keyReleaseEvent(QKeyEvent *e)
             && ((key >= Qt::Key_A && key <= Qt::Key_Z) || key==Qt::Key_Backspace)) {
         QRect cr = QRect (m_posX, m_posY ,20,20);
         cr.setWidth(m_completer->popup()->sizeHintForColumn(0) + m_completer->popup()->verticalScrollBar()->sizeHint().width());
-//         qDebug() << "!### word " << m_currentWord;   /* word piece on cursor */
 
        m_completer->complete(cr); // popup it up!
    }
@@ -342,24 +340,16 @@ void CWEdit::insertCompletion( QString completion )
     int lineStart = SendScintilla(SCI_POSITIONFROMLINE, line);
     int cols = newPos - lineStart;
     int cole = cols + m_currentWord.length() ;
-    //qDebug() << "### newpos: " << newPos;
-    //qDebug() << "### selezione col: " << cols << "-" << cole;
-    //qDebug() << "### word " << m_currentWord;
     setSelection(line,cols,line,cole);
-    //QString QCompleter::currentCompletion () cons
-//    QModelIndex QCompleter::currentIndex () const
-  //  int QCompleter::currentRow () const
 
     completion += "( )";
     int extra = 0;
     if ( hasSelectedText() ) {
         cut();
         insert(completion);
-      //  qDebug("aaa");
     } else {
          extra = completion.length() - m_currentWord.length();
          insert(completion.right(extra));
-        // qDebug("bbb");
     }
 
     setCursorPosition(line, cols - lineStart + completion.length() - 1);
@@ -370,7 +360,6 @@ bool CWEdit::canImproveWord()
     int len = m_currentWord.length();
     for (int i=0; i<m_words.count(); ++i) {
         QString & word = m_words[i];
-    //    qDebug() << word.mid(1, len);
         if (word.length() > len &&
                 word.mid(0, len) == m_currentWord) {
             return true;
@@ -389,7 +378,6 @@ void CWEdit::insertText(const char *text)
     std::string s = text;
     size_t n = std::count(s.begin(), s.end(), '\n');
     setCursorPosition(line + n, 0);
-    //emit eventModified();
 }
 
 void CWEdit::setFontSize(int size)

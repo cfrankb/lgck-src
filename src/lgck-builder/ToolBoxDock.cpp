@@ -28,6 +28,7 @@
 #include "../shared/GameEvents.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/interfaces/ISound.h"
+#include "../shared/Proto.h"
 #include <QMenu>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -139,17 +140,13 @@ void CToolBoxDock::copySprite()
 
     QAbstractItemModel * model =  m_ui->treeObjects->model();
     if (!model) {
-        qDebug("model is null\n");
+        qCritical("model is null\n");
     }
-
     model->insertRow(pos);
-
     item = m_ui->treeObjects->topLevelItem( pos );
     m_ui->treeObjects->setCurrentItem( item );
     updateIcon( item, gf.m_arrProto.getSize() - 1 );
-
     gf.setDirty(true);
-
     delete d;
 }
 
@@ -201,7 +198,7 @@ void CToolBoxDock::editSprite()
 
             QAbstractItemModel * model =  m_ui->treeObjects->model();
             if (!model) {
-                qDebug("model is null\n");
+                qCritical("model is null\n");
             }
             if (pos != row) {
                 model->removeRow(row);
@@ -267,7 +264,7 @@ void CToolBoxDock::createSprite()
         int pos = protoIndex->insert( gf.m_arrProto.getSize() - 1 );
         QAbstractItemModel * model =  m_ui->treeObjects->model();
         if (!model) {
-            qDebug("model is null\n");
+            qCritical("model is null\n");
         }
         model->insertRow(pos);
         QTreeWidgetItem * item = m_ui->treeObjects->topLevelItem( pos );
@@ -381,7 +378,7 @@ void CToolBoxDock::updateIcon(QTreeWidgetItem *itm, int protoId)
 
     QImage img;
     if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
     delete [] png;
 
@@ -424,6 +421,24 @@ void CToolBoxDock::updateObjects (int OldframeSet, int newFrameSet)
 
 void CToolBoxDock::on_treeObjects_itemSelectionChanged()
 {
+    QModelIndex indexObject = m_ui->treeObjects->currentIndex();
+    QTreeWidgetItem * item = m_ui->treeObjects->currentItem();
+    int protoId = CGame::INVALID;
+    if (item && indexObject.row() != -1) {
+        ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
+        protoId = data->protoId;
+        const CProto & proto = m_gameFile->m_arrProto.get(protoId);
+        qDebug("spriteSelected: proto: [%d] at index [%d] [%s]",
+               protoId,
+               indexObject.row(),
+               proto.getName());
+    } else {
+        qDebug("spriteSelected: proto: [%d] at index [%d] [%s]",
+               protoId,
+               indexObject.row(),
+               "invalid");
+    }
+    emit currentProtoChanged(protoId);
     updateButtons();
 }
 
@@ -1351,7 +1366,7 @@ void CToolBoxDock::on_btnAddDisplay_clicked()
         conf.add(d);
         QAbstractItemModel * model =  m_ui->treeDisplays->model();
         if (!model) {
-            qDebug("model is null\n");
+            qCritical("model is null\n");
         }
         model->insertRow(pos);
         QTreeWidgetItem * item = m_ui->treeDisplays->topLevelItem( pos );
@@ -1565,7 +1580,7 @@ void CToolBoxDock::on_btnAddFont_clicked()
         QTreeWidget * tree = m_ui->treeFonts;
         QAbstractItemModel * model =  tree->model();
         if (!model) {
-            qDebug("model is null\n");
+            qCritical("model is null\n");
         }
         model->insertRow(pos);
         QTreeWidgetItem * item = tree->topLevelItem( pos );

@@ -98,10 +98,10 @@ bool CExportGame::copyRuntime(QString & runtimeSource, QStringList & depList, QS
                 depList = data.split("\n", Qt::SkipEmptyParts);
                 return copyList(depList, appDir, outMsg);
             } else {
-                qDebug() << QString("cannot read: %1").arg(deps);
+                qWarning() << QString("cannot read: %1").arg(deps);
             }
         } else {
-            qDebug() << QString("cannot find: %1").arg(deps);
+            qWarning() << QString("cannot find: %1").arg(deps);
         }
     }
     return true;
