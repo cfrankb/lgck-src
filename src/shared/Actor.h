@@ -108,6 +108,7 @@ public:
     CProto & getProto();
     void togglePathPlayback(bool enable);
     const char *getClassName();
+    void copyFrom(const CActor & s);
 
     enum  {
         TAG_REBORN          = 0x0001,

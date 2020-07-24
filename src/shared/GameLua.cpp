@@ -80,7 +80,7 @@ CLuaVM CGame::m_lua;
 
 void CGame::initLua()
 {
-    qDebug("initLua");
+    CLuaVM::debugv("initLua");
     // registers functions
     for (int i = 0; exports[i].fnName; ++i) {
         m_lua.registerFn(exports[i].fnName, exports[i].fnAddr);
@@ -468,7 +468,7 @@ int killPlayer(lua_State *)
     if (player.proto().m_nClass == CLASS_PLAYER_OBJECT) {
         game.killPlayer( player );
     } else {
-        qDebug("kill player against none player object.");
+        CLuaVM::debugv("kill player against none player object.");
     }
     return 0;
 }

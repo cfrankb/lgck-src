@@ -93,7 +93,7 @@ public:
 
     const char * getName() { return m_name.c_str(); }
     void setName(const char *name) { m_name = name;}
-    const CFolder operator = (CFolder & s);
+    const CFolder & operator = (CFolder & s);
     CFolder::CFileEntry * operator [] (const char * fileName);
     CFolder::CFileEntry * operator [] (int i);
     int getSize() { return m_size; }

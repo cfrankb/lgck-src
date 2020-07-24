@@ -87,5 +87,7 @@
         <file>images/mouse-cursor.png</file>
         <file>images/ftview-grid.png</file>
         <file>images/icons8-erase-40.png</file>
+        <file>images/icons8-eraser-50.png</file>
+        <file>images/sketchpntbrush.png</file>
     </qresource>
 </RCC>

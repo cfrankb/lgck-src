@@ -2,6 +2,7 @@
 #include "string.h"
 #include "../shared/Font.h"
 #include "../shared/FileWrap.h"
+#include "../shared/LuaVM.h"
 #include "stdafx.h"
 
 CFontManager::CFontManager()
@@ -114,7 +115,7 @@ void CFontManager::reset()
         file.close();
         add(font, DEFAULT_FONT);
     } else {
-        qDebug("can't read %s", fontName);
+        CLuaVM::debugv("can't read %s", fontName);
     }
 }
 
@@ -124,7 +125,7 @@ bool CFontManager::read(IFile & file)
     unsigned int file_version = 0;
     file.read(&file_version, sizeof(file_version));
     if(file_version != VERSION) {
-        qDebug("incorrect version CFontManager");
+        CLuaVM::debugv("incorrect version CFontManager");
         return false;
     }
     int size;

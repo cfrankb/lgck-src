@@ -124,7 +124,8 @@ bool CMonster::testAim(int aim, int  oldAim)
 {
     CGame & game = * (CGame *) m_game;
     CFrame & frame = game.toFrame(*this);
-    CMonster t = *this;
+    CMonster t;
+    t.copyFrom(*this);
 
     bool leap = aim & CGame::LEAP;
     if ( leap ) {

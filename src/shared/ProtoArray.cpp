@@ -140,7 +140,7 @@ bool CProtoArray::read(IFile &file)
         break;
 
         default:
-            qDebug("unknown proto.dat version (0x%.8x)\n", version);
+            CLuaVM::debugv("unknown proto.dat version (0x%.8x)\n", version);
         break;
     }
     return result;
@@ -506,7 +506,7 @@ bool CProtoArray::isIndexed()
 void CProtoArray::debugIndex()
 {
     for (int k = 0 ; k < m_indexSize; ++k) {
-        qDebug("index %d = %d (%s)\n", k, m_index[k], m_objects[ m_index[k] ].proto().getName());
+        CLuaVM::debugv("index %d = %d (%s)\n", k, m_index[k], m_objects[ m_index[k] ].proto().getName());
     }
 }
 
@@ -714,7 +714,7 @@ void CProtoIndex::debug()
     file.open("../debug/protoIndex.txt", "a");
     char s[1024];
     for (int k = 0 ; k < m_size; ++k) {
-        qDebug("index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
+        CLuaVM::debugv("index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
         sprintf(s, "index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
         file.write(s, strlen(s));
     }

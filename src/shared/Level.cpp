@@ -28,7 +28,7 @@
 #include "Layer.h"
 #include "helper.h"
 #include "../shared/FileWrap.h"
-#include "../shared/qtgui/cheat.h"
+#include "LuaVM.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CLevel
@@ -128,7 +128,7 @@ bool CLevel::readLegacyV1(IFile & file)
     uint8_t *pCompressData = new uint8_t [ compressSize ];
 
     if (totalSize != (size * sizeof(CLevelEntry))) {
-        qDebug("CLevel() : total uncompressed size doesn't match array size\n");
+        CLuaVM::debugv("CLevel() : total uncompressed size doesn't match array size\n");
         return false;
     }
 
@@ -140,7 +140,7 @@ bool CLevel::readLegacyV1(IFile & file)
                          compressSize);
 
     if (err) {
-        qDebug("CLevel::Read err=%d\n", err);
+        CLuaVM::debugv("CLevel::Read err=%d\n", err);
     }
 
     CLayer *layer = new CLayer(CLayer::LAYER_MAIN);

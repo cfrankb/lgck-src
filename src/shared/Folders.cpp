@@ -289,7 +289,7 @@ bool CFolder::readFolderIndex(CFileWrap & file)
     return true;
 }
 
-const CFolder CFolder::operator = (CFolder & s)
+const CFolder &CFolder::operator =(CFolder & s)
 {
     m_name = s.getName();
     m_offset = s.getOffset();

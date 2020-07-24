@@ -40,7 +40,7 @@ void CThreadUpdater::sendRequest()
     QUrl url = QUrl( m_url );
     QNetworkRequest request( url );
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-    //QNetworkReply *reply = manager.get(req);
+    //QNetworkReply *reply = manager.get(request);
     QNetworkReply *reply = manager.post(request, m_data);
     eventLoop.exec(); // blocks stack until "finished()" has been called
 
@@ -50,11 +50,10 @@ void CThreadUpdater::sendRequest()
         result = reply->readAll();
         qDebug() << "Success" <<reply->readAll();
         delete reply;
-    }
-    else {
+    } else {
         //failure
         result = reply->readAll();
-        qDebug() << "Failure" <<reply->errorString();
+        qWarning() << "Failure" <<reply->errorString();
         delete reply;
     }
 

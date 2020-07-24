@@ -122,6 +122,11 @@ CActor & CActor::operator = (const CActor &s)
     return *this;
 }
 
+void CActor::copyFrom(const CActor & s)
+{
+    *(this) = s;
+}
+
 void CActor::init()
 {
     m_id = 0;
@@ -237,7 +242,7 @@ bool CActor::tryAnimation(int seq)
             return true;
         }
     } else {
-        qDebug("-- tryAnimation() seq `0x%x` out of range for `%d`.", seq, m_id);
+        CLuaVM::debugv("-- tryAnimation() seq `0x%x` out of range for `%d`.", seq, m_id);
     }
     return false;
 }
@@ -454,7 +459,8 @@ bool CActor::canMove(int nAim, bool bActor)
     case CGame::FALL:
         if (m_nY >= m_game->BUFFERHEI-frame.m_nHei) {
             if ( m_game->getWrap() & CLevel::WRAP_DOWN ) {
-                CActor t = *this;
+                CActor t;
+                t.copyFrom(*this);
                 t.move(CGame::UP);
                 if (t.canMove(CGame::DOWN, bActor)) {
                     return true;
@@ -468,7 +474,8 @@ bool CActor::canMove(int nAim, bool bActor)
 
     case CGame::LEFT:
         if (m_nX == 0) {
-            CActor t = *this;
+            CActor t;
+            t.copyFrom(*this);
             t.moveTo( m_game->BUFFERLEN, m_nY);
             if ( (m_game->getWrap() & CLevel::WRAP_LEFT)
                 && t.canMove(CGame::LEFT, bActor)) {
@@ -482,7 +489,8 @@ bool CActor::canMove(int nAim, bool bActor)
 
     case CGame::RIGHT:
         if (m_nX >= m_game->BUFFERLEN-frame.m_nLen) {
-            CActor t = *this;
+            CActor t;
+            t.copyFrom(*this);
             t.move(CGame::LEFT);
             if ( (m_game->getWrap() & CLevel::WRAP_RIGHT)
                 && t.canMove(CGame::RIGHT, bActor)) {
@@ -1466,7 +1474,7 @@ bool CActor::isSolid(const CMapEntry *pMap, int aim)
     }
     // enfore nosplat for player
     if ( protoActor.m_nClass == CLASS_PLAYER_OBJECT &&
-            aim == CGame::FALL && map.m_nFwEntry ) {
+            aim == CGame::FALL && map.m_fwCount ) {
         for (int i=0; i < map.m_fwCount; ++i) {
             const CActor & entry = scene[map.m_nFwEntry[i]];
             const CProto & protoMap = m_game->m_arrProto[entry.m_nProto];

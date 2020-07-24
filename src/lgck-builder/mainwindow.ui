@@ -87,7 +87,7 @@
     <addaction name="actionView_Code"/>
     <addaction name="separator"/>
     <addaction name="actionSend_to_back"/>
-    <addaction name="actionBrint_to_front"/>
+    <addaction name="actionBring_to_front"/>
     <addaction name="actionEdit_Path"/>
     <addaction name="separator"/>
     <addaction name="menuAll_Instance"/>
@@ -185,8 +185,6 @@
      <addaction name="actionRestart"/>
      <addaction name="actionPause"/>
      <addaction name="actionQuit_Game"/>
-     <addaction name="separator"/>
-     <addaction name="actionDebug"/>
     </widget>
     <widget class="QMenu" name="menuLayers">
      <property name="title">
@@ -405,7 +403,7 @@
     <string>B</string>
    </property>
   </action>
-  <action name="actionBrint_to_front">
+  <action name="actionBring_to_front">
    <property name="text">
     <string>Bring to front</string>
    </property>

@@ -37,7 +37,6 @@ public:
     lua_State * getState();
     int exec(const char *luaCode);
 
-    void debug(const char *s);
     void clearLog();
     void registerFn(const char * fnName, lua_CFunction fn);
     void registerInt(const char *name, int value);
@@ -48,6 +47,8 @@ public:
     // lua interface
     static void setCallback(std::function<void(const char *)> callback);
     static int debug(lua_State *L);
+    static void debug(const char *s);
+    static void debugv(const char *fmt, ...);
 
 protected:
     static std::function<void(const char *)> m_callback;

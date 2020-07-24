@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include "LuaVM.h"
 #include "FileWrap.h"
-#include "../shared/qtgui/cheat.h"
 
 std::function<void(const char *)> CLuaVM::m_callback = nullptr;
 
@@ -65,6 +64,20 @@ void CLuaVM::debug(const char *s)
 {
     if (s && m_callback) {
         m_callback(s);
+    }
+}
+
+void CLuaVM::debugv(const char *fmt, ...)
+{
+    char *s = nullptr;
+    va_list args;
+    va_start(args, fmt);
+    if (vasprintf(&s, fmt, args) == -1) {
+        qDebug("debugv() had an allocation error with vasprintf().");
+    }
+    if (s) {
+        debug(static_cast<const char*>(s));
+        free(s);
     }
 }
 

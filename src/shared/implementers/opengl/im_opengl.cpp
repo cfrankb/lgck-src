@@ -20,6 +20,7 @@
 #include "im_opengl.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"
+#include "../shared/LuaVM.h"
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
@@ -218,10 +219,10 @@ int CIMOpengl::add(const char *uuid, CFont *font)
     GLint maxSize;
     glEnable(GL_TEXTURE_2D); GLDEBUG();
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize); GLDEBUG();
-    qDebug("MAXSIZE: %u", maxSize);
+    CLuaVM::debugv("MAXSIZE: %u", maxSize);
 
     glGenTextures(1, &textureId); GLDEBUG();
-    qDebug("texture: %.8x", textureId);
+    CLuaVM::debugv("texture: %.8x", textureId);
     CFrame frame(font->width(), font->height());
     memcpy(frame.getRGB(), font->pixels(), font->width() * font->height() * sizeof(unsigned int));
     int ix = pow2roundup(frame.m_nLen);

@@ -45,7 +45,7 @@ bool CGRSdl::init(CGame *game, int w, int h, const char*title)
     }
     m_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN );
     if (!m_window) {
-        qDebug("SDL_CreateWindow failed");
+        CLuaVM::debugv("SDL_CreateWindow failed");
         return false;
     }
     queryDriver();
@@ -189,7 +189,7 @@ void CGRSdl::update()
 void CGRSdl::queryDriver()
 {
     int count = SDL_GetNumRenderDrivers();
-    qDebug("driver count: %d", count);
+    CLuaVM::debugv("driver count: %d", count);
     for (int i=0; i < count ; ++i) {
         SDL_RendererInfo info;
         int result = SDL_GetRenderDriverInfo(i, &info);
@@ -207,8 +207,8 @@ void CGRSdl::queryDriver()
         if (info.flags & SDL_RENDERER_TARGETTEXTURE) {
             flags += "SDL_RENDERER_TARGETTEXTURE ";
         }
-        qDebug("driver %s", info.name);
-        qDebug("...flags: %s", flags.c_str());
+        CLuaVM::debugv("driver %s", info.name);
+        CLuaVM::debugv("...flags: %s", flags.c_str());
     }
 }
 

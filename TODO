@@ -190,8 +190,6 @@ Fresh bugs
 [ ] BUG 3520092: player fall through platform bad -- object mapping code bug
 [ ] BUG: resizing the pane view during 'test level' causes a resize
 [ ] BUG: teleport won't activate when player is on top of level     
-[ ] BUG: debug console not always working (debug console obsolete)
-[ ] BUG: debug.clear causing crash
 [ ] BUG: moving a selection in the editor doesn't move all items at the same pace
 [ ] BUG: edit event pane not save when test game is trigged
 [ ] BUG: when restoring to a way point, state of displays not restored

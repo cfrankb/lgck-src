@@ -75,6 +75,7 @@ protected:
     int gridMask();
     void entryFromProto(const int protoId, CLevelEntry &entry);
     void paintSprite();
+    void setCursor();
 
 Q_SIGNALS:
     void pathEnded();

@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "Display.h"
 #include "IFile.h"
+#include "LuaVM.h"
 
 CDisplayConfig::CDisplayConfig()
 {
@@ -154,7 +155,7 @@ bool CDisplayConfig::read(IFile & file)
     unsigned int file_version = 0;
     file.read(&file_version, sizeof(file_version));
     if(file_version != VERSION) {
-        qDebug("incorrect version CDisplayConfig");
+        CLuaVM::debugv("incorrect version CDisplayConfig");
         return false;
     }
     int size;

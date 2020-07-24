@@ -3,6 +3,7 @@
 #include <cstring>
 #include "stdafx.h"
 #include "helper.h"
+#include "LuaVM.h"
 #include <zlib.h>
 
 #define SIGNATURE "LGCKFONT"
@@ -114,7 +115,7 @@ bool CFont::read(IFile & file)
     file.read(&version, 4);
     //ASSERT(version==VERSION);
     if (version != VERSION_1 && version != VERSION_2) {
-        qDebug("invalid version: %d", version);
+        CLuaVM::debugv("invalid version: %d", version);
         return false;
     }
     m_width = m_height = 0;
@@ -165,7 +166,7 @@ bool CFont::read(IFile & file)
                              tmp,
                              tmpSize);
         if (err) {
-            qDebug("CFont::Read err=%d\n", err);
+            CLuaVM::debugv("CFont::Read err=%d\n", err);
             return false;
         }
     }

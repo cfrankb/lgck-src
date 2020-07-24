@@ -185,7 +185,7 @@ private slots:
     void on_actionTest_Level_triggered();
     void on_actionAbout_triggered();
     void on_actionNew_file_triggered();
-    void on_actionBrint_to_front_triggered();
+    void on_actionBring_to_front_triggered();
     void on_actionSend_to_back_triggered();
     void on_actionDelete_Object_triggered();
     void on_actionMove_Level_triggered();

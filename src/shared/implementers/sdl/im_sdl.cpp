@@ -20,6 +20,7 @@
 #include "im_sdl.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"
+#include "../shared/LuaVM.h"
 
 #include <cstring>
 #include <SDL2/SDL.h>
@@ -57,7 +58,7 @@ void CIMSdl::deleteImageSet(ImageSet &set)
 
 void CIMSdl::forget()
 {
-    qDebug("CIMSdl::forget()");
+    CLuaVM::debugv("CIMSdl::forget()");
     for (int i = 0; i < m_size; ++i) {
         deleteImageSet(* m_imageSets[i]);
     }
@@ -223,7 +224,7 @@ void CIMSdl::setRenderer(SDL_Renderer *renderer)
 
 int CIMSdl::add(const char *uuid, CFont *font)
 {
-    qDebug("adding font: %s %dx%d", uuid, font->width(), font->height());
+    CLuaVM::debugv("adding font: %s %dx%d", uuid, font->width(), font->height());
     ASSERT(font->pixels());
     makeCurrent();
     SDL_Surface* surface =

@@ -42,6 +42,7 @@
 #include "../shared/helper.h"
 #include "displayconfig.h"
 #include "fontmanager.h"
+#include "LuaVM.h"
 
 CSettings::SETTING CGameFile::m_gameDefaults[] =
 {
@@ -361,7 +362,7 @@ int CGameFile::whoIs(CLevel & level, int x, int y)
 
     CLayer *layer = level.getCurrentLayer();
     if (!layer) {
-        qDebug("layer is null\n");
+        CLuaVM::debugv("layer is null\n");
     } else {
         for (int n=0; n < layer->getSize(); ++n) {
             CLevelEntry &entry = (*layer)[n];
@@ -421,7 +422,7 @@ void CGameFile::killProto(int nProto)
 
 bool CGameFile::read(const char *filepath)
 {
-    qDebug("reading ...\n");
+    CLuaVM::debugv("reading ...\n");
     CFolders fs;
     if (fs.open(filepath ? filepath:m_fileName.c_str(), false)) {
         forget();
@@ -439,7 +440,7 @@ bool CGameFile::read(const char *filepath)
         }
 
         if (version.id > ((unsigned)SS_LGCK_VERSION)) {
-            qDebug("Unsupported version of LGCK: 0x%.8x\n", version.id);            
+            CLuaVM::debugv("Unsupported version of LGCK: 0x%.8x\n", version.id);
             const char msg[] = "Unsupported version of LGCK: 0x%.8x\nYou'll need to upgrade to use this file!";
             int len = strlen(msg) + 16;
             char tmp[len];
@@ -447,7 +448,7 @@ bool CGameFile::read(const char *filepath)
             m_lastError = tmp;
             return false;
         } else {
-            qDebug("Version: 0x%.8x\n", version.id);
+            CLuaVM::debugv("Version: 0x%.8x\n", version.id);
         }
 
         if (!version.game_uid) {
@@ -458,7 +459,7 @@ bool CGameFile::read(const char *filepath)
 
         CFolder *obl = fs["obldata"];
         if (!obl) {
-            qDebug("missing `obldata` folder\n");
+            CLuaVM::debugv("missing `obldata` folder\n");
             m_lastError = "damaged database: missing `obldata` folder";
             return false;
         }
@@ -479,7 +480,7 @@ bool CGameFile::read(const char *filepath)
         // Proto
         CFolder::CFileEntry * proto = fs.checkOut("proto.dat");
         if (!proto) {
-            qDebug("missing `./proto.dat`\n");
+            CLuaVM::debugv("missing `./proto.dat`\n");
             m_lastError = "damaged database:\nmissing `./proto.dat`";
             return false;
         }
@@ -492,7 +493,7 @@ bool CGameFile::read(const char *filepath)
         // scripts
         CFolder *levels = fs["scripts"];
         if (!levels) {
-            qDebug("missing `scripts` folder\n");
+            CLuaVM::debugv("missing `scripts` folder\n");
             m_lastError = "damaged database:\nmissing `scripts` folder";
             return false;
         }
@@ -510,7 +511,7 @@ bool CGameFile::read(const char *filepath)
         // sounds
         CFolder *sounds = fs["sounds"];
         if (!sounds) {
-            qDebug("missing `sounds` folder\n");
+            CLuaVM::debugv("missing `sounds` folder\n");
             m_lastError = "damaged database:\nmissing `sounds` folder";
             return false;
         }
@@ -532,7 +533,7 @@ bool CGameFile::read(const char *filepath)
         m_settings->copySettings(m_gameDefaults);
         CFolder::CFileEntry * lgck_cfg = fs.checkOut("lgck.cfg");
         if (!lgck_cfg) {
-            qDebug("missing `./lgck.cfg`\n");
+            CLuaVM::debugv("missing `./lgck.cfg`\n");
             m_lastError = "missing `./lgck.cfg`";
             return false;
         }
@@ -552,7 +553,7 @@ bool CGameFile::read(const char *filepath)
         } else {
             // clear the event array to prevent spill over
             m_events->forget();
-            qDebug("no game events defined\n");
+            CLuaVM::debugv("no game events defined\n");
         }
 
         // strings
@@ -563,7 +564,7 @@ bool CGameFile::read(const char *filepath)
         } else {
             // clear the string array to prevent spill over
             m_strings->forget();
-            qDebug("no strings defined\n");
+            CLuaVM::debugv("no strings defined\n");
         }
 
         // paths
@@ -574,7 +575,7 @@ bool CGameFile::read(const char *filepath)
         } else {
             // clear the string array to prevent spill over
             m_paths->forget();
-            qDebug("no paths defined\n");
+            CLuaVM::debugv("no paths defined\n");
         }
 
         // displayconf
@@ -583,7 +584,7 @@ bool CGameFile::read(const char *filepath)
             file.seek(displayConf->getOffset());
             m_displayConfig->read(file);
         } else {
-            qDebug("Warning: missing `displayConf`. Using defaults.\n");
+            CLuaVM::debugv("Warning: missing `displayConf`. Using defaults.\n");
             m_displayConfig->reset();
         }
 
@@ -593,17 +594,17 @@ bool CGameFile::read(const char *filepath)
             file.seek(fonts->getOffset());
             m_fontManager->read(file);
         } else {
-            qDebug("Warning: missing `fonts`. Using defaults.\n");
+            CLuaVM::debugv("Warning: missing `fonts`. Using defaults.\n");
             m_fontManager->reset();
         }
 
-        qDebug("FS[0] %s", m_arrFrames[0]->tag("UUID").c_str());
-        qDebug("read done ;) \n");
+        CLuaVM::debugv("FS[0] %s", m_arrFrames[0]->tag("UUID").c_str());
+        CLuaVM::debugv("read done ;) \n");
         return true;
     }
 
     const char *msg = "can't open `%s`";
-    qDebug(msg, m_fileName.c_str());
+    CLuaVM::debugv(msg, m_fileName.c_str());
     char tmp[strlen(msg) + m_fileName.length() + 1];
     sprintf(tmp, msg, m_fileName.c_str());
     m_lastError = tmp;//QString("can't open `%1`").arg(m_fileName);

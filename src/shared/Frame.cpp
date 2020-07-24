@@ -32,6 +32,7 @@
 #include "IFile.h"
 #include "FileWrap.h"
 #include "helper.h"
+#include "LuaVM.h"
 #include "../shared/stdafx.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -151,7 +152,7 @@ void CFrame::write(IFile & file)
         uint8_t *pDest;
         int err = compressData((uint8_t *)m_rgb, 4 * m_nLen * m_nHei, &pDest, nDestLen);
         if (err != Z_OK) {
-            qDebug("CFrame::write error: %d", err);
+            CLuaVM::debugv("CFrame::write error: %d", err);
         }
 
         file.write(&nDestLen,4);
@@ -319,7 +320,7 @@ void CFrame::toPng(uint8_t * & png, int & totalSize, uint8_t *obl5data, int obl5
     uint64_t cDataSize;
     int err = compressData(data, dataSize, &cData, cDataSize);
     if (err != Z_OK) {
-        qDebug("CFrame::toPng error: %d", err);
+        CLuaVM::debugv("CFrame::toPng error: %d", err);
     }
 
     delete [] data;

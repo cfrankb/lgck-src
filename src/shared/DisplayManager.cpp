@@ -224,7 +224,7 @@ void CDisplayManager::drawText(CDisplay & display)
 {
     CFont *font = m_game->getFonts()->at(display.font());
     if (!font) {
-        qDebug("warning: invalid fontID: %d", display.font());
+        CLuaVM::debugv("warning: invalid fontID: %d", display.font());
         font = m_game->getFonts()->at(0);
     }
     font->FaceSize(display.size());
@@ -424,7 +424,7 @@ void CDisplayManager::drawDisplay(CDisplay & display)
         break;
 
     default:
-        qDebug("unknown DisplayType: %d", display.type());
+        CLuaVM::debugv("unknown DisplayType: %d", display.type());
         drawText(display);
     }
 }

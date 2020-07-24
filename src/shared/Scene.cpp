@@ -407,7 +407,7 @@ void CScene::write(IFile &file)
 
 const CScene &CScene::operator =(const CScene &s)
 {
-    qDebug("const CScene &CScene::operator =(const CScene &s)");
+    CLuaVM::debugv("const CScene &CScene::operator =(const CScene &s)");
     forget();
     delete [] m_actors;
     m_size = s.m_size;

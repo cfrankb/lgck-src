@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include "stdafx.h"
 #include "FileWrap.h"
+#include "LuaVM.h"
 
 /////////////////////////////////////////////////////////////////////
 // CDisplay
@@ -280,7 +281,7 @@ bool CDisplay::read(IFile &file)
     unsigned int file_version = 0;
     file.read(&file_version, sizeof(file_version));
     if (file_version != VERSION) {
-        qDebug("incorrect version");
+        CLuaVM::debugv("incorrect version");
         return false;
     }
     int count = 0;

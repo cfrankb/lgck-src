@@ -83,8 +83,8 @@
 char MainWindow::m_appName[] = "LGCK builder";
 char MainWindow::m_author[] = "cfrankb";
 
-#define WEB_PATH QString("http://cfrankb.com/lgck/")
-#define UPDATER_URL "http://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
+#define WEB_PATH QString("https://cfrankb.com/lgck/")
+#define UPDATER_URL "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
 
 #define MAX_FONT_SIZE 50
 #define MIN_FONT_SIZE 10
@@ -713,7 +713,7 @@ void MainWindow::updateMenus()
             ui->actionCopy_Object,
             ui->actionDelete_Object,
             ui->actionSend_to_back,
-            ui->actionBrint_to_front,
+            ui->actionBring_to_front,
             ui->actionCustomize,
             ui->actionEdit_Object,
             ui->actionEdit_Images,
@@ -814,7 +814,7 @@ void MainWindow::updateMenus()
         ui->actionUnmark_All_as_Goals->setEnabled( enableMulti );
 
         ui->actionRemove_All->setEnabled( enableMulti );
-        ui->actionBrint_to_front->setEnabled( enableMulti );
+        ui->actionBring_to_front->setEnabled( enableMulti );
         ui->actionSend_to_back->setEnabled( enableMulti );
         ui->actionCopy_Object->setEnabled( enableMulti );
         ui->actionDelete_Object->setEnabled( enableMulti );
@@ -1044,7 +1044,7 @@ void MainWindow::on_actionSend_to_back_triggered()
     }
 }
 
-void MainWindow::on_actionBrint_to_front_triggered()
+void MainWindow::on_actionBring_to_front_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
@@ -1872,7 +1872,7 @@ void MainWindow::showContextMenu(const QPoint& pos)
                 menu.addSeparator();
                 menu.addAction(ui->actionCopy);
                 menu.addAction(ui->actionSend_to_back);
-                menu.addAction(ui->actionBrint_to_front);
+                menu.addAction(ui->actionBring_to_front);
                 menu.addSeparator();
                 menu.addAction(ui->actionCut);
                 menu.addAction(ui->actionDelete);
@@ -2326,7 +2326,7 @@ QAction** MainWindow::actionShortcuts()
         ui->actionTest_Level,
         ui->actionAbout,
         ui->actionNew_file,
-        ui->actionBrint_to_front,
+        ui->actionBring_to_front,
         ui->actionSend_to_back,
         ui->actionDelete_Object,
         ui->actionMove_Level,
@@ -3004,7 +3004,8 @@ void MainWindow::changeProtoIcon(int protoId)
 {
     uint8_t *png;
     int size;
-    m_doc.toFrame(m_doc.toProto(protoId > 0 ? protoId : 0)).toPng(png, size);
+    CProto proto = m_doc.toProto(protoId > 0 ? protoId : 0);
+    m_doc.toFrame(proto).toPng(png, size);
 
     QImage img;
     if (!img.loadFromData(png, size)) {
@@ -3013,5 +3014,6 @@ void MainWindow::changeProtoIcon(int protoId)
     delete [] png;
 
     QPixmap pm = QPixmap::fromImage(img);
+    m_protoIcon->setToolTip(proto.getName());
     m_protoIcon->setPixmap(pm.scaled(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE, Qt::IgnoreAspectRatio));
 }

@@ -415,7 +415,7 @@ void CGame::cacheImages()
             m_imageManager->add( m_arrFrames[i] );
         }
     }else{
-        qDebug("IImageManager not implemented");
+        CLuaVM::debugv("IImageManager not implemented");
     }
 }
 
@@ -458,7 +458,7 @@ void CGame::splitLevel(CLevel *level, CScene *sBK, CScene *sFW)
     CProtoArray & arrProto = m_arrProto;
     CLayer *main = level->getMainLayer();
     if (!main) {
-        qDebug("main layer is null\n");
+        CLuaVM::debugv("main layer is null\n");
         return;
     }
 
@@ -491,7 +491,7 @@ bool CGame::calculateWorldSize(CLevel *s, int &width, int &height)
     int largerY = -1;
     CLayer *main = s->getMainLayer();
     if (!main) {
-        qDebug("main is null\n");
+        CLuaVM::debugv("main is null\n");
         return false;
     }
     for (int i=0; i < main->getSize(); ++i) {
@@ -538,7 +538,7 @@ bool CGame::resetDefaultDisplays()
 {   
     IDisplayManager *dm = displays();
     if (!dm) {
-        qDebug("IDisplayManager not attached\n");
+        CLuaVM::debugv("IDisplayManager not attached\n");
         return false;
     }
     clearDisplay();
@@ -582,7 +582,7 @@ bool CGame::initLevel(int n)
         }
     }
 
-    qDebug("opening music");
+    CLuaVM::debugv("opening music");
     // start music
     const char* music = s->getSetting("music");
     if (music[0]) {
@@ -592,7 +592,7 @@ bool CGame::initLevel(int n)
         if (m_music && m_music->open(filePath)) {
             m_music->play();
         } else {
-            qDebug("failed to music");
+            CLuaVM::debugv("failed to music");
         }
     }
 
@@ -658,7 +658,7 @@ bool CGame::initLevel(int n)
     resetTicks();
 
     // Init PlayerObject
-    qDebug("init player\n");
+    CLuaVM::debugv("init player\n");
     if (svar("playerEntry") != -1) {
         CActor & player = (*m_sFW)[svar("playerEntry")];
         player.callEvent(CObject::EO_ACTIVATE);
@@ -673,14 +673,14 @@ bool CGame::initLevel(int n)
     int tick_rate = s->getSettingInt( CLevel::SPARAM_TICK_RATE );
     if (!tick_rate) {
         tick_rate = DEFAULT_TICK_RATE;
-        qDebug("default tick rate\n");
+        CLuaVM::debugv("default tick rate\n");
     }
 
     var("TICK_SCALE") = 1000 / tick_rate;
     setTimeLeft( s->getSettingInt("time") );
 
     // level specific settings
-    qDebug("init level settings\n");
+    CLuaVM::debugv("init level settings\n");
     microtime(&m_startTime);
     var("startTime") = m_startTime;
     counter("nextTick") = var("TICK_SCALE");
@@ -778,7 +778,7 @@ bool CGame::managePlayer()
         player.unMap();
         player.callEvent(CObject::EO_DEATH);
         if (!player.tryAnimation(CObject::AS_DEAD + player.m_nAim)) {
-            qDebug("player death animation failed (aim=0x%x)", player.m_nAim);
+            CLuaVM::debugv("player death animation failed (aim=0x%x)", player.m_nAim);
             player.set(EXTRA_DEATHINDICATOR, DI_REMOVAL);
         }
     }
@@ -1022,7 +1022,8 @@ void CGame::managePlayerMovements(CActor & player)
         CFrame & frame = * m_arrFrames.getFrame( player );
         if (joyState & JOY_UP
                 && player.get(EXTRA_PATHDIR) == -1) {
-            CActor t_player = player;
+            CActor t_player;
+            t_player.copyFrom(player);
             t_player.move(UP);
             if (player.canMove(UP, false) &&
                     !t_player.canFall()) {
@@ -1071,7 +1072,8 @@ void CGame::managePlayerMovements(CActor & player)
                 player.autoCenter(LEFT);
                 player.callEvent(CObject::EO_MOVE);
             }  else {
-                CActor t_player = player;
+                CActor t_player;
+                t_player.copyFrom(player);
                 t_player.move(UP);
                 if (player.m_nY !=0 &&
                         player.canMove(UP, false) &&
@@ -1096,7 +1098,8 @@ void CGame::managePlayerMovements(CActor & player)
                 player.autoCenter(RIGHT);
                 player.callEvent(CObject::EO_MOVE);
             } else {
-                CActor t_player = player;
+                CActor t_player;
+                t_player.copyFrom(player);
                 t_player.move(UP);
                 player.autoCenter(RIGHT);
                 if (player.m_nY !=0 &&
@@ -1252,7 +1255,7 @@ bool CGame::initSettings()
     }
 
     if (settings[PARAM_POINTS].value[0] == ':') {
-        qDebug("points internal");
+        CLuaVM::debugv("points internal");
         CFileWrap file;
         if (file.open(settings[PARAM_POINTS].value.c_str() )) {
             m_points = new CFrameSet;
@@ -1268,7 +1271,7 @@ bool CGame::initSettings()
     }
 
     if (!m_points) {
-        qDebug("`%s` not found", settings[PARAM_POINTS].value.c_str());
+        CLuaVM::debugv("`%s` not found", settings[PARAM_POINTS].value.c_str());
         m_lastError = "`points` not found";
         return false;
     }
@@ -1304,13 +1307,13 @@ void CGame::setVitals(int hp, int lives, int score)
 bool CGame::initLevelTest( int level,  int skill,  bool initSound)
 {
     // Intialize the game settings
-    qDebug("init settings");
+    CLuaVM::debugv("init settings");
 
     if (!initSettings()) {
         return false;
     }
 
-    qDebug("init sound");
+    CLuaVM::debugv("init sound");
     // Load sound re/sources
     if (initSound) {
         initSounds();
@@ -1318,7 +1321,7 @@ bool CGame::initLevelTest( int level,  int skill,  bool initSound)
 
     setSkill(skill);
 
-    qDebug("init level");
+    CLuaVM::debugv("init level");
 
     // Initialize the level
     if (!initLevel( level )) {
@@ -1421,7 +1424,7 @@ bool CGame::isEndLevelMeet()
 
 void CGame::postInitLevel()
 {
-    qDebug("postInitLevel\n");
+    CLuaVM::debugv("postInitLevel\n");
 
     // invoke onCreate event
     callLvEvent(CLevel::EL_CREATE);
@@ -1436,7 +1439,7 @@ void CGame::postInitLevel()
         callLvEvent(CLevel::EL_RESTART);
     }
 
-    qDebug("postInitLevel completed\n");
+    CLuaVM::debugv("postInitLevel completed\n");
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -1681,7 +1684,7 @@ bool CGame::loadScript( const char *scriptName )
     CFileWrap file;
     bool result = file.open(path);
     if (!result) {
-        qDebug("-- loading internal:%s\n", scriptName);
+        CLuaVM::debugv("-- loading internal:%s\n", scriptName);
         sprintf(path, ":/scripts/%s", scriptName);
         result = file.open(path);
     }
@@ -1700,7 +1703,7 @@ bool CGame::loadScript( const char *scriptName )
         const char fmt[] = "-- failed to load `%s`\n";
         sprintf( tmp, fmt , scriptName);
         m_lua.debug(tmp);
-        qDebug(fmt, tmp);
+        CLuaVM::debugv(fmt, tmp);
     }
     return result;
 }
@@ -1714,7 +1717,7 @@ bool CGame::readScript( const char *scriptName, std::string &out )
     CFileWrap file;
     bool result = file.open(path);
     if (!result) {
-        qDebug("-- loading internal:%s\n", scriptName);
+        CLuaVM::debugv("-- loading internal:%s\n", scriptName);
         sprintf(path, ":/scripts/%s", scriptName);
         result = file.open(path);
     }
@@ -1731,7 +1734,7 @@ bool CGame::readScript( const char *scriptName, std::string &out )
         const char fmt2[] = "-- failed to load `%s`\n";
         sprintf(tmp, fmt2, scriptName);
         m_lua.debug(tmp);
-        qDebug(fmt2, tmp);
+        CLuaVM::debugv(fmt2, tmp);
     }
     return result;
 }
@@ -1780,7 +1783,7 @@ void CGame::callObjEvent(int objId, int eventId)
     CScene & scene = *(m_sFW);
     int proto = scene[objId].m_nProto;
     if (proto <= 0) {
-        qDebug("execObjEvent() invalid call rejected: objId: %d, proto: 0x%.4x, event: 0x%x", objId, proto, eventId);
+        CLuaVM::debugv("execObjEvent() invalid call rejected: objId: %d, proto: 0x%.4x, event: 0x%x", objId, proto, eventId);
         return ;
     }
 
@@ -1839,26 +1842,26 @@ CGame &CGame::getGame()
 
 void CGame::attach(IImageManager *im)
 {
-    qDebug(im? "attaching IImageManager" : "detaching IImageManager");
+    CLuaVM::debugv(im? "attaching IImageManager" : "detaching IImageManager");
     m_imageManager = im;
     cacheImages();
 }
 
 void CGame::attach(IGraphics *gr)
 {
-    qDebug(gr? "attaching IGraphics" : "detaching IGraphics");
+    CLuaVM::debugv(gr? "attaching IGraphics" : "detaching IGraphics");
     m_graphics = gr;
 }
 
 void CGame::attach(IMusic *mu)
 {
-    qDebug(mu? "attaching IMusic" : "detaching IMusic");
+    CLuaVM::debugv(mu? "attaching IMusic" : "detaching IMusic");
     m_music = mu;
 }
 
 void CGame::attach(ISound *sn)
 {
-    qDebug(sn? "attaching ISound" : "detaching ISound");
+    CLuaVM::debugv(sn? "attaching ISound" : "detaching ISound");
     m_sound = sn;
 }
 
@@ -2089,7 +2092,7 @@ void CGame::loadGame(IFile &file)
     // Read Counters
     file.read(&size, sizeof(size));
     m_counters.clear();
-    qDebug("Counters: %d", size);
+    CLuaVM::debugv("Counters: %d", size);
     for (unsigned int i=0; i < size; ++i) {
         std::string key;
         file >> key;
@@ -2102,7 +2105,7 @@ void CGame::loadGame(IFile &file)
 
     // Read Variables
     file.read(&size, sizeof(size));
-    qDebug("Vars: %d", size);
+    CLuaVM::debugv("Vars: %d", size);
     m_vars.clear();
     for (unsigned int i=0; i < size; ++i) {
         std::string key;
@@ -2145,7 +2148,7 @@ void CGame::loadGame(IFile &file)
 
     // load strv
     file.read(&size, sizeof(size));
-    qDebug("Strings: %d", size);
+    CLuaVM::debugv("Strings: %d", size);
     m_strings.clear();
     for (unsigned int i=0; i < size; ++i) {
         std::string key;
@@ -2207,10 +2210,10 @@ void CGame::remap()
 
 bool CGame::initFonts()
 {
-    qDebug("initFont()");
+    CLuaVM::debugv("initFont()");
     CFontManager * fonts = getFonts();
     if (!fonts) {
-        qDebug("font manager not created");
+        CLuaVM::debugv("font manager not created");
         return false;
     }
 
@@ -2218,11 +2221,11 @@ bool CGame::initFonts()
          CFont *font = fonts->at(i);
          unsigned int tex = font->textureId();
          if (tex) {
-             qDebug("Font %d already initialized %u", i, tex);
+             CLuaVM::debugv("Font %d already initialized %u", i, tex);
          } else {
-             qDebug("adding font: %d", i);
+             CLuaVM::debugv("adding font: %d", i);
              int textureId = m_imageManager->add(fonts->nameAt(i), font);
-             qDebug("textureId: %u", textureId);
+             CLuaVM::debugv("textureId: %u", textureId);
              font->setTextureId(textureId);
          }
     }

@@ -27,6 +27,7 @@
 #include "IFile.h"
 #include "PngMagic.h"
 #include "helper.h"
+#include "LuaVM.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFrameSet
@@ -100,7 +101,7 @@ void CFrameSet::write0x501(IFile & file)
     uint8_t *dest;
     int err = compressData((uint8_t *)buffer, (uint64_t) totalSize, &dest, destSize);
     if (err != Z_OK) {
-        qDebug("CFrameSet::write0x501 error: %d", err);
+        CLuaVM::debugv("CFrameSet::write0x501 error: %d", err);
     }
 
     // OBL5 IMAGESET HEADER
@@ -311,7 +312,7 @@ CFrame * CFrameSet::operator[](int n) const
 
  void CFrameSet::copyTags(CFrameSet & src)
  {
-     qDebug("copytags");
+     CLuaVM::debugv("copytags");
      // copy tags
      m_tags.clear();
      for(auto kv : src.m_tags) {

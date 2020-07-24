@@ -8,6 +8,8 @@
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QTime>
+#include <QCursor>
+#include <QPixmap>
 #include "Level.h"
 #include "Layer.h"
 #include "Const.h"
@@ -16,7 +18,6 @@
 #include "Frame.h"
 #include "Selection.h"
 #include "inputs/qt/kt_qt.h"
-#include "qtgui/cheat.h"
 
 constexpr int MAX_PIXEL = 0x7ff8;
 constexpr int MARGIN = 32;
@@ -133,6 +134,7 @@ void CLevelScroll::paintSprite()
 
 void CLevelScroll::mousePressEvent(QMouseEvent * event)
 {
+    setCursor();
     //qDebug("mousePressEvent");
     switch (event->button())
     {
@@ -200,12 +202,16 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
             return;
         }
         m_mouse.orgX = m_mouse.orgY = -1;
+        if (m_bErase) {
+            layer.removeSelectedSprites();
+        }
     }
     //setFocus();
 }
 
 void CLevelScroll::mouseReleaseEvent(QMouseEvent * event)
 {
+    setCursor();
     //qDebug("mouseReleaseEvent");
     switch (event->button())
     {
@@ -247,12 +253,16 @@ void CLevelScroll::mouseReleaseEvent(QMouseEvent * event)
                 emit menuChanged();
                 layer.select(selection);
             }
+            if (m_bErase) {
+                layer.removeSelectedSprites();
+            }
         }
     }
 }
 
 void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
 {
+    setCursor();
     //qDebug("mouseMoveEvent");
     QSize sz = size();
     m_mouse.oldX = m_mouse.x;
@@ -322,7 +332,7 @@ void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
 void CLevelScroll::editPath()
 {
     QSize sz = size();
-    emit statusChanged(0, tr("Editing Path : SPACE to Save / ESC to Cancel"));
+    emit statusChanged(0, tr("Editing Path: Use CURSORS to move, SPACE to Save or ESC to Cancel"));
     ++m_ticks;
     //setFocus();
     if (m_game && m_game->getSize()) {
@@ -917,4 +927,20 @@ void CLevelScroll::setEraserState(bool state)
 {
     qDebug("erase state: %d", state);
     m_bErase = state;
+}
+
+void CLevelScroll::setCursor()
+{
+    if (m_editPath) {
+        QCursor c = QCursor(QPixmap(":/images/pd/footprint.png"));
+        viewport()->setCursor(c);
+    } else if (m_bErase) {
+        QCursor c = QCursor(QPixmap(":/images/icons8-eraser-50.png"), 20, 45);
+        viewport()->setCursor(c);
+    } else if (m_paintSprite) {
+        QCursor c = QCursor(QPixmap(":/images/sketchpntbrush.png"), 10, 31);
+        viewport()->setCursor(c);
+    } else {
+        viewport()->unsetCursor();
+    }
 }

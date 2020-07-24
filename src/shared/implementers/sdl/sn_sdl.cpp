@@ -23,13 +23,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #include <SDL2/SDL_mixer.h>
+#include "../shared/LuaVM.h"
 
 CSndSDL::CSndSDL()
 {   
     m_valid = false;
     // Initialize all SDL subsystems
     if ( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )  {
-        qDebug("SDL_init failed: %s", SDL_GetError());
+        CLuaVM::debugv("SDL_init failed: %s", SDL_GetError());
         return;
     }
     m_valid = true;
@@ -58,7 +59,7 @@ void CSndSDL::forget()
 void CSndSDL::add(unsigned char *data, unsigned int size, unsigned int uid)
 {
     if (m_sounds.find(uid) != m_sounds.end()) {
-        qDebug("ADD: sound already added: %u", uid);
+        CLuaVM::debugv("ADD: sound already added: %u", uid);
         return;
     }
     SND *snd = new SND;
@@ -68,13 +69,13 @@ void CSndSDL::add(unsigned char *data, unsigned int size, unsigned int uid)
     SDL_RWops *rw = SDL_RWFromConstMem((void*) data,  size);
     if (!rw) {
         fail = true;
-        qDebug("SDL_RWFromConstMem Failed: %s", SDL_GetError());
+        CLuaVM::debugv("SDL_RWFromConstMem Failed: %s", SDL_GetError());
     }
     if (!fail) {
         snd->chunk = Mix_LoadWAV_RW(rw, 1);
         if (!snd->chunk) {
             fail = true;
-            qDebug("Mix_LoadWAV_RW Failed: %s", Mix_GetError());
+            CLuaVM::debugv("Mix_LoadWAV_RW Failed: %s", Mix_GetError());
         }
     }
     if (fail) {
@@ -93,7 +94,7 @@ void CSndSDL::replace(unsigned char *data, unsigned int size, unsigned int uid)
 void CSndSDL::remove(unsigned int uid)
 {
     if (m_sounds.find(uid) == m_sounds.end()) {
-        qDebug("REMOVE: sound not found: %u", uid);
+        CLuaVM::debugv("REMOVE: sound not found: %u", uid);
         return;
     }
     SND *snd = m_sounds[uid];
@@ -116,7 +117,7 @@ void CSndSDL::play(unsigned int uid)
     snd->channel = Mix_PlayChannel(
                 snd->channel, snd->chunk, 0);
     if (snd->channel==-1) {
-        qDebug("Mix_PlayChannel: %s",Mix_GetError());
+        CLuaVM::debugv("Mix_PlayChannel: %s",Mix_GetError());
     }
 }
 

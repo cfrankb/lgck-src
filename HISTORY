@@ -9,6 +9,7 @@ HISTORY OF LGCK BUILDER
 - ENGINE: major code clean up
 - EDITOR: mark/unmark all goals matching a sprite 
 - EDITOR: added debug output window
+- EDITOR: tile paint, eraser modes added
 - LUA: display_setFlagXY, display_setFont
 
 

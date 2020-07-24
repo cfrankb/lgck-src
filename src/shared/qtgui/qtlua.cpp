@@ -112,7 +112,7 @@ void qtLua_init()
 
 void error(const char *name, int args)
 {
-    qDebug("error: fn `%s` needs `%d` args", name, args);
+    CLuaVM::debugv("error: fn `%s` needs `%d` args", name, args);
 }
 
 int addWidget(void * c)
@@ -2741,7 +2741,7 @@ int qslider_new(lua_State *L)
     if (argc < 0 and argc > 1) {
        error(fn, 0);
     } else {
-        int arg0 = (argc >= 1) ? lua_tointeger(L, 1) : Qt::Vertical;
+        int arg0 = (argc >= 1) ? lua_tointeger(L, 1) : (int) Qt::Vertical;
         return addWidget(new QSlider(static_cast<Qt::Orientation>(arg0)));
     }
     return 0;

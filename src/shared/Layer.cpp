@@ -22,7 +22,8 @@
 #include "LevelEntry.h"
 #include <cstdio>
 #include <zlib.h>
-#include "../shared/IFile.h"
+#include "IFile.h"
+#include "LuaVM.h"
 #include "helper.h"
 
 CLayer::CLayer(const char* name, int type, int h, int v)
@@ -202,7 +203,7 @@ bool CLayer::read(IFile & file, bool compr)
     if (compr) {
         uint8_t *pCompressData = new uint8_t [ nCompressSize ];
         if (nTotalSize != (m_size * sizeof(CLevelEntry))) {
-            qDebug("CLayer() : total uncompressed size doesn't match array size\n");
+            CLuaVM::debugv("CLayer() : total uncompressed size doesn't match array size\n");
             return false;
         }
         file.read(pCompressData, nCompressSize);
@@ -211,7 +212,7 @@ bool CLayer::read(IFile & file, bool compr)
                              pCompressData,
                              nCompressSize);
         if (err) {
-            qDebug("CLayer::Read err=%d\n", err);
+            CLuaVM::debugv("CLayer::Read err=%d\n", err);
             return false;
         }
         delete [] pCompressData;
@@ -250,7 +251,7 @@ bool CLayer::write(IFile &file, bool compr)
     if (compr) {
         int err = compressData((uint8_t *)m_arrEntries, (uint64_t)nTotalSize, &pCompressData, nCompressSize);
         if (err != Z_OK) {
-            qDebug("CLayer::Write error: %d", err);
+            CLuaVM::debugv("CLayer::Write error: %d", err);
         }
         file << (int) nTotalSize;
         file << (int) nCompressSize;

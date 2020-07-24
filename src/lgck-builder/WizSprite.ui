@@ -194,7 +194,7 @@
      <rect>
       <x>60</x>
       <y>160</y>
-      <width>121</width>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -273,7 +273,7 @@
      <rect>
       <x>220</x>
       <y>190</y>
-      <width>131</width>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -349,7 +349,7 @@
      <rect>
       <x>320</x>
       <y>100</y>
-      <width>101</width>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
@@ -664,7 +664,7 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>171</width>
+      <width>201</width>
       <height>21</height>
      </rect>
     </property>
@@ -801,8 +801,8 @@
      <rect>
       <x>20</x>
       <y>46</y>
-      <width>52</width>
-      <height>14</height>
+      <width>71</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -814,7 +814,7 @@
      <rect>
       <x>20</x>
       <y>15</y>
-      <width>71</width>
+      <width>81</width>
       <height>16</height>
      </rect>
     </property>
@@ -949,7 +949,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>20</x>
       <y>116</y>
-      <width>141</width>
+      <width>171</width>
       <height>19</height>
      </rect>
     </property>
@@ -1199,8 +1199,8 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>15</x>
        <y>100</y>
-       <width>52</width>
-       <height>14</height>
+       <width>71</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -1258,7 +1258,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>14</x>
        <y>68</y>
-       <width>71</width>
+       <width>81</width>
        <height>16</height>
       </rect>
      </property>
