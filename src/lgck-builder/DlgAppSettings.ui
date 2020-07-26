@@ -47,7 +47,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_1">
        <attribute name="title">
@@ -619,6 +619,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
   <tabstop>cShowGrid</tabstop>
   <tabstop>cbGridSize</tabstop>
   <tabstop>eGridColor</tabstop>
@@ -640,7 +641,6 @@
   <tabstop>eRuntimeArgs</tabstop>
   <tabstop>btnRestore</tabstop>
   <tabstop>tableWidget</tabstop>
-  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources/>
  <connections>
