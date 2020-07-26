@@ -51,8 +51,8 @@
 #include "Font.h"
 #include "WizFont.h"
 
-static const char g_oblFilter[] = "Object Blocks (*.obl *.obl5)";
-static const char g_pngFilter[] = "PNG Images (*.png)";
+static const QString g_oblFilter = QObject::tr("Object Blocks (*.obl *.obl5)");
+static const QString g_pngFilter = QObject::tr("PNG Images (*.png)");
 
 CToolBoxDock::CToolBoxDock(QWidget *parent) :
     QDockWidget(parent),
@@ -144,8 +144,8 @@ void CToolBoxDock::copySprite()
     }
     model->insertRow(pos);
     item = m_ui->treeObjects->topLevelItem( pos );
-    m_ui->treeObjects->setCurrentItem( item );
     updateIcon( item, gf.m_arrProto.getSize() - 1 );
+    m_ui->treeObjects->setCurrentItem( item );
     gf.setDirty(true);
     delete d;
 }
@@ -206,9 +206,8 @@ void CToolBoxDock::editSprite()
             }
             //indexProto->debug();
             QTreeWidgetItem * item = m_ui->treeObjects->topLevelItem( pos );
-            m_ui->treeObjects->setCurrentItem( item );
             updateIcon( item, protoId );
-
+            m_ui->treeObjects->setCurrentItem( item );
             gf.setDirty(true);
         }
     }
@@ -259,7 +258,7 @@ void CToolBoxDock::createSprite()
             // delete the frameSet if we don't need it
             delete wiz->getFrameSet();
         }
-        CProtoIndex *protoIndex = (CProtoIndex *)m_index;
+        CProtoIndex *protoIndex = m_index;
         protoIndex->resizeIndex( protoIndex->getSize() + 1);
         int pos = protoIndex->insert( gf.m_arrProto.getSize() - 1 );
         QAbstractItemModel * model =  m_ui->treeObjects->model();
@@ -268,8 +267,8 @@ void CToolBoxDock::createSprite()
         }
         model->insertRow(pos);
         QTreeWidgetItem * item = m_ui->treeObjects->topLevelItem( pos );
+        updateIcon(item, gf.m_arrProto.getSize() - 1);
         m_ui->treeObjects->setCurrentItem( item );
-        updateIcon( item, gf.m_arrProto.getSize() - 1 );
         gf.setDirty(true);
         if (QMessageBox::question(this, "", tr("Do you want to edit your new sprite?"),
                                  QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
@@ -1257,14 +1256,14 @@ void CToolBoxDock::exportSprite()
     COBL5File oblDoc;
 
     QStringList filters;
-    QString selected = tr(g_oblFilter) + "\n" + tr(g_pngFilter);
+    QString selected = g_oblFilter + "\n" + g_pngFilter;
     QString suffix = "obl";
     QString fileName = "";
 
-    selected = tr(g_pngFilter) + "\n" + tr(g_oblFilter);
+    selected = g_pngFilter + "\n" + g_oblFilter;
     suffix = "png";
-    filters.append(tr(g_pngFilter));
-    filters.append(tr(g_oblFilter));
+    filters.append(g_pngFilter);
+    filters.append(g_oblFilter);
 
     CWFileSave * dlg = new CWFileSave(this,tr("Save As"),"",selected);
 
@@ -1283,7 +1282,7 @@ void CToolBoxDock::exportSprite()
     char outFormat[5];
     if (!fileName.isEmpty()) {
         selected = dlg->selectedNameFilter();
-        if (selected == tr(g_oblFilter)) {
+        if (selected == g_oblFilter) {
             strcpy(outFormat, "OBL5");
         } else {
             strcpy(outFormat, "PNG");

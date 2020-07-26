@@ -58,12 +58,11 @@ public:
     CGame *getGame();
     void createEventEditor();
     void makeCurrent();
+    static const char m_appName[];
+    static const char m_author[];
+    static const QString m_appTitle;
 
 private:
-    static char m_fileFilter[];
-    static char m_appName[];
-    static char m_appTitle[];
-    static char m_author[];
     Ui::MainWindow *ui;
     QComboBox *m_comboEvents;
     QComboBox *m_comboLayers;
@@ -79,7 +78,9 @@ private:
     QElapsedTimer m_time;
     int m_nextTick;
     bool m_bShowGrid;
-    char m_gridColor[8];
+    QString m_gridColor;
+    QString m_triggerKeyColor;
+    bool m_bShowTriggerKey;
     int m_gridSize;
     int m_skill;
     int m_lives;
@@ -296,6 +297,8 @@ signals:
     void debugText(const QString & text);
     void spritePaintStateChanged(bool state);
     void eraserStateChanged(bool state);
+    void triggerKeyColorChanged(const QString & color);
+    void triggerKeyShow(bool state);
 };
 
 #endif // MAINWINDOW_H

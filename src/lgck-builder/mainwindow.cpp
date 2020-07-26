@@ -80,8 +80,9 @@
 #include "exportgame.h"
 #include "infodock.h"
 
-char MainWindow::m_appName[] = "LGCK builder";
-char MainWindow::m_author[] = "cfrankb";
+const char MainWindow::m_appName[] = "LGCK builder";
+const char MainWindow::m_author[] = "cfrankb";
+const QString MainWindow::m_appTitle = MainWindow::tr("LGCK builder IDE");
 
 #define WEB_PATH QString("https://cfrankb.com/lgck/")
 #define UPDATER_URL "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
@@ -118,7 +119,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     m_proto = -1;
     m_event = -1;
-    m_gridColor[0] = 0;
+    m_gridColor = "000000";
+    m_triggerKeyColor = "FFFF00";
     m_gridSize = 32;
     m_fontSize = DEFAULT_FONT_SIZE;
     m_viewMode = VM_EDITOR;
@@ -256,6 +258,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, SIGNAL(eraserStateChanged(bool)),
             m_scroll, SLOT(setEraserState(bool)));
+
+    connect(this, SIGNAL(triggerKeyColorChanged(QString)),
+            m_lview, SLOT(setTriggerKeyColor(QString)));
+
+    connect(this, SIGNAL(triggerKeyShow(bool)),
+            m_lview, SLOT(showTriggerKey(bool)));
 
     // debugOutput
     m_infoDock = new CInfoDock(this);
@@ -477,7 +485,7 @@ bool MainWindow::updateTitle()
     } else {
         file = QFileInfo(m_doc.getFileName()).fileName();
     }
-    setWindowTitle(tr("%1[*] - %2").arg(file).arg(tr("LGCK builder IDE")));
+    setWindowTitle(tr("%1[*] - %2").arg(file).arg(m_appTitle));
     return true;
 }
 
@@ -1317,10 +1325,12 @@ void MainWindow::showAppSettings(int tab)
     QString s = QString(tr("%1 Settings").arg(m_appName));
     d->setWindowTitle(s);
     d->showGrid(m_bShowGrid);
-    d->setGridColor(QString(m_gridColor));
+    d->setGridColor(m_gridColor);
     d->setGridSize(m_gridSize);
+    d->setTriggerKeyColor(m_triggerKeyColor);
     d->setUpdater(m_bUpdate, m_updateURL);
     d->setFontSize(m_fontSize);
+    d->setShowTriggerKey(m_bShowTriggerKey);
     d->setCurrentTab(tab);
     qDebug("Font Size: %d", m_fontSize);
     QAction **actions = actionShortcuts();
@@ -1352,7 +1362,8 @@ void MainWindow::showAppSettings(int tab)
         emit gridSizeChanged(d->getGridSize());
         m_gridSize = d->getGridSize();
         emit gridColorChanged(d->getGridColor());
-        strcpy(m_gridColor, q2c(d->getGridColor().mid(0,6)));
+        m_gridColor = d->getGridColor().mid(0,6);
+        m_triggerKeyColor = d->getTriggerKeyColor().mid(0,6);
         ui->action_ShowGrid->setChecked(m_bShowGrid);
         m_lview->repaint();
         m_skill = d->getSkill();
@@ -1360,9 +1371,12 @@ void MainWindow::showAppSettings(int tab)
         m_score = d->getScore();
         m_lives = d->getLives();
         m_fontSize = d->getFontSize();
+        m_bShowTriggerKey = d->getShowTriggerKey();
         d->getRuntime(m_runtime, m_runtimeArgs);
         emit fontSizeChanged(m_fontSize);
         m_skipSplash = d->getSkipSplashScreen();
+        emit triggerKeyColorChanged(m_triggerKeyColor);
+        emit triggerKeyShow(m_bShowTriggerKey);
     }
     delete d;
 }
@@ -2374,6 +2388,7 @@ QAction** MainWindow::actionShortcuts()
         ui->actionLayer_ToolBar,
         ui->actionEdit_Images,
         ui->actionDebugOutput,
+        ui->actionSprite_Paint,
         nullptr
     };
     return actions;
@@ -2387,8 +2402,9 @@ void MainWindow::saveSettings()
     bool saveSettings = ui->actionSave_Settings->isChecked();
     if (saveSettings) {
         settings.setValue("showGrid", m_bShowGrid);
-        settings.setValue("gridColor", QString(m_gridColor));
+        settings.setValue("gridColor", m_gridColor);
         settings.setValue("gridSize", m_gridSize);
+        settings.setValue("triggerKeyColor", m_triggerKeyColor);
         settings.beginGroup("Shortcuts");
         QAction **actions = actionShortcuts();
         for (uint i=0; actions[i];++i) {
@@ -2468,9 +2484,13 @@ void MainWindow::reloadSettings()
     ui->action_ShowGrid->setChecked(m_bShowGrid);
     QString color = settings.value("gridColor", "a0b0c0").toString();
     emit gridColorChanged(color);
-    strcpy(m_gridColor, q2c(color.mid(0,6)));
+    m_gridColor = color.mid(0,6);
     m_gridSize = settings.value("gridSize", 32).toInt() & 0xf0;
     emit gridSizeChanged(m_gridSize > 0 ? m_gridSize : 32);
+    m_triggerKeyColor = settings.value("triggerKeyColor", "ffff00").toString();
+    m_bShowTriggerKey = settings.value("showTriggerKey", true).toBool();
+    emit triggerKeyColorChanged(m_triggerKeyColor);
+    emit triggerKeyShow(m_bShowTriggerKey);
     bool saveSettings = settings.value("saveSettings", true).toBool();
     ui->actionSave_Settings->setChecked(saveSettings);
     // TestLevel
@@ -2829,7 +2849,7 @@ void MainWindow::goExternalRuntime()
     }
     if (!errMsg.isEmpty()){
         warningMessage(errMsg);
-        showAppSettings(CDlgAppSettings::TAB_RUNTIME);
+        showAppSettings(CDlgAppSettings::TAB_TEST);
     }
 }
 

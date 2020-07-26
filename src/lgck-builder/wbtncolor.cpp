@@ -56,6 +56,7 @@ void CWBtnColor::click()
 void CWBtnColor::setBuddy(QLineEdit* q)
 {
     m_buddy = q;
+    q->setInputMask("hhhhhh");
     connect(q, SIGNAL(textChanged(QString)), this, SLOT(setColor(QString)));
     connect(this, SIGNAL(colorChanged(QString)), q, SLOT(setText(QString)));
 }

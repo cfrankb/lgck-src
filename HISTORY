@@ -10,6 +10,7 @@ HISTORY OF LGCK BUILDER
 - EDITOR: mark/unmark all goals matching a sprite 
 - EDITOR: added debug output window
 - EDITOR: tile paint, eraser modes added
+- EDITOR: show TriggerKeys in editor
 - LUA: display_setFlagXY, display_setFont
 
 

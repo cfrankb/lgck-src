@@ -23,6 +23,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_2_0>
 #include <QTimer>
+#include "Color.h"
 
 class CGame;
 
@@ -64,6 +65,8 @@ protected:
     bool m_showGrid;
     int m_gridSize;
     unsigned int m_gridColor;
+    unsigned int m_triggerKeyColor;
+    bool m_showTriggerKey;
     CGame *m_game;
     bool m_hasFocus;
     QTimer m_timer;
@@ -78,6 +81,7 @@ protected:
     void drawCheckers();
     void drawBackground();
     void drawItemRect();
+    void uint2color(u_int32_t rgba, Color &out);
 
 Q_SIGNALS:
     void focused(bool);
@@ -90,6 +94,8 @@ protected slots:
     void showGrid(bool show);
     void setGridSize(int size);
     void setGridColor(const QString & gridColor);
+    void setTriggerKeyColor(const QString & gridColor);
+    void showTriggerKey(bool state);
     friend class CLevelScroll;
 };
 

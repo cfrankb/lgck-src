@@ -261,6 +261,7 @@ void CSnd::debug()
 
 bool CSnd::read(IFile & file)
 {
+    UNUSED(file);
     return true;
 }
 

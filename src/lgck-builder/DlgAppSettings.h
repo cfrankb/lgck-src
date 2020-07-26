@@ -35,13 +35,17 @@ public:
     CDlgAppSettings(QWidget *parent = 0);
     ~CDlgAppSettings();
 
-    void init();    
+    void init();
     void load(QStringList & listActions, QStringList & listShortcuts, QStringList & listDefaults);
     void save(QStringList & listShortcuts);
     int getGridSize();
     QString getGridColor();
+    QString getTriggerKeyColor();
+    bool getShowTriggerKey();
     void setGridSize(int gridSize);
-    void setGridColor(QString gridColor);
+    void setGridColor(const QString & color);
+    void setTriggerKeyColor(const QString & color);
+    void setShowTriggerKey(bool show);
     bool isShowGrid();
     void showGrid(bool show);
     void setSkill(int skill);
@@ -64,22 +68,18 @@ public:
     static const char *defaultRuntimeArgs();
 
     enum {
-        TAB_GRID,
-        TAB_SHORTCUTS,
-        TAB_TEST,
-        TAB_UPDATER,
         TAB_EDITOR,
-        TAB_RUNTIME,
+        TAB_TEST,
+        TAB_SHORTCUTS,
         TAB_DEFAULT=0
     };
 
 protected:
     void changeEvent(QEvent *e);
     static int m_gridSizes [];
-
-    QString m_gridColor;
     int m_gridSize;
-    bool m_showGrid;
+    void enableGridOptions();
+    void enableTriggerKeyOptions();
 
 private:
     Ui::CDlgAppSettings *m_ui;
@@ -87,20 +87,18 @@ private:
     CWHotKey **m_hotkeys;
     QStringList *m_defaultShortcuts;
     int m_count;
-    void setBtnColor(const QString & str);
 
 signals:
     void versionCheck();
 
 private slots:
     void on_cShowGrid_clicked();
-    void on_btnGridColor_clicked();
     void buttonPushed();
-    void on_eGridColor_textChanged(const QString &arg1);
     void on_cCheckUpdate_clicked(bool checked);
     void on_btnCheckUpdate_clicked();
     void on_btnRuntime_clicked();
     void on_btnRestore_clicked();
+    void on_cbShowTriggerKey_toggled(bool checked);
 };
 
 #endif // DLGAPPSETTINGS_H

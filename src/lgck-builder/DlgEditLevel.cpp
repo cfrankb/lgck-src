@@ -318,7 +318,7 @@ void CDlgEditLevel::on_pushButton_clicked()
 
 void CDlgEditLevel::on_btnMusic_clicked()
 {
-    QString fileFilter = "Music files (*.ogg)";
+    QString fileFilter = tr("Music files (*.ogg)");
     QString fileName = m_gameFile->m_path.c_str();
     fileName = QFileDialog::getOpenFileName(this, tr("Select Music File"), fileName, fileFilter);
     if (!fileName.isEmpty()) {

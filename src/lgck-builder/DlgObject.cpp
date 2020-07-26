@@ -1165,3 +1165,10 @@ void CDlgObject::on_cInactive_clicked(bool checked)
 {
     m_ui->cbInactive->setEnabled(checked);
 }
+
+void CDlgObject::on_btnUuid_clicked()
+{
+    CProto & proto = m_gameFile->m_arrProto[m_objectIndex];
+    QClipboard *clip = QApplication::clipboard();
+    clip->setText(proto.m_uuid);
+}

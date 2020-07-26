@@ -34,6 +34,8 @@
 #include "implementers/opengl/im_opengl.h"
 #include "inputs/qt/kt_qt.h"
 #include <QDebug>
+#include "fontmanager.h"
+#include "Font.h"
 
 // doc.qt.io/qt-5/qopenglwidget.html#paintGL
 // http://guillaume.belz.free.fr/doku.php?id=opengl_dans_qt5
@@ -213,6 +215,17 @@ bool CLevelViewGL::isGameMode()
     return gameMode;
 }
 
+void CLevelViewGL::uint2color(u_int32_t rgba, Color & out)
+{
+    uint8_t blue = rgba & 0xff;
+    uint8_t green = (rgba & 0xff00) >> 8;
+    uint8_t red = (rgba >> 16) & 0xff;
+    uint8_t alpha = rgba >> 24;
+    out = {
+        red, green, blue, alpha
+    };
+}
+
 void CLevelViewGL::drawScreen()
 {
     CLevel & level = m_game->getCurrentLevel();
@@ -241,6 +254,7 @@ void CLevelViewGL::drawScreen()
 
     CIMOpengl * im = (CIMOpengl *)m_game->cache();
     if (!im) {
+        qWarning("image cache not set.");
         return;
     }
 
@@ -254,6 +268,12 @@ void CLevelViewGL::drawScreen()
     float green = (colorMod & 0xff00) >> 8;
     float red = (colorMod >> 16) & 0xff;
     glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+
+    CFont *font = m_game->getFonts()->at(0);
+    font->FaceSize(16);
+    Color fontColor;
+    uint2color(m_triggerKeyColor, fontColor);
+    Color shadowColor = { 0, 0, 0, 255};
 
     for (int i=0; i < layer.getSize(); ++i) {
         CLevelEntry & entry = layer[i] ;
@@ -285,6 +305,13 @@ void CLevelViewGL::drawScreen()
                 glTexCoord2f(1.0f, 1.0f); glVertex3f(x2, y1, 0.0);
                 glTexCoord2f(1.0f, 0.0); glVertex3f(x2, y2, 0.0);
             glEnd();
+            if (m_showTriggerKey && entry.m_nTriggerKey & TRIGGER_KEYS) {
+                char key[3] = {0,0,0};
+                sprintf(key, "%.2d", entry.m_nTriggerKey & TRIGGER_KEYS);
+                m_game->graphics()->render(*font, key, x + 2, y + 2, shadowColor);
+                m_game->graphics()->render(*font, key, x, y, fontColor);
+                glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+            }
         }
     }
     glDisable(GL_TEXTURE_2D);
@@ -378,4 +405,14 @@ void CLevelViewGL::setGridSize(int size)
 void CLevelViewGL::setGridColor(const QString & gridColor)
 {
     m_gridColor = 0x60000000 | strtol(q2c(gridColor), NULL, 16);
+}
+
+void CLevelViewGL::setTriggerKeyColor(const QString & color)
+{
+    m_triggerKeyColor = 0xff000000 | strtol(q2c(color), NULL, 16);
+}
+
+void CLevelViewGL::showTriggerKey(bool state)
+{
+    m_showTriggerKey = state;
 }

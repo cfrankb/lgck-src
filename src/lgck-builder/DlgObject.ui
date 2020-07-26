@@ -263,6 +263,32 @@
        <normaloff>:/images/plus.png</normaloff>:/images/plus.png</iconset>
      </property>
     </widget>
+    <widget class="QPushButton" name="btnUuid">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>10</y>
+       <width>25</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Copy Uuid to clipboard</string>
+     </property>
+     <property name="toolTipDuration">
+      <number>-4</number>
+     </property>
+     <property name="whatsThis">
+      <string>Copy Uuid to clipboard</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="lgck-builder.qrc">
+       <normaloff>:/images/pd/copy.png</normaloff>:/images/pd/copy.png</iconset>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">

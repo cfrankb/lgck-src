@@ -11,9 +11,8 @@ CWFileSave::CWFileSave(QWidget *parent ,
 
 void CWFileSave::changeDefaultSuffix ( const QString & filter )
 {
-    //const char oblFilter[] = "Object Blocks (*.obl *.obl5)";
-    const char pngFilter[] = "PNG Images (*.png)";
-    if (filter == tr(pngFilter)) {
+    const QString pngFilter = tr("PNG Images (*.png)");
+    if (filter == pngFilter) {
         setDefaultSuffix("png");
     } else {
         setDefaultSuffix("obl");

@@ -130,7 +130,7 @@ bool CExportGame::copyList(QStringList & list, const QString srcDir, QString & o
 bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString & outMsg)
 {
     QWidget *parent = dynamic_cast<QWidget*>(dlg.parent());
-    const char *appName = "LGCK builder";
+    const QString appName = tr("LGCK builder");
     QString appDir = QCoreApplication::applicationDirPath();
     if (m_tmpDir.isValid()) {
         qDebug() << m_tmpPath;
@@ -240,7 +240,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
     }
 
     QApplication::restoreOverrideCursor();
-    QString fileName = QFileDialog::getSaveFileName(parent, dlg.tr("Export Distribution..."), outName, dlg.tr(q2c(fileFilter)));
+    QString fileName = QFileDialog::getSaveFileName(parent, dlg.tr("Export Distribution..."), outName, fileFilter);
     if (!fileName.isEmpty()) {
         std::string in = q2c(finalOut);
         std::string out = q2c(fileName);

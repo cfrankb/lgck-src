@@ -43,4 +43,6 @@
     #define ASSERT assert
 #endif
 
+#define UNUSED(x) (void)x;
+
 #endif

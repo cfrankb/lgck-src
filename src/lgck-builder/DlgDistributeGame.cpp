@@ -52,13 +52,13 @@ CDlgDistributeGame::~CDlgDistributeGame()
 void CDlgDistributeGame::on_btnRuntime_clicked()
 {
 #ifdef Q_OS_WIN32
-    const char fileFilter[] = "Runtime executables (lgck-runtime*.exe)";
+    const QString fileFilter = tr("Runtime executables (lgck-runtime*.exe)");
 #else
-    const char fileFilter[] = "Runtime executables (lgck-runtime*)";
+    const QString fileFilter = tr("Runtime executables (lgck-runtime*)");
 #endif
     QString runtime;
     getRuntime(runtime);
-    runtime = QFileDialog::getOpenFileName(this, tr("Select LGCK Runtime"), runtime, tr(fileFilter));
+    runtime = QFileDialog::getOpenFileName(this, tr("Select LGCK Runtime"), runtime, fileFilter);
     if (!runtime.isEmpty()) {
         ui->eRuntime->setText(runtime);
     }
@@ -66,10 +66,10 @@ void CDlgDistributeGame::on_btnRuntime_clicked()
 
 void CDlgDistributeGame::on_btnSFX_clicked()
 {
-    const char fileFilter[] = "7z SFX modules (*.sfx)";
+    const QString fileFilter = tr("7z SFX modules (*.sfx)");
     QString sfx;
     getSFX(sfx);
-    sfx = QFileDialog::getOpenFileName(this, tr("Select 7z SFX module"), sfx, tr(fileFilter));
+    sfx = QFileDialog::getOpenFileName(this, tr("Select 7z SFX module"), sfx, fileFilter);
     if (!sfx.isEmpty()) {
         ui->eSFX->setText(sfx);
     }

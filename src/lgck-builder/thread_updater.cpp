@@ -28,10 +28,14 @@ void CThreadUpdater::setData(const QByteArray & data)
 
 void CThreadUpdater::sendRequest()
 {
+    QSslConfiguration sslConfiguration(QSslConfiguration::defaultConfiguration());
+    sslConfiguration.setProtocol(QSsl::TlsV1_2);
     //const char *link = "http://cfrankb.fb/lgck/api/chkv.php?ver=00.06.00.06";
     // create custom temporary event loop on stack
     QEventLoop eventLoop;
 
+    qDebug() << "sslLibraryBuildVersionString: " << QSslSocket::sslLibraryBuildVersionString();
+    qDebug("sslLibraryVersionNumber: %ld", QSslSocket::sslLibraryVersionNumber());
     qDebug() << "URL:" << m_url;
 
     // "quit()" the event-loop, when the network request "finished()"
@@ -39,23 +43,23 @@ void CThreadUpdater::sendRequest()
     QObject::connect(&manager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
     QUrl url = QUrl( m_url );
     QNetworkRequest request( url );
+    if (m_url.startsWith("https://")) {
+        request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+    }
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     //QNetworkReply *reply = manager.get(request);
     QNetworkReply *reply = manager.post(request, m_data);
     eventLoop.exec(); // blocks stack until "finished()" has been called
 
-    QString result;
+    QString result = reply->readAll();;
     if (reply->error() == QNetworkReply::NoError) {
         //success
-        result = reply->readAll();
-        qDebug() << "Success" <<reply->readAll();
-        delete reply;
+        qDebug() << "Success: " << result;
     } else {
         //failure
-        result = reply->readAll();
-        qWarning() << "Failure" <<reply->errorString();
-        delete reply;
+        qWarning() << "Failure: " << reply->errorString();
     }
+    delete reply;
 
     if (result.indexOf("result: all okay\n") != -1) {
         QRegExp exp = QRegExp("download: [a-zA-z0-9:\\._/]+");
@@ -70,8 +74,13 @@ void CThreadUpdater::sendRequest()
             QStringList list = exp.capturedTexts();
             dwVersion = list[0].mid(strlen("version: "));
         }
+        qDebug() << "dwUrl: " << dwUrl;
+        qDebug() << "dwVersion: " << dwVersion;
         if (!dwUrl.isEmpty()) {
             emit newVersion(dwUrl, dwVersion);
         }
+    } else {
+        qWarning("Incomplete version information returned.");
     }
+    eventLoop.quit();
 }

@@ -33,9 +33,6 @@
 #include <QScreen>
 #include <QSurfaceFormat>
 
-static char appName[] = "LGCK builder";
-static char author[] = "cfrankb";
-
 int main(int argc, char *argv[])
 {
     QSurfaceFormat format;
@@ -61,7 +58,7 @@ int main(int argc, char *argv[])
 
     QString fileName = "";
     bool done = false;
-    QSettings settings(author, appName);
+    QSettings settings(MainWindow::m_author, MainWindow::m_appName);
     settings.beginGroup("Editor");
     bool skipSplash = settings.value("skipSplash", false).toBool();
     settings.endGroup();
@@ -74,11 +71,10 @@ int main(int argc, char *argv[])
         do {
             QString ver = SS_BUILD_STR;
             CDlgSelect * dlg = new CDlgSelect(&w);
-            dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
+            dlg->setWindowTitle(MainWindow::m_appTitle + " " + ver);
             dlg->raise();
             dlg->setWindowState(Qt::WindowActive);
             QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-            //QRect screenGeometry = QApplication::desktop()->screenGeometry();
             int x = (screenGeometry.width() - dlg->width()) / 2;
             int y = (screenGeometry.height() - dlg->height()) / 2;
             dlg->move(x, y);
@@ -129,7 +125,7 @@ int main(int argc, char *argv[])
             w.open(fileName);
         } else {
             QString errMsg = QObject::tr("Invalid file: %1").arg(fileName);
-            QMessageBox::warning(&w, QString(appName), errMsg);
+            QMessageBox::warning(&w, QString(MainWindow::m_appName), errMsg);
         }
     }
     return app.exec();

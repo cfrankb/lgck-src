@@ -35,8 +35,6 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
 {
     m_ui->setupUi(this);
     m_gridSize = 16;
-    m_gridColor = "a0b0c0";
-    m_showGrid = true;
     m_count = 0;
     m_hotkeys = NULL;
     m_defaultShortcuts = new QStringList();
@@ -72,6 +70,12 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
                                 "%3 skill\n" \
                                 "%4 width\n" \
                                 "%5 height"));
+
+    m_ui->btnGridColor->setBuddy(m_ui->eGridColor);
+    m_ui->btnTriggerKeyColor->setBuddy(m_ui->eTriggerKeyColor);
+
+
+
 }
 
 CDlgAppSettings::~CDlgAppSettings()
@@ -105,52 +109,43 @@ void CDlgAppSettings::changeEvent(QEvent *e)
     }
 }
 
-void CDlgAppSettings::on_btnGridColor_clicked()
-{
-    QString str = m_ui->eGridColor->text();
-    bool ok;
-    uint color = str.toUInt(&ok,16);
-    int red = color >> 16 & 0xff;
-    int green = color >> 8 & 0xff;
-    int blue = color & 0xff;
-    QColorDialog *d = new QColorDialog(QColor(red,green,blue), this);
-    int result = d->exec();
-    if (result == QDialog::Accepted) {
-        QColor color = d->currentColor();
-        QString s = QString::asprintf("%.2x%.2x%.2x", color.red(), color.green(), color.blue() );
-        m_ui->eGridColor->setText(s);
-    }
-    delete d;
-}
-
 void CDlgAppSettings::setGridSize(int gridSize)
 {
     m_gridSize = gridSize;
 }
 
-void CDlgAppSettings::setGridColor(QString gridColor)
+void CDlgAppSettings::setGridColor(const QString &color)
 {
-    m_gridColor = gridColor;
+    m_ui->eGridColor->setText(color);
+}
+
+void CDlgAppSettings::setTriggerKeyColor(const QString & color)
+{
+    m_ui->eTriggerKeyColor->setText(color);
 }
 
 bool CDlgAppSettings::isShowGrid()
 {
-    return m_showGrid;
+    return m_ui->cShowGrid->isChecked();
 }
 
 void CDlgAppSettings::showGrid(bool show)
 {
-    m_showGrid = show;
+    m_ui->cShowGrid->setChecked(show);
+}
+
+void CDlgAppSettings::enableGridOptions()
+{
+    bool showGrid = m_ui->cShowGrid->isChecked();
+    m_ui->eGridColor->setEnabled(showGrid);
+    m_ui->cbGridSize->setEnabled(showGrid);
+    m_ui->btnGridColor->setEnabled(showGrid);
 }
 
 void CDlgAppSettings::init()
 {
-    m_ui->cShowGrid->setChecked(m_showGrid);
-    m_ui->eGridColor->setText(m_gridColor);
-    setBtnColor(m_gridColor);
-    m_ui->eGridColor->setEnabled( m_showGrid );
-    m_ui->cbGridSize->setEnabled( m_showGrid );
-    m_ui->btnGridColor->setEnabled( m_showGrid );
+    enableGridOptions();
+    enableTriggerKeyOptions();
     for (unsigned int i = 0; i < sizeof(m_gridSizes) / sizeof(int); ++i) {
         QString s = QString("%1").arg(m_gridSizes[i]);
         m_ui->cbGridSize->addItem(s);
@@ -158,8 +153,6 @@ void CDlgAppSettings::init()
             m_ui->cbGridSize->setCurrentIndex( i );
         }
     }
-
-    // TODO:update checkbox state
     m_ui->eApiURL->setEnabled(m_ui->cCheckUpdate->isChecked());
 }
 
@@ -170,15 +163,17 @@ int CDlgAppSettings::getGridSize()
 
 void CDlgAppSettings::on_cShowGrid_clicked()
 {
-    m_showGrid = m_ui->cShowGrid->isChecked();
-    m_ui->eGridColor->setEnabled( m_showGrid );
-    m_ui->cbGridSize->setEnabled( m_showGrid );
-    m_ui->btnGridColor->setEnabled( m_showGrid );
+    enableGridOptions();
 }
 
 QString CDlgAppSettings::getGridColor()
 {
     return m_ui->eGridColor->text();
+}
+
+QString CDlgAppSettings::getTriggerKeyColor()
+{
+    return m_ui->eTriggerKeyColor->text();
 }
 
 void CDlgAppSettings::load(QStringList &listActions, QStringList &listShortcuts, QStringList &defaults)
@@ -200,7 +195,6 @@ void CDlgAppSettings::load(QStringList &listActions, QStringList &listShortcuts,
     widget->setColumnWidth(1, 208-20);
     widget->setColumnWidth(2, 16);
     widget->verticalHeader()->setVisible(false);
-    //widget->horizontalHeader()->setMovable(false);
     m_count = listActions.count();
     m_hotkeys = new CWHotKey *[m_count];
     QPixmap pixmap(":/images/pd/dagobert83_cancelx16.png");
@@ -287,23 +281,6 @@ void CDlgAppSettings::setHP(int hp)
     m_ui->eHitPoints->setText(s);
 }
 
-void CDlgAppSettings::setBtnColor(const QString & str)
-{
-    bool ok;
-    uint color = str.toUInt(&ok,16);
-    int red = color >> 16 & 0xff;
-    int green = color >> 8 & 0xff;
-    int blue = color & 0xff;
-    m_ui->btnGridColor->setStyleSheet(
-        QString("* { background-color: rgb(%1,%2,%3) }")
-        .arg(red).arg(green).arg(blue));
-}
-
-void CDlgAppSettings::on_eGridColor_textChanged(const QString &arg1)
-{
-    setBtnColor(arg1);
-}
-
 void CDlgAppSettings::on_cCheckUpdate_clicked(bool checked)
 {
     m_ui->eApiURL->setEnabled(checked);
@@ -353,7 +330,6 @@ void CDlgAppSettings::on_btnRuntime_clicked()
 
 void CDlgAppSettings::on_btnRestore_clicked()
 {
-    //m_ui->eRuntime->setText("");
     m_ui->eRuntimeArgs->setText(defaultRuntimeArgs());
 }
 
@@ -387,4 +363,27 @@ bool CDlgAppSettings::getSkipSplashScreen()
 void CDlgAppSettings::setSkipSplashScreen(bool state)
 {
     m_ui->cSkipSplashScreen->setChecked(state);
+}
+
+void CDlgAppSettings::setShowTriggerKey(bool show)
+{
+    m_ui->cbShowTriggerKey->setChecked(show);
+}
+
+bool CDlgAppSettings::getShowTriggerKey()
+{
+    return m_ui->cbShowTriggerKey->isChecked();
+}
+
+void CDlgAppSettings::enableTriggerKeyOptions()
+{
+    bool checked = m_ui->cbShowTriggerKey->isChecked();
+    m_ui->eTriggerKeyColor->setEnabled(checked);
+    m_ui->btnTriggerKeyColor->setEnabled(checked);
+}
+
+void CDlgAppSettings::on_cbShowTriggerKey_toggled(bool checked)
+{
+    Q_UNUSED(checked);
+    enableTriggerKeyOptions();
 }
