@@ -45,19 +45,24 @@ public:
 
 // Attributes
 public:
-        int getSize();
+        int getSize() const;
         int getProtoIndex (const char* str);
         static int getEventCount();
         static const char * getEventName(int i);
 
 // Operations
 public:
-        void add (const CProto proto);
+        int add(const CProto proto);
         void forget();
         void removeAt (int n);
+        bool exportMeta(IFile & file, int i);
+        bool importMeta(IFile & file);
         CObject & getObject(int i);
         CProto & operator [] (int n);
-        CProto & get(int i);
+        CProtoArray & operator += (CProtoArray & src);
+        CProtoArray & operator = (CProtoArray & src);
+        CProto & get(int i) const;
+        void debug();
 
         // remove references
         void killProto (int nProto);

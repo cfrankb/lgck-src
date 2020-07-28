@@ -51,9 +51,6 @@
 #include "Font.h"
 #include "WizFont.h"
 
-static const QString g_oblFilter = QObject::tr("Object Blocks (*.obl *.obl5)");
-static const QString g_pngFilter = QObject::tr("PNG Images (*.png)");
-
 CToolBoxDock::CToolBoxDock(QWidget *parent) :
     QDockWidget(parent),
     m_ui(new Ui::CToolBoxDock)
@@ -1089,7 +1086,7 @@ void CToolBoxDock::editSound()
 
     CSnd snd ( (* gf.m_arrSounds[ index.row() ]) );
     QString wavFilter = tr("Wav sounds (*.wav)");
-    QString oggFilter = tr("OggSound (*.ogg)");
+    QString oggFilter = tr("Ogg sounds (*.ogg)");
     QString allFilter = tr("Popular sound files (*.wav *.ogg *.flac *.aiff *.au)");
     static QString fileFilter = allFilter + ";;" + wavFilter + ";;" + oggFilter ;
 
@@ -1241,6 +1238,10 @@ void CToolBoxDock::updateFrameSet(int frameSet)
 
 void CToolBoxDock::exportSprite()
 {
+    const QString oblFilter = QObject::tr("Object Blocks (*.obl *.obl5)");
+    const QString pngFilter = QObject::tr("PNG Images (*.png)");
+    const QString metaFilter = QObject::tr("Metadata (*.proto)");
+
     CProtoIndex * indexProto = (CProtoIndex*) m_index;
     QTreeWidgetItem * item = m_ui->treeObjects->currentItem();
     if (!item || !indexProto) {
@@ -1253,24 +1254,20 @@ void CToolBoxDock::exportSprite()
     CGame & gf = *((CGame*)m_gameFile);
     CProto & proto = gf.m_arrProto[protoId];
     CFrameSet * frameSet = gf.frames()[proto.m_nFrameSet];
-    COBL5File oblDoc;
 
+    QString selected = pngFilter + "\n" + oblFilter + "\n" + metaFilter;
+    QString suffix = "png";
+    QString fileName = proto.getName();
     QStringList filters;
-    QString selected = g_oblFilter + "\n" + g_pngFilter;
-    QString suffix = "obl";
-    QString fileName = "";
+    filters.append(pngFilter);
+    filters.append(oblFilter);
+    filters.append(metaFilter);
 
-    selected = g_pngFilter + "\n" + g_oblFilter;
-    suffix = "png";
-    filters.append(g_pngFilter);
-    filters.append(g_oblFilter);
-
-    CWFileSave * dlg = new CWFileSave(this,tr("Save As"),"",selected);
-
+    CWFileSave * dlg = new CWFileSave(this,tr("Save As"), QDir::homePath(), selected);
     dlg->setNameFilters(filters);
     dlg->setAcceptMode(QFileDialog::AcceptSave);
     dlg->setDefaultSuffix(suffix);
-
+    dlg->selectNameFilter(pngFilter); // workarround for default suffix not being set
     connect(dlg, SIGNAL(filterSelected(QString)), dlg, SLOT(changeDefaultSuffix(QString)));
     if (dlg->exec()) {
         QStringList fileNames = dlg->selectedFiles();
@@ -1282,15 +1279,32 @@ void CToolBoxDock::exportSprite()
     char outFormat[5];
     if (!fileName.isEmpty()) {
         selected = dlg->selectedNameFilter();
-        if (selected == g_oblFilter) {
+        bool isObl = true;
+        if (selected == oblFilter) {
             strcpy(outFormat, "OBL5");
-        } else {
+        } else if(selected == pngFilter) {
             strcpy(outFormat, "PNG");
+        } else if(selected == metaFilter) {
+            strcpy(outFormat, "PRTO");
+            isObl = false;
         }
-        oblDoc.setFormat(outFormat);
-        oblDoc.getImageSet() = *frameSet;
-        oblDoc.setFileName(fileName);
-        oblDoc.write();
+        bool result = false;
+        if (isObl) {
+            COBL5File oblDoc;
+            oblDoc.setFormat(outFormat);
+            oblDoc.getImageSet() = *frameSet;
+            oblDoc.setFileName(fileName);
+            result = oblDoc.write();
+        } else {
+            CFileWrap file;
+            if (file.open(q2c(fileName), "wb")) {
+                result = m_gameFile->m_arrProto.exportMeta(file, protoId);
+                file.close();
+            }
+        }
+        if (!result) {
+            QMessageBox::warning(static_cast<QWidget*>(parent()), "", tr("Failed to export."));
+        }
     }
     delete dlg;
 }

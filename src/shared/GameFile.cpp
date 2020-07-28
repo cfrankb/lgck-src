@@ -201,7 +201,7 @@ void CGameFile::init()
     }
 
     // Add the default Proto-object
-    m_arrProto.add ( CProto ("(blank)"));
+    m_arrProto.add(CProto("(blank)"));
 
     // reset default settings
     m_settings->copySettings( m_gameDefaults );
@@ -420,6 +420,11 @@ void CGameFile::killProto(int nProto)
 /////////////////////////////////////////////////////////////////////////////
 // file i/o
 
+int CGameFile::addFrameSet(CFrameSet *pFrameSet)
+{
+    return m_arrFrames.add(pFrameSet);
+}
+
 bool CGameFile::read(const char *filepath)
 {
     CLuaVM::debugv("reading ...\n");
@@ -474,7 +479,7 @@ bool CGameFile::read(const char *filepath)
                 m_lastError = "failed to read FrameSet";
                 return false;
             }
-            m_arrFrames.add(pFrameSet);
+            addFrameSet(pFrameSet);
         }
 
         // Proto

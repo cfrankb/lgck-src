@@ -180,6 +180,8 @@ public:
     CFrameArray & frames();
     CProto & toProto(int protoId);
 
+    int addFrameSet(CFrameSet *pFrameSet);
+
     /////////////////////////////////////////////////////////////////
     // i/o
 

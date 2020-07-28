@@ -100,7 +100,7 @@ void CDlgPathDir::changeEvent(QEvent *e)
     }
 }
 
-void CDlgPathDir::load(const char aim)
+void CDlgPathDir::load(const uint8_t aim)
 {
     for (int i=0; i < MAX_ICONS; ++i) {
         if (m_iconValues[i] == aim) {
@@ -109,7 +109,7 @@ void CDlgPathDir::load(const char aim)
     }
 }
 
-void CDlgPathDir::save(char & aim)
+void CDlgPathDir::save(uint8_t & aim)
 {
     if (ui->cbAim->currentIndex() != -1) {
         aim = m_iconValues[ui->cbAim->currentIndex()];

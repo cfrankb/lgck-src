@@ -468,6 +468,9 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
     if (fileName.isEmpty())
         return false;
+    if (!fileName.endsWith(".lgckdb")) {
+        fileName.append(".lgckdb");
+    }
     m_doc.setFileName(q2c(fileName));
     return true;
 }
@@ -1104,6 +1107,7 @@ void MainWindow::on_actionNew_file_triggered()
             m_toolBox->init();
             setViewMode(VM_EDITOR);
             m_doc.setDirty(true);
+            on_actionCreate_Level_triggered();
         }
         delete wiz;
     }
@@ -1577,6 +1581,9 @@ void MainWindow::on_actionC_declarations_triggered()
     QString fileFilter = tr("Header files (*.h)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".h")) {
+            fileName.append(".h");
+        }
         CFileWrap file;
         if (file.open(q2c(fileName), "wb")) {
             file += "// Constants declarations for C/C++\r\n" \
@@ -1618,6 +1625,9 @@ void MainWindow::on_actionRuntime_Lua_triggered()
     QString fileFilter = tr("Lua script (*.lua)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".lua")) {
+            fileName.append(".lua");
+        }
         CFileWrap file;
         if (file.open(q2c(fileName), "wb")) {
             std::string lua;

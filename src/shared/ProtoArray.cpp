@@ -34,6 +34,8 @@
 /////////////////////////////////////////////////////////////////////////////
 // CProtoArray
 
+constexpr const char * PRTO_SIGNATURE = "PRTO";
+
 CProtoArray::CProtoArray()
 {
     m_nSize = 0;
@@ -267,7 +269,7 @@ void CProtoArray::forget()
     forgetIndex();
 }
 
-void CProtoArray::add (const CProto proto)
+int CProtoArray::add(const CProto proto)
 {
     if (m_nSize == m_nMax) {
         m_nMax += GROWBY;
@@ -287,7 +289,7 @@ void CProtoArray::add (const CProto proto)
     // clear the animations
     obj.clearAnimations();
 
-    ++m_nSize;
+    return m_nSize++;
 }
 
 void CProtoArray::removeAt (int n)
@@ -298,7 +300,7 @@ void CProtoArray::removeAt (int n)
     --m_nSize;
 }
 
-CProto & CProtoArray::get(int n)
+CProto & CProtoArray::get(int n) const
 {
     if ((n < 0) || (n >= m_nSize)) {
         return m_protoTmp;
@@ -312,7 +314,24 @@ CProto & CProtoArray::operator [] (int n)
     return get(n);
 }
 
-int CProtoArray::getSize()
+CProtoArray & CProtoArray::operator += (CProtoArray & src)
+{
+    int j = getSize();
+    for (int i=0; i < src.getSize(); ++i) {
+        add(src.get(i));
+        getObject(j++) = src.getObject(i);
+    }
+    return *this;
+}
+
+CProtoArray & CProtoArray::operator = (CProtoArray & src)
+{
+    forget();
+    forgetIndex();
+    return (*this += src);
+}
+
+int CProtoArray::getSize() const
 {
     return m_nSize;
 }
@@ -402,6 +421,53 @@ CProto & CProtoArray::getProto(CLevelEntry & entry)
 CObject & CProtoArray::getObject(int i)
 {
     return m_objects[i];
+}
+
+bool CProtoArray::exportMeta(IFile &file, int i)
+{
+    CProtoArray t;
+    int n = t.add(this->get(i)); // add proto
+    t.getObject(n) = this->getObject(i);
+    file.write(PRTO_SIGNATURE, 4);
+    uint32_t version = PROTO_VERSION;
+    file.write(&version, sizeof(uint32_t));
+    t.write(file);
+    return true;
+}
+
+bool CProtoArray::importMeta(IFile &file)
+{
+    char sig[4];
+    file.read(sig, sizeof(sig));
+    uint32_t version = 0xffffffff;
+    file.read(&version, sizeof(version));
+    if (memcmp(sig, PRTO_SIGNATURE, sizeof(sig)) != 0) {
+        CLuaVM::debug("invalid signature");
+        return false;
+    }
+    if (version > PROTO_VERSION) {
+        CLuaVM::debug("invalid version");
+        return false;
+    }
+    CProtoArray t;
+    t.read(file);
+    *this += t;
+    return true;
+}
+
+void CProtoArray::debug()
+{
+    qDebug("CProtoArray size: %d", m_nSize);
+    for (int i=0; i < getSize(); ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        qDebug("Sprite #%d [%s] - eventcount %d", i, proto.getName(), obj.getEventCount());
+        for (int j=0; j < obj.getEventCount(); ++j) {
+        //    qDebug("  event %d - %s", j, obj.getEvent(j));
+        }
+        obj.debug();
+    }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -531,7 +597,6 @@ CProtoIndex * CProtoArray::createIndex(int pattern)
     index->init();
     return index;
 }
-
 
 /////////////////////////////////////////////////////////////////////
 // CProtoIndex

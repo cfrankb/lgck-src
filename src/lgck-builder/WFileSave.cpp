@@ -9,12 +9,15 @@ CWFileSave::CWFileSave(QWidget *parent ,
 
 }
 
-void CWFileSave::changeDefaultSuffix ( const QString & filter )
+void CWFileSave::changeDefaultSuffix(const QString & filter)
 {
-    const QString pngFilter = tr("PNG Images (*.png)");
-    if (filter == pngFilter) {
+    if (filter.contains("*.png")) {
         setDefaultSuffix("png");
-    } else {
+    } else if (filter.contains("*.obl")) {
         setDefaultSuffix("obl");
+    } else if (filter.contains("*.proto")) {
+        setDefaultSuffix("proto");
+    } else {
+        setDefaultSuffix("");
     }
 }

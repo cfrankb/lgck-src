@@ -74,6 +74,7 @@ public:
     void setTag(const char *tag, const char *v);
     void copyTags(CFrameSet & src);
     void assignNewUUID();
+    void toSubset(CFrameSet & dest, int start, int end=-1);
 
     // Implementation
 public:

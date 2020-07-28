@@ -226,6 +226,16 @@ void CLevelViewGL::uint2color(u_int32_t rgba, Color & out)
     };
 }
 
+void CLevelViewGL::uint2rgba(u_int32_t rgba, float &red, float &green, float &blue, float &alpha)
+{
+    Color t;
+    uint2color(rgba, t);
+    blue = t.blue / 255.0f;
+    green = t.green / 255.0f;
+    red = t.red / 255.0f;
+    alpha = t.alpha / 255.0f;
+}
+
 void CLevelViewGL::drawScreen()
 {
     CLevel & level = m_game->getCurrentLevel();
@@ -237,6 +247,7 @@ void CLevelViewGL::drawScreen()
     int w = std::min(sz.width(), (int) (MAX_PIXEL - mx));
     int h = std::min(sz.height(), (int)(MAX_PIXEL - my));
 
+    float red, green, blue, alpha;
     // draw background
     if (w > 0 && h > 0) {
         int x1 = 0;
@@ -244,11 +255,9 @@ void CLevelViewGL::drawScreen()
         int y1 = sz.height() - h;
         int y2 = sz.height();
         // Color: #RRGGBB
-        int bkColor = strtol(level.getSetting("bkcolor"), NULL, 16);
-        float blue = (bkColor & 0xff);
-        float green = (bkColor & 0xff00) >> 8;
-        float red = (bkColor >> 16) & 0xff;
-        glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+        uint32_t bkColor = 0xff000000 | strtoul(level.getSetting("bkcolor"), NULL, 16);
+        uint2rgba(bkColor, red, green, blue, alpha);
+        glColor4f(red, green, blue, alpha);
         glRectf(x1, y1, x2, y2);
     }
 
@@ -263,11 +272,9 @@ void CLevelViewGL::drawScreen()
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     CLayer & layer = * level.getCurrentLayer();
-    int colorMod = strtol(level.getSetting("colorMod"), NULL, 16);
-    float blue = (colorMod & 0xff);// << 16;
-    float green = (colorMod & 0xff00) >> 8;
-    float red = (colorMod >> 16) & 0xff;
-    glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+    uint32_t colorMod = 0xff000000 | strtoul(level.getSetting("colorMod"), NULL, 16);
+    uint2rgba(colorMod, red, green, blue, alpha);
+    glColor4f(red, green, blue, alpha);
 
     CFont *font = m_game->getFonts()->at(0);
     font->FaceSize(16);
@@ -275,6 +282,7 @@ void CLevelViewGL::drawScreen()
     uint2color(m_triggerKeyColor, fontColor);
     Color shadowColor = { 0, 0, 0, 255};
 
+    // draw sprites
     for (int i=0; i < layer.getSize(); ++i) {
         CLevelEntry & entry = layer[i] ;
         CFrameSet & filter = m_game->toFrameSet(entry.m_nFrameSet);
@@ -305,12 +313,13 @@ void CLevelViewGL::drawScreen()
                 glTexCoord2f(1.0f, 1.0f); glVertex3f(x2, y1, 0.0);
                 glTexCoord2f(1.0f, 0.0); glVertex3f(x2, y2, 0.0);
             glEnd();
+            // draw trigger keys
             if (m_showTriggerKey && entry.m_nTriggerKey & TRIGGER_KEYS) {
                 char key[3] = {0,0,0};
                 sprintf(key, "%.2d", entry.m_nTriggerKey & TRIGGER_KEYS);
                 m_game->graphics()->render(*font, key, x + 2, y + 2, shadowColor);
                 m_game->graphics()->render(*font, key, x, y, fontColor);
-                glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+                glColor4f(red, green, blue, alpha);
             }
         }
     }
@@ -324,8 +333,8 @@ void CLevelViewGL::drawScreen()
 void CLevelViewGL::drawGrid()
 {
     QSize sz = size();
-    int mx = 0;//horizontalScrollBar()->value();
-    int my = 0;//verticalScrollBar()->value();
+    int mx = 0;
+    int my = 0;
     emit scrollStatusResync(mx, my);
     int w = std::min(sz.width(), (int) (MAX_PIXEL - mx));
     int h = std::min(sz.height(), (int) (MAX_PIXEL - my));
@@ -333,11 +342,9 @@ void CLevelViewGL::drawGrid()
     glLineWidth(0.5f);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    float gr_red = (m_gridColor & 0xff) / 255.0f;
-    float gr_green = ((m_gridColor >> 8) & 0xff ) / 255.0f;
-    float gr_blue = ((m_gridColor >> 16) & 0xff) / 255.0f;
-    float gr_alpha = (m_gridColor >> 24) ;
-    glColor4f(gr_red, gr_green, gr_blue, gr_alpha / 255.0f);
+    float red, green, blue, alpha;
+    uint2rgba(m_gridColor, red, green, blue, alpha);
+    glColor4f(red, green, blue, alpha);
 
     for (int x = m_gridSize - mx ; x < w; x+= m_gridSize) {
         glBegin(GL_LINES);
@@ -404,12 +411,12 @@ void CLevelViewGL::setGridSize(int size)
 
 void CLevelViewGL::setGridColor(const QString & gridColor)
 {
-    m_gridColor = 0x60000000 | strtol(q2c(gridColor), NULL, 16);
+    m_gridColor = 0x60000000 | strtoul(q2c(gridColor), NULL, 16);
 }
 
 void CLevelViewGL::setTriggerKeyColor(const QString & color)
 {
-    m_triggerKeyColor = 0xff000000 | strtol(q2c(color), NULL, 16);
+    m_triggerKeyColor = 0xff000000 | strtoul(q2c(color), NULL, 16);
 }
 
 void CLevelViewGL::showTriggerKey(bool state)

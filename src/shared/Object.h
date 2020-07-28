@@ -157,6 +157,8 @@ public:
         EO_RIGHTCLICK,
         EO_NOTIFYCLOSURE
     } EVENT_OBJECT;
+
+    void debug();
 private:
     static std::string m_animationList[];
     static std::string m_pathList[];

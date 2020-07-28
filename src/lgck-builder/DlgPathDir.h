@@ -34,8 +34,8 @@ public:
     explicit CDlgPathDir(QWidget *parent = 0);
     ~CDlgPathDir();
 
-    void load(const char aim);
-    void save(char & aim);
+    void load(const uint8_t aim);
+    void save(uint8_t &aim);
 
 protected:
     void changeEvent(QEvent *e);

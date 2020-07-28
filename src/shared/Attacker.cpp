@@ -17,7 +17,7 @@ CAttacker::CAttacker():CMonster()
 void CAttacker::doManage()
 {
     CGame & game = * (CGame *) m_game;
-    CProto & proto = game.m_arrProto[m_nProto];
+    CProto & proto = game.toProto(m_nProto);
     CFrame & frame = game.toFrame( *this );
     CActor & player = game.getPlayer();
     CFrame & playerFrame = game.toFrame( player );

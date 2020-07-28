@@ -42,7 +42,7 @@ void CPath::read(IFile & file)
     m_size = 0;
     file.read(&m_size, 2);
     m_max = m_size;
-    m_path = new char[m_size];
+    m_path = new uint8_t[m_size];
     file.read(m_path, m_size);
 }
 
@@ -54,11 +54,11 @@ void CPath::write(IFile & file)
     }
 }
 
-void CPath::add(char aim)
+void CPath::add(uint8_t aim)
 {
     if (m_size == m_max) {
         m_max += GROW_BY;
-        char *tmp = new char[m_max];
+        uint8_t *tmp = new uint8_t[m_max];
         if (m_path) {
             memcpy(tmp, m_path, m_size);
             delete [] m_path;
@@ -71,11 +71,11 @@ void CPath::add(char aim)
     ++ m_size;
 }
 
-void CPath::insertAt(int i, char aim)
+void CPath::insertAt(int i, uint8_t aim)
 {
     if (m_size == m_max) {
         m_max += GROW_BY;
-        char *tmp = new char[m_max];
+        uint8_t *tmp = new uint8_t[m_max];
         if (m_path) {
             memcpy(tmp, m_path, m_size);
             delete [] m_path;
@@ -118,7 +118,7 @@ void CPath::forget()
     m_max = 0;
 }
 
-char & CPath::operator[] (int i) const
+uint8_t & CPath::operator[] (int i) const
 {
     return m_path[i] ;
 }
@@ -131,7 +131,7 @@ CPath & CPath::operator = (const CPath &src)
     m_max = m_size;
 
     if (m_size) {
-        m_path = new char[m_max];
+        m_path = new uint8_t[m_max];
     }
 
     for (int i=0; i < m_size; ++i) {
@@ -155,16 +155,12 @@ void CPath::setOptions(int options)
 
 void CPath::debug()
 {
-    //qDebug("<%d> sizeof", m_size);
-
-    //for (int i=0; i < m_size; ++i) {
-    //    qDebug("<%d> %d", i, m_path[i]);
-    //}
+    qDebug("[size %d] %s", m_size, toHex().c_str());
 }
 
-bool CPath::isValidAim(char aim)
+bool CPath::isValidAim(uint8_t aim)
 {
-    return aim >= -1 && aim < 4;
+    return aim == 0xff || aim < 4;
 }
 
 bool CPath::operator == (const CPath & src)
@@ -183,4 +179,18 @@ bool CPath::operator == (const CPath & src)
 bool CPath::operator != (const CPath & src)
 {
     return !((*this) == src);
+}
+
+std::string CPath::toHex() {
+    constexpr char hex[] = "0123456789ABCDEF";
+    std::string s(m_size * 3, ' ');
+    for (int i = 0; i < m_size; ++i) {
+        s[3 * i]     = hex[m_path[i] >> 4];
+        s[3 * i + 1] = hex[m_path[i] & 0x0f];
+    }
+    return s;
+}
+
+uint8_t * CPath::raw() {
+    return m_path;
 }

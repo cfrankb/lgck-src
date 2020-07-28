@@ -198,8 +198,8 @@ void CDlgEntry::enablePlaybackOptions(bool enable)
 
 void CDlgEntry::updateText()
 {   
-    CGameFile &gf = *((CGameFile*)m_gameFile);
-    CProto & proto = gf.m_arrProto[ m_proto ];
+    CGameFile & gf = *m_gameFile;
+    CProto & proto = gf.toProto(m_proto);
     QString sName = QString(tr("%1 - %2")).arg(m_entry).arg(proto.getName());
     m_ui->sObject->setText( sName );
     m_ui->sClass->setText( gf.m_className [ proto.m_nClass ].c_str() );
@@ -208,8 +208,7 @@ void CDlgEntry::updateText()
 
 void CDlgEntry::enableCheckboxes()
 {
-   CGameFile &gf = *((CGameFile*)m_gameFile);
-   CProto & proto = gf.m_arrProto[ m_proto ];
+   CProto & proto = m_gameFile->toProto(m_proto);
    bool result = proto.m_nClass >= 0x10;
 
    // trigger key
@@ -326,14 +325,14 @@ void CDlgEntry::save(const int entryPos)
 
 void CDlgEntry::on_btnObject_clicked()
 {
-    CGameFile &gf = *((CGameFile*)m_gameFile);
-    CProto proto = gf.m_arrProto[m_proto];
+    CGameFile &gf = *m_gameFile;
+    CProto proto = gf.toProto(m_proto);
     CDlgObject *d = new CDlgObject (this);
     d->setGameDB(m_gameFile);
     d->load( m_proto );
     if (d->exec() == QDialog::Accepted) {
         d->save( m_proto );
-        if (proto != gf.m_arrProto[ m_proto ]) {
+        if (proto != gf.toProto(m_proto)) {
             gf.setDirty(true);
             updateText();
             enableCheckboxes();

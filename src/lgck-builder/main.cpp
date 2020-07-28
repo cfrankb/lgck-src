@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
         fileName = argv[1];
     }
 
+    bool newProject = false;
     if (!skipSplash && fileName.isEmpty()) {
         do {
             QString ver = SS_BUILD_STR;
@@ -96,6 +97,7 @@ int main(int argc, char *argv[])
                     w.initToolBox();
                     done = true;
                     w.getGame()->setDirty(true);
+                    newProject = true;
                 }
                 break;
 
@@ -127,6 +129,10 @@ int main(int argc, char *argv[])
             QString errMsg = QObject::tr("Invalid file: %1").arg(fileName);
             QMessageBox::warning(&w, QString(MainWindow::m_appName), errMsg);
         }
+    }
+
+    if (newProject) {
+        w.addLevel();
     }
     return app.exec();
 }

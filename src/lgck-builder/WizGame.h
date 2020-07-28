@@ -37,10 +37,12 @@ public:
 
     void init(CGame *game);
     void save();
+
+private:
+    void addSampleSprites();
     
 private slots:
     void on_rSetByDifficulty_clicked();
-
     void on_rSetByLevel_clicked();
 
 private:

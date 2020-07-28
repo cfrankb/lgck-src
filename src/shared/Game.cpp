@@ -1890,10 +1890,12 @@ int & CGame::counter(const char*s)
 }
 
 bool CGame::playSound(const char *name)
-{\
+{
     CSnd *snd = m_arrSounds[name];
     if (snd) {
         m_sound->play(snd->getUID());
+    } else {
+        CLuaVM::debugv("invalid requested sound: %s", name);
     }
     return snd != NULL;
 }
@@ -1903,6 +1905,8 @@ bool CGame::playSound(int index)
     CSnd *snd = m_arrSounds[index];
     if (snd) {
         m_sound->play(snd->getUID());
+    } else {
+        CLuaVM::debugv("invalid requested sound: %d", index);
     }
     return snd != NULL;
 }

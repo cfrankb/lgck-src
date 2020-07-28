@@ -62,11 +62,18 @@ CObject & CObject::operator = (CObject & s)
         m_events[i] = s.getEvent(i);
     }
 
-    // TODO: copy the animation sequences too
+    // copy the animation sequences
 
     int count = getAnimationCount();
     for (int i = 0; i < count; ++i) {
         m_animations[i] = s.getAnimation(i);
+    }
+
+    // copy paths
+
+    count = getPathCount();
+    for (int i=0; i < count; ++i) {
+        m_paths[i] = s.getPath(i);
     }
 
     return *this;
@@ -188,7 +195,6 @@ void CObject::setAnimation (int i, const CAnimation & s)
     m_animations[i] = s;
 }
 
-
 void CObject::readAnimations(IFile & file)
 {
     int count = getAnimationCount();
@@ -196,6 +202,7 @@ void CObject::readAnimations(IFile & file)
 
     // count of initiated animation sequences
     file.read(&j, sizeof(uint8_t));
+    //qDebug(">>> animations: %d", j);
 
     for (int i=0; i < j; ++i) {
         m_animations[i].read(file);
@@ -322,5 +329,14 @@ void CObject::writePaths(IFile &file)
 
     for (int i=0; i < j; ++i) {
         m_paths[i].write(file);
+    }
+}
+
+void CObject::debug()
+{
+    CObject & obj = *this;
+    for (int j=0; j < obj.getPathCount(); ++j) {
+        CPath & path = obj.getPath(j);
+        qDebug("Path %d %s [size: %d] %s", j, obj.getPathName(j), path.getSize(), path.toHex().c_str());
     }
 }

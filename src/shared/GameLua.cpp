@@ -99,9 +99,11 @@ int playSound(lua_State *L)
     } else {
         for ( int n=1; n <= argc; ++n ) {
             if (lua_isnumber(L, n)) {
-                CGame::getGame().playSound(lua_tointeger(L, n));
+                int i = lua_tointeger(L, n);
+                CGame::getGame().playSound(i);
             } else {
-                CGame::getGame().playSound(lua_tostring(L, n));
+                const char* name = lua_tostring(L, n);
+                CGame::getGame().playSound(name);
             }
         }
     }

@@ -133,7 +133,7 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
         qDebug(">>sprite");
         CONST_DATA *data = gf.getSpriteList();
         for (int i=0; data[i].name != ""; ++i) {
-            CProto & proto = gf.m_arrProto[i];
+            CProto & proto = gf.toProto(i);
             CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
             uint8_t *png;
             int size;

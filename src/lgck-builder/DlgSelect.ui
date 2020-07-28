@@ -48,18 +48,16 @@
     <string>This is the button to open an existing game.</string>
    </property>
    <property name="text">
-    <string>Open
-Game</string>
+    <string/>
    </property>
    <property name="icon">
-    <iconset>
-     <normalon>:/images/0000-1.png</normalon>
-    </iconset>
+    <iconset resource="lgck-builder.qrc">
+     <normaloff>:/images/splash/open.png</normaloff>:/images/splash/open.png</iconset>
    </property>
    <property name="iconSize">
     <size>
-     <width>48</width>
-     <height>48</height>
+     <width>80</width>
+     <height>90</height>
     </size>
    </property>
    <property name="autoDefault">
@@ -85,18 +83,16 @@ Game</string>
     <string>This is the button to create a new game.</string>
    </property>
    <property name="text">
-    <string>New
-Game</string>
+    <string/>
    </property>
    <property name="icon">
-    <iconset>
-     <normalon>:/images/bitmap1.png</normalon>
-    </iconset>
+    <iconset resource="lgck-builder.qrc">
+     <normaloff>:/images/splash/new.png</normaloff>:/images/splash/new.png</iconset>
    </property>
    <property name="iconSize">
     <size>
-     <width>64</width>
-     <height>64</height>
+     <width>80</width>
+     <height>90</height>
     </size>
    </property>
   </widget>
@@ -186,17 +182,16 @@ Game</string>
     <string>This is the button to lauch the sprite editor.</string>
    </property>
    <property name="text">
-    <string>Sprite
-Editor</string>
+    <string/>
    </property>
    <property name="icon">
     <iconset resource="lgck-builder.qrc">
-     <normaloff>:/images/sprite_editor.png</normaloff>:/images/sprite_editor.png</iconset>
+     <normaloff>:/images/splash/editor.png</normaloff>:/images/splash/editor.png</iconset>
    </property>
    <property name="iconSize">
     <size>
-     <width>32</width>
-     <height>32</height>
+     <width>80</width>
+     <height>90</height>
     </size>
    </property>
   </widget>
@@ -216,17 +211,16 @@ Editor</string>
     <string>Watch tutorials on how to make games.</string>
    </property>
    <property name="text">
-    <string>Watch
-tutorials</string>
+    <string/>
    </property>
    <property name="icon">
     <iconset resource="lgck-builder.qrc">
-     <normaloff>:/images/pd/1393320584.png</normaloff>:/images/pd/1393320584.png</iconset>
+     <normaloff>:/images/splash/tutorials.png</normaloff>:/images/splash/tutorials.png</iconset>
    </property>
    <property name="iconSize">
     <size>
-     <width>32</width>
-     <height>32</height>
+     <width>80</width>
+     <height>90</height>
     </size>
    </property>
   </widget>

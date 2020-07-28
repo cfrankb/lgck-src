@@ -93,14 +93,11 @@ void CSndArray::add(CSnd * pSnd)
     m_nSize++;
 }
 
-CSnd t_Snd;
-
 CSnd * CSndArray::operator [](int n)
 {
     if (n < 0 || n >= m_nSize) {
-        return &t_Snd;
-    }
-    else {
+        return nullptr;
+    } else {
         return m_arrSnds[n];
     }
 }
@@ -112,7 +109,22 @@ CSnd * CSndArray::operator [](const char *name)
             return m_arrSnds[n];
         }
     }
-    return &t_Snd;
+    return nullptr;
+}
+
+bool CSndArray::hasSound(int i)
+{
+    return !(i < 0 || i >= m_nSize);
+}
+
+bool CSndArray::hasSound(const char *name)
+{
+    for (int i = 0; i < m_nSize; ++i) {
+        if (!strcmp(name,m_arrSnds[i]->getName())) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void CSndArray::debug()
@@ -142,7 +154,6 @@ CSnd::CSnd(const CSnd * snd)
     init();
     copy(*snd);
 }
-
 
 CSnd::CSnd(const char* name, char *data, int size)
 {

@@ -64,8 +64,8 @@ protected:
 
     bool m_showGrid;
     int m_gridSize;
-    unsigned int m_gridColor;
-    unsigned int m_triggerKeyColor;
+    uint32_t m_gridColor;
+    uint32_t m_triggerKeyColor;
     bool m_showTriggerKey;
     CGame *m_game;
     bool m_hasFocus;
@@ -82,6 +82,7 @@ protected:
     void drawBackground();
     void drawItemRect();
     void uint2color(u_int32_t rgba, Color &out);
+    void uint2rgba(u_int32_t rgba, float &red, float &green, float &blue, float &alpha);
 
 Q_SIGNALS:
     void focused(bool);

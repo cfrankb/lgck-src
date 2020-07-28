@@ -71,7 +71,7 @@ void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
     item->setData(0, Qt::UserRole, v);
 
     CGameFile & gf = *m_gameFile;
-    CProto & proto = gf.m_arrProto[ protoId ];
+    CProto & proto = gf.toProto(protoId);
 
     uint8_t *png;
     int size;
@@ -121,7 +121,7 @@ void CDlgExportSprite::on_btnExport_clicked()
         foreach(QTreeWidgetItem *item, itemList) {
            ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
            CGameFile & gf = *m_gameFile;
-           CProto & proto = gf.m_arrProto[ data->protoId ];
+           CProto & proto = gf.toProto(data->protoId);
            CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
            QString fileName = QDir(dir).filePath(QString(proto.m_szName) + "." + suffix);
            oblDoc.setFormat(outFormat);

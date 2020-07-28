@@ -902,3 +902,13 @@ void CFrameSet::setTag(const char *tag, const char *v)
 {
     m_tags[tag] = v;
 }
+
+void CFrameSet::toSubset(CFrameSet & dest, int start, int end)
+{
+    int last = end == -1 ? getSize() : end;
+    CFrameSet & me = *this;
+    for (int i=start; i < last; ++i) {
+        CFrame *p = new CFrame(me[i]);
+        dest.add(p);
+    }
+}

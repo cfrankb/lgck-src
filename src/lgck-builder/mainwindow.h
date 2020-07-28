@@ -167,6 +167,9 @@ protected:
 
     QOpenGLContext *m_context;
 
+public slots:
+    void addLevel();
+
 private slots:
     void on_actionRestart_triggered();
     void on_actionDebug_triggered();
@@ -236,7 +239,7 @@ private slots:
     void selectLevel(int index);
     void editLevel(int index);
     void deleteLevel(int index);
-    void addLevel();
+
     void notifyKeyEvent(int keyCode, int state);
     void updateMenus();
     void setStatus(int i, const QString message);

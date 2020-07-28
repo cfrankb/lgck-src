@@ -631,6 +631,22 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QCheckBox" name="cSampleSprites">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>90</y>
+      <width>281</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add sample sprites to this project.</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
  </widget>
  <tabstops>

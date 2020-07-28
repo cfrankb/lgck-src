@@ -55,7 +55,7 @@ CDlgPath::CDlgPath(QWidget *parent) :
     ui(new Ui::CDlgPath)
 {
     ui->setupUi(this);
-    m_path = (void*) new CPath;
+    m_path = new CPath;
 }
 
 CDlgPath::~CDlgPath()
@@ -111,7 +111,7 @@ void CDlgPath::on_btnAdd_clicked()
     dlg->load(-1);
 
     if (dlg->exec()) {
-        char aim = -1;
+        uint8_t aim = 0xff;
         dlg->save(aim);
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIcon(item, aim);
@@ -203,24 +203,15 @@ void CDlgPath::updateIcon(QTreeWidgetItem *item, int aim)
 void CDlgPath::on_btnRaw_clicked()
 {
     QString tmp;
-    QString s;
-    CPath & path = * ((CPath*) m_path);
-
-    for (int i=0; i < path.getSize(); ++i) {
-        if (i) {
-            s += " ";
-        }
-        QString tmp = QString::asprintf("%2.2x", path[i]);
-        s += tmp.mid(0,2);
-    }
-
+    CPath & path = *m_path;
+    QString s = path.toHex().c_str();
     bool ok = false;
 
     QString result = QInputDialog::getText(this, QString(""),
             tr("Edit path"), QLineEdit::Normal,
             s, &ok);
 
-    if (ok) {
+   if (ok) {
         CPath tmp;
 
         // remove trailing white spaces

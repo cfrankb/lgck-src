@@ -426,7 +426,7 @@ void CLevelScroll::editPath()
             if (!endPath) {
                 QString s;
                 if (!layer.isMultiSelection()) {
-                    s = QString(tr("Object: x=%1 y=%2")).arg(entry.m_nX).arg(entry.m_nY);
+                    s = QString(tr("Sprite: x = %1 y = %2")).arg(entry.m_nX).arg(entry.m_nY);
                 } else {
                     s = tr("multiple selection");
                 }
@@ -449,7 +449,7 @@ void CLevelScroll::initMouse()
 
 void CLevelScroll::entryFromProto(const int protoId, CLevelEntry &entry)
 {
-    CProto & proto = m_game->m_arrProto[protoId];
+    CProto & proto = m_game->toProto(protoId);
     entry.m_nProto = protoId;
     entry.m_nFrameNo = proto.m_nFrameNo;
     entry.m_nFrameSet = proto.m_nFrameSet;
