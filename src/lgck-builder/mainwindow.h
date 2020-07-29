@@ -32,6 +32,8 @@ class CDlgDistributeGame;
 class QFileSystemWatcher;
 class CInfoDock;
 class QLabel;
+class CGameFixer;
+class QToolButton;
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -61,6 +63,7 @@ public:
     static const char m_appName[];
     static const char m_author[];
     static const QString m_appTitle;
+    void setReady(bool ready);
 
 private:
     Ui::MainWindow *ui;
@@ -75,6 +78,7 @@ private:
     QToolBar *m_layerToolbar;
     CGame m_doc;
     QTimer m_timer;
+    QTimer m_timerIndicator;
     QElapsedTimer m_time;
     int m_nextTick;
     bool m_bShowGrid;
@@ -129,6 +133,9 @@ private:
     QAction *m_actionEraser;
     QStringList & defaultShortcuts();
     QLabel *m_protoIcon;
+    CGameFixer * m_fixer;
+    QToolButton *m_btnIndicator;
+    bool m_ready;
     void saveSettings();
     enum {
         MaxRecentFiles      = 4,
@@ -269,6 +276,8 @@ private slots:
     void on_actionSprite_Paint_toggled(bool checked);
     void eraserToggled(bool checked);
     void changeProtoIcon(int protoId);
+    void updateIndicator();
+    void indicatorTriggered();
 
 signals:
     void levelDeleted(int index);

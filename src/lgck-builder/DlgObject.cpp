@@ -458,7 +458,8 @@ void CDlgObject::load(const int index)
     m_ui->cAutoTrigger->setChecked(proto.m_bAutoTrigger != 0);
 
     // trigger
-    m_ui->cTrigger->setChecked( proto.getOption(CProto::OPTION_NO_TRIGGER) );
+    m_ui->cTrigger->setChecked(proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP));
+    m_ui->cTrigger->setChecked(proto.getOption(CProto::OPTION_NO_TRIGGER_CALL));
 
     // page 5 ****************************************************************
 
@@ -685,7 +686,8 @@ void CDlgObject::save(const int index)
     }
 
     // trigger
-    proto.setOption(CProto::OPTION_NO_TRIGGER, m_ui->cTrigger->checkState () == Qt::Checked);
+    proto.setOption(CProto::OPTION_NO_TRIGGER_FLIP, m_ui->cTrigger->checkState () == Qt::Checked);
+    proto.setOption(CProto::OPTION_NO_TRIGGER_CALL, m_ui->cTriggerCall->checkState () == Qt::Checked);
 
     // set autoGoal
     proto.setOption(CProto::OPTION_AUTO_GOAL, m_ui->cAutomaticGoal->checkState () == Qt::Checked);
@@ -1171,4 +1173,14 @@ void CDlgObject::on_btnUuid_clicked()
     CProto & proto = m_gameFile->m_arrProto[m_objectIndex];
     QClipboard *clip = QApplication::clipboard();
     clip->setText(proto.m_uuid);
+}
+
+void CDlgObject::on_cAutoTrigger_toggled(bool checked)
+{
+    m_ui->cTriggerCall->setChecked(!checked);
+}
+
+void CDlgObject::on_cTriggerCall_toggled(bool checked)
+{
+    m_ui->cAutoTrigger->setChecked(!checked);
 }

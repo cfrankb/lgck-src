@@ -276,8 +276,12 @@ void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
         }
     } else if (!this->isGameMode() && !m_editPath) {
         QString s = "";
-        if (m_mouse.x >= 0 && m_mouse.y >= 0) {
-           s = tr("x = %1 y = %2").arg(m_mouse.x).arg(m_mouse.y);
+        if (m_game->getSize()) {
+            if (m_mouse.x >= 0 && m_mouse.y >= 0) {
+               s = tr("x = %1 y = %2").arg(m_mouse.x).arg(m_mouse.y);
+            }
+        } else {
+            s = tr("No level in this project. Go to Build, Create New Level to add one.");
         }
         emit statusChanged(0, s);
         if (m_game && m_game->getSize()) {
@@ -454,7 +458,7 @@ void CLevelScroll::entryFromProto(const int protoId, CLevelEntry &entry)
     entry.m_nFrameNo = proto.m_nFrameNo;
     entry.m_nFrameSet = proto.m_nFrameSet;
 
-    if (proto.getOption(CProto::OPTION_NO_TRIGGER)) {
+    if (proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP)) {
         entry.m_nActionMask = 0xf;
     } else {
         entry.m_nActionMask = 0x8f;

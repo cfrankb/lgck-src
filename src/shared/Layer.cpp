@@ -25,6 +25,8 @@
 #include "IFile.h"
 #include "LuaVM.h"
 #include "helper.h"
+#include "Game.h"
+#include "Actor.h"
 
 CLayer::CLayer(const char* name, int type, int h, int v)
 {
@@ -401,4 +403,29 @@ void CLayer::getOffset(int & mx, int & my)
 {
     mx = m_mx;
     my = m_my;
+}
+
+int CLayer::countSpriteOfClass(CGame & game, int spriteClass)
+{
+    int count = 0;
+    for (int i=0; i < m_size; ++i) {
+        CProto & proto = game.protos().getProto(m_arrEntries[i]);
+        if (proto.m_nClass == spriteClass) {
+            ++ count;
+        }
+    }
+    return count;
+}
+
+int CLayer::countGoals()
+{
+    int count = 0;
+    for (int i=0; i < m_size; ++i) {
+        CLevelEntry & entry = m_arrEntries[i];
+        CActor actor = CActor(entry);
+        if (actor.isGoal()) {
+            ++ count;
+        }
+    }
+    return count;
 }

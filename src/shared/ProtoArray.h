@@ -41,6 +41,7 @@ public:
         virtual bool read (IFile & file);
         virtual bool write (IFile & file);
         CProto & getProto(CLevelEntry & entry);
+        int getProtoIdFromUuid (const char* uuid);
         CProtoArray();
 
 // Attributes
@@ -62,6 +63,8 @@ public:
         CProtoArray & operator += (CProtoArray & src);
         CProtoArray & operator = (CProtoArray & src);
         CProto & get(int i) const;
+        int countSpriteOfGivenClass(int spriteClass);
+        int countAutoGoals();
         void debug();
 
         // remove references
@@ -93,6 +96,7 @@ protected:
         void forgetIndex();
         bool readEx (IFile & file, int version);
         void fixUUIDs();
+        void createFixUpTable(CProtoArray & slave);
 
         int *m_index;
         int m_indexSize;

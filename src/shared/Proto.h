@@ -71,7 +71,7 @@ public:
     uint8_t m_nPoints;
 
     int16_t m_nProtoBuddy;
-    uint16_t m_options;
+    uint16_t m_options;         // OPTION_XXXXX flags
 
     int16_t m_nChProto;
     int16_t m_nChSound;
@@ -84,7 +84,7 @@ public:
     uint8_t m_nRbDelay;
     uint8_t m_nRebirths;
 
-    int16_t m_nAutoProto;
+    int16_t m_nAutoProto;       // proto changeTo (auto)
     int16_t m_nAutoBullet;
     int16_t m_nAutoSound;
     uint8_t m_bAutoTrigger;
@@ -95,7 +95,7 @@ public:
     uint8_t m_nAutoSoundTime;
     uint8_t m_nAutoTriggerTime;
 
-    uint8_t m_nMaxBullets;     // max actve bullets
+    uint8_t m_nMaxBullets;     // max active bullets
     uint8_t m_nFireRate;
     uint8_t m_rebirthLocation;
     uint8_t m_solidState;     // flag see SOLID_XXXX
@@ -104,7 +104,7 @@ public:
     uint16_t m_bulletSound;
     char m_uuid[40];
 
-    enum {
+    enum:uint16_t {
         OPTION_NO_GRAVITY       = 0x0001,  // antigravity flag
         OPTION_DESTROY_ON_USE   = 0x0002,
         OPTION_SOLID            = 0x0004,  // Solid to Monsters
@@ -113,9 +113,10 @@ public:
         OPTION_INACTIVE         = 0x0020,  // doesnt interract until flag is cleared
         OPTION_INACTIVE_USERDEF = 0x0040,  // userdef is activated through scripting
         OPTION_INVENTORY_HIDDEN = 0x0080,  // doesn't display this item in the inventory
+        OPTION_NO_TRIGGER_CALL  = 0x0100,  // this object cannot auto call a trigger
         OPTION_ADVANCED         = 0x1000,  // handle advanced stuff like inventory and state
         OPTION_NO_SPLAT         = 0x2000,  // this object cannot be crushed
-        OPTION_NO_TRIGGER       = 0x4000,  // don't trigger this object
+        OPTION_NO_TRIGGER_FLIP  = 0x4000,  // don't trigger flip this object
         OPTION_NO_SHIFT_AT_DEATH= 0x8000   // leave corps behind
     };
 

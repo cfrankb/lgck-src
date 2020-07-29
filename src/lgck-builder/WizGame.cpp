@@ -24,7 +24,7 @@
 #include <QStringList>
 #include "../shared/Settings.h"
 #include "../shared/GameEvents.h"
-#include "../shared/FileWrap.h"
+#include "gamefixer.h"
 
 #define MIN_VALUE 1
 #define MAX_VALUE 255
@@ -173,62 +173,9 @@ void CWizGame::save()
     }
 
     if (ui->cSampleSprites->isChecked()) {
-        addSampleSprites();
-    }
-}
-
-typedef struct {
-    const char * obl;
-    const char * meta;
-    const char * name;
-} metaItem;
-
-void CWizGame::addSampleSprites()
-{
-    metaItem items[] = {
-        {":res/meta/annie.obl", ":res/meta/annie.proto", "player"},
-        {":res/meta/diamond.obl", ":res/meta/diamond.proto", "diamond"},
-        {":res/meta/wallbrick.obl", ":res/meta/wallbrick.proto", "wallbrick"},
-        {":res/meta/drago.obl", ":res/meta/drago.proto", "drago"}
-    };
-
-    CFileWrap file;
-    for (unsigned int i=0; i < sizeof(items)/sizeof(metaItem); ++i) {
-        CFrameSet *frameSet = new CFrameSet;
-        int frameSetId = 0;
-        metaItem & item = items[i];
-        if (file.open(item.obl, "rb")) {
-            frameSet->read(file);
-            frameSet->setName(item.name);
-            frameSetId = m_game->addFrameSet(frameSet);
-            file.close();
-        } else {
-            qWarning("failed to read: %s", item.obl);
-        }
-
-        if (file.open(item.meta, "rb")) {
-            m_game->m_arrProto.getSize();
-            CProtoArray t;
-            //qDebug("------------------------------------------IMPORTING: %s", item.name);
-            t.importMeta(file);
-            //qDebug("BEFORE @@@@@@@@@@@@@ %s", item.name);
-            //t.debug();
-            CProto & proto = t[0];
-            proto.m_nFrameSet = frameSetId;
-            proto.m_nChProto = 0;
-            proto.m_nChSound = 0;
-            proto.m_nAutoProto = 0;
-            proto.m_nAutoSound = 0;
-            proto.m_nAutoBullet = 0;
-            proto.m_nProtoBuddy = 0;
-            strcpy(proto.m_szName, item.name);
-            m_game->m_arrProto += t;
-            //qDebug("AFTER @@@@@@@@@@@@@ %s", item.name);
-            //m_game->m_arrProto.debug();
-            file.close();
-        } else {
-            qWarning("failed to read: %s", item.meta);
-        }
+        CGameFixer fixer;
+        fixer.setGame(m_game);
+        fixer.addSampleSprites();
     }
 }
 

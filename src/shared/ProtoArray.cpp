@@ -430,6 +430,7 @@ bool CProtoArray::exportMeta(IFile &file, int i)
     t.getObject(n) = this->getObject(i);
     file.write(PRTO_SIGNATURE, 4);
     uint32_t version = PROTO_VERSION;
+    createFixUpTable(t);
     file.write(&version, sizeof(uint32_t));
     t.write(file);
     return true;
@@ -455,6 +456,45 @@ bool CProtoArray::importMeta(IFile &file)
     return true;
 }
 
+typedef struct {
+    std::unordered_map<int, std::string> protoFix;
+} FixUpTable;
+
+void CProtoArray::createFixUpTable(CProtoArray &slave)
+{
+    qDebug("createFixUpTable(CProtoArray &slave)");
+    FixUpTable table;
+    for (int i=0; i < slave.getSize(); ++i) {
+        CProto & proto = slave.getObject(i).proto();
+        const int protoValues[] = {
+            proto.m_nChProto,
+            proto.m_nAutoProto,
+            proto.m_nAutoBullet,
+            proto.m_nProtoBuddy
+        };
+        for (unsigned int j=0; j < sizeof(protoValues)/sizeof(int); ++j) {
+            int v = protoValues[j];
+            if (v) {
+                table.protoFix[v] = getObject(v).proto().m_uuid;
+            }
+        }
+        /*
+        proto.m_nChProto = 0;
+        proto.m_nChSound = 0;
+        proto.m_nAutoProto = 0;
+        proto.m_nAutoSound = 0;
+        proto.m_nAutoBullet = 0;
+        proto.m_nProtoBuddy = 0;
+        proto.m_bulletSound = 0;
+        */
+    }
+    std::unordered_map<int, std::string>::iterator it = table.protoFix.begin();
+    while(it != table.protoFix.end()) {
+        qDebug("proto %d >> uuid: %s", it->first, it->second.c_str());
+        ++it;
+    }
+}
+
 void CProtoArray::debug()
 {
     qDebug("CProtoArray size: %d", m_nSize);
@@ -467,7 +507,44 @@ void CProtoArray::debug()
         }
         obj.debug();
     }
+}
 
+int CProtoArray::getProtoIdFromUuid (const char* uuid)
+{
+    for (int i=0; i < m_nSize; ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        if (strcmp(proto.m_uuid, uuid)==0) {
+            return i;
+        }
+    }
+    return NOT_FOUND;
+}
+
+int CProtoArray::countSpriteOfGivenClass(int spriteClass)
+{
+    int count = 0;
+    for (int i=0; i < m_nSize; ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        if (proto.m_nClass == spriteClass) {
+            ++ count;
+        }
+    }
+    return count;
+}
+
+int CProtoArray::countAutoGoals()
+{
+    int count = 0;
+    for (int i=0; i < m_nSize; ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        if (proto.m_options | proto.OPTION_AUTO_GOAL) {
+            ++ count;
+        }
+    }
+    return count;
 }
 
 /////////////////////////////////////////////////////////////////////////////

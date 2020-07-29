@@ -362,7 +362,11 @@ void CActor::moveTo(const int x, const int y)
 
 void CActor::callTrigger()
 {
-    m_game->callTrigger(m_nTriggerKey & TRIGGER_KEYS);
+    // if OPTION_NO_TRIGGER_CALL flag is set this
+    // sprite cannot call a trigger.
+    if (!proto().getOption(CProto::OPTION_NO_TRIGGER_CALL)) {
+        m_game->callTrigger(m_nTriggerKey & TRIGGER_KEYS);
+    }
 }
 
 void CActor::setGame(CGame *game)

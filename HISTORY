@@ -11,7 +11,10 @@ HISTORY OF LGCK BUILDER
 - EDITOR: added debug output window
 - EDITOR: tile paint, eraser modes added
 - EDITOR: show TriggerKeys in editor
+- EDITOR: added GameFixer that report and help fix common design errors
+- EDITOR: added sample sprite to New Games
 - LUA: display_setFlagXY, display_setFont
+- LUA: spriteIdFromUuid
 
 
 *** 0.6.0.8

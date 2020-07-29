@@ -395,7 +395,7 @@ void CWizSprite::load(const int index)
     // trigger
 
 //    ui->cTrigger->setChecked( proto.m_bNoTrigger != 0 );
-    ui->cTrigger->setChecked( proto.getOption(CProto::OPTION_NO_TRIGGER) );
+    ui->cTrigger->setChecked( proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP) );
 
     updateButtons();
 
@@ -580,7 +580,7 @@ void CWizSprite::save(const int index)
         proto.m_bAutoTrigger = 0;
     }
 
-    proto.setOption(CProto::OPTION_NO_TRIGGER, ui->cTrigger->checkState () == Qt::Checked);
+    proto.setOption(CProto::OPTION_NO_TRIGGER_FLIP, ui->cTrigger->checkState () == Qt::Checked);
 
     CObject & object = gf.m_arrProto.getObject( index );
     if (ui->cKillOffScreen->checkState() == Qt::Checked) {

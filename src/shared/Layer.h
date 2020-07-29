@@ -24,6 +24,7 @@
 #include <string>
 #include "../shared/ISurface.h"
 class IFile;
+class CGame;
 
 class CLayer: public ISurface
 {
@@ -70,6 +71,8 @@ public:
 
     void setOffset(int mx, int my);
     void getOffset(int & mx, int & my);
+    int countSpriteOfClass(CGame &game, int spriteClass);
+    int countGoals();
 
     enum {
         LAYER_BK,

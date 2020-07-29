@@ -34,7 +34,7 @@ void CFontManager::forget()
 {
     for (int i=0; i < m_size; ++i) {
         deleteFont(m_fonts[i]);
-        m_fonts[i] = NULL;
+        m_fonts[i] = nullptr;
     }
     m_size = 0;
 }
@@ -55,7 +55,7 @@ CFont * CFontManager::find(const char *name)
     if (i != NOT_FOUND) {
         return m_fonts[i]->font;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -115,7 +115,7 @@ void CFontManager::reset()
         file.close();
         add(font, DEFAULT_FONT);
     } else {
-        CLuaVM::debugv("can't read %s", fontName);
+        CLuaVM::debugv("can't read resource: %s", fontName);
     }
 }
 
@@ -166,7 +166,7 @@ CFont *CFontManager::at(int i)
     if (i >= 0 && i < m_size) {
         return m_fonts[i]->font;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 

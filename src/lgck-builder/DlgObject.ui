@@ -54,7 +54,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>6</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideNone</enum>
@@ -742,7 +742,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>240</y>
+       <y>230</y>
        <width>181</width>
        <height>71</height>
       </rect>
@@ -863,7 +863,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>218</y>
+       <y>200</y>
        <width>221</width>
        <height>71</height>
       </rect>
@@ -1259,12 +1259,25 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>120</x>
        <y>190</y>
-       <width>251</width>
+       <width>331</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>This object will not be triggered</string>
+      <string>This object will not be triggered (trigger flip).</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cTriggerCall">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>230</y>
+       <width>281</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>This object will not call a trigger.</string>
      </property>
     </widget>
    </widget>

@@ -3806,3 +3806,19 @@ int display_setTemplate(lua_State *L)
     }
     return 0;
 }
+
+int spriteIdFromUuid(lua_State *L)
+{
+    const char *fnName = "spriteIdFromUuid";
+    int argc = lua_gettop(L);
+    if (argc != 1) {
+        CGame::error(fnName, 1);
+        return 0;
+    } else {
+        CGame & game = CGame::getGame();
+        const char *uuid = lua_tostring(L, 1);
+        int id = game.m_arrProto.indexOfUUID(uuid);
+        lua_pushinteger(L, id);
+        return 1;
+    }
+}

@@ -15,6 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "LuaVM.h"
 
 typedef struct  {
     const char *fnName;
@@ -240,6 +241,7 @@ luaFn ( XOR )
 luaFn ( display_setFlagXY )
 luaFn ( display_setFont )
 luaFn ( display_setTemplate )
+luaFn ( spriteIdFromUuid )
 
 static FUNCTION exports [] = {
     fn ( addToHP )
@@ -457,6 +459,7 @@ static FUNCTION exports [] = {
     fn ( display_setFlagXY )
     fn ( display_setFont )
     fn ( display_setTemplate )
+    fn ( spriteIdFromUuid )
     alias ( "activateSprite", sprite_activate )
     alias ( "addDisplayC", display_new )
     alias ( "addElement", element_new )

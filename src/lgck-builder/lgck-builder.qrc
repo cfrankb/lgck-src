@@ -101,5 +101,23 @@
         <file>res/meta/diamond.obl</file>
         <file>res/meta/drago.proto</file>
         <file>res/meta/drago.obl</file>
+        <file>res/meta/sparkle.proto</file>
+        <file>res/meta/sparkle.obl</file>
+        <file>res/meta/deico.proto</file>
+        <file>res/meta/deico.obl</file>
+        <file>res/meta/little_star (player bullet).proto</file>
+        <file>res/meta/little_star (player bullet).obl</file>
+        <file>res/meta/little_star (dead).proto</file>
+        <file>res/meta/little_star (dead).obl</file>
+        <file>res/meta/switch94.proto</file>
+        <file>res/meta/switch94.obl</file>
+        <file>res/meta/snake.proto</file>
+        <file>res/meta/snake.obl</file>
+        <file>res/meta/forcef94.proto</file>
+        <file>res/meta/forcef94.obl</file>
+        <file>images/Light-bulb-red.png</file>
+        <file>images/Light-bulb-green.png</file>
+        <file>images/Light-bulb-yellow.png</file>
+        <file>images/Light-bulb-white.png</file>
     </qresource>
 </RCC>

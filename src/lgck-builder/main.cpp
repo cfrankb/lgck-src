@@ -134,5 +134,7 @@ int main(int argc, char *argv[])
     if (newProject) {
         w.addLevel();
     }
+
+    w.setReady(true);
     return app.exec();
 }

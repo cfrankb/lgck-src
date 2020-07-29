@@ -103,6 +103,8 @@ private slots:
     void editAnimation(int i);
     void clearAnimation(int i);
     void on_btnUuid_clicked();
+    void on_cAutoTrigger_toggled(bool checked);
+    void on_cTriggerCall_toggled(bool checked);
 };
 
 #endif // DLGOBJECT_H

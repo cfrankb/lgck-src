@@ -1137,7 +1137,7 @@ void CGame::callTrigger (const int nKey)
         for (int i = 0; i < scene.getSize(); ++i) {
             CActor & entry = scene[i];
             CProto & proto =  m_arrProto [entry.m_nProto];
-            if (!proto.getOption(CProto::OPTION_NO_TRIGGER) &&
+            if (!proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP) &&
                 (entry.m_nTriggerKey & TRIGGER_KEYS) == nKey) {
                 entry.unMap();
                 entry.m_nTriggerKey ^= entry.m_nActionMask & TRIGGER_MASK;

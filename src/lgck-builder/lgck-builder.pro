@@ -55,6 +55,8 @@ win32:LIBS += -llua \
     -lopengl32
 
 SOURCES +=  mainwindow.cpp \
+    dlgindicator.cpp \
+    gamefixer.cpp \
     infodock.cpp \
     main.cpp \
     levelviewgl.cpp \
@@ -158,6 +160,8 @@ SOURCES +=  mainwindow.cpp \
     ../shared/interfaces/IGraphics.cpp
 
 HEADERS  +=  mainwindow.h \
+    dlgindicator.h \
+    gamefixer.h \
     infodock.h \
     levelviewgl.h \
     levelscroll.h \
@@ -297,4 +301,5 @@ FORMS  += mainwindow.ui \
     DlgExportSprite.ui \
     DlgDistributeGame.ui \
     dlgdisplay.ui \
+    dlgindicator.ui \
     infodock.ui

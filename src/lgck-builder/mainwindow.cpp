@@ -34,6 +34,7 @@
 #include <QOperatingSystemVersion>
 #include <QFlags>
 #include <QSysInfo>
+#include <QToolButton>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -79,6 +80,8 @@
 #include "DlgDistributeGame.h"
 #include "exportgame.h"
 #include "infodock.h"
+#include "gamefixer.h"
+#include "dlgindicator.h"
 
 const char MainWindow::m_appName[] = "LGCK builder";
 const char MainWindow::m_author[] = "cfrankb";
@@ -97,6 +100,10 @@ MainWindow *me = nullptr;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    // Setup the timer for the indicator
+    m_timerIndicator.setInterval(2000);
+    m_timerIndicator.stop();
+    m_ready = false;
     me = this;
     QString s;
     QString appVersion;
@@ -124,6 +131,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_gridSize = 32;
     m_fontSize = DEFAULT_FONT_SIZE;
     m_viewMode = VM_EDITOR;
+    m_fixer = new CGameFixer;
+    m_fixer->setGame(&m_doc);
     // initToolBar() must be placed before update menus.
     initToolBar();
     m_scroll = new CLevelScroll(this, &m_doc);
@@ -163,7 +172,7 @@ MainWindow::MainWindow(QWidget *parent)
     initFileMenu();
     updateMenus();
 
-    // Setup the timer
+    // Setup the timer for the screen refresh
     m_timer.setInterval(1000 / TICK_MAX_RATE);
     m_timer.start();
     m_time.start();
@@ -179,6 +188,7 @@ MainWindow::MainWindow(QWidget *parent)
             m_toolBox, SLOT(updateFrameSet(int)));
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(viewEvent()));
+    connect(&m_timerIndicator, SIGNAL(timeout()), this, SLOT(updateIndicator()));
     m_toolBox->init();
 
     // link the toolBox to MainWindow
@@ -377,6 +387,7 @@ MainWindow::~MainWindow()
     if (m_updater) {
         delete m_updater;
     }
+    delete m_fixer;
 }
 
 bool MainWindow::maybeSave()
@@ -1656,6 +1667,12 @@ void MainWindow::initToolBar()
     ui->toolBar->addAction(ui->actionCreate_Level);
     ui->toolBar->addAction(ui->actionEdit_Level);
     ui->toolBar->addAction(ui->actionTest_Level);
+    m_btnIndicator = new QToolButton(ui->toolBar);
+    m_btnIndicator->setIcon(QIcon(":/images/Light-bulb-white.png"));
+    m_btnIndicator->setToolTip(tr("Analyzing"));
+    m_btnIndicator->resize(size);
+    connect(m_btnIndicator, SIGNAL (clicked()), this, SLOT(indicatorTriggered()));
+    ui->toolBar->addWidget(m_btnIndicator);
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->actionPrevious);
     ui->toolBar->addAction(ui->actionNext);
@@ -3046,4 +3063,32 @@ void MainWindow::changeProtoIcon(int protoId)
     QPixmap pm = QPixmap::fromImage(img);
     m_protoIcon->setToolTip(proto.getName());
     m_protoIcon->setPixmap(pm.scaled(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE, Qt::IgnoreAspectRatio));
+}
+
+void MainWindow::updateIndicator()
+{
+    if (m_ready) {
+        m_fixer->troubleshoot();
+        m_btnIndicator->setIcon(QIcon(m_fixer->getIcon()));
+        QString status;
+        m_fixer->getStatus(status);
+        m_btnIndicator->setToolTip(status);
+    }
+}
+
+void MainWindow::setReady(bool ready)
+{
+    m_ready = ready;
+    if (m_ready) {
+        m_timerIndicator.start();
+    } else {
+        m_timerIndicator.stop();
+    }
+}
+
+void MainWindow::indicatorTriggered()
+{
+    CDlgIndicator dlg;
+    dlg.setText(m_fixer->getText());
+    dlg.exec();
 }

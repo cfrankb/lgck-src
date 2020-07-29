@@ -179,6 +179,9 @@ public:
     CFrameSet & toFrameSet(int frameSet);
     CFrameArray & frames();
     CProto & toProto(int protoId);
+    inline CProtoArray & protos() {
+        return m_arrProto;
+    }
 
     int addFrameSet(CFrameSet *pFrameSet);
 

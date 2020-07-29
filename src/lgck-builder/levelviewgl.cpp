@@ -277,6 +277,9 @@ void CLevelViewGL::drawScreen()
     glColor4f(red, green, blue, alpha);
 
     CFont *font = m_game->getFonts()->at(0);
+    if (!font) {
+        qWarning("Font[0] is not set.");
+    }
     font->FaceSize(16);
     Color fontColor;
     uint2color(m_triggerKeyColor, fontColor);
