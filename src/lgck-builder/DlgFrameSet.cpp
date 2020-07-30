@@ -28,6 +28,7 @@
 #include "../shared/FrameSet.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
+#include "launcher.h"
 
 CDlgFrameSet::CDlgFrameSet(QWidget *parent) :
     QDialog(parent),
@@ -99,8 +100,10 @@ void CDlgFrameSet::init(CFrameSet * frameSet)
 
     // disable button if sprite editor not found
     QString appDir = QCoreApplication::applicationDirPath();
-    QString path = appDir + "/obl5edit.exe";
-    m_ui->btnEdit->setDisabled(!fileExists(path));
+
+    Path outPath;
+    bool found = getCmd(SPRITE_EDITOR, outPath);
+    m_ui->btnEdit->setDisabled(!found);
 }
 
 void CDlgFrameSet::updateButtons()
@@ -154,30 +157,32 @@ void CDlgFrameSet::on_btnEdit_clicked()
 
         // same image set to temp file
         CFileWrap file;
-        if (file.open(q2c(tmp.fileName()),"w")) {
+        if (file.open(q2c(tmp.fileName()),"wb")) {
             m_frameSet->write(file);
             file.close();
         }
 
         // lauch the editor
-        QString path = appDir + "/obl5edit.exe";
+        Path outPath;
+        getCmd(SPRITE_EDITOR, outPath); // we assume that it was found
+
+        QStringList list = QStringList{fileName};
         QProcess proc;
-        proc.setWorkingDirectory(appDir);
-        QStringList list;
-        list << fileName;
-        proc.start(path, list);
+        proc.setWorkingDirectory(outPath.path);
+        proc.start(outPath.cmd, list);
         proc.waitForFinished(-1);
 
         // check the exitCode
         int result = proc.exitCode();
         if (result) {
+            QStringList cmd = QStringList {outPath.path, outPath.cmd};
             QString outMsg = QString(tr("An error occured: %1\nCode: %2"))
-                           .arg(path + " " + list.join(" ")).arg(result);
+                           .arg(cmd.join("/") + " " + list.join(" ")).arg(result);
             qDebug() << outMsg;
             QMessageBox::critical(this, "", outMsg);
         } else {
             // reload the changes
-            if (file.open(q2c(tmp.fileName()),"r")) {
+            if (file.open(q2c(tmp.fileName()),"rb")) {
                 std::string uuid = m_frameSet->tag("UUID");
                 m_frameSet->read(file);
                 m_frameSet->setTag("UUID", uuid.c_str());

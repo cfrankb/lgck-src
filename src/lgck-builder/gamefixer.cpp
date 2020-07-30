@@ -8,6 +8,7 @@
 
 CGameFixer::CGameFixer()
 {
+    // https://publicdomainvectors.org/en/search/light/1
     m_game = nullptr;
     m_severity = Okay;
 }
@@ -164,8 +165,8 @@ void CGameFixer::troubleshoot()
             m_errors.push_back(
                         DesignError{
                             Error,
-                            tr("No player found on current Level. You must include one."),
-                            tr("A player object is required for the level to execute properly. "\
+                            tr("No player found in the current Level. You must include one."),
+                            tr("A player object marks the start position is required for the level to execute properly. "\
                                "This is mandatory and will lead to failure if absent."),
                             "/lgck/sprite_wizard.html"
                         });
@@ -208,6 +209,27 @@ void CGameFixer::troubleshoot()
                         "",
                         ""
                     });
+    }
+
+    if (m_game->protos().getSize() == 1) {
+        m_errors.push_back(
+            DesignError{
+                Error,
+                tr("No Sprite in your project"),
+                tr("You must supply a number of sprites including a Player Object to your project. "\
+                "This is a mandatory requirement. Select File and New Project and The Wizard will fix this issue by including sample sprites. "),
+                ""
+            });
+    } else if (m_game->protos().countAutoGoals()==0){
+        m_errors.push_back(
+            DesignError{
+                Warning,
+                tr("No sprite defined as an automatic goal."),
+                tr("While This can be perfectly valid, "\
+                   "you may be required to mark every single goal on the level manually. "\
+                   "This is not recommended."),
+                ""
+        });
     }
 
     for(auto error: m_errors){

@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
+#include "launcher.h"
 
 CDlgSelect::CDlgSelect(QWidget *parent) :
     QDialog(parent),
@@ -55,18 +56,15 @@ void CDlgSelect::on_btnNoShow_clicked()
 
 void CDlgSelect::on_btnSpriteEditor_clicked()
 {
-    QString appDir = QCoreApplication::applicationDirPath();
-    qDebug() << appDir;
-#ifdef Q_OS_WIN32
-    QString cmd = "obl5edit.exe";
-#else
-    QString cmd = "obl5edit";
-#endif
-    QString runtime = "\"" + appDir + "/" + cmd + "\"";
-    bool result = QProcess::startDetached(runtime, QStringList());
+    Path outPath;
+    if (!getCmd(SPRITE_EDITOR, outPath)) {
+        QMessageBox::warning(this, "", tr("Couldn't find executable: %1").arg(SPRITE_EDITOR));
+        return;
+    }
+    QString runtime = "\"" + outPath.path + "/" + outPath.cmd + "\"";
+    bool result = launchProcess(outPath);
     if (!result) {
-        QString errMsg = tr("Running external editor failed: %1").arg(runtime);
-        QMessageBox::warning(this, "", errMsg);
+        QMessageBox::warning(this, "", tr("Running external editor failed: %1").arg(runtime));
     }
 }
 

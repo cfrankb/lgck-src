@@ -540,7 +540,7 @@ int CProtoArray::countAutoGoals()
     for (int i=0; i < m_nSize; ++i) {
         CObject & obj = getObject(i);
         CProto & proto = obj.proto();
-        if (proto.m_options | proto.OPTION_AUTO_GOAL) {
+        if (proto.m_options & proto.OPTION_AUTO_GOAL) {
             ++ count;
         }
     }

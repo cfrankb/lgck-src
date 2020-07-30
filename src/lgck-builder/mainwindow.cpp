@@ -82,6 +82,7 @@
 #include "infodock.h"
 #include "gamefixer.h"
 #include "dlgindicator.h"
+#include "launcher.h"
 
 const char MainWindow::m_appName[] = "LGCK builder";
 const char MainWindow::m_author[] = "cfrankb";
@@ -2882,18 +2883,15 @@ void MainWindow::goExternalRuntime()
 
 void MainWindow::on_actionSprite_Editor_triggered()
 {
-    QString appDir = QCoreApplication::applicationDirPath();
-    qDebug() << appDir;
-#ifdef Q_OS_WIN32
-    QString cmd = "obl5edit.exe";
-#else
-    QString cmd = "obl5edit";
-#endif
-    QString runtime = QString("\"%1/%2\"").arg(appDir).arg(cmd);
-    bool result = QProcess::startDetached(runtime, QStringList());
+    Path outPath;
+    if (!getCmd(SPRITE_EDITOR, outPath)) {
+        QMessageBox::warning(this, m_appName, tr("Couldn't find executable: %1").arg(SPRITE_EDITOR));
+        return;
+    }
+    QString runtime = "\"" + outPath.path + "/" + outPath.cmd + "\"";
+    bool result = launchProcess(outPath);
     if (!result) {
-        QString errMsg = tr("Running external editor failed: %1").arg(runtime);
-        warningMessage(errMsg);
+        QMessageBox::warning(this, m_appName, tr("Running external editor failed: %1").arg(runtime));
     }
 }
 

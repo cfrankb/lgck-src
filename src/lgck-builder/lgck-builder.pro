@@ -58,6 +58,7 @@ SOURCES +=  mainwindow.cpp \
     dlgindicator.cpp \
     gamefixer.cpp \
     infodock.cpp \
+    launcher.cpp \
     main.cpp \
     levelviewgl.cpp \
     levelscroll.cpp \
@@ -163,6 +164,7 @@ HEADERS  +=  mainwindow.h \
     dlgindicator.h \
     gamefixer.h \
     infodock.h \
+    launcher.h \
     levelviewgl.h \
     levelscroll.h \
     DlgSource.h \
