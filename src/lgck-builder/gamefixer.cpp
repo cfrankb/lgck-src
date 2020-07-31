@@ -6,11 +6,15 @@
 #include "Layer.h"
 #include <vector>
 
+constexpr int ICON_SIZE = 24;
+constexpr char WEB_PATH[] = "https://cfrankb.com/lgck/";
+
 CGameFixer::CGameFixer()
 {
     // https://publicdomainvectors.org/en/search/light/1
     m_game = nullptr;
     m_severity = Okay;
+    m_flip = false;
 }
 
 void CGameFixer::setGame(CGame *game)
@@ -134,7 +138,7 @@ void CGameFixer::troubleshoot()
                         Error,
                         tr("No Level in your project. You must include one."),
                         tr("This is mandatory. Please go to Build, Create New Level to add a level."),
-                        "/lgck/create_level.html"
+                        "create_level.html"
                     });
     } else {
         m_errors.push_back(
@@ -151,7 +155,7 @@ void CGameFixer::troubleshoot()
                             Error,
                             tr("Current Level is empty. "),
                             tr("This is not intentional. Your level cannot be empty."),
-                            "/lgck/edit_level.html"
+                            "edit_level.html"
                         });
         } else if (layer->countSpriteOfClass(*m_game, CLASS_PLAYER_OBJECT)) {
             m_errors.push_back(
@@ -168,7 +172,7 @@ void CGameFixer::troubleshoot()
                             tr("No player found in the current Level. You must include one."),
                             tr("A player object marks the start position is required for the level to execute properly. "\
                                "This is mandatory and will lead to failure if absent."),
-                            "/lgck/sprite_wizard.html"
+                            "sprite_wizard.html"
                         });
         }
         if (layer->countGoals()) {
@@ -237,15 +241,16 @@ void CGameFixer::troubleshoot()
     }
 }
 
-const char *CGameFixer::getIcon(Severity severity)
+const char *CGameFixer::getIcon(Severity severity, bool flip)
 {
+    m_flip = !m_flip;
     switch (severity) {
         case Okay:
             return ":/images/Light-bulb-green.png";
         case Warning:
             return ":/images/Light-bulb-yellow.png";
         case Error:
-            return ":/images/Light-bulb-red.png";
+            return m_flip & flip ? ":/images/Light-bulb-wine.png" : ":/images/Light-bulb-red.png";
     }
     return "";
 }
@@ -281,16 +286,18 @@ QString CGameFixer::getText()
     QString out;
     for(auto error: m_errors){
         QString sError = tr("Info");
-        QString img = tr("<img src='%1' width=32 height=32>").arg(getIcon(error.severity));
+        QString img = tr("<img src='%1' width=%2 height=%2>").arg(getIcon(error.severity, false)).arg(ICON_SIZE);
         if (error.severity == Warning) {
             sError = tr("Warning");
         } else if (error.severity == Error) {
             sError = tr("Error");
         }
-        out += tr("<div><b>[%1] %2</b></div><div>%3<br><br></div>").arg(
+        QString link = QString("<a href=\"%1%2\">%3</a>").arg(WEB_PATH).arg(error.url).arg(tr("more info..."));
+        out += tr("<div><b>[%1] %2</b></div><div>%3%4<br><br></div>").arg(
                     img,
                     error.message,
-                    error.severity != Okay ? error.tip : tr("This requirement is satisfied."));
+                    error.severity != Okay ? error.tip : tr("This requirement is satisfied."),
+                    error.severity != Okay && !link.isEmpty() && false ? link : "");
     }
     return out;
 }

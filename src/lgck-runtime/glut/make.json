@@ -1,5 +1,5 @@
 {
-    "target": "glut/lgck-runtime",
+    "target": "build/lgck-runtime-glut",
     "cxx": "g++",
     "linux": {
         "output" : "makefile",
@@ -48,9 +48,10 @@
         "../shared/implementers/opengl/*opengl.cpp",
         "../shared/implementers/sdl/sn_sdl.cpp",
         "../shared/implementers/sdl/mu_sdl.cpp",
+        "../shared/interfaces/*.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/glut/*.cpp",
-        "shared/lgck_res.cpp"
+        "build/lgck_res.cpp"
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
     "obj_dir": "target/glut",

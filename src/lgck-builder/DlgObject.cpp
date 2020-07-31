@@ -459,7 +459,7 @@ void CDlgObject::load(const int index)
 
     // trigger
     m_ui->cTrigger->setChecked(proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP));
-    m_ui->cTrigger->setChecked(proto.getOption(CProto::OPTION_NO_TRIGGER_CALL));
+    m_ui->cTriggerCall->setChecked(proto.getOption(CProto::OPTION_NO_TRIGGER_CALL));
 
     // page 5 ****************************************************************
 

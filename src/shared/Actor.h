@@ -21,6 +21,7 @@
 
 #include "LevelEntry.h"
 #include <unordered_map>
+#include <string>
 
 class CGame;
 class CHitData;

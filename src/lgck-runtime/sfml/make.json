@@ -15,6 +15,7 @@
             "lua5.2",
             "SDL2",
             "SDL2_mixer",
+            "sfml-audio",
             "sfml-graphics",
             "sfml-window",
             "sfml-system",
@@ -43,6 +44,7 @@
         "sfml/main.cpp",
         "../shared/*.cpp",
         "../shared/implementers/sfml/*.cpp",
+        "../shared/interfaces/*.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/sfml/*.cpp",
         "build/lgck_res.cpp"

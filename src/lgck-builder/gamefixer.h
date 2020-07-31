@@ -29,7 +29,7 @@ public:
     Severity severity() {
         return m_severity;
     }
-    const char *getIcon(Severity severity);
+    const char *getIcon(Severity severity, bool flip=true);
     const char *getIcon();
     void getStatus(QString & status);
     const std::vector<DesignError> errors();
@@ -37,6 +37,7 @@ public:
 
 protected:
     CGame *m_game;
+    bool m_flip;
     Severity m_severity;
     std::vector<DesignError> m_errors;
 };

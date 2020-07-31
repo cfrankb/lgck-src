@@ -21,6 +21,7 @@
 
 #include "interfaces/IImageManager.h"
 #include <unordered_map>
+#include <string>
 
 #ifdef LGCK_QT
     #include <QOpenGLFunctions_2_0>

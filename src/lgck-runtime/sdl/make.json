@@ -28,11 +28,11 @@
         "libs" : [
             "-L../../../redist/lib/static",
             "-static",
-			"-lmingw32",
-			"-lSDL2_mixer -lFLAC -lvorbisfile -lvorbis -logg",
-			"-lSDL2main -lSDL2 -lSDL2_mixer  -lm -ldinput8 -ldxguid -ldxerr8",
-			"-luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32",
-			"-lversion -luuid -llua -lz -static-libgcc"
+            "-lmingw32",
+            "-lSDL2_mixer -lFLAC -lvorbisfile -lvorbis -logg",
+            "-lSDL2main -lSDL2 -lSDL2_mixer  -lm -ldinput8 -ldxguid -ldxerr8",
+            "-luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32",
+            "-lversion -luuid -llua -lz -static-libgcc"
         ],
         "flags" : ["-std=gnu++11", "-O3", "-Wall"]
     },
@@ -40,6 +40,7 @@
         "sdl/main.cpp",
         "../shared/*.cpp",
         "../shared/implementers/sdl/*.cpp",
+        "../shared/interfaces/*.cpp",
         "../shared/inputs/*.cpp",
         "../shared/inputs/sdl/*.cpp",
         "build/lgck_res.cpp"

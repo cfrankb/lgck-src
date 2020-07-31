@@ -84,7 +84,7 @@ void IGraphics::drawScreen()
           screenLen - offsetX,
           screenHei - offsetY,
           m_game->var("bkColor") | 0xff000000);
-    int colorMod = m_game->var("colorMod") | 0xff000000;
+    uint32_t colorMod = m_game->var("colorMod") | 0xff000000;
     m_colorMod.blue = (colorMod & 0xff);
     m_colorMod.green = (colorMod & 0xff00) >> 8;
     m_colorMod.red = (colorMod >> 16) & 0xff;

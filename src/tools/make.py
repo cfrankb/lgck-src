@@ -30,7 +30,7 @@ import platform
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 def chunks(l, n):
-    for i in xrange(0, len(l), n):
+    for i in range(0, len(l), n):
         yield l[i:i+n]
 
 class CMakeU():
@@ -39,7 +39,7 @@ class CMakeU():
         self.lines = []
 
     def scanfile(self,fpath, deps):
-        print fpath
+        print (fpath)
         sfile = open(fpath, 'r')
         for line in sfile:
             if line[:10] == '#include "':
@@ -50,7 +50,7 @@ class CMakeU():
                     src = os.path.join(os.path.dirname(fpath), os.path.basename(src))
                 if not os.path.exists(src):
                     if self.args.verbose:
-                        print "warning: can't find %s" % src
+                        print("warning: can't find {}".format(src))
                     continue
                 if os.path.basename(base) not in self.data['exclude'] and src not in deps:
                     deps.append(src)
@@ -89,11 +89,11 @@ class CMakeU():
         objs = ' '.join([obj for obj in objs])
         tfile.write(':link\n')
         tfile.write('g++ {cflags} {objs} build\lgck.res {libs} -o {target}\n'.format(
-			cflags=cflags,
-			objs=objs,
-			libs=libs,
-			target=self.data['target']
-		))
+            cflags=cflags,
+            objs=objs,
+            libs=libs,
+            target=self.data['target']
+        ))
         tfile.write(r'@if %errorlevel% neq 0 goto err')
         tfile.write('\n')
         tfile.write('goto out\n')
@@ -122,7 +122,7 @@ class CMakeU():
         objs = []
         src = self.get_source()
         if self.args.verbose:
-            print ' \\\n'.join('{x}'.format(x=x) for x in src)
+            print(' \\\n'.join('{x}'.format(x=x) for x in src))
         objd = []
         for fname in src:
             deps = [fname]
@@ -133,7 +133,7 @@ class CMakeU():
             if os.path.exists(fname):
                 self.scanfile(fname,deps)
             else:
-                print '*',fname
+                print('*',fname)
                 exit(EXIT_FAILURE)
             objn = base + '.o';
             if objn[:3] == '../':
@@ -156,7 +156,7 @@ class CMakeU():
         tfile.write('LIBS=%s\n'% ' '.join(['-l{lib}'.format(lib=lib) for lib in self.data['linux']['libs']]))
         tfile.write('\nall: $(TARGET)\n\n');
         objs = self.tdeps.items()
-        objs.sort()
+        objs = sorted(objs)
         for k, v in objs:
             tfile.write('%s: %s\n' % (k, ' '.join([fname for fname in v[0]])))
             tfile.write('\tmkdir -p ' + ' '.join([c for c in objd]) + '\n')
@@ -172,18 +172,18 @@ class CMakeU():
         with open('res.json') as s:
             raw = s.read()
         res = json.loads(raw)
-        print res
+        print(res)
         CHUNK_SIZE = 32
         out_file = res['out']
         odir = os.path.dirname(out_file)
-        print odir
+        print(odir)
         if not os.path.exists(odir):
             if platform.system()=='Windows':
                 subprocess.check_call(["mkdir", odir.replace('/', '\\')])
             else:
                 subprocess.check_call(["mkdir", "-p", odir])
         base = res['base']
-        tfile = open(out_file, 'wb')
+        tfile = open(out_file, 'w')
         tfile.write('#include "FileWrap.h"\n\n');
         i = 0
         for fname in res['file_list']:
@@ -192,7 +192,7 @@ class CMakeU():
             sfile.close()
             tfile.write('const unsigned char file_%d[]={\n' % i)
             for line in chunks(binascii.b2a_hex(data), CHUNK_SIZE):
-                tfile.write('    ' + ','.join(['0x'+ch for ch in chunks(line, 2)]))
+                tfile.write('    ' + ','.join(['0x'+ch.decode("utf-8") for ch in chunks(line, 2)]))
                 if len(line) == CHUNK_SIZE:
                     tfile.write(',')
                 tfile.write('\n')
@@ -217,7 +217,7 @@ class CMakeU():
             raw = f.read() 
             f.close()
         except:
-            print "can't open %s" % self.args.file
+            print("can't open {}".format(self.args.file))
             exit(-1)
         self.data = json.loads(raw)
         if self.args.res:

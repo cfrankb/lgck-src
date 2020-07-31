@@ -1,6 +1,7 @@
 #include "FileWrap.h"
 #include "Display.h"
 #include <cstdlib>
+#include <cstring>
 #include "stdafx.h"
 #include "FileWrap.h"
 #include "LuaVM.h"

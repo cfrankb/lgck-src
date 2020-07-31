@@ -27,7 +27,7 @@
     "binOut": "bin",
     "recOut": "rec",
     "verbose": "1",
-    "qif": true,
+    "qif": false,
     "noCheckRPATH": false,
     "noCheckPATH": false,
     "name": "lgck-builder",

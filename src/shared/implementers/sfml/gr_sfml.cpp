@@ -83,16 +83,15 @@ void CGRSfml::clear(unsigned int rgb)
     clear(rgb & 0xff, (rgb >> 8) & 0xff, (rgb >> 16) & 0xff);
 }
 
-void CGRSfml::paintImage(int x1, int y1, int frameSet, int frameNo)
+void CGRSfml::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
 {
-    CFrame *frame = (*( m_game->m_arrFrames[frameSet]))[frameNo];
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
-    unsigned int red = rgba & 0xff;
-    unsigned int green = (rgba >> 8) & 0xff;
-    unsigned int blue = (rgba >> 16) & 0xff;
-    unsigned int alpha = (rgba >> 24) & 0xff;
+    uint32_t red = rgba & 0xff;
+    uint32_t green = (rgba >> 8) & 0xff;
+    uint32_t blue = (rgba >> 16) & 0xff;
+    uint32_t alpha = (rgba >> 24) & 0xff;
     int w = x2 - x1;
     int h = y2 - y1;
     sf::RectangleShape rect(sf::Vector2f(w, h));
@@ -107,17 +106,16 @@ void CGRSfml::paintImage(int x1, int y1, int frameSet, int frameNo)
     rect.setPosition(x1,y1);
     m_window->draw(rect);
 }
-
-void CGRSfml::paintImage(int x1, int y1, CFrame *frame, int frameSet, int frameNo)
+void CGRSfml::paintImage(int x1, int y1, int frameSet, int frameNo)
 {
     unsigned int id_texture = m_imageManager->getImage(frameSet, frameNo);
     sf::Sprite sprite;
     sprite.setTexture(*m_imageManager->texture(id_texture));
     sprite.setOrigin(0,0);
     sprite.setColor(sf::Color(
-                        m_colorMod.red,
-                        m_colorMod.green,
-                        m_colorMod.blue,
+                        255,//m_colorMod.red,
+                        255,//m_colorMod.green,
+                        255,//m_colorMod.blue,
                         0xff));
     int screenLen;
     int screenHei;
@@ -133,7 +131,10 @@ IDisplayManager* CGRSfml::displayManager()
 
 void CGRSfml::ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
 {
-    paint(x1, y1, x2, y2, rgba, fill);
+    int screenLen;
+    int screenHei;
+    getScreenSize(screenLen, screenHei);
+    paint(x1, screenHei - y1, x2, screenHei - y2, rgba, fill);
 }
 
 void CGRSfml::ss_paintImage(int x1, int y1, int frameSet, int frameNo)
@@ -141,7 +142,7 @@ void CGRSfml::ss_paintImage(int x1, int y1, int frameSet, int frameNo)
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
-    paintImage(x1, y1, frameSet, frameNo);
+    paintImage(x1,screenHei - y1, frameSet, frameNo);
 }
 
 IImageManager *CGRSfml::CGRSfml::cache()

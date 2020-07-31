@@ -79,7 +79,7 @@ void CIMSfml::cacheInverse(int i, CFrameSet *filter)
     for (int x=0; x < filter->getSize(); ++x) {
         CFrame frame;
         frame.copy((*filter)[x]);
-        UINT32 *t = frame.getRGB();
+        uint32_t *t = frame.getRGB();
         for (int j=0; j < frame.m_nLen * frame.m_nHei; ++j) {
             t[j] = (t[j] & 0x00ffffff) + (t[j] & 0xff000000) / 2;
         }
