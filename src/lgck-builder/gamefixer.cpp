@@ -90,8 +90,10 @@ void CGameFixer::addSampleSprites()
         int frameSetId = 0;
         metaItem & item = items[i];
         char *oblPath = nullptr;
-        asprintf(&oblPath, ":res/meta/%s.obl", item.name);
-        if (file.open(oblPath, "rb")) {
+        if (asprintf(&oblPath, ":res/meta/%s.obl", item.name) == -1) {
+            qDebug("asprintf alloc failed");
+        }
+        if (oblPath && file.open(oblPath, "rb")) {
             frameSet->read(file);
             frameSet->setName(item.name);
             frameSetId = m_game->addFrameSet(frameSet);
@@ -102,8 +104,10 @@ void CGameFixer::addSampleSprites()
         free(oblPath);
 
         char *metaPath = nullptr;
-        asprintf(&metaPath, ":res/meta/%s.proto", item.name);
-        if (file.open(metaPath, "rb")) {
+        if (asprintf(&metaPath, ":res/meta/%s.proto", item.name) == -1) {
+            qDebug("asprintf alloc failed");
+        }
+        if (metaPath && file.open(metaPath, "rb")) {
             m_game->m_arrProto.getSize();
             CProtoArray t;
             t.importMeta(file);

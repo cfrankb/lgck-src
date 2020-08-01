@@ -18,7 +18,7 @@ OTHER_FILES +=  TODO
 DEFINES += USE_QFILE=1
 win32:DEFINES += MAKE_WIN32
 win32:LIBS += -L../../redist/lib
-LIBS += -lz
+LIBS += -lz -llua5.2
 QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
 QMAKE_LFLAGS_WINDOWS += -Wl,--dynamicbase -Wl,--nxcompat
@@ -53,7 +53,8 @@ SOURCES += mainwindow.cpp \
     framewidget.cpp \
     previewwidget.cpp \
     previewscroll.cpp \
-    ../shared/helper.cpp
+    ../shared/helper.cpp \
+    ../shared/LuaVM.cpp
 
 HEADERS  += mainwindow.h \
     OBL5File.h \
@@ -84,7 +85,8 @@ HEADERS  += mainwindow.h \
     framescroll.h \
     framewidget.h \
     previewwidget.h \
-    previewscroll.h
+    previewscroll.h \
+    ../shared/LuaVM.h
 
 FORMS    += mainwindow.ui \
     DlgAbout.ui \
