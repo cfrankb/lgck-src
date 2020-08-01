@@ -23,7 +23,7 @@
      <x>290</x>
      <y>20</y>
      <width>81</width>
-     <height>241</height>
+     <height>261</height>
     </rect>
    </property>
    <property name="orientation">
@@ -33,7 +33,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QTextEdit" name="eText">
+  <widget class="QTextBrowser" name="eTextBrowser">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -41,9 +41,6 @@
      <width>271</width>
      <height>281</height>
     </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
    </property>
    <property name="html">
     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;

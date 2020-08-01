@@ -64,6 +64,7 @@ protected:
 
     bool m_showGrid;
     int m_gridSize;
+    int m_triggerFontSize;
     uint32_t m_gridColor;
     uint32_t m_triggerKeyColor;
     bool m_showTriggerKey;
@@ -97,6 +98,7 @@ protected slots:
     void setGridColor(const QString & gridColor);
     void setTriggerKeyColor(const QString & gridColor);
     void showTriggerKey(bool state);
+    void setTriggerFontSize(int size);
     friend class CLevelScroll;
 };
 

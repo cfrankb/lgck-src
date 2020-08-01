@@ -54,6 +54,6 @@
         "build/lgck_res.cpp"
     ],
     "exclude": ["stdafx", "zlib", "vlamits3"],
-    "obj_dir": "target/glut",
+    "obj_dir": "build/glut",
     "declare" : []
 }

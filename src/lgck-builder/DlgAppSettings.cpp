@@ -29,6 +29,10 @@
 #include "ui_DlgAppSettings.h"
 #include "../shared/qtgui/cheat.h"
 
+constexpr int triggerFontSizes[] = {
+    16, 18, 20, 22, 24, 26
+};
+
 CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     QDialog(parent),
     m_ui(new Ui::CDlgAppSettings)
@@ -59,12 +63,17 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     m_ui->tabWidget->setCurrentIndex(0);
 
     // editor
-
     for (int i=10; i< 50; ++i) {
         QString s = QString("%1").arg(i);
         m_ui->cbFontSize->addItem(s);
     }
     m_ui->cbFontSize->setCurrentIndex(0);
+
+    for (unsigned int i=0; i< sizeof(triggerFontSizes)/sizeof(int); ++i) {
+        m_ui->cbTriggerKeyFontSize->addItem(
+                    QString("%1").arg(triggerFontSizes[i]),
+                    QVariant(triggerFontSizes[i]));
+    }
     m_ui->sArgsHelp->setText(tr("%1 lgckdb filename\n" \
                                 "%2 level\n" \
                                 "%3 skill\n" \
@@ -73,9 +82,6 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
 
     m_ui->btnGridColor->setBuddy(m_ui->eGridColor);
     m_ui->btnTriggerKeyColor->setBuddy(m_ui->eTriggerKeyColor);
-
-
-
 }
 
 CDlgAppSettings::~CDlgAppSettings()
@@ -191,7 +197,7 @@ void CDlgAppSettings::load(QStringList &listActions, QStringList &listShortcuts,
     widget->setColumnCount(3);
     widget->setRowCount(listActions.count());
     widget->setHorizontalHeaderLabels(labels);
-    widget->setColumnWidth(0, 120+35);
+    widget->setColumnWidth(0, 200);
     widget->setColumnWidth(1, 208-20);
     widget->setColumnWidth(2, 16);
     widget->verticalHeader()->setVisible(false);
@@ -307,6 +313,21 @@ void CDlgAppSettings::on_btnCheckUpdate_clicked()
 void CDlgAppSettings::setFontSize(int size)
 {
     m_ui->cbFontSize->setCurrentIndex(std::max(size - 10, 0));
+}
+
+void CDlgAppSettings::setTriggerFontSize(int size) {
+    for (unsigned int i=0; i< sizeof(triggerFontSizes)/sizeof(int); ++i) {
+        if (triggerFontSizes[i] == size) {
+            m_ui->cbTriggerKeyFontSize->setCurrentIndex(i);
+            return;
+        }
+    }
+    m_ui->cbTriggerKeyFontSize->setCurrentIndex(0);
+}
+
+int CDlgAppSettings::getTriggerFontSize()
+{
+    return triggerFontSizes[m_ui->cbTriggerKeyFontSize->currentIndex()];
 }
 
 int CDlgAppSettings::getFontSize()

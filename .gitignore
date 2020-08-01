@@ -32,4 +32,6 @@ src/build/setup/*
 src/build/linux/bin/*
 src/build/linux/Distro/*
 src/build/linux/setup/*
+src/build/linux/resources/*
 src/tools/buildcount.dat
+

@@ -46,6 +46,7 @@ public:
     void setGridColor(const QString & color);
     void setTriggerKeyColor(const QString & color);
     void setShowTriggerKey(bool show);
+    void setTriggerFontSize(int size);
     bool isShowGrid();
     void showGrid(bool show);
     void setSkill(int skill);
@@ -62,6 +63,7 @@ public:
     void getRuntime(QString & path, QString & args);
     void setRuntime(const QString path, const QString args);
     int getFontSize();
+    int getTriggerFontSize();
     bool getSkipSplashScreen();
     void setSkipSplashScreen(bool state);
     void setCurrentTab(int i);

@@ -51,6 +51,7 @@ CLevelViewGL::CLevelViewGL(QWidget* parent, CGame *game):
     m_gridColor = 0x60c0b0a0;
     m_hasFocus = false;
     m_game = game;
+    m_triggerFontSize = 16;
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(this, SIGNAL(versionCheck()),
@@ -280,7 +281,7 @@ void CLevelViewGL::drawScreen()
     if (!font) {
         qWarning("Font[0] is not set.");
     }
-    font->FaceSize(16);
+    font->FaceSize(m_triggerFontSize);
     Color fontColor;
     uint2color(m_triggerKeyColor, fontColor);
     Color shadowColor = { 0, 0, 0, 255};
@@ -425,4 +426,9 @@ void CLevelViewGL::setTriggerKeyColor(const QString & color)
 void CLevelViewGL::showTriggerKey(bool state)
 {
     m_showTriggerKey = state;
+}
+
+void CLevelViewGL::setTriggerFontSize(int size)
+{
+    m_triggerFontSize = size;
 }

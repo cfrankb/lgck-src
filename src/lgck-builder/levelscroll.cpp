@@ -135,6 +135,10 @@ void CLevelScroll::paintSprite()
 void CLevelScroll::mousePressEvent(QMouseEvent * event)
 {
     setCursor();
+    if (!m_game | !m_game->getSize()) {
+        return;
+    }
+
     //qDebug("mousePressEvent");
     switch (event->button())
     {
@@ -211,6 +215,10 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
 
 void CLevelScroll::mouseReleaseEvent(QMouseEvent * event)
 {
+    if (!m_game | !m_game->getSize()) {
+        return;
+    }
+
     setCursor();
     //qDebug("mouseReleaseEvent");
     switch (event->button())
@@ -263,6 +271,9 @@ void CLevelScroll::mouseReleaseEvent(QMouseEvent * event)
 void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
 {
     setCursor();
+    if (!m_game | !m_game->getSize()) {
+        return;
+    }
     //qDebug("mouseMoveEvent");
     QSize sz = size();
     m_mouse.oldX = m_mouse.x;
@@ -935,7 +946,11 @@ void CLevelScroll::setEraserState(bool state)
 
 void CLevelScroll::setCursor()
 {
-    if (m_editPath) {
+    if (m_gameMode) {
+        viewport()->setCursor(Qt::ArrowCursor);
+    } else if (!m_game || !m_game->getSize()) {
+        viewport()->setCursor(Qt::ForbiddenCursor);
+    } else if (m_editPath) {
         QCursor c = QCursor(QPixmap(":/images/pd/footprint.png"));
         viewport()->setCursor(c);
     } else if (m_bErase) {
@@ -945,6 +960,6 @@ void CLevelScroll::setCursor()
         QCursor c = QCursor(QPixmap(":/images/sketchpntbrush.png"), 10, 31);
         viewport()->setCursor(c);
     } else {
-        viewport()->unsetCursor();
+        viewport()->setCursor(Qt::ArrowCursor);
     }
 }

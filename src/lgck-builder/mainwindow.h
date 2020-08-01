@@ -85,6 +85,7 @@ private:
     QString m_gridColor;
     QString m_triggerKeyColor;
     bool m_bShowTriggerKey;
+    int m_triggerFontSize;
     int m_gridSize;
     int m_skill;
     int m_lives;
@@ -311,6 +312,7 @@ signals:
     void eraserStateChanged(bool state);
     void triggerKeyColorChanged(const QString & color);
     void triggerKeyShow(bool state);
+    void triggerKeyFontSizeChanged(int size);
 };
 
 #endif // MAINWINDOW_H

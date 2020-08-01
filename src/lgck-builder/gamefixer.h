@@ -31,13 +31,18 @@ public:
     }
     const char *getIcon(Severity severity, bool flip=true);
     const char *getIcon();
-    void getStatus(QString & status);
+    QString getTooltip();
+    QString getStatus();
     const std::vector<DesignError> errors();
     QString getText();
+    bool ready() {
+        return m_ready;
+    }
 
 protected:
     CGame *m_game;
     bool m_flip;
+    bool m_ready;
     Severity m_severity;
     std::vector<DesignError> m_errors;
 };

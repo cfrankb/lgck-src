@@ -18,6 +18,7 @@ public:
 
 private:
     Ui::CDlgIndicator *ui;
+    QString m_html;
 };
 
 #endif // DLGINDICATOR_H

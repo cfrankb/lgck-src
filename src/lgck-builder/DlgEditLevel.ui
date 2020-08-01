@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>462</width>
-    <height>600</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,13 +22,13 @@
   <property name="minimumSize">
    <size>
     <width>462</width>
-    <height>600</height>
+    <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>462</width>
-    <height>600</height>
+    <height>500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -37,9 +37,9 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>560</y>
-     <width>341</width>
+     <x>120</x>
+     <y>460</y>
+     <width>331</width>
      <height>32</height>
     </rect>
    </property>
@@ -53,17 +53,17 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>5</y>
-     <width>421</width>
-     <height>531</height>
+     <width>441</width>
+     <height>451</height>
     </rect>
    </property>
    <property name="tabPosition">
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -192,27 +192,42 @@
       <enum>Qt::RichText</enum>
      </property>
     </widget>
-    <widget class="QLineEdit" name="eColorMod">
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Config</string>
+    </attribute>
+    <widget class="CWBtnColor" name="btnColorMod">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>350</y>
-       <width>121</width>
-       <height>25</height>
+       <x>272</x>
+       <y>100</y>
+       <width>81</width>
+       <height>24</height>
       </rect>
      </property>
-     <property name="toolTip">
-      <string>Primary light source for this level.</string>
+     <property name="text">
+      <string/>
      </property>
-     <property name="inputMask">
-      <string>hhhhhh</string>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Background color</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_17">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>380</y>
+       <x>10</x>
+       <y>240</y>
        <width>111</width>
        <height>17</height>
       </rect>
@@ -221,79 +236,11 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Introduction&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="CWBtnColor" name="btnITextColor">
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>440</y>
-       <width>81</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="eIBkColor">
-     <property name="geometry">
-      <rect>
-       <x>158</x>
-       <y>410</y>
-       <width>121</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Background color for the transition screen</string>
-     </property>
-     <property name="inputMask">
-      <string>hhhhhh</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_15">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>440</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Text Color</string>
-     </property>
-    </widget>
-    <widget class="CWBtnColor" name="btnColorMod">
-     <property name="geometry">
-      <rect>
-       <x>282</x>
-       <y>350</y>
-       <width>81</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="CWBtnColor" name="btnIBkColor">
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>410</y>
-       <width>81</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
     <widget class="CWBtnColor" name="btnColor">
      <property name="geometry">
       <rect>
-       <x>282</x>
-       <y>290</y>
+       <x>272</x>
+       <y>40</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -302,27 +249,11 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLineEdit" name="bkColor">
+    <widget class="CWBtnColor" name="btnITextColor">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>290</y>
-       <width>121</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Background color of the level.</string>
-     </property>
-     <property name="inputMask">
-      <string>hhhhhh</string>
-     </property>
-    </widget>
-    <widget class="CWBtnColor" name="btnBorderColor">
-     <property name="geometry">
-      <rect>
-       <x>282</x>
-       <y>320</y>
+       <x>270</x>
+       <y>300</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -334,8 +265,8 @@
     <widget class="QLabel" name="label_16">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>260</y>
+       <x>10</x>
+       <y>10</y>
        <width>62</width>
        <height>17</height>
       </rect>
@@ -347,43 +278,17 @@
       <enum>Qt::RichText</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_21">
+    <widget class="QLineEdit" name="eIBkColor">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>350</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Color Mod</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_13">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>320</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Border Color</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="eITextColor">
-     <property name="geometry">
-      <rect>
-       <x>158</x>
-       <y>440</y>
+       <x>148</x>
+       <y>270</y>
        <width>121</width>
        <height>25</height>
       </rect>
      </property>
      <property name="toolTip">
-      <string>Text color for the transition screen</string>
+      <string>Background color for the transition screen</string>
      </property>
      <property name="inputMask">
       <string>hhhhhh</string>
@@ -392,8 +297,8 @@
     <widget class="QLineEdit" name="eBorderColor">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>320</y>
+       <x>150</x>
+       <y>70</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -405,11 +310,108 @@
       <string>hhhhhh</string>
      </property>
     </widget>
+    <widget class="QLabel" name="label_21">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>100</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Color Mod</string>
+     </property>
+    </widget>
+    <widget class="CWBtnColor" name="btnBorderColor">
+     <property name="geometry">
+      <rect>
+       <x>272</x>
+       <y>70</y>
+       <width>81</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="CWBtnColor" name="btnIBkColor">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>270</y>
+       <width>81</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>300</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Text Color</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eColorMod">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>100</y>
+       <width>121</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Primary light source for this level.</string>
+     </property>
+     <property name="inputMask">
+      <string>hhhhhh</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Border Color</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eITextColor">
+     <property name="geometry">
+      <rect>
+       <x>148</x>
+       <y>300</y>
+       <width>121</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Text color for the transition screen</string>
+     </property>
+     <property name="inputMask">
+      <string>hhhhhh</string>
+     </property>
+    </widget>
     <widget class="QLabel" name="label_14">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>410</y>
+       <x>20</x>
+       <y>270</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -418,21 +420,121 @@
       <string>Background color</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLineEdit" name="bkColor">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>290</y>
+       <x>150</x>
+       <y>40</y>
        <width>121</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Background color of the level.</string>
+     </property>
+     <property name="inputMask">
+      <string>hhhhhh</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>187</y>
+       <width>91</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Background color</string>
+      <string>Wrap arround</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cOpenTop">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>187</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>open top</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cWrapUp">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>187</y>
+       <width>82</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>top</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cWrapDown">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>187</y>
+       <width>82</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>bottom</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cWrapLeft">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>213</y>
+       <width>82</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>left</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cWrapRight">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>213</y>
+       <width>82</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>right</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>140</y>
+       <width>371</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>These options control whether the borders are will allow sprites to move from one to the other.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_2">
+   <widget class="QWidget" name="tab_3">
     <attribute name="title">
      <string>Features</string>
     </attribute>
@@ -610,32 +712,6 @@
       <string>End Level</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cWrapUp">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>374</y>
-       <width>82</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>top</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cWrapLeft">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>400</y>
-       <width>82</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>left</string>
-     </property>
-    </widget>
     <widget class="QCheckBox" name="cNoGravity">
      <property name="geometry">
       <rect>
@@ -650,19 +726,6 @@
      </property>
      <property name="text">
       <string>no gravity</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cWrapRight">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>400</y>
-       <width>82</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>right</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -686,64 +749,6 @@
        <width>281</width>
        <height>25</height>
       </rect>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cWrapDown">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>374</y>
-       <width>82</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>bottom</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>327</y>
-       <width>371</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>These options control whether the borders are will allow sprites to move from one to the other.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_7">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>374</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Wrap arround</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cOpenTop">
-     <property name="geometry">
-      <rect>
-       <x>320</x>
-       <y>374</y>
-       <width>81</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>open top</string>
      </property>
     </widget>
     <widget class="QComboBox" name="cbTrigger">
@@ -789,7 +794,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_6">
+   <widget class="QWidget" name="tab_4">
     <attribute name="title">
      <string>Expert</string>
     </attribute>

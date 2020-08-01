@@ -15,6 +15,7 @@ CGameFixer::CGameFixer()
     m_game = nullptr;
     m_severity = Okay;
     m_flip = false;
+    m_ready = false;
 }
 
 void CGameFixer::setGame(CGame *game)
@@ -129,6 +130,7 @@ void CGameFixer::addSampleSprites()
 
 void CGameFixer::troubleshoot()
 {
+    m_ready = true;
     m_severity = Okay;
     m_errors.clear();
 
@@ -144,7 +146,7 @@ void CGameFixer::troubleshoot()
         m_errors.push_back(
                     DesignError{
                         Okay,
-                        tr("Found at least 1 level in project."),
+                        tr("Found at least 1 level in your project."),
                         "",
                         ""
                     });
@@ -155,7 +157,7 @@ void CGameFixer::troubleshoot()
                             Error,
                             tr("Current Level is empty. "),
                             tr("This is not intentional. Your level cannot be empty."),
-                            "edit_level.html"
+                            "insert_sprite.html"
                         });
         } else if (layer->countSpriteOfClass(*m_game, CLASS_PLAYER_OBJECT)) {
             m_errors.push_back(
@@ -229,7 +231,7 @@ void CGameFixer::troubleshoot()
             DesignError{
                 Warning,
                 tr("No sprite defined as an automatic goal."),
-                tr("While This can be perfectly valid, "\
+                tr("While this can be perfectly valid, "\
                    "you may be required to mark every single goal on the level manually. "\
                    "This is not recommended."),
                 ""
@@ -260,8 +262,9 @@ const char *CGameFixer::getIcon()
     return getIcon(m_severity);
 }
 
-void CGameFixer::getStatus(QString & status)
+QString CGameFixer::getTooltip()
 {
+    QString status;
     int warnings = 0;
     int errors = 0;
 
@@ -279,7 +282,32 @@ void CGameFixer::getStatus(QString & status)
     } else {
         status = tr("No errors detected");
     }
+    return status;
 }
+
+QString CGameFixer::getStatus()
+{
+    QString status;
+    int warnings = 0;
+    int errors = 0;
+
+    for(auto error: m_errors){
+        if (error.severity == Warning) {
+            ++ warnings;
+        } else if (error.severity == Error) {
+            ++ errors;
+        }
+    }
+    if (errors) {
+        status = tr("%1 error%2 require your attention. Click for more details.").arg(errors).arg(errors>1? "s" :"");
+    } else if (warnings) {
+        status = tr("%1 warning%2 detected. Click for more details.").arg(warnings).arg(warnings>1? "s" :"");
+    } else {
+        status = tr("No errors detected.");
+    }
+    return status;
+}
+
 
 QString CGameFixer::getText()
 {
@@ -292,12 +320,12 @@ QString CGameFixer::getText()
         } else if (error.severity == Error) {
             sError = tr("Error");
         }
-        QString link = QString("<a href=\"%1%2\">%3</a>").arg(WEB_PATH).arg(error.url).arg(tr("more info..."));
+        QString link = QString("&nbsp;<a href=\"%1%2\">%3</a>").arg(WEB_PATH).arg(error.url).arg(tr("more info..."));
         out += tr("<div><b>[%1] %2</b></div><div>%3%4<br><br></div>").arg(
                     img,
                     error.message,
                     error.severity != Okay ? error.tip : tr("This requirement is satisfied."),
-                    error.severity != Okay && !link.isEmpty() && false ? link : "");
+                    error.severity != Okay && !error.url.isEmpty() ? link : "");
     }
     return out;
 }

@@ -13,7 +13,13 @@
     "allQmlDependes": false,
     "libDir": "./",
     "recursiveDepth": "3",
-    "extraLibs": "myExtraLib (libssl)",
+    "extraLibs": [
+        "libqscintilla2_qt5",
+        "liblua5.2",
+        "libSDL2_mixer-2.0",
+        "libSDL2-2.0",
+        "libz"
+    ],
     "extraPlugin": "myExtraPulgin (platforms)",
     "targetDir": "./Distro",
     "targetPackage": "",

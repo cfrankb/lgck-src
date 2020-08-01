@@ -102,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     // Setup the timer for the indicator
-    m_timerIndicator.setInterval(2000);
+    m_timerIndicator.setInterval(500);
     m_timerIndicator.stop();
     m_ready = false;
     me = this;
@@ -275,6 +275,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, SIGNAL(triggerKeyShow(bool)),
             m_lview, SLOT(showTriggerKey(bool)));
+
+    connect(this, SIGNAL(triggerKeyFontSizeChanged(int)),
+            m_lview, SLOT(setTriggerFontSize(int)));
 
     // debugOutput
     m_infoDock = new CInfoDock(this);
@@ -1364,6 +1367,7 @@ void MainWindow::showAppSettings(int tab)
     d->setLives(m_lives);
     d->setRuntime(m_runtime, m_runtimeArgs);
     d->setSkipSplashScreen(m_skipSplash);
+    d->setTriggerFontSize(m_triggerFontSize);
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
     if (d->exec() == QDialog::Accepted) {
@@ -1388,6 +1392,8 @@ void MainWindow::showAppSettings(int tab)
         m_lives = d->getLives();
         m_fontSize = d->getFontSize();
         m_bShowTriggerKey = d->getShowTriggerKey();
+        m_triggerFontSize = d->getTriggerFontSize();
+        emit triggerKeyFontSizeChanged(m_triggerFontSize);
         d->getRuntime(m_runtime, m_runtimeArgs);
         emit fontSizeChanged(m_fontSize);
         m_skipSplash = d->getSkipSplashScreen();
@@ -2433,6 +2439,7 @@ void MainWindow::saveSettings()
         settings.setValue("gridColor", m_gridColor);
         settings.setValue("gridSize", m_gridSize);
         settings.setValue("triggerKeyColor", m_triggerKeyColor);
+        settings.setValue("triggerKeyFontSize", m_triggerFontSize);
         settings.beginGroup("Shortcuts");
         QAction **actions = actionShortcuts();
         for (uint i=0; actions[i];++i) {
@@ -2516,6 +2523,7 @@ void MainWindow::reloadSettings()
     m_gridSize = settings.value("gridSize", 32).toInt() & 0xf0;
     emit gridSizeChanged(m_gridSize > 0 ? m_gridSize : 32);
     m_triggerKeyColor = settings.value("triggerKeyColor", "ffff00").toString();
+    m_triggerFontSize = settings.value("triggerKeyFontSize", 24).toInt();
     m_bShowTriggerKey = settings.value("showTriggerKey", true).toBool();
     emit triggerKeyColorChanged(m_triggerKeyColor);
     emit triggerKeyShow(m_bShowTriggerKey);
@@ -3064,14 +3072,16 @@ void MainWindow::changeProtoIcon(int protoId)
 }
 
 void MainWindow::updateIndicator()
-{
+{   static int cycle = 0;
     if (m_ready) {
-        m_fixer->troubleshoot();
+        if (cycle % 4 == 0) {
+            m_fixer->troubleshoot();
+        }
         m_btnIndicator->setIcon(QIcon(m_fixer->getIcon()));
-        QString status;
-        m_fixer->getStatus(status);
-        m_btnIndicator->setToolTip(status);
+        m_btnIndicator->setToolTip(m_fixer->getTooltip());
+        m_btnIndicator->setStatusTip(m_fixer->getStatus());
     }
+    ++cycle;
 }
 
 void MainWindow::setReady(bool ready)
@@ -3086,7 +3096,9 @@ void MainWindow::setReady(bool ready)
 
 void MainWindow::indicatorTriggered()
 {
-    CDlgIndicator dlg;
-    dlg.setText(m_fixer->getText());
-    dlg.exec();
+    if (m_fixer->ready()){
+        CDlgIndicator dlg;
+        dlg.setText(m_fixer->getText());
+        dlg.exec();
+    }
 }
