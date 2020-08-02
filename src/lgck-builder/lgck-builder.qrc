@@ -120,5 +120,6 @@
         <file>images/Light-bulb-yellow.png</file>
         <file>images/Light-bulb-white.png</file>
         <file>images/Light-bulb-wine.png</file>
+        <file>res/const.txt</file>
     </qresource>
 </RCC>

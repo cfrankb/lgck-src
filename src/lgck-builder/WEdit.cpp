@@ -1,6 +1,6 @@
 /*
     LGCK Builder GUI
-    Copyright (C) 1999, 2012  Francois Blanchette
+    Copyright (C) 1999, 2020  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,55 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+/****************************************************************************
+**
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
+**
+** This file is part of the examples of the Qt Toolkit.
+**
+** $QT_BEGIN_LICENSE:BSD$
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
+**
+** BSD License Usage
+** Alternatively, you may use this file under the terms of the BSD license
+** as follows:
+**
+** "Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are
+** met:
+**   * Redistributions of source code must retain the above copyright
+**     notice, this list of conditions and the following disclaimer.
+**   * Redistributions in binary form must reproduce the above copyright
+**     notice, this list of conditions and the following disclaimer in
+**     the documentation and/or other materials provided with the
+**     distribution.
+**   * Neither the name of The Qt Company Ltd nor the names of its
+**     contributors may be used to endorse or promote products derived
+**     from this software without specific prior written permission.
+**
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+**
+** $QT_END_LICENSE$
+**
+****************************************************************************/
 
 #include "WEdit.h"
 #include <QCompleter>
@@ -55,7 +104,7 @@ CWEdit::CWEdit(QWidget *parent) :
     setLineWrapMode(NoWrap);
 
     // start autocompleter
-    m_words = words();
+    m_words = words() + constants();
     m_completer = new QCompleter();
     m_listmodel = new QStringListModel(m_completer);
     m_listmodel->setStringList(m_words);
@@ -69,11 +118,11 @@ CWEdit::CWEdit(QWidget *parent) :
     connect(m_completer, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
 }
 
-QStringList CWEdit::words()
+QStringList CWEdit::fromFile(const char *fileName)
 {
     QString fct;
     CFileWrap file;
-    if (file.open(":/res/functions.txt")) {
+    if (file.open(fileName)) {
         int size = file.getSize();
         char tmp[ size + 1];
         tmp[size]=0;
@@ -84,6 +133,16 @@ QStringList CWEdit::words()
     return fct.split("\n");
 }
 
+QStringList CWEdit::words()
+{
+    return fromFile(":/res/functions.txt");
+}
+
+QStringList CWEdit::constants()
+{
+    return fromFile(":/res/const.txt");
+}
+
 QCompleter *CWEdit::completer() const
 {
     return m_completer;
@@ -92,6 +151,9 @@ QCompleter *CWEdit::completer() const
 CWEdit::~CWEdit() {
 
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// autocomplete
 
 void CWEdit::insertCompletion( QString completion )
 {
@@ -165,12 +227,14 @@ void CWEdit::keyPressEvent(QKeyEvent *e)
     m_completer->complete(cr); // popup it up!
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // TODO: cleanup later
 void CWEdit::setFontSize(int size)
 {
     setFont(QFont("Courier", size, QFont::DemiBold));
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // line numbers
 
 int CWEdit::lineNumberAreaWidth()
@@ -208,12 +272,12 @@ void CWEdit::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // highlight
 
 void CWEdit::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
-
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
         QColor lineColor = highlightColor.lighter(160);

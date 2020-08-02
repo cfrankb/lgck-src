@@ -13,6 +13,7 @@ HISTORY OF LGCK BUILDER
 - EDITOR: show TriggerKeys in editor
 - EDITOR: added GameFixer that report and help fix common design errors
 - EDITOR: added sample sprite to New Games
+- EDITOR: replaced QScintilla with a native Qt solution
 - LUA: display_setFlagXY, display_setFont
 - LUA: spriteIdFromUuid
 
