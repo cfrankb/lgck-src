@@ -66,12 +66,12 @@ void CDlgSource::changeEvent(QEvent *e)
 
 void CDlgSource::setText(const QString s)
 {
-    m_ui->eSource->setText(s.trimmed());
+    m_ui->eSource->setPlainText(s.trimmed());
 }
 
 const QString CDlgSource::getText()
 {
-    return m_ui->eSource->text().trimmed();
+    return m_ui->eSource->toPlainText().trimmed();
 }
 
 void CDlgSource::setReadOnly() const

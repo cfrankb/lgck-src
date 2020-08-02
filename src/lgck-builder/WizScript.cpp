@@ -28,7 +28,7 @@ CWizScript::CWizScript(QWidget *parent) :
         ui->cbAction->addItem(m_actions[i].name);
     }
     ui->sDesc->setText(m_actions[0].desc);
-    ui->sSample->setText(m_actions[0].sample);
+    ui->sSample->setPlainText(m_actions[0].sample);
     ui->sSample->setReadOnly(true);
     ui->sSample->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
@@ -67,7 +67,7 @@ void CWizScript::init(CGameFile *gf)
 void CWizScript::on_cbAction_currentIndexChanged(int index)
 {
     ui->sDesc->setText(m_actions[index].desc);
-    ui->sSample->setText(m_actions[index].sample);
+    ui->sSample->setPlainText(m_actions[index].sample);
     unloadScript();
     loadScript(index);
     m_index = index;

@@ -18,33 +18,31 @@
 
 #ifndef WEDIT_H
 #define WEDIT_H
-
-#include <qt/Qsci/qsciscintilla.h>
+#include <QPlainTextEdit>
 #include <qstringlist.h>
 
-class CLexer;
-class QsciAPIs;
 class QCompleter;
 class QStringListModel;
+class CLuaHighlighter;
 
-class CWEdit : public QsciScintilla
+class CWEdit : public QPlainTextEdit
 {
     Q_OBJECT
 public:
     explicit CWEdit(QWidget *parent = 0);
     ~CWEdit();
-protected:
-    // reimplemented from private
-    void keyPressEvent(QKeyEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
-    char getCharacter(int &pos) const;
-    QString getWord(int &pos) const;
 
-    bool canImproveWord();
+public:
+    void lineNumberAreaPaintEvent(QPaintEvent *event);
+    int lineNumberAreaWidth();
+    QCompleter *completer() const;
+
+protected:
+    void keyPressEvent(QKeyEvent *e) override;
+    void focusInEvent(QFocusEvent *e) override;
+    QString textUnderCursor() const;
 
     QStringList m_words;
-    CLexer *m_lexer;
-    QsciAPIs *m_api;
     QCompleter * m_completer;
     QStringListModel *m_listmodel;
     int m_pos;
@@ -53,14 +51,46 @@ protected:
     int m_posY;
     QString m_currentWord;
     bool m_ready;
+    CLuaHighlighter *m_highlighter;
+    QStringList words();
 
 signals:
 
 public slots:
-    void CursorAtIndex(int line ,int pos);
     void insertCompletion( QString completion );
-    void insertText(const char *text);
     void setFontSize(int size);
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
+private slots:
+    void updateLineNumberAreaWidth(int newBlockCount);
+    void highlightCurrentLine();
+    void updateLineNumberArea(const QRect &rect, int dy);
+
+private:
+    QWidget *lineNumberArea;
+};
+
+class LineNumberArea : public QWidget
+{
+public:
+    LineNumberArea(CWEdit *editor) : QWidget(editor), codeEditor(editor)
+    {}
+
+    QSize sizeHint() const override
+    {
+        return QSize(codeEditor->lineNumberAreaWidth(), 0);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        codeEditor->lineNumberAreaPaintEvent(event);
+    }
+
+private:
+    CWEdit *codeEditor;
 };
 
 #endif // WEDIT_H

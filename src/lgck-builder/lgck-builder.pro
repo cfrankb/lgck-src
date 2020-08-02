@@ -34,20 +34,19 @@ win32:QMAKE_LIBDIR    += ../../../redist/lib
 
 CONFIG( debug, debug|release ) {
     # debug
-    win32:LIBS      += -lqscintilla2_qt5d
     win32:DEFINES   += LGCK_OPENGL_DEBUG=1
 } else {
     # release
-    win32:LIBS      += -lqscintilla2_qt5
 }
 
-unix:LIBS += -lqscintilla2_qt5 \
+unix:LIBS += \
     -llua5.2 \
     -lSDL2_mixer \
     -lSDL2-2.0 \
     -lz
 
-win32:LIBS += -llua \
+win32:LIBS += \
+    -llua \
     -lmingw32 \
     -lSDL2_mixer \
     -lSDL2 \
@@ -59,6 +58,7 @@ SOURCES +=  mainwindow.cpp \
     gamefixer.cpp \
     infodock.cpp \
     launcher.cpp \
+    luahighlighter.cpp \
     main.cpp \
     levelviewgl.cpp \
     levelscroll.cpp \
@@ -81,7 +81,6 @@ SOURCES +=  mainwindow.cpp \
     WizSprite.cpp \
     WFrameSet.cpp \
     WEdit.cpp \
-    Lexer.cpp \
     WEditEvents.cpp \
     DlgTestLevel.cpp \
     WizPageEasy.cpp \
@@ -163,6 +162,7 @@ SOURCES +=  mainwindow.cpp \
 HEADERS  +=  mainwindow.h \
     dlgindicator.h \
     gamefixer.h \
+    luahighlighter.h \
     infodock.h \
     launcher.h \
     levelviewgl.h \
@@ -186,7 +186,6 @@ HEADERS  +=  mainwindow.h \
     WizSprite.h \
     WFrameSet.h \
     WEdit.h \
-    Lexer.h \
     WEditEvents.h \
     DlgTestLevel.h \
     WizPageEasy.h \

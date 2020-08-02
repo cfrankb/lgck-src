@@ -73,7 +73,7 @@ void CWEditEvents::setProto(int proto, int event)
             }
         } else {
             if (event != m_event && m_event != -1) {
-                m_events[ m_event ] = ui->eSource->text().trimmed();
+                m_events[ m_event ] = ui->eSource->toPlainText().trimmed();
                 CObject & object = m_game->m_arrProto.getObject(proto);
                 object.setEvent( event, q2c(m_events[event]));
                 emit eventModified();
@@ -94,9 +94,9 @@ void CWEditEvents::setEvent(int event)
 void CWEditEvents::reload()
 {
     if (m_events [ m_event ].isEmpty()) {
-        ui->eSource->setText( "" );
+        ui->eSource->setPlainText( "" );
     } else {
-        ui->eSource->setText( m_events [ m_event ] + "\n");
+        ui->eSource->setPlainText( m_events [ m_event ] + "\n");
     }
     ui->eSource->setFocus();
 }
@@ -104,7 +104,7 @@ void CWEditEvents::reload()
 void CWEditEvents::commitEvents()
 {
     if (m_event != -1) {
-        m_events[ m_event ] = ui->eSource->text().trimmed();
+        m_events[ m_event ] = ui->eSource->toPlainText().trimmed();
     }
     if (m_proto != -1) {
         CObject & object = m_game->m_arrProto.getObject(m_proto);
@@ -131,13 +131,7 @@ void CWEditEvents::deleteSprite(int sprite)
 
 void CWEditEvents::insertText(const char *text)
 {
-    int line;
-    int index;
-    ui->eSource->getCursorPosition(&line, &index);
-    ui->eSource->insertAt(text, line, index);
-    std::string s = text;
-    size_t n = std::count(s.begin(), s.end(), '\n');
-    ui->eSource->setCursorPosition(line + n, 0);
+    ui->eSource->insertPlainText(text);
     emit eventModified();
 }
 
