@@ -83,6 +83,7 @@
 #include "gamefixer.h"
 #include "dlgindicator.h"
 #include "launcher.h"
+#include "options.h"
 
 const char MainWindow::m_appName[] = "LGCK builder";
 const char MainWindow::m_author[] = "cfrankb";
@@ -91,10 +92,23 @@ const QString MainWindow::m_appTitle = MainWindow::tr("LGCK builder IDE");
 #define WEB_PATH QString("https://cfrankb.com/lgck/")
 #define UPDATER_URL "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
 
-#define MAX_FONT_SIZE 50
-#define MIN_FONT_SIZE 10
-#define DEFAULT_FONT_SIZE MIN_FONT_SIZE
 #define RUNTIME_DEFAULT_ARGS "%1"
+constexpr int MIN_FONT_SIZE = 10;
+constexpr int MAX_FONT_SIZE = 50;
+constexpr int DEFAULT_FONT_SIZE = MIN_FONT_SIZE;
+constexpr char DEFAULT_FONT_NAME[] = "Courier";
+constexpr char FONT_SIZE[] = "fontSize";
+constexpr char FONT_NAME[] = "fontName";
+constexpr char SKIP_SPLASH[] = "skipSplash";
+constexpr char ENABLE_AUTO_COMPLETE[] = "enableAutocomplete";
+constexpr char ENABLE_HIGHLIGHT[] = "enableHighlight";
+constexpr char ENABLE_WHITESPACE[] = "enableWhiteSpace";
+constexpr char ENABLE_WORDWRAP[] = "enableWordWrap";
+
+#define EO_STR(x) m_editorOptions->get(x).toString()
+#define EO_INT(x) m_editorOptions->get(x).toInt()
+#define EO_BOOL(x) m_editorOptions->get(x).toBool()
+#define EO_SET(k, v) m_editorOptions->set(k, v)
 
 MainWindow *me = nullptr;
 
@@ -130,7 +144,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_gridColor = "000000";
     m_triggerKeyColor = "FFFF00";
     m_gridSize = 32;
-    m_fontSize = DEFAULT_FONT_SIZE;
     m_viewMode = VM_EDITOR;
     m_fixer = new CGameFixer;
     m_fixer->setGame(&m_doc);
@@ -293,6 +306,14 @@ MainWindow::MainWindow(QWidget *parent)
     emit debugText(tr("LuaVM ready.\n"));
 
     // reload settings
+    m_editorOptions = new COptions("Editor");
+    m_editorOptions->set(FONT_SIZE, DEFAULT_FONT_SIZE)
+            .set(FONT_NAME, DEFAULT_FONT_NAME)
+            .set(SKIP_SPLASH, false)
+            .set(ENABLE_AUTO_COMPLETE, true)
+            .set(ENABLE_WORDWRAP, true)
+            .set(ENABLE_HIGHLIGHT, true)
+            .set(ENABLE_WHITESPACE, true);
     reloadSettings();
     CSndSDL *sn = new CSndSDL();
     m_doc.attach((ISound*)sn);
@@ -337,14 +358,20 @@ void MainWindow::createEventEditor()
     connect(this, SIGNAL(textInserted(const char*)),
             m_editEvents, SLOT(insertText(const char*)));
 
-    connect(this, SIGNAL(fontSizeChanged(int)),
-            m_editEvents, SLOT(setFontSize(int)));
+    connect(this, SIGNAL(fontChanged(const QFont &)),
+            m_editEvents, SLOT(setFont(const QFont &)));
 
     if (m_editEvents) {
         m_editEvents->hide();
     }
 
-    emit fontSizeChanged(m_fontSize);
+    emit fontChanged(currentFont());
+}
+
+
+QFont MainWindow::currentFont()
+{
+    return QFont(EO_STR(FONT_NAME), EO_INT(FONT_SIZE), QFont::DemiBold);
 }
 
 QElapsedTimer & MainWindow::getTime()
@@ -382,7 +409,6 @@ void MainWindow::focusInEvent ( QFocusEvent * event )
 MainWindow::~MainWindow()
 {
     delete ui;
-    //delete m_lview;
     delete (CMusicSDL*) m_doc.music();
     m_doc.attach((IMusic*)NULL);
     delete (CSndSDL*) m_doc.sound();
@@ -390,6 +416,9 @@ MainWindow::~MainWindow()
     while (m_updater && m_updater->isRunning());
     if (m_updater) {
         delete m_updater;
+    }
+    if (m_editorOptions) {
+        delete m_editorOptions;
     }
     delete m_fixer;
 }
@@ -1348,10 +1377,14 @@ void MainWindow::showAppSettings(int tab)
     d->setGridSize(m_gridSize);
     d->setTriggerKeyColor(m_triggerKeyColor);
     d->setUpdater(m_bUpdate, m_updateURL);
-    d->setFontSize(m_fontSize);
+    d->setFontSize(EO_INT(FONT_SIZE));
+    d->setFont(EO_STR(FONT_NAME));
+    d->enableWordWrap(EO_BOOL(ENABLE_WORDWRAP));
+    d->enableHighlight(EO_BOOL(ENABLE_HIGHLIGHT));
+    d->enableWhiteSpace(EO_BOOL(ENABLE_WHITESPACE));
+    d->enableAutocomplete(EO_BOOL(ENABLE_AUTO_COMPLETE));
     d->setShowTriggerKey(m_bShowTriggerKey);
     d->setCurrentTab(tab);
-    qDebug("Font Size: %d", m_fontSize);
     QAction **actions = actionShortcuts();
     QStringList listActions;
     QStringList listShortcuts;
@@ -1366,7 +1399,7 @@ void MainWindow::showAppSettings(int tab)
     d->setScore(m_score);
     d->setLives(m_lives);
     d->setRuntime(m_runtime, m_runtimeArgs);
-    d->setSkipSplashScreen(m_skipSplash);
+    d->setSkipSplashScreen(EO_BOOL("skipSplash"));
     d->setTriggerFontSize(m_triggerFontSize);
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
@@ -1390,13 +1423,18 @@ void MainWindow::showAppSettings(int tab)
         m_start_hp = d->getHP();
         m_score = d->getScore();
         m_lives = d->getLives();
-        m_fontSize = d->getFontSize();
+        EO_SET(FONT_SIZE, d->getFontSize());
+        EO_SET(FONT_NAME, d->getFont());
+        EO_SET(SKIP_SPLASH, d->getSkipSplashScreen());
+        EO_SET(ENABLE_WORDWRAP, d->wordWrap());
+        EO_SET(ENABLE_HIGHLIGHT, d->highlight());
+        EO_SET(ENABLE_WHITESPACE, d->whiteSpace());
+        EO_SET(ENABLE_AUTO_COMPLETE, d->autocomplete());
         m_bShowTriggerKey = d->getShowTriggerKey();
         m_triggerFontSize = d->getTriggerFontSize();
         emit triggerKeyFontSizeChanged(m_triggerFontSize);
         d->getRuntime(m_runtime, m_runtimeArgs);
-        emit fontSizeChanged(m_fontSize);
-        m_skipSplash = d->getSkipSplashScreen();
+        emit fontChanged(currentFont());
         emit triggerKeyColorChanged(m_triggerKeyColor);
         emit triggerKeyShow(m_bShowTriggerKey);
     }
@@ -2423,6 +2461,7 @@ QAction** MainWindow::actionShortcuts()
         ui->actionEdit_Images,
         ui->actionDebugOutput,
         ui->actionSprite_Paint,
+        m_actionEraser,
         nullptr
     };
     return actions;
@@ -2483,10 +2522,8 @@ void MainWindow::saveSettings()
         formatVersion(ver);
         settings.setValue("version", ver);
         settings.endGroup();
-        settings.beginGroup("Editor");
-        settings.setValue("fontSize", m_fontSize);
-        settings.setValue("skipSplash", m_skipSplash);
-        settings.endGroup();
+        // Editor
+        m_editorOptions->write(settings);
         // Runtime
         settings.beginGroup("Runtime");
         settings.setValue("path", m_runtime);
@@ -2594,10 +2631,9 @@ void MainWindow::reloadSettings()
     m_rez = settings.value("rez", 0).toInt();
     settings.endGroup();
 
-    settings.beginGroup("Editor");
-    m_fontSize = settings.value("fontSize", DEFAULT_FONT_SIZE).toInt();
-    m_skipSplash = settings.value("skipSplash", false).toBool();
-    emit fontSizeChanged(m_fontSize);
+    // Editor
+    m_editorOptions->read(settings);
+    emit fontChanged(currentFont());
     settings.endGroup();
 
     // Tools
@@ -2783,26 +2819,24 @@ void MainWindow::makeCurrent()
 
 void MainWindow::on_actionIncrease_Font_Size_triggered()
 {
-    ++ m_fontSize;
-    if (m_fontSize > MAX_FONT_SIZE) {
-        m_fontSize = MAX_FONT_SIZE;
-    }
-    emit fontSizeChanged(m_fontSize);
+    int fontSize = EO_INT(FONT_SIZE);
+    ++ fontSize;
+    EO_SET(FONT_SIZE, fontSize > MAX_FONT_SIZE ? MAX_FONT_SIZE : fontSize);
+    emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionDecrease_Font_Size_triggered()
 {
-    -- m_fontSize;
-    if (m_fontSize < MIN_FONT_SIZE) {
-        m_fontSize = MIN_FONT_SIZE;
-    }
-    emit fontSizeChanged(m_fontSize);
+    int fontSize = EO_INT(FONT_SIZE);
+    -- fontSize;
+    EO_SET(FONT_SIZE, fontSize < MIN_FONT_SIZE ? MIN_FONT_SIZE : fontSize);
+    emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionReset_Font_Size_triggered()
 {
-    m_fontSize = DEFAULT_FONT_SIZE;
-    emit fontSizeChanged(m_fontSize);
+    EO_SET(FONT_SIZE, DEFAULT_FONT_SIZE);
+    emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionEdit_Images_triggered()
@@ -3011,7 +3045,6 @@ void MainWindow::changeEvent(QEvent* e)
                          }
                      }
                  }
-                 //layer.clearSelection();
                  m_doc.setDirty(true);
              }
              m_lview->repaint();

@@ -34,6 +34,8 @@ class CInfoDock;
 class QLabel;
 class CGameFixer;
 class QToolButton;
+class QFont;
+class COptions;
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -101,7 +103,7 @@ private:
     int m_pathOrgX;
     int m_pathOrgY;
     int m_pathEntry;
-    int m_fontSize;
+    COptions *m_editorOptions;
     bool m_bUpdate;
     QString m_updateURL;
     CThreadUpdater *m_updater;
@@ -112,7 +114,6 @@ private:
     int m_rezW;
     int m_rezH;
     bool m_runtimeExternal;
-    bool m_skipSplash;
     bool maybeSave();
     bool save();
     bool saveAs();
@@ -130,6 +131,7 @@ private:
     void adjustViewPort();
     void commitAll();
     void exportGame();
+    QFont currentFont();
     QAction **actionShortcuts();
     QAction *m_actionEraser;
     QStringList & defaultShortcuts();
@@ -304,7 +306,7 @@ signals:
     void scrollbarShown(bool);
     void focusGL();
     void textInserted(const char *text);
-    void fontSizeChanged(int);
+    void fontChanged(const QFont &);
     void frameSetChanged(int fs);
     void spriteUpdated(int protoId);
     void debugText(const QString & text);

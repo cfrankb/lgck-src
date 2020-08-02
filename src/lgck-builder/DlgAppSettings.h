@@ -63,10 +63,20 @@ public:
     void getRuntime(QString & path, QString & args);
     void setRuntime(const QString path, const QString args);
     int getFontSize();
+    void setFont(const QString & font);
+    QString getFont();
     int getTriggerFontSize();
     bool getSkipSplashScreen();
     void setSkipSplashScreen(bool state);
     void setCurrentTab(int i);
+    void enableWhiteSpace(bool state);
+    void enableHighlight(bool state);
+    void enableAutocomplete(bool state);
+    void enableWordWrap(bool state);
+    bool whiteSpace();
+    bool highlight();
+    bool autocomplete();
+    bool wordWrap();
     static const char *defaultRuntimeArgs();
 
     enum {

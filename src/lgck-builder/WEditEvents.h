@@ -49,7 +49,7 @@ private slots:
     void commitEvents();
     void deleteSprite(int sprite);
     void insertText(const char *text);
-    void setFontSize(int size);
+    void setFont(const QFont & font);
 signals:
     void eventChanged(int proto, int event);
     void eventModified();

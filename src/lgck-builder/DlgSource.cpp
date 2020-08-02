@@ -21,7 +21,7 @@
 #include <QPushButton>
 #include "WizScript.h"
 
-int CDlgSource::m_fontSize = 10;
+QFont CDlgSource::m_font = QFont("courrier", 10, QFont::DemiBold);
 
 CDlgSource::CDlgSource(QWidget *parent) :
         QDialog(parent),
@@ -35,8 +35,8 @@ CDlgSource::CDlgSource(QWidget *parent) :
     m_gameFile = NULL;
     connect(m_btn, SIGNAL(pressed()), this, SLOT(wizButton()));
     connect(this, SIGNAL(textInserted(const char*)), m_ui->eSource, SLOT(insertText(const char*)));
-    connect(this,SIGNAL(fontSizeChanged(int)), m_ui->eSource, SLOT(setFontSize(int)));
-    emit fontSizeChanged(m_fontSize);
+    connect(this, SIGNAL(fontChanged(const QFont &)), m_ui->eSource, SLOT(setFont(const QFont &)));
+    emit fontChanged(m_font);
 }
 
 CDlgSource::~CDlgSource()
@@ -91,7 +91,7 @@ void CDlgSource::wizButton()
     m_ui->eSource->setFocus();
 }
 
-void CDlgSource::setFontSize(int size)
+void CDlgSource::setFont(const QFont &font)
 {
-    m_fontSize = size;
+    m_font = font;
 }

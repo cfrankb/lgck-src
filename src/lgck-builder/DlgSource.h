@@ -37,17 +37,17 @@ public:
     void setText(const QString s);
     const QString getText();
     void setReadOnly() const;
-    static void setFontSize(int size);
+    static void setFont(const QFont & font);
 
 signals:
     void textInserted(const char *);
-    void fontSizeChanged(int);
+    void fontChanged(const QFont &);
 
 protected:
     void changeEvent(QEvent *e);
     QPushButton *m_btn;
     CGameFile *m_gameFile;
-    static int m_fontSize;
+    static QFont m_font;
 
 protected slots:
     void wizButton();

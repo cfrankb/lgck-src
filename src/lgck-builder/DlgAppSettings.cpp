@@ -24,13 +24,14 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QDebug>
 #include "WHotKey.h"
 #include "DlgAppSettings.h"
 #include "ui_DlgAppSettings.h"
 #include "../shared/qtgui/cheat.h"
 
 constexpr int triggerFontSizes[] = {
-    16, 18, 20, 22, 24, 26
+    16, 18, 20, 22, 24, 26, 28, 30, 32, 40
 };
 
 CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
@@ -407,4 +408,54 @@ void CDlgAppSettings::on_cbShowTriggerKey_toggled(bool checked)
 {
     Q_UNUSED(checked);
     enableTriggerKeyOptions();
+}
+
+void CDlgAppSettings::setFont(const QString & font)
+{
+    QFont f = QFont();
+    f.setFamily(font);
+    m_ui->cbFontFamily->setCurrentFont(f);
+}
+
+QString CDlgAppSettings::getFont()
+{
+     return m_ui->cbFontFamily->currentFont().family();
+}
+
+void CDlgAppSettings::enableWhiteSpace(bool state)
+{
+    m_ui->cWhiteSpace->setChecked(state);
+}
+void CDlgAppSettings::enableHighlight(bool state)
+{
+    m_ui->cHighlight->setChecked(state);
+}
+void CDlgAppSettings::enableAutocomplete(bool state)
+{
+    m_ui->cAutoComplete->setChecked(state);
+}
+
+void CDlgAppSettings::enableWordWrap(bool state)
+{
+    m_ui->cWordWrap->setChecked(state);
+}
+
+bool CDlgAppSettings::whiteSpace()
+{
+    return m_ui->cWhiteSpace->isChecked();
+}
+
+bool CDlgAppSettings::highlight()
+{
+    return m_ui->cHighlight->isChecked();
+}
+
+bool CDlgAppSettings::autocomplete()
+{
+    return m_ui->cAutoComplete->isChecked();
+}
+
+bool CDlgAppSettings::wordWrap()
+{
+    return m_ui->cWordWrap->isChecked();
 }

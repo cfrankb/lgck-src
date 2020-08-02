@@ -89,6 +89,7 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *e) override;
     void focusInEvent(QFocusEvent *e) override;
+    void resizeEvent(QResizeEvent *event) override;
     QString textUnderCursor() const;
 
     QStringList m_words;
@@ -105,14 +106,19 @@ protected:
     QStringList words();
     QStringList constants();
 
-signals:
+    bool m_enableAutocomplete;
+    bool m_enableHighlight;
+    bool m_enableWhiteSpace;
+    bool m_enableWordWrap;
 
 public slots:
     void insertCompletion( QString completion );
     void setFontSize(int size);
-
-protected:
-    void resizeEvent(QResizeEvent *event) override;
+    void setFont(const QFont &);
+    void enableAutocomplete(bool state);
+    void enableHighlight(bool state);
+    void enableWhiteSpace(bool state);
+    void enableWordWrap(bool state);
 
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);

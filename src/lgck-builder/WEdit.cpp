@@ -95,15 +95,15 @@ CWEdit::CWEdit(QWidget *parent) :
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
+    m_enableHighlight = true;
     setFocus();
 
     setTabStopDistance(fontMetrics().horizontalAdvance(QLatin1Char('9')));
-    QTextOption option;
-    option.setFlags(QTextOption::ShowLineAndParagraphSeparators | QTextOption::ShowTabsAndSpaces);
-    document()->setDefaultTextOption(option);
-    setLineWrapMode(NoWrap);
+    enableWhiteSpace(true);
+    enableWordWrap(false);
 
     // start autocompleter
+    m_enableAutocomplete = true;
     m_words = words() + constants();
     m_completer = new QCompleter();
     m_listmodel = new QStringListModel(m_completer);
@@ -116,6 +116,36 @@ CWEdit::CWEdit(QWidget *parent) :
     m_completer->setCaseSensitivity(Qt::CaseSensitive);
     m_completer->setWrapAround(false);
     connect(m_completer, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
+}
+
+void CWEdit::enableAutocomplete(bool state)
+{
+    m_enableAutocomplete = state;
+}
+
+void CWEdit::enableHighlight(bool state)
+{
+    m_enableHighlight = state;
+}
+
+void CWEdit::enableWhiteSpace(bool state)
+{
+    QTextOption option;
+    if (state) {
+        option.setFlags(QTextOption::ShowLineAndParagraphSeparators | QTextOption::ShowTabsAndSpaces);
+    } else {
+        option.setFlags(option.flags() ^ (QTextOption::ShowLineAndParagraphSeparators | QTextOption::ShowTabsAndSpaces));
+    }
+    document()->setDefaultTextOption(option);
+}
+
+void CWEdit::enableWordWrap(bool state)
+{
+    if (state) {
+        setLineWrapMode(WidgetWidth);
+    } else {
+        setLineWrapMode(NoWrap);
+    }
 }
 
 QStringList CWEdit::fromFile(const char *fileName)
@@ -157,7 +187,7 @@ CWEdit::~CWEdit() {
 
 void CWEdit::insertCompletion( QString completion )
 {
-    if (m_completer->widget() != this)
+    if (m_completer->widget() != this || !m_enableAutocomplete)
         return;
     QTextCursor tc = textCursor();
     int extra = completion.length() - m_completer->completionPrefix().length();
@@ -231,7 +261,12 @@ void CWEdit::keyPressEvent(QKeyEvent *e)
 // TODO: cleanup later
 void CWEdit::setFontSize(int size)
 {
-    setFont(QFont("Courier", size, QFont::DemiBold));
+    QPlainTextEdit::setFont(QFont("Courier", size, QFont::DemiBold));
+}
+
+void CWEdit::setFont(const QFont & font)
+{
+    QPlainTextEdit::setFont(font);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -277,6 +312,10 @@ void CWEdit::resizeEvent(QResizeEvent *e)
 
 void CWEdit::highlightCurrentLine()
 {
+    if (!m_enableHighlight) {
+        return;
+    }
+
     QList<QTextEdit::ExtraSelection> extraSelections;
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
