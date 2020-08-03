@@ -20,6 +20,8 @@
 #define DLGSOURCE_H
 
 #include <QDialog>
+#include "optiongroup.h"
+
 class QPushButton;
 class CGameFile;
 
@@ -38,6 +40,7 @@ public:
     const QString getText();
     void setReadOnly() const;
     static void setFont(const QFont & font);
+    static void setOptions(COptionGroup &options);
 
 signals:
     void textInserted(const char *);
@@ -48,6 +51,7 @@ protected:
     QPushButton *m_btn;
     CGameFile *m_gameFile;
     static QFont m_font;
+    static COptionGroup m_options;
 
 protected slots:
     void wizButton();

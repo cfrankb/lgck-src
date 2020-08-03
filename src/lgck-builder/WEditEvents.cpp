@@ -141,3 +141,9 @@ void CWEditEvents::setFont(const QFont &font)
     ui->eSource->setFont(font);
     CDlgSource::setFont(font);
 }
+
+void CWEditEvents::setOptions(COptionGroup & options)
+{
+    ui->eSource->setOptions(options);
+    CDlgSource::setOptions(options);
+}

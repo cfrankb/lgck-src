@@ -73,6 +73,7 @@
 class QCompleter;
 class QStringListModel;
 class CLuaHighlighter;
+class COptionGroup;
 
 class CWEdit : public QPlainTextEdit
 {
@@ -115,6 +116,7 @@ public slots:
     void insertCompletion( QString completion );
     void setFontSize(int size);
     void setFont(const QFont &);
+    void setOptions(COptionGroup &options);
     void enableAutocomplete(bool state);
     void enableHighlight(bool state);
     void enableWhiteSpace(bool state);

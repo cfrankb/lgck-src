@@ -77,6 +77,7 @@
 #include "luahighlighter.h"
 #include "../shared/stdafx.h"
 #include "../shared/FileWrap.h"
+#include "optiongroup.h"
 
 const QColor highlightColor = QColor(Qt::yellow);
 const QColor indentationBackgroundColor = QColor(Qt::lightGray);
@@ -134,18 +135,14 @@ void CWEdit::enableWhiteSpace(bool state)
     if (state) {
         option.setFlags(QTextOption::ShowLineAndParagraphSeparators | QTextOption::ShowTabsAndSpaces);
     } else {
-        option.setFlags(option.flags() ^ (QTextOption::ShowLineAndParagraphSeparators | QTextOption::ShowTabsAndSpaces));
+        option.setFlags(option.flags());
     }
     document()->setDefaultTextOption(option);
 }
 
 void CWEdit::enableWordWrap(bool state)
 {
-    if (state) {
-        setLineWrapMode(WidgetWidth);
-    } else {
-        setLineWrapMode(NoWrap);
-    }
+    setWordWrapMode(state ? QTextOption::WrapAnywhere : QTextOption::NoWrap);
 }
 
 QStringList CWEdit::fromFile(const char *fileName)
@@ -213,6 +210,11 @@ void CWEdit::focusInEvent(QFocusEvent *e)
 
 void CWEdit::keyPressEvent(QKeyEvent *e)
 {
+    if (!m_enableAutocomplete) {
+        QPlainTextEdit::keyPressEvent(e);
+        return;
+    }
+
     if (m_completer && m_completer->popup()->isVisible()) {
         // The following keys are forwarded by the completer to the widget
        switch (e->key()) {
@@ -255,18 +257,6 @@ void CWEdit::keyPressEvent(QKeyEvent *e)
     cr.setWidth(m_completer->popup()->sizeHintForColumn(0)
                 + m_completer->popup()->verticalScrollBar()->sizeHint().width());
     m_completer->complete(cr); // popup it up!
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// TODO: cleanup later
-void CWEdit::setFontSize(int size)
-{
-    QPlainTextEdit::setFont(QFont("Courier", size, QFont::DemiBold));
-}
-
-void CWEdit::setFont(const QFont & font)
-{
-    QPlainTextEdit::setFont(font);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -354,4 +344,29 @@ void CWEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
         bottom = top + qRound(blockBoundingRect(block).height());
         ++blockNumber;
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// options
+
+void CWEdit::setOptions(COptionGroup & options)
+{
+    constexpr char ENABLE_AUTO_COMPLETE[] = "enableAutocomplete";
+    constexpr char ENABLE_HIGHLIGHT[] = "enableHighlight";
+    constexpr char ENABLE_WHITESPACE[] = "enableWhiteSpace";
+    constexpr char ENABLE_WORDWRAP[] = "enableWordWrap";
+    enableWordWrap(options[ENABLE_WORDWRAP].toBool());
+    enableHighlight(options[ENABLE_HIGHLIGHT].toBool());
+    enableWhiteSpace(options[ENABLE_WHITESPACE].toBool());
+    enableAutocomplete(options[ENABLE_AUTO_COMPLETE].toBool());
+}
+
+void CWEdit::setFontSize(int size)
+{
+    QPlainTextEdit::setFont(QFont("Courier", size, QFont::DemiBold));
+}
+
+void CWEdit::setFont(const QFont & font)
+{
+    QPlainTextEdit::setFont(font);
 }

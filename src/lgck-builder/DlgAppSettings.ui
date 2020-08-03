@@ -250,14 +250,37 @@
     <widget class="QCheckBox" name="cSkipSplashScreen">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>270</y>
+       <x>130</x>
+       <y>330</y>
        <width>151</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
       <string>skip splash screen</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>290</y>
+       <width>101</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Last projects</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbProjects">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>287</y>
+       <width>86</width>
+       <height>25</height>
+      </rect>
      </property>
     </widget>
    </widget>

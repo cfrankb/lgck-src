@@ -1,28 +1,25 @@
-#ifndef CFONTOPTIONS_H
-#define CFONTOPTIONS_H
+#ifndef COPTIONS_H
+#define COPTIONS_H
 
 #include <QObject>
 #include <QSettings>
 #include <QVariant>
 #include <unordered_map>
+#include "optiongroup.h"
 
 class QSettings;
 
-class COptions: public QObject
+class COptions
 {
-    //Q_OBJECT
-
 public:
-    COptions(const char *group);
+    COptions();
     ~COptions();
-    COptions & set(const char *name, QVariant value);
-    QVariant & get(const char *name);
+    COptionGroup & operator[](const char *name);
     void read(QSettings & settings);
     void write(QSettings & settings);
 
 protected:
-    QString m_group;
-    std::unordered_map<std::string, QVariant> m_options;
+    std::unordered_map<std::string, COptionGroup> m_groups;
 };
 
-#endif // CFONTOPTIONS_H
+#endif // COPTIONS_H

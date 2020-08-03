@@ -2,10 +2,9 @@
 #include <QSettings>
 #include <QDebug>
 
-COptions::COptions(const char *group)
+COptions::COptions()
 {
-    Q_ASSERT(group && group[0]);
-    m_group = group;
+
 }
 
 COptions::~COptions()
@@ -13,35 +12,23 @@ COptions::~COptions()
 
 }
 
-QVariant & COptions::get(const char *name)
+COptionGroup & COptions::operator[](const char *name)
 {
-    return m_options[name];
-}
-
-COptions &COptions::set(const char *name, QVariant value)
-{
-    m_options[name] = value;
-    return *this;
+    COptionGroup & group = m_groups[name];
+    group.setName(name);
+    return group;
 }
 
 void COptions::read(QSettings & settings)
 {
-    settings.beginGroup(m_group);
-    for (auto it = m_options.begin(); it != m_options.end(); ++it) {
-        qDebug() << QString("read option: ") << it->first.c_str() << it->second;
-        std::string name = it->first;
-        m_options[name] = settings.value(name.c_str(), it->second);
+    for (auto it = m_groups.begin(); it != m_groups.end(); ++it) {
+        it->second.read(settings);
     }
-    settings.endGroup();
 }
 
-void COptions::write(QSettings &settings)
+void COptions::write(QSettings & settings)
 {
-    settings.beginGroup(m_group);
-    for (auto it = m_options.begin(); it != m_options.end(); ++it) {
-        qDebug() << QString("write option: ") << it->first.c_str() << it->second;
-        std::string name = it->first;
-        settings.setValue(name.c_str(), it->second);
+    for (auto it = m_groups.begin(); it != m_groups.end(); ++it) {
+        it->second.write(settings);
     }
-    settings.endGroup();
 }

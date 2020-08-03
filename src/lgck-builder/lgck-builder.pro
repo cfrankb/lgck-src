@@ -55,6 +55,7 @@ win32:LIBS += \
 
 SOURCES +=  mainwindow.cpp \
     dlgindicator.cpp \
+    optiongroup.cpp \
     options.cpp \
     gamefixer.cpp \
     infodock.cpp \
@@ -162,6 +163,7 @@ SOURCES +=  mainwindow.cpp \
 
 HEADERS  +=  mainwindow.h \
     dlgindicator.h \
+    optiongroup.h \
     options.h \
     gamefixer.h \
     luahighlighter.h \

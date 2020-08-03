@@ -22,6 +22,7 @@
 #include "WizScript.h"
 
 QFont CDlgSource::m_font = QFont("courrier", 10, QFont::DemiBold);
+COptionGroup CDlgSource::m_options;
 
 CDlgSource::CDlgSource(QWidget *parent) :
         QDialog(parent),
@@ -37,6 +38,7 @@ CDlgSource::CDlgSource(QWidget *parent) :
     connect(this, SIGNAL(textInserted(const char*)), m_ui->eSource, SLOT(insertText(const char*)));
     connect(this, SIGNAL(fontChanged(const QFont &)), m_ui->eSource, SLOT(setFont(const QFont &)));
     emit fontChanged(m_font);
+    m_ui->eSource->setOptions(m_options);
 }
 
 CDlgSource::~CDlgSource()
@@ -94,4 +96,9 @@ void CDlgSource::wizButton()
 void CDlgSource::setFont(const QFont &font)
 {
     m_font = font;
+}
+
+void CDlgSource::setOptions(COptionGroup &options)
+{
+    m_options = options;
 }

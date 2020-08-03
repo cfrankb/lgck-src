@@ -32,6 +32,9 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QSurfaceFormat>
+#include <QLockFile>
+
+constexpr char appUuid[] = "e139b7fd-2d73-4eba-84ac-339fca583e89";
 
 int main(int argc, char *argv[])
 {
@@ -45,6 +48,13 @@ int main(int argc, char *argv[])
 
     srand( time( NULL ) );
     QApplication app(argc, argv);
+    QString tmpDir = QDir::tempPath();
+    QLockFile lockFile(tmpDir + QString("/%1.lock").arg(appUuid));
+    if(!lockFile.tryLock(100)){
+        QMessageBox::warning(nullptr, "", QObject::tr("You cannot run more than one instance of this application."));
+        return 1;
+    }
+
     QFileInfo fi(app.applicationDirPath());
     QString portable = QApplication::applicationDirPath() + "/portable.txt";
     if(fi.isDir() && fi.isWritable() && QFileInfo::exists(portable)) {
@@ -52,7 +62,6 @@ int main(int argc, char *argv[])
         QSettings::setDefaultFormat(QSettings::IniFormat);
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
     }
-
     MainWindow w;
     w.createEventEditor();
 

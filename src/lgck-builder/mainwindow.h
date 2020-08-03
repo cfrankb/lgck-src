@@ -36,6 +36,7 @@ class CGameFixer;
 class QToolButton;
 class QFont;
 class COptions;
+class COptionGroup;
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -83,12 +84,12 @@ private:
     QTimer m_timerIndicator;
     QElapsedTimer m_time;
     int m_nextTick;
-    bool m_bShowGrid;
-    QString m_gridColor;
-    QString m_triggerKeyColor;
-    bool m_bShowTriggerKey;
-    int m_triggerFontSize;
-    int m_gridSize;
+    //bool m_bShowGrid;
+    //QString m_gridColor;
+    //QString m_triggerKeyColor;
+    //bool m_bShowTriggerKey;
+    //int m_triggerFontSize;
+    //int m_gridSize;
     int m_skill;
     int m_lives;
     int m_start_hp;
@@ -103,7 +104,7 @@ private:
     int m_pathOrgX;
     int m_pathOrgY;
     int m_pathEntry;
-    COptions *m_editorOptions;
+    COptions *m_options;
     bool m_bUpdate;
     QString m_updateURL;
     CThreadUpdater *m_updater;
@@ -125,6 +126,7 @@ private:
     void initFileMenu();
     void reloadRecentFileActions();
     void updateRecentFileActions();
+    void initSettings();
     void reloadSettings();
     void hideView(bool hide);
     void showLayerName();
@@ -141,7 +143,8 @@ private:
     bool m_ready;
     void saveSettings();
     enum {
-        MaxRecentFiles      = 4,
+        //MaxRecentFiles      = 4,
+        MAX_PROJECTS        = 16,
         TICK_MAX_RATE       = 200,
         TICK_SCALE          = 1000 / 35,
         LABEL0_SIZE         = 500,
@@ -153,7 +156,7 @@ private:
         TOOLBAR_ICON_SIZE   = 16
     };
     QLabel *m_labels[3];
-    QAction *m_recentFileActs[MaxRecentFiles];
+    QAction *m_recentFileActs[16];
     virtual void closeEvent(QCloseEvent *event);
     virtual void setVisible ( bool visible );
     virtual void resizeEvent (QResizeEvent *event);
@@ -307,6 +310,7 @@ signals:
     void focusGL();
     void textInserted(const char *text);
     void fontChanged(const QFont &);
+    void editorOptionChanged(COptionGroup & options);
     void frameSetChanged(int fs);
     void spriteUpdated(int protoId);
     void debugText(const QString & text);

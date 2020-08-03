@@ -93,6 +93,8 @@ const QString MainWindow::m_appTitle = MainWindow::tr("LGCK builder IDE");
 #define UPDATER_URL "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
 
 #define RUNTIME_DEFAULT_ARGS "%1"
+
+constexpr const char EDITOR[] = "Editor";
 constexpr int MIN_FONT_SIZE = 10;
 constexpr int MAX_FONT_SIZE = 50;
 constexpr int DEFAULT_FONT_SIZE = MIN_FONT_SIZE;
@@ -104,17 +106,33 @@ constexpr char ENABLE_AUTO_COMPLETE[] = "enableAutocomplete";
 constexpr char ENABLE_HIGHLIGHT[] = "enableHighlight";
 constexpr char ENABLE_WHITESPACE[] = "enableWhiteSpace";
 constexpr char ENABLE_WORDWRAP[] = "enableWordWrap";
+constexpr char GENERAL [] = "";
+constexpr char GRIDCOLOR[] = "gridColor";
+constexpr char SHOWGRID[] = "showGrid";
+constexpr char TRIGGER_KEY_COLOR[] = "triggerKeyColor";
+constexpr char TRIGGER_KEY_FONT_SIZE[] = "triggerKeyFontSize";
+constexpr char TRIGGER_KEY_SHOW[] = "showTriggerKey";
+constexpr char GRIDSIZE[] = "gridSize";
+constexpr char LAST_PROJECTS[] = "lastProjects";
 
-#define EO_STR(x) m_editorOptions->get(x).toString()
-#define EO_INT(x) m_editorOptions->get(x).toInt()
-#define EO_BOOL(x) m_editorOptions->get(x).toBool()
-#define EO_SET(k, v) m_editorOptions->set(k, v)
+#define EO_STR(k) (*m_options)[EDITOR].get(k).toString()
+#define EO_INT(k) (*m_options)[EDITOR].get(k).toInt()
+#define EO_BOOL(k) (*m_options)[EDITOR].get(k).toBool()
+#define EO_SET(k, v) (*m_options)[EDITOR].set(k, v)
+
+#define O_STR(s,k) (*m_options)[s].get(k).toString()
+#define O_INT(s,k) (*m_options)[s].get(k).toInt()
+#define O_BOOL(s,k) (*m_options)[s].get(k).toBool()
+#define O_SET(s,k,v) (*m_options)[s].set(k,v)
 
 MainWindow *me = nullptr;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    // Init Settings
+    initSettings();
+
     // Setup the timer for the indicator
     m_timerIndicator.setInterval(500);
     m_timerIndicator.stop();
@@ -141,9 +159,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     m_proto = -1;
     m_event = -1;
-    m_gridColor = "000000";
-    m_triggerKeyColor = "FFFF00";
-    m_gridSize = 32;
     m_viewMode = VM_EDITOR;
     m_fixer = new CGameFixer;
     m_fixer->setGame(&m_doc);
@@ -306,14 +321,6 @@ MainWindow::MainWindow(QWidget *parent)
     emit debugText(tr("LuaVM ready.\n"));
 
     // reload settings
-    m_editorOptions = new COptions("Editor");
-    m_editorOptions->set(FONT_SIZE, DEFAULT_FONT_SIZE)
-            .set(FONT_NAME, DEFAULT_FONT_NAME)
-            .set(SKIP_SPLASH, false)
-            .set(ENABLE_AUTO_COMPLETE, true)
-            .set(ENABLE_WORDWRAP, true)
-            .set(ENABLE_HIGHLIGHT, true)
-            .set(ENABLE_WHITESPACE, true);
     reloadSettings();
     CSndSDL *sn = new CSndSDL();
     m_doc.attach((ISound*)sn);
@@ -328,6 +335,7 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::createEventEditor()
 {
     // Create the event Editor
+    qDebug("createEventEditor");
 
     m_editEvents = new CWEditEvents(this);
     m_editEvents->setWindowTitle(tr("Event script"));
@@ -361,11 +369,15 @@ void MainWindow::createEventEditor()
     connect(this, SIGNAL(fontChanged(const QFont &)),
             m_editEvents, SLOT(setFont(const QFont &)));
 
+    connect(this, SIGNAL(editorOptionChanged(COptionGroup &)),
+            m_editEvents, SLOT(setOptions(COptionGroup &)));
+
     if (m_editEvents) {
         m_editEvents->hide();
     }
 
     emit fontChanged(currentFont());
+    emit editorOptionChanged((*m_options)[EDITOR]);
 }
 
 
@@ -417,8 +429,8 @@ MainWindow::~MainWindow()
     if (m_updater) {
         delete m_updater;
     }
-    if (m_editorOptions) {
-        delete m_editorOptions;
+    if (m_options) {
+        delete m_options;
     }
     delete m_fixer;
 }
@@ -626,9 +638,11 @@ void MainWindow::openRecentFile()
 
 void MainWindow::initFileMenu()
 {
+    qDebug("initFileMenu");
+
     // gray out the open recent `nothin' yet`
     ui->action_nothin_yet->setEnabled(false);
-    for (int i = 0; i < MaxRecentFiles; i++) {
+    for (int i = 0; i < MAX_PROJECTS; i++) {
         m_recentFileActs[i] = new QAction(this);
         m_recentFileActs[i]->setVisible(false);
         ui->menuOpen_recent->addAction(m_recentFileActs[i]);
@@ -645,7 +659,7 @@ void MainWindow::reloadRecentFileActions()
 {
     QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
-    int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
+    int numRecentFiles = qMin(files.size(), (int)O_INT(GENERAL, LAST_PROJECTS));
     for (int i = 0; i < numRecentFiles; ++i) {
         QString text = tr("&%1 %2").arg(i + 1).arg(QFileInfo(files[i]).fileName());
         m_recentFileActs[i]->setText(text);
@@ -653,7 +667,7 @@ void MainWindow::reloadRecentFileActions()
         m_recentFileActs[i]->setVisible(true);
         m_recentFileActs[i]->setStatusTip(files[i]);
     }
-    for (int j = numRecentFiles; j < MaxRecentFiles; ++j)
+    for (int j = numRecentFiles; j < (int)O_INT(GENERAL, LAST_PROJECTS); ++j)
         m_recentFileActs[j]->setVisible(false);
     ui->action_nothin_yet->setVisible(numRecentFiles == 0);
 }
@@ -666,7 +680,7 @@ void MainWindow::updateRecentFileActions()
     files.removeAll(fileName);
     if (!fileName.isEmpty()) {
         files.prepend(fileName);
-        while (files.size() > MaxRecentFiles)
+        while (files.size() > O_INT(GENERAL, LAST_PROJECTS))
             files.removeLast();
     }
     settings.setValue("recentFileList", files);
@@ -746,7 +760,7 @@ void MainWindow::updateMenus()
         actionsGame[i]->setEnabled( m_viewMode == VM_GAME );
     }
 
-    for (int j = 0; j < MaxRecentFiles; ++j) {
+    for (int j = 0; j < O_INT(GENERAL, LAST_PROJECTS); ++j) {
         m_recentFileActs[j]->setEnabled( m_viewMode != VM_GAME );
     }
 
@@ -942,7 +956,7 @@ void MainWindow::on_actionDelete_Level_triggered()
         if (ret == QMessageBox::Ok) {
             m_doc.setDirty( true );
             int index = m_doc.m_nCurrLevel;
-            delete & m_doc.getCurrentLevel();//m_doc[ m_doc.m_nCurrLevel ] ;
+            delete & m_doc.getCurrentLevel();
             m_doc.removeLevel ( m_doc.m_nCurrLevel );
             if ( m_doc.m_nCurrLevel > m_doc.getSize() - 1) {
                 -- m_doc.m_nCurrLevel ;
@@ -1222,7 +1236,6 @@ void MainWindow::on_actionTest_Level_triggered()
                 m_doc.initLua();
                 m_runtimeExternal = dlg->isExternal();
                 if (dlg->isExternal()){
-                // http://stackoverflow.com/questions/19442400/qt-execute-external-program
                     goExternalRuntime();
                 } else {
                     // set the start level
@@ -1372,10 +1385,11 @@ void MainWindow::showAppSettings(int tab)
     connect(d, SIGNAL(versionCheck()), this, SLOT(checkVersion()));
     QString s = QString(tr("%1 Settings").arg(m_appName));
     d->setWindowTitle(s);
-    d->showGrid(m_bShowGrid);
-    d->setGridColor(m_gridColor);
-    d->setGridSize(m_gridSize);
-    d->setTriggerKeyColor(m_triggerKeyColor);
+    d->showGrid(O_BOOL(GENERAL, SHOWGRID));
+    d->setGridColor(O_STR(GENERAL, GRIDCOLOR));
+    d->setGridSize(O_INT(GENERAL, GRIDSIZE));
+    d->setTriggerKeyColor(O_STR(GENERAL, TRIGGER_KEY_COLOR));
+    d->setShowTriggerKey(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
     d->setUpdater(m_bUpdate, m_updateURL);
     d->setFontSize(EO_INT(FONT_SIZE));
     d->setFont(EO_STR(FONT_NAME));
@@ -1383,7 +1397,7 @@ void MainWindow::showAppSettings(int tab)
     d->enableHighlight(EO_BOOL(ENABLE_HIGHLIGHT));
     d->enableWhiteSpace(EO_BOOL(ENABLE_WHITESPACE));
     d->enableAutocomplete(EO_BOOL(ENABLE_AUTO_COMPLETE));
-    d->setShowTriggerKey(m_bShowTriggerKey);
+    d->setLastProjects(O_INT(GENERAL, LAST_PROJECTS));
     d->setCurrentTab(tab);
     QAction **actions = actionShortcuts();
     QStringList listActions;
@@ -1399,8 +1413,8 @@ void MainWindow::showAppSettings(int tab)
     d->setScore(m_score);
     d->setLives(m_lives);
     d->setRuntime(m_runtime, m_runtimeArgs);
-    d->setSkipSplashScreen(EO_BOOL("skipSplash"));
-    d->setTriggerFontSize(m_triggerFontSize);
+    d->setSkipSplashScreen(EO_BOOL(SKIP_SPLASH));
+    d->setTriggerFontSize(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
     if (d->exec() == QDialog::Accepted) {
@@ -1410,14 +1424,14 @@ void MainWindow::showAppSettings(int tab)
             QAction *a = actions[i];
             a->setShortcut(QKeySequence(listShortcuts[i]));
         }
-        m_bShowGrid = d->isShowGrid();
-        emit gridVisible(m_bShowGrid);
+        O_SET(GENERAL, SHOWGRID, d->isShowGrid());
+        emit gridVisible(O_BOOL(GENERAL, SHOWGRID));
         emit gridSizeChanged(d->getGridSize());
-        m_gridSize = d->getGridSize();
+        O_SET(GENERAL, GRIDSIZE, d->getGridSize());
         emit gridColorChanged(d->getGridColor());
-        m_gridColor = d->getGridColor().mid(0,6);
-        m_triggerKeyColor = d->getTriggerKeyColor().mid(0,6);
-        ui->action_ShowGrid->setChecked(m_bShowGrid);
+        O_SET(GENERAL, GRIDCOLOR, d->getGridColor().mid(0,6));
+        O_SET(GENERAL, TRIGGER_KEY_COLOR, d->getTriggerKeyColor().mid(0,6));
+        ui->action_ShowGrid->setChecked(O_BOOL(GENERAL, SHOWGRID));
         m_lview->repaint();
         m_skill = d->getSkill();
         m_start_hp = d->getHP();
@@ -1430,13 +1444,15 @@ void MainWindow::showAppSettings(int tab)
         EO_SET(ENABLE_HIGHLIGHT, d->highlight());
         EO_SET(ENABLE_WHITESPACE, d->whiteSpace());
         EO_SET(ENABLE_AUTO_COMPLETE, d->autocomplete());
-        m_bShowTriggerKey = d->getShowTriggerKey();
-        m_triggerFontSize = d->getTriggerFontSize();
-        emit triggerKeyFontSizeChanged(m_triggerFontSize);
+        O_SET(GENERAL, TRIGGER_KEY_SHOW, d->getShowTriggerKey());
+        O_SET(GENERAL, TRIGGER_KEY_FONT_SIZE, d->getTriggerFontSize());
+        emit triggerKeyFontSizeChanged(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
         d->getRuntime(m_runtime, m_runtimeArgs);
         emit fontChanged(currentFont());
-        emit triggerKeyColorChanged(m_triggerKeyColor);
-        emit triggerKeyShow(m_bShowTriggerKey);
+        emit editorOptionChanged((*m_options)[EDITOR]);
+        emit triggerKeyColorChanged(O_STR(GENERAL, TRIGGER_KEY_COLOR));
+        emit triggerKeyShow(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
+        O_SET(GENERAL, LAST_PROJECTS, d->lastProjects());
     }
     delete d;
 }
@@ -1754,10 +1770,6 @@ void MainWindow::initToolBar()
     m_levelToolbar->addAction(ui->actionPaste);
     m_levelToolbar->addAction(ui->actionDelete);
     m_levelToolbar->addSeparator();
-    //m_levelToolbar->addAction(ui->action_ShowGrid);
-    //actionShowGrid = m_levelToolbar->addAction(QIcon(":/images/ftview-grid.png"), tr("grid"), this, "gridTriggered");
-    //actionShowGrid->setCheckable(true);
-    //ui->action_ShowGrid->setIcon(QIcon(":/images/ftview-grid.png"));
     m_levelToolbar->addAction(ui->actionSprite_Paint);
     ui->actionSprite_Paint->setIcon(QIcon(":/images/strawberrypntbrush.png"));
     ui->actionSprite_Paint->setStatusTip(tr("Paint the tile under the cursor with the given sprite"));
@@ -2474,11 +2486,8 @@ void MainWindow::saveSettings()
     settings.setValue("saveSettings", ui->actionSave_Settings->isChecked());
     bool saveSettings = ui->actionSave_Settings->isChecked();
     if (saveSettings) {
-        settings.setValue("showGrid", m_bShowGrid);
-        settings.setValue("gridColor", m_gridColor);
-        settings.setValue("gridSize", m_gridSize);
-        settings.setValue("triggerKeyColor", m_triggerKeyColor);
-        settings.setValue("triggerKeyFontSize", m_triggerFontSize);
+
+        // shortcuts
         settings.beginGroup("Shortcuts");
         QAction **actions = actionShortcuts();
         for (uint i=0; actions[i];++i) {
@@ -2505,8 +2514,8 @@ void MainWindow::saveSettings()
         settings.setValue("mainWindow:geometry", this->saveGeometry());
         settings.setValue("mainWindow:state", this->saveState());
         settings.setValue("version", UI_VERSION);
-       // settings.setValue("mainWindow:pos", this->geometry());
         settings.endGroup();
+
         settings.beginGroup("TestLevel");
         settings.setValue("skill", m_skill);
         settings.setValue("start_hp", m_start_hp);
@@ -2514,6 +2523,7 @@ void MainWindow::saveSettings()
         settings.setValue("lives", m_lives);
         settings.setValue("continue", m_bContinue);
         settings.endGroup();
+
         settings.beginGroup("Updater");
         settings.setValue("updater_check", m_bUpdate);
         settings.setValue("updater_url", m_updateURL);
@@ -2522,8 +2532,10 @@ void MainWindow::saveSettings()
         formatVersion(ver);
         settings.setValue("version", ver);
         settings.endGroup();
+
         // Editor
-        m_editorOptions->write(settings);
+        m_options->write(settings);
+
         // Runtime
         settings.beginGroup("Runtime");
         settings.setValue("path", m_runtime);
@@ -2546,26 +2558,49 @@ void MainWindow::formatVersion(QString &ver)
     ver = QString::asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
 }
 
+void MainWindow::initSettings()
+{
+    qDebug("initSettings");
+    m_options = new COptions;
+    COptionGroup & editor = (*m_options)[EDITOR];
+    editor.set(FONT_SIZE, DEFAULT_FONT_SIZE)
+            .set(FONT_NAME, DEFAULT_FONT_NAME)
+            .set(SKIP_SPLASH, false)
+            .set(ENABLE_AUTO_COMPLETE, true)
+            .set(ENABLE_WORDWRAP, true)
+            .set(ENABLE_HIGHLIGHT, true)
+            .set(ENABLE_WHITESPACE, true);
+
+    COptionGroup & general = (*m_options)[GENERAL];
+    general.set(GRIDCOLOR, "000000")
+            .set(SHOWGRID, true)
+            .set(TRIGGER_KEY_COLOR, "FFFF00")
+            .set(TRIGGER_KEY_FONT_SIZE, 24)
+            .set(TRIGGER_KEY_SHOW, true)
+            .set(GRIDSIZE, 32)
+            .set(LAST_PROJECTS, 4);
+
+    QSettings settings(m_author, m_appName);
+    m_options->read(settings);
+}
+
 void MainWindow::reloadSettings()
 {
+    qDebug("reloadSettings");
     QSettings settings;
     qDebug() << settings.fileName();
+
     // grid
-    m_bShowGrid = settings.value("showGrid", true).toBool();
-    emit gridVisible(m_bShowGrid);
-    ui->action_ShowGrid->setChecked(m_bShowGrid);
-    QString color = settings.value("gridColor", "a0b0c0").toString();
-    emit gridColorChanged(color);
-    m_gridColor = color.mid(0,6);
-    m_gridSize = settings.value("gridSize", 32).toInt() & 0xf0;
-    emit gridSizeChanged(m_gridSize > 0 ? m_gridSize : 32);
-    m_triggerKeyColor = settings.value("triggerKeyColor", "ffff00").toString();
-    m_triggerFontSize = settings.value("triggerKeyFontSize", 24).toInt();
-    m_bShowTriggerKey = settings.value("showTriggerKey", true).toBool();
-    emit triggerKeyColorChanged(m_triggerKeyColor);
-    emit triggerKeyShow(m_bShowTriggerKey);
+    emit gridVisible(O_BOOL(GENERAL, SHOWGRID));
+    ui->action_ShowGrid->setChecked(O_BOOL(GENERAL, SHOWGRID));
+    emit gridColorChanged(O_STR(GENERAL, GRIDCOLOR));
+    emit gridSizeChanged(O_INT(GENERAL, GRIDSIZE) > 0 ? O_INT(GENERAL, GRIDSIZE) : 32);
+    emit triggerKeyColorChanged(O_STR(GENERAL, TRIGGER_KEY_COLOR));
+    emit triggerKeyShow(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
+    emit triggerKeyFontSizeChanged(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
     bool saveSettings = settings.value("saveSettings", true).toBool();
     ui->actionSave_Settings->setChecked(saveSettings);
+
     // TestLevel
     settings.beginGroup("TestLevel");
     m_skill = settings.value("skill", 0).toInt();
@@ -2632,9 +2667,8 @@ void MainWindow::reloadSettings()
     settings.endGroup();
 
     // Editor
-    m_editorOptions->read(settings);
     emit fontChanged(currentFont());
-    settings.endGroup();
+    emit editorOptionChanged((*m_options)[EDITOR]);
 
     // Tools
     settings.beginGroup("Tools");
@@ -2707,8 +2741,8 @@ void MainWindow::on_actionStatus_bar_toggled(bool arg1)
 
 void MainWindow::on_action_ShowGrid_toggled(bool arg1)
 {
-    m_bShowGrid = arg1;
-    emit gridVisible(m_bShowGrid);
+    O_SET(GENERAL, SHOWGRID, arg1);
+    emit gridVisible(O_BOOL(GENERAL, SHOWGRID));
     m_lview->repaint();
 }
 

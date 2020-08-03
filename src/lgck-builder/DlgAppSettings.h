@@ -77,6 +77,8 @@ public:
     bool highlight();
     bool autocomplete();
     bool wordWrap();
+    void setLastProjects(int count);
+    int lastProjects();
     static const char *defaultRuntimeArgs();
 
     enum {

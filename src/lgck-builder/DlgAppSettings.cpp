@@ -34,6 +34,10 @@ constexpr int triggerFontSizes[] = {
     16, 18, 20, 22, 24, 26, 28, 30, 32, 40
 };
 
+constexpr int lastProjectCount[] = {
+    4, 8, 12, 16
+};
+
 CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     QDialog(parent),
     m_ui(new Ui::CDlgAppSettings)
@@ -72,9 +76,13 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
 
     for (unsigned int i=0; i< sizeof(triggerFontSizes)/sizeof(int); ++i) {
         m_ui->cbTriggerKeyFontSize->addItem(
-                    QString("%1").arg(triggerFontSizes[i]),
-                    QVariant(triggerFontSizes[i]));
+                    QString("%1").arg(triggerFontSizes[i]));
     }
+
+    for (unsigned int i=0; i< sizeof(lastProjectCount)/sizeof(int); ++i) {
+        m_ui->cbProjects->addItem(QString("%1").arg(lastProjectCount[i]));
+    }
+
     m_ui->sArgsHelp->setText(tr("%1 lgckdb filename\n" \
                                 "%2 level\n" \
                                 "%3 skill\n" \
@@ -390,6 +398,7 @@ void CDlgAppSettings::setSkipSplashScreen(bool state)
 void CDlgAppSettings::setShowTriggerKey(bool show)
 {
     m_ui->cbShowTriggerKey->setChecked(show);
+    enableTriggerKeyOptions();
 }
 
 bool CDlgAppSettings::getShowTriggerKey()
@@ -402,6 +411,7 @@ void CDlgAppSettings::enableTriggerKeyOptions()
     bool checked = m_ui->cbShowTriggerKey->isChecked();
     m_ui->eTriggerKeyColor->setEnabled(checked);
     m_ui->btnTriggerKeyColor->setEnabled(checked);
+    m_ui->cbTriggerKeyFontSize->setEnabled(checked);
 }
 
 void CDlgAppSettings::on_cbShowTriggerKey_toggled(bool checked)
@@ -458,4 +468,20 @@ bool CDlgAppSettings::autocomplete()
 bool CDlgAppSettings::wordWrap()
 {
     return m_ui->cWordWrap->isChecked();
+}
+
+void CDlgAppSettings::setLastProjects(int count)
+{
+    for (unsigned int i=0; i< sizeof(lastProjectCount)/sizeof(int); ++i) {
+        if (lastProjectCount[i] == count) {
+            m_ui->cbProjects->setCurrentIndex(i);
+            return;
+        }
+    }
+    m_ui->cbProjects->setCurrentIndex(0);
+}
+
+int CDlgAppSettings::lastProjects()
+{
+    return lastProjectCount[m_ui->cbProjects->currentIndex()];
 }

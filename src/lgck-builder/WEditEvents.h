@@ -28,6 +28,7 @@ namespace Ui {
 class CWEdit;
 class QAbstractButton;
 class CGameFile;
+class COptionGroup;
 
 class CWEditEvents : public QDockWidget
 {
@@ -50,6 +51,7 @@ private slots:
     void deleteSprite(int sprite);
     void insertText(const char *text);
     void setFont(const QFont & font);
+    void setOptions(COptionGroup &options);
 signals:
     void eventChanged(int proto, int event);
     void eventModified();
