@@ -46,7 +46,6 @@ void COptionGroup::read(QSettings & settings)
     for (auto it = m_options.begin(); it != m_options.end(); ++it) {
         std::string name = it->first;
         m_options[name] = settings.value(name.c_str(), it->second);
-        qDebug() << m_group << QString("A-read option: ") << name.c_str() << m_options[name];
     }
     settings.endGroup();
 }
@@ -55,7 +54,6 @@ void COptionGroup::write(QSettings &settings)
 {
     settings.beginGroup(m_group);
     for (auto it = m_options.begin(); it != m_options.end(); ++it) {
-        qDebug() << QString("write option: ") << it->first.c_str() << it->second;
         std::string name = it->first;
         settings.setValue(name.c_str(), it->second);
     }
@@ -67,4 +65,9 @@ void COptionGroup::debug()
     for (auto it = m_options.begin(); it != m_options.end(); ++it) {
         qDebug() << QString("debug option: ") << it->first.c_str() << it->second;
     }
+}
+
+void COptionGroup::unset(const char *name)
+{
+    m_options.erase(name);
 }

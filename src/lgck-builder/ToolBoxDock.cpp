@@ -42,7 +42,7 @@
 #include "DlgFrameSet.h"
 #include "WizSprite.h"
 #include "Snd.h"
-#include "WFileSave.h"
+#include "WFileDialog.h"
 #include "OBL5File.h"
 #include "displayconfig.h"
 #include "Display.h"
@@ -1263,12 +1263,11 @@ void CToolBoxDock::exportSprite()
     filters.append(oblFilter);
     filters.append(metaFilter);
 
-    CWFileSave * dlg = new CWFileSave(this,tr("Save As"), QDir::homePath(), selected);
+    CWFileDialog * dlg = new CWFileDialog(this,tr("Save As"), QDir::homePath(), selected);
     dlg->setNameFilters(filters);
     dlg->setAcceptMode(QFileDialog::AcceptSave);
     dlg->setDefaultSuffix(suffix);
     dlg->selectNameFilter(pngFilter); // workarround for default suffix not being set
-    connect(dlg, SIGNAL(filterSelected(QString)), dlg, SLOT(changeDefaultSuffix(QString)));
     if (dlg->exec()) {
         QStringList fileNames = dlg->selectedFiles();
         if (fileNames.count()>0) {

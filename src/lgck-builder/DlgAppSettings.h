@@ -79,6 +79,10 @@ public:
     bool wordWrap();
     void setLastProjects(int count);
     int lastProjects();
+    void setTickMaxRate(int rate);
+    int tickMaxRate();
+    void setLastFolder(bool set);
+    bool lastFolder();
     static const char *defaultRuntimeArgs();
 
     enum {

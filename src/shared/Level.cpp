@@ -69,6 +69,7 @@ CSettings::SETTING CLevel::m_defaults[] =
     { "width", "0", 0},
     { "height", "0", 0},
     { "colorMod", "ffffffff",0},
+    { "author", "",0},
     { "", "", 0 }
 };
 

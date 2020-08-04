@@ -122,7 +122,7 @@ Double-click on the one you want to edit.</string>
     </rect>
    </property>
    <property name="text">
-    <string>Selec the sprites that you want export from the box below and press the export button.</string>
+    <string>Select the sprites that you want export from the box below and press the export button.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

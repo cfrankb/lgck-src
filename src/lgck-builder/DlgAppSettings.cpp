@@ -38,6 +38,10 @@ constexpr int lastProjectCount[] = {
     4, 8, 12, 16
 };
 
+constexpr int tickMaxRateOptions[]= {
+    10, 25, 50, 100, 200, 250, 400
+};
+
 CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     QDialog(parent),
     m_ui(new Ui::CDlgAppSettings)
@@ -81,6 +85,10 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
 
     for (unsigned int i=0; i< sizeof(lastProjectCount)/sizeof(int); ++i) {
         m_ui->cbProjects->addItem(QString("%1").arg(lastProjectCount[i]));
+    }
+
+    for (unsigned int i=0; i< sizeof(tickMaxRateOptions)/sizeof(int); ++i) {
+        m_ui->cbTickMaxRate->addItem(QString("%1").arg(tickMaxRateOptions[i]));
     }
 
     m_ui->sArgsHelp->setText(tr("%1 lgckdb filename\n" \
@@ -207,7 +215,7 @@ void CDlgAppSettings::load(QStringList &listActions, QStringList &listShortcuts,
     widget->setRowCount(listActions.count());
     widget->setHorizontalHeaderLabels(labels);
     widget->setColumnWidth(0, 200);
-    widget->setColumnWidth(1, 208-20);
+    widget->setColumnWidth(1, 228);
     widget->setColumnWidth(2, 16);
     widget->verticalHeader()->setVisible(false);
     m_count = listActions.count();
@@ -484,4 +492,30 @@ void CDlgAppSettings::setLastProjects(int count)
 int CDlgAppSettings::lastProjects()
 {
     return lastProjectCount[m_ui->cbProjects->currentIndex()];
+}
+
+void CDlgAppSettings::setTickMaxRate(int scale)
+{
+    for (unsigned int i=0; i< sizeof(tickMaxRateOptions)/sizeof(int); ++i) {
+        if (tickMaxRateOptions[i] == scale) {
+            m_ui->cbTickMaxRate->setCurrentIndex(i);
+            return;
+        }
+    }
+    m_ui->cbTickMaxRate->setCurrentIndex(2);
+}
+
+int CDlgAppSettings::tickMaxRate()
+{
+    return tickMaxRateOptions[m_ui->cbTickMaxRate->currentIndex()];
+}
+
+void CDlgAppSettings::setLastFolder(bool set)
+{
+    m_ui->cLastFolder->setChecked(set);
+}
+
+bool CDlgAppSettings::lastFolder()
+{
+    return m_ui->cLastFolder->isChecked();
 }

@@ -133,7 +133,10 @@ void CWEdit::enableWhiteSpace(bool state)
 {
     QTextOption option;
     if (state) {
-        option.setFlags(QTextOption::ShowLineAndParagraphSeparators | QTextOption::ShowTabsAndSpaces);
+        option.setFlags(
+                    QTextOption::ShowLineAndParagraphSeparators
+                    | QTextOption::ShowTabsAndSpaces
+                    | QTextOption::IncludeTrailingSpaces);
     } else {
         option.setFlags(option.flags());
     }
@@ -143,6 +146,7 @@ void CWEdit::enableWhiteSpace(bool state)
 void CWEdit::enableWordWrap(bool state)
 {
     setWordWrapMode(state ? QTextOption::WrapAnywhere : QTextOption::NoWrap);
+    setLineWrapMode(state ? WidgetWidth : NoWrap);
 }
 
 QStringList CWEdit::fromFile(const char *fileName)

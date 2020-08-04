@@ -3,11 +3,11 @@
 
 #include <QFileDialog>
 
-class CWFileSave : public QFileDialog
+class CWFileDialog : public QFileDialog
 {
     Q_OBJECT
 public:
-    explicit CWFileSave(QWidget *parent = 0,
+    explicit CWFileDialog(QWidget *parent = 0,
          const QString &caption = QString(),
          const QString &directory = QString(),
          const QString &filter = QString());

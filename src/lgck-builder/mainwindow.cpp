@@ -114,11 +114,16 @@ constexpr char TRIGGER_KEY_FONT_SIZE[] = "triggerKeyFontSize";
 constexpr char TRIGGER_KEY_SHOW[] = "showTriggerKey";
 constexpr char GRIDSIZE[] = "gridSize";
 constexpr char LAST_PROJECTS[] = "lastProjects";
-
-#define EO_STR(k) (*m_options)[EDITOR].get(k).toString()
-#define EO_INT(k) (*m_options)[EDITOR].get(k).toInt()
-#define EO_BOOL(k) (*m_options)[EDITOR].get(k).toBool()
-#define EO_SET(k, v) (*m_options)[EDITOR].set(k, v)
+constexpr char TESTLEVEL[] = "TestLevel";
+constexpr char SKILL[] = "skill";
+constexpr char LIVES[] = "lives";
+constexpr char SCORE[] = "score";
+constexpr char START_HP[] = "start_hp";
+constexpr char CONTINUE[] = "continue";
+constexpr char XTICK_MAX_RATE[] = "tick_max_rate";
+constexpr char LAST_FOLDER[] = "rememberLastFolder";
+constexpr char FOLDERS[] = "Folders";
+constexpr char FOLDER_LGCKDB[] = "lgckdb";
 
 #define O_STR(s,k) (*m_options)[s].get(k).toString()
 #define O_INT(s,k) (*m_options)[s].get(k).toInt()
@@ -134,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent)
     initSettings();
 
     // Setup the timer for the indicator
+    changeTickMaxRate();
     m_timerIndicator.setInterval(500);
     m_timerIndicator.stop();
     m_ready = false;
@@ -157,8 +163,8 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setApplicationVersion(appVersion);
 
     ui->setupUi(this);
-    m_proto = -1;
-    m_event = -1;
+    m_proto = CGame::INVALID;
+    m_event = CGame::INVALID;
     m_viewMode = VM_EDITOR;
     m_fixer = new CGameFixer;
     m_fixer->setGame(&m_doc);
@@ -202,8 +208,6 @@ MainWindow::MainWindow(QWidget *parent)
     updateMenus();
 
     // Setup the timer for the screen refresh
-    m_timer.setInterval(1000 / TICK_MAX_RATE);
-    m_timer.start();
     m_time.start();
     m_nextTick = m_time.elapsed() + TICK_SCALE;
 
@@ -383,7 +387,7 @@ void MainWindow::createEventEditor()
 
 QFont MainWindow::currentFont()
 {
-    return QFont(EO_STR(FONT_NAME), EO_INT(FONT_SIZE), QFont::DemiBold);
+    return QFont(O_STR(EDITOR, FONT_NAME), O_INT(EDITOR, FONT_SIZE), QFont::DemiBold);
 }
 
 QElapsedTimer & MainWindow::getTime()
@@ -481,10 +485,10 @@ void MainWindow::loadFileName(const QString & fileName)
             files.removeAll(fileName);
             settings.setValue("recentFileList", files);
         }
-        qDebug("MakeCurrent()");
         QApplication::restoreOverrideCursor();
         updateRecentFileActions();
         reloadRecentFileActions();
+        memorizeFilePath();
     }
     updateTitle();
     m_lview->makeCurrent();
@@ -521,13 +525,20 @@ bool MainWindow::save()
 bool MainWindow::saveAs()
 {
     commitAll();
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
+    QString fileName =
+            QFileDialog::getSaveFileName(
+                this,
+                tr("Save As"),
+                m_doc.getFileName(),
+                tr("LGCK games (*.lgckdb)")
+            );
     if (fileName.isEmpty())
         return false;
     if (!fileName.endsWith(".lgckdb")) {
         fileName.append(".lgckdb");
     }
     m_doc.setFileName(q2c(fileName));
+    memorizeFilePath();
     return true;
 }
 
@@ -638,8 +649,6 @@ void MainWindow::openRecentFile()
 
 void MainWindow::initFileMenu()
 {
-    qDebug("initFileMenu");
-
     // gray out the open recent `nothin' yet`
     ui->action_nothin_yet->setEnabled(false);
     for (int i = 0; i < MAX_PROJECTS; i++) {
@@ -1190,25 +1199,25 @@ void MainWindow::on_actionTest_Level_triggered()
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
         m_doc.initFonts();
         CDlgTestLevel *dlg = new CDlgTestLevel(this);
-        dlg->setSkill(m_skill);
-        dlg->setHP(m_start_hp);
-        dlg->setScore(m_score);
-        dlg->setLives(m_lives);
-        dlg->setContinue(m_bContinue);
+        dlg->setSkill(O_INT(TESTLEVEL, SKILL));
+        dlg->setHP(O_INT(TESTLEVEL, START_HP));
+        dlg->setScore(O_INT(TESTLEVEL, SCORE));
+        dlg->setLives(O_INT(TESTLEVEL, LIVES));
+        dlg->setContinue(O_INT(TESTLEVEL, CONTINUE));
         dlg->setExternal(m_runtimeExternal);
         dlg->setRez(m_rez);
         CLevel & level = m_doc.getCurrentLevel();
         dlg->analyseLevel(&level);
         if (dlg->exec()) {
-            m_skill = dlg->getSkill();
-            m_start_hp = dlg->getHP();
-            m_score = dlg->getScore();
-            m_lives = dlg->getLives();
-            m_bContinue = dlg->getContinue();
+            O_SET(TESTLEVEL, SKILL, dlg->getSkill());
+            O_SET(TESTLEVEL, START_HP, dlg->getHP());
+            O_SET(TESTLEVEL, SCORE, dlg->getScore());
+            O_SET(TESTLEVEL, LIVES, dlg->getLives());
+            O_SET(TESTLEVEL, CONTINUE, dlg->getContinue());
             m_rez = dlg->getRez();
             m_rezH = dlg->getHeight();
             m_rezW = dlg->getWidth();
-            qDebug("skill: %d", m_skill);
+            qDebug("skill: %d", O_INT(TESTLEVEL, SKILL));
             QString errMsg = "";
             if (!m_doc.getSize()) {
                 errMsg = tr("No level available to play.");
@@ -1231,8 +1240,12 @@ void MainWindow::on_actionTest_Level_triggered()
 
             if (errMsg.isEmpty()) {
                 m_doc.clearKeys();
-                m_doc.setVitals(m_start_hp, m_lives, m_score);
-                m_doc.setSkill(m_skill);
+                m_doc.setVitals(
+                            O_INT(TESTLEVEL, START_HP),
+                            O_INT(TESTLEVEL, LIVES),
+                            O_INT(TESTLEVEL, SCORE)
+                            );
+                m_doc.setSkill(O_INT(TESTLEVEL, SKILL));
                 m_doc.initLua();
                 m_runtimeExternal = dlg->isExternal();
                 if (dlg->isExternal()){
@@ -1303,7 +1316,7 @@ void MainWindow::handleGameEvents()
             break;
 
         case CGame::EVENT_TIMEOUT:
-            if (!m_bContinue) {
+            if (!O_INT(TESTLEVEL, CONTINUE)) {
                 QMessageBox::information(this, tr(m_appName),
                                      tr("You ran out of time."));
             }
@@ -1311,7 +1324,7 @@ void MainWindow::handleGameEvents()
 
         case CGame::EVENT_PLAYER_DIED:
             --m_doc.counter("lives");
-            if (!m_bContinue) {
+            if (!O_INT(TESTLEVEL, CONTINUE)) {
                 QMessageBox::information(this, tr(m_appName),
                                          tr("You were killed."));
             } else {
@@ -1391,13 +1404,15 @@ void MainWindow::showAppSettings(int tab)
     d->setTriggerKeyColor(O_STR(GENERAL, TRIGGER_KEY_COLOR));
     d->setShowTriggerKey(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
     d->setUpdater(m_bUpdate, m_updateURL);
-    d->setFontSize(EO_INT(FONT_SIZE));
-    d->setFont(EO_STR(FONT_NAME));
-    d->enableWordWrap(EO_BOOL(ENABLE_WORDWRAP));
-    d->enableHighlight(EO_BOOL(ENABLE_HIGHLIGHT));
-    d->enableWhiteSpace(EO_BOOL(ENABLE_WHITESPACE));
-    d->enableAutocomplete(EO_BOOL(ENABLE_AUTO_COMPLETE));
+    d->setFontSize(O_INT(EDITOR, FONT_SIZE));
+    d->setFont(O_STR(EDITOR, FONT_NAME));
+    d->enableWordWrap(O_BOOL(EDITOR, ENABLE_WORDWRAP));
+    d->enableHighlight(O_BOOL(EDITOR, ENABLE_HIGHLIGHT));
+    d->enableWhiteSpace(O_BOOL(EDITOR, ENABLE_WHITESPACE));
+    d->enableAutocomplete(O_BOOL(EDITOR, ENABLE_AUTO_COMPLETE));
     d->setLastProjects(O_INT(GENERAL, LAST_PROJECTS));
+    d->setTickMaxRate(O_INT(GENERAL, XTICK_MAX_RATE));
+    d->setLastFolder(O_BOOL(GENERAL, LAST_FOLDER));
     d->setCurrentTab(tab);
     QAction **actions = actionShortcuts();
     QStringList listActions;
@@ -1408,12 +1423,12 @@ void MainWindow::showAppSettings(int tab)
         listShortcuts.append(s.toString());
         listActions.append(a->text());
     }
-    d->setSkill(m_skill);
-    d->setHP(m_start_hp);
-    d->setScore(m_score);
-    d->setLives(m_lives);
+    d->setSkill(O_INT(TESTLEVEL, SKILL));
+    d->setHP(O_INT(TESTLEVEL, START_HP));
+    d->setScore(O_INT(TESTLEVEL, SCORE));
+    d->setLives(O_INT(TESTLEVEL, LIVES));
     d->setRuntime(m_runtime, m_runtimeArgs);
-    d->setSkipSplashScreen(EO_BOOL(SKIP_SPLASH));
+    d->setSkipSplashScreen(O_BOOL(EDITOR, SKIP_SPLASH));
     d->setTriggerFontSize(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
@@ -1433,17 +1448,17 @@ void MainWindow::showAppSettings(int tab)
         O_SET(GENERAL, TRIGGER_KEY_COLOR, d->getTriggerKeyColor().mid(0,6));
         ui->action_ShowGrid->setChecked(O_BOOL(GENERAL, SHOWGRID));
         m_lview->repaint();
-        m_skill = d->getSkill();
-        m_start_hp = d->getHP();
-        m_score = d->getScore();
-        m_lives = d->getLives();
-        EO_SET(FONT_SIZE, d->getFontSize());
-        EO_SET(FONT_NAME, d->getFont());
-        EO_SET(SKIP_SPLASH, d->getSkipSplashScreen());
-        EO_SET(ENABLE_WORDWRAP, d->wordWrap());
-        EO_SET(ENABLE_HIGHLIGHT, d->highlight());
-        EO_SET(ENABLE_WHITESPACE, d->whiteSpace());
-        EO_SET(ENABLE_AUTO_COMPLETE, d->autocomplete());
+        O_SET(TESTLEVEL, SKILL, d->getSkill());
+        O_SET(TESTLEVEL, START_HP, d->getHP());
+        O_SET(TESTLEVEL, SCORE, d->getScore());
+        O_SET(TESTLEVEL, LIVES, d->getLives());
+        O_SET(EDITOR, FONT_SIZE, d->getFontSize());
+        O_SET(EDITOR, FONT_NAME, d->getFont());
+        O_SET(EDITOR, SKIP_SPLASH, d->getSkipSplashScreen());
+        O_SET(EDITOR, ENABLE_WORDWRAP, d->wordWrap());
+        O_SET(EDITOR, ENABLE_HIGHLIGHT, d->highlight());
+        O_SET(EDITOR, ENABLE_WHITESPACE, d->whiteSpace());
+        O_SET(EDITOR, ENABLE_AUTO_COMPLETE, d->autocomplete());
         O_SET(GENERAL, TRIGGER_KEY_SHOW, d->getShowTriggerKey());
         O_SET(GENERAL, TRIGGER_KEY_FONT_SIZE, d->getTriggerFontSize());
         emit triggerKeyFontSizeChanged(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
@@ -1453,6 +1468,9 @@ void MainWindow::showAppSettings(int tab)
         emit triggerKeyColorChanged(O_STR(GENERAL, TRIGGER_KEY_COLOR));
         emit triggerKeyShow(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
         O_SET(GENERAL, LAST_PROJECTS, d->lastProjects());
+        O_SET(GENERAL, XTICK_MAX_RATE, d->tickMaxRate());
+        O_SET(GENERAL, LAST_FOLDER, d->lastFolder());
+        changeTickMaxRate();
     }
     delete d;
 }
@@ -2486,7 +2504,6 @@ void MainWindow::saveSettings()
     settings.setValue("saveSettings", ui->actionSave_Settings->isChecked());
     bool saveSettings = ui->actionSave_Settings->isChecked();
     if (saveSettings) {
-
         // shortcuts
         settings.beginGroup("Shortcuts");
         QAction **actions = actionShortcuts();
@@ -2514,14 +2531,6 @@ void MainWindow::saveSettings()
         settings.setValue("mainWindow:geometry", this->saveGeometry());
         settings.setValue("mainWindow:state", this->saveState());
         settings.setValue("version", UI_VERSION);
-        settings.endGroup();
-
-        settings.beginGroup("TestLevel");
-        settings.setValue("skill", m_skill);
-        settings.setValue("start_hp", m_start_hp);
-        settings.setValue("score", m_score);
-        settings.setValue("lives", m_lives);
-        settings.setValue("continue", m_bContinue);
         settings.endGroup();
 
         settings.beginGroup("Updater");
@@ -2572,13 +2581,25 @@ void MainWindow::initSettings()
             .set(ENABLE_WHITESPACE, true);
 
     COptionGroup & general = (*m_options)[GENERAL];
-    general.set(GRIDCOLOR, "000000")
+    general.set(GRIDCOLOR, "a0b0c0")
             .set(SHOWGRID, true)
             .set(TRIGGER_KEY_COLOR, "FFFF00")
             .set(TRIGGER_KEY_FONT_SIZE, 24)
             .set(TRIGGER_KEY_SHOW, true)
             .set(GRIDSIZE, 32)
-            .set(LAST_PROJECTS, 4);
+            .set(LAST_PROJECTS, 4)
+            .set(XTICK_MAX_RATE, 100)
+            .set(LAST_FOLDER, true);
+
+    COptionGroup & testLevel = (*m_options)[TESTLEVEL];
+    testLevel.set(SKILL, 0)
+            .set(LIVES, 5)
+            .set(SCORE, 0)
+            .set(START_HP, 32)
+            .set(CONTINUE, true);
+
+    COptionGroup & folders = (*m_options)[FOLDERS];
+    folders.set(FOLDER_LGCKDB, "");
 
     QSettings settings(m_author, m_appName);
     m_options->read(settings);
@@ -2601,14 +2622,6 @@ void MainWindow::reloadSettings()
     bool saveSettings = settings.value("saveSettings", true).toBool();
     ui->actionSave_Settings->setChecked(saveSettings);
 
-    // TestLevel
-    settings.beginGroup("TestLevel");
-    m_skill = settings.value("skill", 0).toInt();
-    m_lives = settings.value("lives", 5).toInt();
-    m_score = settings.value("score", 0).toInt();
-    m_start_hp = settings.value("start_hp", 32).toInt();
-    m_bContinue = settings.value("continue", true).toBool();
-    settings.endGroup();
     // save default shortcuts
     defaultShortcuts();
     // restore settings from config
@@ -2853,23 +2866,23 @@ void MainWindow::makeCurrent()
 
 void MainWindow::on_actionIncrease_Font_Size_triggered()
 {
-    int fontSize = EO_INT(FONT_SIZE);
+    int fontSize = O_INT(EDITOR, FONT_SIZE);
     ++ fontSize;
-    EO_SET(FONT_SIZE, fontSize > MAX_FONT_SIZE ? MAX_FONT_SIZE : fontSize);
+    O_SET(EDITOR, FONT_SIZE, fontSize > MAX_FONT_SIZE ? MAX_FONT_SIZE : fontSize);
     emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionDecrease_Font_Size_triggered()
 {
-    int fontSize = EO_INT(FONT_SIZE);
+    int fontSize = O_INT(EDITOR, FONT_SIZE);
     -- fontSize;
-    EO_SET(FONT_SIZE, fontSize < MIN_FONT_SIZE ? MIN_FONT_SIZE : fontSize);
+    O_SET(EDITOR, FONT_SIZE, fontSize < MIN_FONT_SIZE ? MIN_FONT_SIZE : fontSize);
     emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionReset_Font_Size_triggered()
 {
-    EO_SET(FONT_SIZE, DEFAULT_FONT_SIZE);
+    O_SET(EDITOR, FONT_SIZE, DEFAULT_FONT_SIZE);
     emit fontChanged(currentFont());
 }
 
@@ -2936,7 +2949,7 @@ void MainWindow::goExternalRuntime()
         if (!current.isEmpty()) {
             current = current.replace("%1", filename)
                     .replace("%2", QString::number(m_doc.m_nCurrLevel))
-                    .replace("%3", QString::number(m_skill))
+                    .replace("%3", QString::number(O_INT(TESTLEVEL, SKILL)))
                     .replace("%4", QString::number(m_rezW))
                     .replace("%5", QString::number(m_rezH));
             list.append(current);
@@ -3168,4 +3181,18 @@ void MainWindow::indicatorTriggered()
         dlg.setText(m_fixer->getText());
         dlg.exec();
     }
+}
+
+void MainWindow::changeTickMaxRate()
+{
+    m_timer.setInterval(1000 / O_INT(GENERAL, XTICK_MAX_RATE));
+    m_timer.start();
+}
+
+void MainWindow::memorizeFilePath()
+{
+    QDir d = QFileInfo(m_doc.getFileName()).absoluteDir();
+    QString absolutePath = d.absolutePath();
+    qDebug() << "absolutePath:" << absolutePath;
+    O_SET(FOLDERS, FOLDER_LGCKDB, absolutePath);
 }

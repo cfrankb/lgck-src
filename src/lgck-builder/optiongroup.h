@@ -14,6 +14,7 @@ public:
     COptionGroup();
     ~COptionGroup();
     QVariant & operator[](const char *name);
+    void unset(const char *name);
     COptionGroup & operator=(COptionGroup &s);
     void setName(const char *name);
     COptionGroup & set(const char *name, QVariant value);

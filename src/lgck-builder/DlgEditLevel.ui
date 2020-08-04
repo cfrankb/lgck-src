@@ -63,7 +63,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -73,7 +73,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>90</y>
+       <y>154</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -86,7 +86,7 @@
      <property name="geometry">
       <rect>
        <x>159</x>
-       <y>89</y>
+       <y>153</y>
        <width>241</width>
        <height>101</height>
       </rect>
@@ -125,7 +125,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>216</y>
+       <y>280</y>
        <width>57</width>
        <height>15</height>
       </rect>
@@ -138,7 +138,7 @@
      <property name="geometry">
       <rect>
        <x>160</x>
-       <y>210</y>
+       <y>274</y>
        <width>221</width>
        <height>25</height>
       </rect>
@@ -157,7 +157,7 @@
      <property name="geometry">
       <rect>
        <x>382</x>
-       <y>211</y>
+       <y>275</y>
        <width>21</width>
        <height>23</height>
       </rect>
@@ -190,6 +190,29 @@
      </property>
      <property name="textFormat">
       <enum>Qt::RichText</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_26">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>100</y>
+       <width>91</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Author</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eAuthor">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>100</y>
+       <width>241</width>
+       <height>25</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -227,7 +250,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>240</y>
+       <y>270</y>
        <width>111</width>
        <height>17</height>
       </rect>
@@ -253,7 +276,7 @@
      <property name="geometry">
       <rect>
        <x>270</x>
-       <y>300</y>
+       <y>330</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -282,7 +305,7 @@
      <property name="geometry">
       <rect>
        <x>148</x>
-       <y>270</y>
+       <y>300</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -340,7 +363,7 @@
      <property name="geometry">
       <rect>
        <x>270</x>
-       <y>270</y>
+       <y>300</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -353,7 +376,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>300</y>
+       <y>330</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -395,7 +418,7 @@
      <property name="geometry">
       <rect>
        <x>148</x>
-       <y>300</y>
+       <y>330</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -411,7 +434,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>270</y>
+       <y>300</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -440,7 +463,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>187</y>
+       <y>217</y>
        <width>91</width>
        <height>16</height>
       </rect>
@@ -453,7 +476,7 @@
      <property name="geometry">
       <rect>
        <x>310</x>
-       <y>187</y>
+       <y>217</y>
        <width>81</width>
        <height>21</height>
       </rect>
@@ -466,7 +489,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>187</y>
+       <y>217</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -479,7 +502,7 @@
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>187</y>
+       <y>217</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -492,7 +515,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>213</y>
+       <y>243</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -505,7 +528,7 @@
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>213</y>
+       <y>243</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -519,12 +542,12 @@
       <rect>
        <x>20</x>
        <y>140</y>
-       <width>371</width>
-       <height>31</height>
+       <width>401</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>These options control whether the borders are will allow sprites to move from one to the other.</string>
+      <string>These options control permeability of the borders and whether or not sprites will be allowed to move from one end of the screen to the other.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

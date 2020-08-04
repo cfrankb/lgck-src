@@ -1,15 +1,15 @@
-#include "WFileSave.h"
+#include "WFileDialog.h"
 
-CWFileSave::CWFileSave(QWidget *parent ,
+CWFileDialog::CWFileDialog(QWidget *parent ,
      const QString &caption,
      const QString &directory,
      const QString &filter):
     QFileDialog(parent, caption,directory,filter)
 {
-
+    connect(this, SIGNAL(filterSelected(QString)), this, SLOT(changeDefaultSuffix(QString)));
 }
 
-void CWFileSave::changeDefaultSuffix(const QString & filter)
+void CWFileDialog::changeDefaultSuffix(const QString & filter)
 {
     if (filter.contains("*.png")) {
         setDefaultSuffix("png");

@@ -79,17 +79,17 @@ void CDlgEditLevel::setColor(QLineEdit *edit, const QString color)
 
 QString CDlgEditLevel::getTitle ()
 {
-    return m_ui->title->text();
+    return m_ui->title->text().trimmed();
 }
 
 QString CDlgEditLevel::getHint()
 {
-    return m_ui->hint->toPlainText();
+    return m_ui->hint->toPlainText().trimmed();
 }
 
 QString CDlgEditLevel::getColor(QLineEdit *edit)
 {
-    return edit->text();
+    return edit->text().mid(0,6);
 }
 
 void CDlgEditLevel::load(CLevel *s)
@@ -102,6 +102,7 @@ void CDlgEditLevel::load(CLevel *s)
     setTitle(level.getSetting("title"));
     setHint(level.getSetting("hint"));
     m_ui->eUUID->setText(level.getSetting("uuid"));
+    m_ui->eAuthor->setText(level.getSetting("author"));
 
     // page 5
     setColor(m_ui->bkColor, level.getSetting("bkcolor"));
@@ -198,6 +199,7 @@ void CDlgEditLevel::save(CLevel *s)
     // page 1
     level.setSetting("title", q2c(getTitle()));
     level.setSetting("hint", q2c(getHint()));
+    level.setSetting("author", q2c(m_ui->eAuthor->text().trimmed()));
 
     // page5   
     level.setSetting("bkcolor", q2c(getColor(m_ui->bkColor)));

@@ -95,7 +95,7 @@ SOURCES +=  mainwindow.cpp \
     WAnimation.cpp \
     WHotKey.cpp \
     Pixel.cpp \
-    WFileSave.cpp \
+    WFileDialog.cpp \
     ../shared/SndArray.cpp \
     ../shared/Settings.cpp \
     ../shared/ProtoArray.cpp \
@@ -266,7 +266,7 @@ HEADERS  +=  mainwindow.h \
     ../shared/IFile.h \
     ../shared/Font.h \
     ../shared/implementers/opengl/glhelper.h \
-    WFileSave.h \
+    WFileDialog.h \
     OBL5File.h \
     WizFont.h \
     DlgExportSprite.h \

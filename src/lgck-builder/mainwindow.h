@@ -84,18 +84,7 @@ private:
     QTimer m_timerIndicator;
     QElapsedTimer m_time;
     int m_nextTick;
-    //bool m_bShowGrid;
-    //QString m_gridColor;
-    //QString m_triggerKeyColor;
-    //bool m_bShowTriggerKey;
-    //int m_triggerFontSize;
-    //int m_gridSize;
-    int m_skill;
-    int m_lives;
-    int m_start_hp;
-    int m_score;
     int m_start_level;
-    bool m_bContinue;
     bool m_bShowToolBox;
     bool m_bDebugOutput;
     int m_viewMode;
@@ -133,6 +122,7 @@ private:
     void adjustViewPort();
     void commitAll();
     void exportGame();
+    void changeTickMaxRate();
     QFont currentFont();
     QAction **actionShortcuts();
     QAction *m_actionEraser;
@@ -143,9 +133,7 @@ private:
     bool m_ready;
     void saveSettings();
     enum {
-        //MaxRecentFiles      = 4,
         MAX_PROJECTS        = 16,
-        TICK_MAX_RATE       = 200,
         TICK_SCALE          = 1000 / 35,
         LABEL0_SIZE         = 500,
         VM_EDITOR           = 0,
@@ -171,6 +159,7 @@ private:
     void loadFileName(const QString &fileName);
     void markAsGoal(bool isGoal);
     static void newDebugString(const char *s);
+    void memorizeFilePath();
 
 protected:
     void initializeGL();
@@ -252,7 +241,6 @@ private slots:
     void selectLevel(int index);
     void editLevel(int index);
     void deleteLevel(int index);
-
     void notifyKeyEvent(int keyCode, int state);
     void updateMenus();
     void setStatus(int i, const QString message);

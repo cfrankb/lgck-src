@@ -197,7 +197,7 @@ void CGameFixer::troubleshoot()
                             tr("Not including one goal on this level will lead to "\
                                "automatically completing the level upon entry."\
                                "This is likely not the intended result."),
-                            ""
+                            "no_goal_on_current_level.html"
                         });
         }
     }
@@ -209,7 +209,7 @@ void CGameFixer::troubleshoot()
                         tr("No Player Sprite in your project"),
                         tr("You need to supply a Player Object in your project. "\
                         "This is a mandatory requirement because no game can work without one. "),
-                        ""
+                        "no_player_sprite.html"
                     });
     } else {
         m_errors.push_back(
@@ -228,7 +228,7 @@ void CGameFixer::troubleshoot()
                 tr("No Sprite in your project"),
                 tr("You must supply a number of sprites including a Player Object to your project. "\
                 "This is a mandatory requirement. Select File and New Project and The Wizard will fix this issue by including sample sprites. "),
-                ""
+                "create_sprite.html"
             });
     } else if (m_game->protos().countAutoGoals()==0){
         m_errors.push_back(
@@ -238,7 +238,7 @@ void CGameFixer::troubleshoot()
                 tr("While this can be perfectly valid, "\
                    "you may be required to mark every single goal on the level manually. "\
                    "This is not recommended."),
-                ""
+                "no_automatic_goal.html"
         });
     }
 
