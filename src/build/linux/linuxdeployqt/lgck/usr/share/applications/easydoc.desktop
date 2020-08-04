@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Easydoc
+Comment=Documentation utility for LGCK
+Exec=easydoc
+Icon=easydoc
+Categories=Office;

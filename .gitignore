@@ -29,9 +29,21 @@ src/shared/ss_build.h
 src/build/bin/*
 src/build/files/*
 src/build/setup/*
-src/build/linux/bin/*
-src/build/linux/Distro/*
-src/build/linux/setup/*
-src/build/linux/resources/*
+src/build/linux/cqtdeployer/bin/*
+src/build/linux/cqtdeployer/Distro/*
+src/build/linux/cqtdeployer/setup/*
+src/build/linux/cqtdeployer/resources/*
+src/build/linux/linuxdeployqt/*.AppImage
+src/build/linux/linuxdeployqt/lgck/.*
+src/build/linux/linuxdeployqt/lgck/AppRun
+src/build/linux/linuxdeployqt/lgck/*.desktop
+src/build/linux/linuxdeployqt/LGCK Builder IDE
+src/build/linux/linuxdeployqt/lgck/usr/AppRun
+src/build/linux/linuxdeployqt/lgck/usr/lib/*
+src/build/linux/linuxdeployqt/lgck/usr/plugins/*
+src/build/linux/linuxdeployqt/lgck/usr/bin/*
+src/build/linux/linuxdeployqt/lgck/usr/share/doc/*
+src/build/linux/linuxdeployqt/lgck/usr/share/qt.conf
+src/build/linux/linuxdeployqt/lgck/usr/translations/*
 src/tools/buildcount.dat
 

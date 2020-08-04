@@ -14,6 +14,7 @@ ZIP_FILE=../setup/lgck-builder-portable-0.6.0.9[linux].${DATE}.zip
 rm -rf Distro
 cqtdeployer -confFile lgck-builder.json noTranslations force-clear
 
+mkdir -p setup
 cp -r resources/* Distro
 cd Distro
 zip ${ZIP_FILE} -r *
