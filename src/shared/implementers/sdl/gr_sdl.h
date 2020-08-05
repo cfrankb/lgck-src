@@ -48,6 +48,7 @@ public:
     virtual void ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true);
     virtual void ss_paintImage(int x1, int y1, int frameSet, int frameNo);
     virtual IImageManager *cache();
+    virtual bool isFlipped(){ return true; }
     void update();
     SDL_Renderer * renderer();
 

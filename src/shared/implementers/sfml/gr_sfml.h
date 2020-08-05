@@ -49,6 +49,7 @@ public:
     virtual void ss_paintImage(int x1, int y1, int frameSet, int frameNo);
     virtual IImageManager *cache();
     void update();
+    virtual bool isFlipped(){ return true; }
     sf::RenderWindow *window();
 
 protected:

@@ -344,8 +344,10 @@ void CDisplayManager::drawHP()
 
     uint8_t a = m_game->getDisplayAlpha();
     if (a) {
-        m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, display.rgb() + (a << 24));
-        m_graphics->paint(x,screenHei - y, x + sx, screenHei - y - sy, 0xffffff + (a << 24), false);
+        int topY = m_graphics->isFlipped() ? y - sy : screenHei - y;
+        int bottomY = m_graphics->isFlipped() ? y : screenHei - y - sy;
+        m_graphics->paint(x,topY, x + sx, bottomY, display.rgb() + (a << 24));
+        m_graphics->paint(x,topY, x + sx, bottomY, 0xffffff + (a << 24), false);
     }
 }
 

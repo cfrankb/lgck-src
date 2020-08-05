@@ -20,6 +20,7 @@
 #define GR_OPENGL_H
 
 #include "../shared/interfaces/IGraphics.h"
+#include <unordered_map>
 
 class CFrame;
 class CIMOpengl;
@@ -53,6 +54,7 @@ public:
     virtual void ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true);
     virtual void ss_paintImage(int x1, int y1, int frameSet, int frameNo);
     virtual IImageManager *cache();
+    virtual bool isFlipped(){ return false; }
 
 protected:
     CIMOpengl *m_imageManager;
