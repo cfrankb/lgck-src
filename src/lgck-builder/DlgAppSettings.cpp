@@ -49,7 +49,7 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     m_ui->setupUi(this);
     m_gridSize = 16;
     m_count = 0;
-    m_hotkeys = NULL;
+    m_hotkeys = nullptr;
     m_defaultShortcuts = new QStringList();
 
     QString options[] = {

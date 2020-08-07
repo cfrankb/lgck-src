@@ -18,7 +18,7 @@ CWizScript::CWizScript(QWidget *parent) :
     QWizard(parent),
     ui(new Ui::CWizScript)
 {
-    m_gameFile = NULL;
+    m_gameFile = nullptr;
     ui->setupUi(this);
     qtLua_init();
     int wizID = externWidget(this);

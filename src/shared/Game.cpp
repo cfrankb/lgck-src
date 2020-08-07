@@ -163,14 +163,30 @@ CLevel *CGame::getLayers()
 /////////////////////////////////////////////////////////////////////////////
 // cpp interface
 
+typedef struct
+{
+    CGame::JoyState flagValue;
+    lgck::Key::Code keyCode;
+    lgck::Button::JoyButton button;
+} JoyStateMap;
+
 void CGame::updateJoyState()
 {
-    var("joyState") =  m_keys[lgck::Key::Up] * CGame::JOY_UP
-                   | m_keys[lgck::Key::Down] * CGame::JOY_DOWN
-                   | m_keys[lgck::Key::Left] * CGame::JOY_LEFT
-                   | m_keys[lgck::Key::Right] * CGame::JOY_RIGHT
-                   | m_keys[lgck::Key::Space] * CGame::JOY_JUMP
-                   | m_keys[lgck::Key::LShift] * CGame::JOY_FIRE ;
+    JoyStateMap joyStateMap[] = {
+        {CGame::JOY_UP, lgck::Key::Up, lgck::Button::Up},
+        {CGame::JOY_DOWN, lgck::Key::Down, lgck::Button::Down},
+        {CGame::JOY_LEFT, lgck::Key::Left, lgck::Button::Left},
+        {CGame::JOY_RIGHT, lgck::Key::Right, lgck::Button::Right},
+        {CGame::JOY_JUMP, lgck::Key::Space, lgck::Button::A},
+        {CGame::JOY_FIRE, lgck::Key::LShift, lgck::Button::B}
+    };
+    unsigned int state = 0;
+    for (unsigned int i=0; i < sizeof(joyStateMap)/sizeof(JoyStateMap); ++i){
+        JoyStateMap & entry = joyStateMap[i];
+        state |= m_keys[entry.keyCode] * entry.flagValue;
+        state |= m_buttons[entry.button] * entry.flagValue;
+    }
+    var("joyState") = state;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -433,6 +449,9 @@ void CGame::clearKeys()
 {
     for (unsigned int i = 0; i < lgck::Key::Count; ++i) {
         m_keys[i] = 0;
+    }
+    for (unsigned int i = 0; i < lgck::Button::Count; ++i) {
+        m_buttons[i] = 0;
     }
 }
 
@@ -2234,4 +2253,14 @@ bool CGame::initFonts()
          }
     }
     return true;
+}
+
+void CGame::setJoyButton(lgck::Button::JoyButton button, char value)
+{
+    m_buttons[button] = value;
+}
+
+const char * CGame::keys()
+{
+    return m_keys;
 }

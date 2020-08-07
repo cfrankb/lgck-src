@@ -33,7 +33,7 @@ CDlgSource::CDlgSource(QWidget *parent) :
     m_btn = new QPushButton(icon, "");
     m_btn->setStatusTip(tr("scriptWiz"));
     m_ui->buttonBox->addButton(m_btn, QDialogButtonBox::ActionRole);
-    m_gameFile = NULL;
+    m_gameFile = nullptr;
     connect(m_btn, SIGNAL(pressed()), this, SLOT(wizButton()));
     //connect(this, SIGNAL(textInserted(const char*)), m_ui->eSource, SLOT(insertText(const char*)));
     connect(this, SIGNAL(fontChanged(const QFont &)), m_ui->eSource, SLOT(setFont(const QFont &)));

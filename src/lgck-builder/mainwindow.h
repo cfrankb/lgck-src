@@ -37,6 +37,7 @@ class QToolButton;
 class QFont;
 class COptions;
 class COptionGroup;
+class QGamepad;
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -160,6 +161,7 @@ private:
     void markAsGoal(bool isGoal);
     static void newDebugString(const char *s);
     void memorizeFilePath();
+    void wireGamePad();
 
 protected:
     void initializeGL();
@@ -168,6 +170,8 @@ protected:
     virtual void changeEvent(QEvent* e);
 
     QOpenGLContext *m_context;
+    QGamepad *m_gamepad;
+    bool hasGamepad;
 
 public slots:
     void addLevel();
@@ -242,6 +246,7 @@ private slots:
     void editLevel(int index);
     void deleteLevel(int index);
     void notifyKeyEvent(int keyCode, int state);
+    void notifyJoyEvent(lgck::Button::JoyButton button, char value);
     void updateMenus();
     void setStatus(int i, const QString message);
     void setViewMode(int viewMode);
@@ -307,6 +312,7 @@ signals:
     void triggerKeyColorChanged(const QString & color);
     void triggerKeyShow(bool state);
     void triggerKeyFontSizeChanged(int size);
+    void joyEventOccured(lgck::Button::JoyButton button, char value);
 };
 
 #endif // MAINWINDOW_H

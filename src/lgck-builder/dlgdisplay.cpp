@@ -272,7 +272,7 @@ void CDlgDisplay::fillFrameCombo(int frameSet)
     delete [] imgSize;
     for (int i=0; i < imgCount; ++i) {
         delete [] imgPng[i];
-        imgPng[i] = NULL;
+        imgPng[i] = nullptr;
     }
     delete [] imgPng;
 }

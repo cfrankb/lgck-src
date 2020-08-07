@@ -21,7 +21,7 @@ win32:RC_FILE       = lgck-builder.rc
 unix:DEFINES        += MAKE_LINUX=1
 DEFINES             += USE_QFILE=1
 DEFINES             += LGCK_QT=1
-QT                  += core gui opengl network
+QT                  += core gui opengl network gamepad
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET              = lgck-builder
 TEMPLATE            = app
@@ -54,6 +54,7 @@ win32:LIBS += \
     -lopengl32
 
 SOURCES +=  mainwindow.cpp \
+    #../shared/JoyState.cpp \
     dlgindicator.cpp \
     optiongroup.cpp \
     options.cpp \
@@ -162,6 +163,7 @@ SOURCES +=  mainwindow.cpp \
     ../shared/interfaces/IGraphics.cpp
 
 HEADERS  +=  mainwindow.h \
+    #../shared/JoyState.h \
     dlgindicator.h \
     optiongroup.h \
     options.h \

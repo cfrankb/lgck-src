@@ -35,7 +35,7 @@ CDlgFrameSet::CDlgFrameSet(QWidget *parent) :
     m_ui(new Ui::CDlgFrameSet)
 {
     m_ui->setupUi(this);
-    m_frameSet = NULL;
+    m_frameSet = nullptr;
     m_ui->sUUID->setText("UUID: -");
 }
 

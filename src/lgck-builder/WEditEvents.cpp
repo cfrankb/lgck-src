@@ -32,7 +32,7 @@ CWEditEvents::CWEditEvents(QWidget *parent) :
     ui(new Ui::CWEditEvents)
 {
     ui->setupUi(this);
-    m_game = NULL;
+    m_game = nullptr;
     m_proto = -1;
     m_event = -1;    
     m_events = new QString[CProtoArray::getEventCount()];

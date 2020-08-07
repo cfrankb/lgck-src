@@ -56,7 +56,7 @@ CToolBoxDock::CToolBoxDock(QWidget *parent) :
     m_ui(new Ui::CToolBoxDock)
 {
     m_ui->setupUi(this);
-    m_index = NULL;
+    m_index = nullptr;
     m_ui->tabWidget->setCurrentIndex(0);
     setWidget(m_ui->tabWidget);
     connect(this, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),
@@ -68,7 +68,7 @@ CToolBoxDock::~CToolBoxDock()
     delete m_ui;
     if (m_index) {
         delete (CProtoIndex*)m_index;
-        m_index = NULL;
+        m_index = nullptr;
     }
     clearSprites();
 }

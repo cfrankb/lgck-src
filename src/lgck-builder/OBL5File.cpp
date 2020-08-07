@@ -156,7 +156,7 @@ CFrame * COBL5File::getCurrent() const
     if (m_currImage >= 0) {
         return m_filter[m_currImage];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 

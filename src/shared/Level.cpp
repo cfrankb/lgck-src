@@ -62,14 +62,14 @@ CSettings::SETTING CLevel::m_defaults[] =
     { "music", "", 0},
     { "closure", "500", 500},
     { "uuid", "", 0},
-    { "borderColor", "000000", 0},
+    { "borderColor", "000000", 0}, // 12
     { "introBkColor", "000000", 0},
     { "introTextColor", "ffffff", 0},
     { "introTime", "1500", 1500},
     { "width", "0", 0},
     { "height", "0", 0},
     { "colorMod", "ffffffff",0},
-    { "author", "",0},
+    { "author", "",0}, // 19
     { "", "", 0 }
 };
 

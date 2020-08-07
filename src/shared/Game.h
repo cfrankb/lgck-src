@@ -49,6 +49,30 @@ class CFont;
 /////////////////////////////////////////////////////////////////////////////
 // CGame
 
+namespace lgck {
+    namespace Button {
+        enum JoyButton {
+            A,
+            B,
+            X,
+            Y,
+            L1,
+            L3,
+            R1,
+            R3,
+            Select,
+            Start,
+            Up,
+            Down,
+            Left,
+            Right,
+            Center,
+            Guide,
+            Count // this is not a button
+        };
+    };
+};
+
 class CGame : public CGameFile
 {
 
@@ -67,6 +91,7 @@ public:
     static int getVersion();
     int testKey(int keyCode);
     void setKey(int keyCode, char value);
+    void setJoyButton(lgck::Button::JoyButton button, char value);
     void stopMusic();
     void setLastKey(int keyCode);
     void callObjEvent(int objId, int eventId);
@@ -106,7 +131,7 @@ public:
         DEFAULT_TICK_RATE   = 90
     };
 
-    enum {
+    enum JoyState{
         JOY_UP          = 1,
         JOY_DOWN		= 2,
         JOY_LEFT		= 4,
@@ -115,6 +140,7 @@ public:
         JOY_FIRE		= 32,
         JOY_ZKEY		= 64
     };
+
 
     enum {
         DI_NONE             = 0,
@@ -263,6 +289,7 @@ public:
     void updateJoyState();
     uint32_t getJoyState();
     int whoIs(int x, int y);
+    const char *keys();
 
     /////////////////////////////////////////////////////////////////
     // displayManager
@@ -296,8 +323,6 @@ public:
 
     //////////////////////////////////////////////////////////////////
     // Game variables
-    int BUFFERLEN;
-    int BUFFERHEI;
     unsigned long long m_startTime;
     CScene *m_sFW;
     CScene *m_sBK;
@@ -307,7 +332,6 @@ public:
     int m_mx;
     int m_my;
     CInventoryTable *m_inventoryTable;
-    char *m_keys;
 
     /////////////////////////////////////////////////////////////////
     // static
@@ -350,9 +374,17 @@ protected:
     ISound *m_sound;
     CSnapshot *m_snapshot;
     CTasks *m_tasks;
+    char *m_keys;
+    char m_buttons[lgck::Button::Count];
 
     int m_screenLen;
     int m_screenHei;
+    int BUFFERLEN;
+    int BUFFERHEI;
+
+    friend class CActor;
+    friend class CAttacker;
+    friend class IGraphics;
 };
 
 /////////////////////////////////////////////////////////////////////////////

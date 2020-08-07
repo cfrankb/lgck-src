@@ -46,8 +46,8 @@ CDlgGame::CDlgGame(QWidget *parent) :
     m_ui(new Ui::CDlgGame)
 {
     m_ui->setupUi(this);
-    m_indexSettings = NULL;
-    m_countFrameSetUses = NULL;
+    m_indexSettings = nullptr;
+    m_countFrameSetUses = nullptr;
 }
 
 CDlgGame::~CDlgGame()
@@ -55,7 +55,7 @@ CDlgGame::~CDlgGame()
     delete m_ui;
     if (m_indexSettings) {
         delete [] m_indexSettings;
-        m_indexSettings = NULL;
+        m_indexSettings = nullptr;
     }
     if (m_countFrameSetUses) {
         delete [] m_countFrameSetUses;
@@ -90,7 +90,7 @@ void CDlgGame::on_treeSettings_doubleClicked(QModelIndex index)
 
     if (ok && (result != setting.value.c_str())) {
         setting.value = q2c(result);
-        setting.valueInt = strtol(setting.value.c_str(), NULL, 10);
+        setting.valueInt = strtol(setting.value.c_str(), nullptr, 10);
         QTreeWidgetItem * item = m_ui->treeSettings->topLevelItem( index.row() );
         item->setText(1, result);
         gf.setDirty( true );

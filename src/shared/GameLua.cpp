@@ -42,6 +42,7 @@
 #include "interfaces/IMusic.h"
 #include "interfaces/IDisplayManager.h"
 #include "interfaces/IGraphics.h"
+#include "Const.h"
 
 #ifdef USE_QFILE
     #include <QMessageBox>
@@ -2496,8 +2497,8 @@ int testKey(lua_State *L)
     } else {
         CGame & game = CGame::getGame();
         int keyCode = (int) lua_tonumber(L, 1);
-        if (keyCode >= 0 && keyCode < (int)sizeof(game.m_keys)) {
-            lua_pushboolean(L, game.m_keys[keyCode]);
+        if (keyCode >= 0 && keyCode < lgck::Key::Count) {
+            lua_pushboolean(L, game.keys()[keyCode]);
         } else {
             lua_pushboolean(L, false);
         }
@@ -2533,7 +2534,7 @@ int setKey(lua_State *L)
     } else {
         CGame & game = CGame::getGame();
         int keyCode = (int) lua_tonumber(L, 1);
-        if (keyCode >= 0 && keyCode < (int)sizeof(game.m_keys)) {
+        if (keyCode >= 0 && keyCode < lgck::Key::Count) {
             int keyCode = (int) lua_tonumber(L, 1);
             int value = (int) lua_tonumber(L, 2);
             game.setKey(keyCode, value);

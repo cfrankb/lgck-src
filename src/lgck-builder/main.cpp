@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     format.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(format);
 
-    srand( time( NULL ) );
+    srand( time( nullptr ) );
     QApplication app(argc, argv);
     QString tmpDir = QDir::tempPath();
     QLockFile lockFile(tmpDir + QString("/%1.lock").arg(appUuid));

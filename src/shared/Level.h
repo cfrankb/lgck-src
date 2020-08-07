@@ -102,7 +102,15 @@ public:
         SPARAM_TICK_RATE        = 8,
         SPARAM_MUSIC            = 9,
         SPARAM_CLOSURE          = 10,
-        SPARAM_UUID             = 11
+        SPARAM_UUID             = 11,
+        SPARAM_BORDERCOLOR      = 12,
+        SPARAM_INTROBKCOLOR     = 13,
+        SPARAM_INTROTEXTCOLOR   = 14,
+        SPARAM_INTROTIME        = 15,
+        SPARAM_WIDTH            = 16,
+        SPARAM_HEIGHT           = 17,
+        SPARAM_COLORMOD         = 18,
+        SPARAM_AUTHOR           = 19
     } PARAM_LEVEL;
 
     enum {

@@ -126,7 +126,7 @@ void CDlgEditLevel::load(CLevel *s)
         m_ui->cbEndLevel->addItem(endLevelOptions[i]);
     }
 
-    int goal = strtol(level.getSetting("goal"), NULL, 10);
+    int goal = strtol(level.getSetting("goal"), nullptr, 10);
     m_ui->cbEndLevel->setCurrentIndex( goal );
 
     for (int i=0; i < 32; ++i) {
@@ -137,17 +137,17 @@ void CDlgEditLevel::load(CLevel *s)
         }
     }
 
-    int trigger = strtol(level.getSetting("trigger"), NULL, 10);
+    int trigger = strtol(level.getSetting("trigger"), nullptr, 10);
     m_ui->cbTrigger->setCurrentIndex( trigger );
 
-    int wrap = strtol(level.getSetting("wrap"), NULL, 10);
+    int wrap = strtol(level.getSetting("wrap"), nullptr, 10);
     m_ui->cWrapUp->setChecked( wrap & CLevel::WRAP_UP );
     m_ui->cWrapDown->setChecked( wrap & CLevel::WRAP_DOWN );
     m_ui->cWrapLeft->setChecked( wrap & CLevel::WRAP_LEFT );
     m_ui->cWrapRight->setChecked( wrap & CLevel::WRAP_RIGHT );
     m_ui->cOpenTop->setChecked( wrap & CLevel::OPENTOP );
 
-    int noGravity = strtol(level.getSetting("no_gravity"), NULL, 10);
+    int noGravity = strtol(level.getSetting("no_gravity"), nullptr, 10);
     m_ui->cNoGravity->setChecked( noGravity != 0 );
 
     // page3

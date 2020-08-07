@@ -62,9 +62,9 @@ CLevelViewGL::~CLevelViewGL()
 {
     if (m_game) {
         makeCurrent();
-        m_game->attach((IGraphics*) NULL);
+        m_game->attach((IGraphics*) nullptr);
         delete m_game->graphics();
-        m_game->attach((IImageManager*)NULL);
+        m_game->attach((IImageManager*) nullptr);
         delete m_game->cache();
     }
 }
@@ -256,7 +256,7 @@ void CLevelViewGL::drawScreen()
         int y1 = sz.height() - h;
         int y2 = sz.height();
         // Color: #RRGGBB
-        uint32_t bkColor = 0xff000000 | strtoul(level.getSetting("bkcolor"), NULL, 16);
+        uint32_t bkColor = 0xff000000 | strtoul(level.getSetting("bkcolor"), nullptr, 16);
         uint2rgba(bkColor, red, green, blue, alpha);
         glColor4f(red, green, blue, alpha);
         glRectf(x1, y1, x2, y2);
@@ -273,7 +273,7 @@ void CLevelViewGL::drawScreen()
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     CLayer & layer = * level.getCurrentLayer();
-    uint32_t colorMod = 0xff000000 | strtoul(level.getSetting("colorMod"), NULL, 16);
+    uint32_t colorMod = 0xff000000 | strtoul(level.getSetting("colorMod"), nullptr, 16);
     uint2rgba(colorMod, red, green, blue, alpha);
     glColor4f(red, green, blue, alpha);
 
@@ -415,12 +415,12 @@ void CLevelViewGL::setGridSize(int size)
 
 void CLevelViewGL::setGridColor(const QString & gridColor)
 {
-    m_gridColor = 0x60000000 | strtoul(q2c(gridColor), NULL, 16);
+    m_gridColor = 0x60000000 | strtoul(q2c(gridColor), nullptr, 16);
 }
 
 void CLevelViewGL::setTriggerKeyColor(const QString & color)
 {
-    m_triggerKeyColor = 0xff000000 | strtoul(q2c(color), NULL, 16);
+    m_triggerKeyColor = 0xff000000 | strtoul(q2c(color), nullptr, 16);
 }
 
 void CLevelViewGL::showTriggerKey(bool state)

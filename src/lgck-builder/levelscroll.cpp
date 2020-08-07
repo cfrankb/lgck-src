@@ -839,7 +839,7 @@ void CLevelScroll::select(int x1, int y1, int x2, int y2, CSelection & selection
 void CLevelScroll::changeLevel(int i)
 {
     qDebug("IN  changeLevel(int) %d **************", i);
-    CLevel * level = NULL;
+    CLevel * level = nullptr;
     if (m_game && m_game->getSize()) {
         level = & m_game->getCurrentLevel();
     }

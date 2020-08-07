@@ -84,6 +84,7 @@
 #include "dlgindicator.h"
 #include "launcher.h"
 #include "options.h"
+#include <QtGamepad/QGamepad>
 
 const char MainWindow::m_appName[] = "LGCK builder";
 const char MainWindow::m_author[] = "cfrankb";
@@ -91,8 +92,6 @@ const QString MainWindow::m_appTitle = MainWindow::tr("LGCK builder IDE");
 
 #define WEB_PATH QString("https://cfrankb.com/lgck/")
 #define UPDATER_URL "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
-
-#define RUNTIME_DEFAULT_ARGS "%1"
 
 constexpr const char EDITOR[] = "Editor";
 constexpr int MIN_FONT_SIZE = 10;
@@ -135,6 +134,10 @@ MainWindow *me = nullptr;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    // Gamepad
+    m_gamepad = nullptr;
+    wireGamePad();
+
     // Init Settings
     initSettings();
 
@@ -3195,4 +3198,78 @@ void MainWindow::memorizeFilePath()
     QString absolutePath = d.absolutePath();
     qDebug() << "absolutePath:" << absolutePath;
     O_SET(FOLDERS, FOLDER_LGCKDB, absolutePath);
+}
+
+void MainWindow::notifyJoyEvent(lgck::Button::JoyButton button, char value)
+{
+    m_doc.setJoyButton(button, value);
+}
+
+void MainWindow::wireGamePad()
+{
+    auto gamepads = QGamepadManager::instance()->connectedGamepads();
+    qDebug(!gamepads.isEmpty() ? "gamepad found" : "no gamepad found");
+    if (gamepads.isEmpty()) {
+        return;
+    }
+    m_gamepad = new QGamepad(*gamepads.begin(), this);
+    qDebug() << "name: " << m_gamepad->name() << m_gamepad->deviceId();
+
+    connect(this, &MainWindow::joyEventOccured, this, &MainWindow::notifyJoyEvent);
+
+    connect(m_gamepad, &QGamepad::buttonAChanged, this, [](bool pressed){
+        qDebug() << "Button A" << pressed;
+        emit me->joyEventOccured(lgck::Button::A, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonBChanged, this, [](bool pressed){
+        qDebug() << "Button B" << pressed;
+        emit me->joyEventOccured(lgck::Button::B, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonXChanged, this, [](bool pressed){
+        qDebug() << "Button X" << pressed;
+        emit me->joyEventOccured(lgck::Button::X, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonYChanged, this, [](bool pressed){
+        qDebug() << "Button Y" << pressed;
+        emit me->joyEventOccured(lgck::Button::Y, pressed);
+    });
+
+    connect(m_gamepad, &QGamepad::buttonL1Changed, this, [](bool pressed){
+        qDebug() << "Button L1" << pressed;
+        emit me->joyEventOccured(lgck::Button::L1, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonR1Changed, this, [](bool pressed){
+        qDebug() << "Button R1" << pressed;
+        emit me->joyEventOccured(lgck::Button::R1, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonSelectChanged, this, [](bool pressed){
+        qDebug() << "Button Select" << pressed;
+        emit me->joyEventOccured(lgck::Button::Select, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonStartChanged, this, [](bool pressed){
+        qDebug() << "Button Start" << pressed;
+        emit me->joyEventOccured(lgck::Button::Start, pressed);
+    });
+
+    connect(m_gamepad, &QGamepad::buttonGuideChanged, this, [](bool pressed){
+        qDebug() << "Button Guide" << pressed;
+        emit me->joyEventOccured(lgck::Button::Guide, pressed);
+    });
+
+    connect(m_gamepad, &QGamepad::buttonUpChanged, this, [](bool pressed){
+        qDebug() << "Button Up" << pressed;
+        emit me->joyEventOccured(lgck::Button::Up, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonDownChanged, this, [](bool pressed){
+        qDebug() << "Button Down" << pressed;
+        emit me->joyEventOccured(lgck::Button::Down, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonLeftChanged, this, [](bool pressed){
+        qDebug() << "Button Left" << pressed;
+        emit me->joyEventOccured(lgck::Button::Left, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonRightChanged, this, [](bool pressed){
+        qDebug() << "Button Right" << pressed;
+        emit me->joyEventOccured(lgck::Button::Right, pressed);
+    });
 }

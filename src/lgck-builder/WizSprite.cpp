@@ -35,7 +35,7 @@ CWizSprite::CWizSprite(QWidget *parent) :
     ui(new Ui::CWizSprite)
 {
     ui->setupUi(this);
-    m_classIndex = NULL;
+    m_classIndex = nullptr;
     m_frameSet = new CFrameSet();
 }
 
@@ -357,11 +357,10 @@ void CWizSprite::load(const int index)
     const char *jumpModes [] = {
         "VLA3",
         "GIANA",
-        "MIXED",
-        NULL
+        "MIXED"
     };
 
-    for (int n = 0; jumpModes[n]; ++n) {
+    for (unsigned int n = 0; n < sizeof(jumpModes)/sizeof(const char*); ++n) {
         ui->cbJump->addItem(jumpModes[n]);
     }
 
@@ -677,7 +676,7 @@ void CWizSprite::save(const int index)
 
             // decode the string
             for (unsigned int k=0; k < strlen(js.path);k +=3) {
-                char aim = strtol(q2c(sq.mid(k, 2)), NULL, 16);
+                char aim = strtol(q2c(sq.mid(k, 2)), nullptr, 16);
                 path.add(aim);
             }
         }

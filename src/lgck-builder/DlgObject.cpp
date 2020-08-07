@@ -41,8 +41,8 @@ CDlgObject::CDlgObject(QWidget *parent) :
     m_ui->setupUi(this);
     m_classIndex = 0;
     m_animations = (void*) new CAnimation [ CObject::getAnimationCount() ];
-    m_imgPng = NULL;
-    m_imgSize = NULL;
+    m_imgPng = nullptr;
+    m_imgSize = nullptr;
     m_imgCount = 0;
     m_events = new QString [ CProtoArray::getEventCount() ];
     m_paths = new CPath [ CObject::getPathCount() ];
@@ -56,12 +56,12 @@ void CDlgObject::freeImageSet()
             delete [] ((uint8_t**) m_imgPng) [i];
         }
         delete [] (uint8_t**) m_imgPng;
-        m_imgPng = NULL;
+        m_imgPng = nullptr;
     }
 
     if (m_imgSize) {
         delete [] m_imgSize;
-        m_imgSize = NULL;
+        m_imgSize = nullptr;
     }
 }
 
@@ -1130,7 +1130,7 @@ void CDlgObject::restoreDefaultPaths()
 
             // decode the string
             for (unsigned int k=0; k < strlen(js.path);k +=3) {
-                char aim = strtol(q2c(sq.mid(k, 2)), NULL, 16);
+                char aim = strtol(q2c(sq.mid(k, 2)), nullptr, 16);
                 m_paths[js.id_seq].add(aim);
             }
         }
