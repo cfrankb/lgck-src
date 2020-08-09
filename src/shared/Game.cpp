@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <cstring>
 #include <sys/time.h>
 #include "../shared/FileWrap.h"
 #include "../shared/Folders.h"
@@ -64,7 +65,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CGame
 
-int CGame::m_arrPoints[]=
+const int CGame::m_arrPoints[]=
 {
     0,
     10,
@@ -79,6 +80,18 @@ int CGame::m_arrPoints[]=
     2000,
     5000,
     10000
+};
+
+const CGame::JoyStateEntry CGame::m_defaultJoyStateMap[lgck::Player::Count] = {
+    {lgck::Key::Up, lgck::Button::Up},
+    {lgck::Key::Down, lgck::Button::Down},
+    {lgck::Key::Left, lgck::Button::Left},
+    {lgck::Key::Right, lgck::Button::Right},
+    {lgck::Key::Space, lgck::Button::A},
+    {lgck::Key::LShift, lgck::Button::B},
+    {lgck::Key::Invalid, lgck::Button::Invalid},
+    {lgck::Key::Invalid, lgck::Button::Invalid},
+    {lgck::Key::Invalid, lgck::Button::Invalid}
 };
 
 CGame::CGame():CGameFile()
@@ -112,6 +125,7 @@ CGame::CGame():CGameFile()
     svar("WarpTo") = INVALID;
     m_snapshot = new CSnapshot;
     m_tasks = new CTasks;
+    copyDefaultJoyStateMap();
 }
 
 CGame::~CGame()
@@ -155,7 +169,7 @@ int CGame::getTicks()
     return getTickCount();
 }
 
-CLevel *CGame::getLayers()
+CLevel *CGame::layers()
 {
     return m_layers;
 }
@@ -163,28 +177,15 @@ CLevel *CGame::getLayers()
 /////////////////////////////////////////////////////////////////////////////
 // cpp interface
 
-typedef struct
-{
-    CGame::JoyState flagValue;
-    lgck::Key::Code keyCode;
-    lgck::Button::JoyButton button;
-} JoyStateMap;
-
 void CGame::updateJoyState()
 {
-    JoyStateMap joyStateMap[] = {
-        {CGame::JOY_UP, lgck::Key::Up, lgck::Button::Up},
-        {CGame::JOY_DOWN, lgck::Key::Down, lgck::Button::Down},
-        {CGame::JOY_LEFT, lgck::Key::Left, lgck::Button::Left},
-        {CGame::JOY_RIGHT, lgck::Key::Right, lgck::Button::Right},
-        {CGame::JOY_JUMP, lgck::Key::Space, lgck::Button::A},
-        {CGame::JOY_FIRE, lgck::Key::LShift, lgck::Button::B}
-    };
     unsigned int state = 0;
-    for (unsigned int i=0; i < sizeof(joyStateMap)/sizeof(JoyStateMap); ++i){
-        JoyStateMap & entry = joyStateMap[i];
-        state |= m_keys[entry.keyCode] * entry.flagValue;
-        state |= m_buttons[entry.button] * entry.flagValue;
+    int flagValue = 1;
+    for (unsigned int i=0; i < sizeof(m_joyStateMap)/sizeof(JoyStateEntry); ++i){
+        const JoyStateEntry & entry = m_joyStateMap[i];
+        state |= ((entry.keyCode >= 0 ? m_keys[entry.keyCode] : 0) |
+            (entry.button >= 0 ? m_buttons[entry.button] : 0)) * flagValue;
+        flagValue *= 2;
     }
     var("joyState") = state;
 }
@@ -565,7 +566,7 @@ bool CGame::resetDefaultDisplays()
     return true;
 }
 
-unsigned int CGame::bgr2rgb(unsigned int bgr, int alpha)
+unsigned int CGame::bgr2rgb(uint32_t bgr, int alpha)
 {
     int blue = bgr & 0xff;
     int green = (bgr >> 8) & 0xff;
@@ -2264,3 +2265,57 @@ const char * CGame::keys()
 {
     return m_keys;
 }
+
+void CGame::copyDefaultJoyStateMap()
+{
+    memcpy(&m_joyStateMap, &m_defaultJoyStateMap, sizeof(m_joyStateMap));
+}
+
+CGame::JoyStateEntry & CGame::joyStateEntry(int i)
+{
+    return m_joyStateMap[i];
+}
+
+const char * CGame::buttonText(int i)
+{
+    static const char gamePadButtons[][16]{
+        "A",
+        "B",
+        "X",
+        "Y",
+        "L1",
+        "L3",
+        "R1",
+        "R3",
+        "Select",
+        "Start",
+        "Up",
+        "Down",
+        "Left",
+        "Right",
+        "Center",
+        "Guide"
+    };
+    return gamePadButtons[i];
+}
+
+CLuaVM & CGame::luaVM()
+{
+    return m_lua;
+}
+
+uint64_t CGame::startTime()
+{
+    return m_startTime;
+}
+
+CScene *CGame::_fw()
+{
+    return m_sFW;
+}
+
+CScene *CGame::_bk()
+{
+    return m_sBK;
+}
+

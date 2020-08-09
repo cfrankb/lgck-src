@@ -1,14 +1,16 @@
 #include "stdafx.h"
 #include "Const.h"
 #include "kt_qt.h"
+#include <QString>
+#include <QKeySequence>
 
 #define KEY(s, a, b) { s, 0, a, a, b, b },
 
 typedef struct {
     const char *string;
     int base;
-    int sf_start;
-    int sf_end;
+    int lgck_start;
+    int lgck_end;
     int qt_start;
     int qt_end;
 } key_match;
@@ -71,9 +73,52 @@ int CKeyTranslator::translate(int key)
     for (int i = 0; matches[i].qt_start != -1; ++i) {
         if (key >= matches[i].qt_start &&
                 key <= matches[i].qt_end) {
-            return matches[i].sf_start + key - matches[i].qt_start;
+            return matches[i].lgck_start + key - matches[i].qt_start;
         }
     }
     return -1;
+}
+
+int CKeyTranslator::translateLgck2Text(int key, QString & text)
+{
+    text = "";
+    for (unsigned i = 0; matches[i].qt_start != -1; ++i) {
+        if (key >= matches[i].lgck_start &&
+                key <= matches[i].lgck_end) {
+            int qtKeyCode = matches[i].qt_start + key - matches[i].lgck_start;
+            if (qtKeyCode == Qt::Key_Control) {
+                text = "Ctrl";
+            } else if (qtKeyCode == Qt::Key_Shift) {
+                text = "Shift";
+            } else if (qtKeyCode == Qt::Key_Alt) {
+                text = "Alt";
+            } else if (qtKeyCode == Qt::Key_Meta) {
+                text = "Meta";
+            } else {
+                text = QKeySequence(qtKeyCode).toString();
+            }
+            qDebug() << "qtKeyCode " << qtKeyCode << " " << text;
+            return qtKeyCode;
+        }
+    }
+    return -1;
+}
+
+int CKeyTranslator::translateText2Lgck(QString text)
+{
+    int qtKey = -1;
+    if (text == "Ctrl") {
+        qtKey = Qt::Key_Control;
+    } else if (text == "Shift") {
+        qtKey = Qt::Key_Shift;
+    } else if (text == "Alt") {
+        qtKey = Qt::Key_Alt;
+    } else if (text == "Meta") {
+        qtKey = Qt::Key_Meta;
+    } else {
+        QKeySequence keySeq(text);
+        qtKey = keySeq[0];
+    }
+    return translate(qtKey);
 }
 

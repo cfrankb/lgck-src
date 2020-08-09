@@ -25,10 +25,22 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QDebug>
+#include <cstring>
 #include "WHotKey.h"
+#include "WGetKey.h"
 #include "DlgAppSettings.h"
 #include "ui_DlgAppSettings.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/Const.h"
+#include "../shared/inputs/qt/kt_qt.h"
+
+const int CDlgAppSettings::m_gridSizes [] = {
+    16,
+    32,
+    64,
+    128,
+    256
+};
 
 constexpr int triggerFontSizes[] = {
     16, 18, 20, 22, 24, 26, 28, 30, 32, 40
@@ -50,6 +62,8 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     m_gridSize = 16;
     m_count = 0;
     m_hotkeys = nullptr;
+    m_cbButtons = nullptr;
+    m_keys = nullptr;
     m_defaultShortcuts = new QStringList();
 
     QString options[] = {
@@ -99,6 +113,77 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
 
     m_ui->btnGridColor->setBuddy(m_ui->eGridColor);
     m_ui->btnTriggerKeyColor->setBuddy(m_ui->eTriggerKeyColor);
+
+    initButtonTable();
+}
+
+void CDlgAppSettings::initButtonTable()
+{
+    const QStringList listActions = {
+        tr("Up"),
+        tr("Down"),
+        tr("Left"),
+        tr("Right"),
+        tr("Jump"),
+        tr("Fire"),
+        tr("Action"),
+        tr("Special_1"),
+        tr("Special_2")
+    };
+
+    const QStringList buttonText = {
+        QString(""),
+        tr("A"),
+        tr("B"),
+        tr("X"),
+        tr("Y"),
+        tr("L1"),
+        tr("L3"),
+        tr("R1"),
+        tr("R3"),
+        tr("Select"),
+        tr("Start"),
+        tr("Up"),
+        tr("Down"),
+        tr("Left"),
+        tr("Right"),
+        tr("Center"),
+        tr("Guide")
+    };
+
+    QTableWidget *widget = m_ui->tableButtons;
+    widget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    widget->setSelectionMode(QAbstractItemView::NoSelection);
+    widget->setColumnCount(4);
+    widget->setRowCount(listActions.count());
+    widget->setHorizontalHeaderLabels({tr("Actions"), tr("Keys"), tr("Gamepad"), ""});
+    widget->setColumnWidth(0, 150);
+    widget->setColumnWidth(1, 120);
+    widget->setColumnWidth(2, 120);
+    widget->setColumnWidth(3, 16);
+    widget->verticalHeader()->setVisible(false);
+    QIcon icon = QIcon(QPixmap(":/images/pd/dagobert83_cancelx16.png"));
+    m_keys = new CWGetKey *[lgck::Player::Count];
+    m_cbButtons = new QComboBox *[lgck::Player::Count];
+    for (int i=0; i < listActions.count(); ++i){
+        m_keys[i] = new CWGetKey(widget);
+        QPushButton *button = new QPushButton(icon,"", this);
+        m_cbButtons[i] = new QComboBox(widget);
+        for (int j=0; j < buttonText.size(); ++j) {
+            m_cbButtons[i]->addItem(buttonText[j]);
+        }
+        button->setToolTip(tr("Clear"));
+        button->resize(16,16);
+        button->setProperty("id", i);
+        QLabel *label = new QLabel();
+        label->setText(listActions[i]);
+        widget->setCellWidget(i,0,label);
+        widget->setCellWidget(i,1,m_keys[i]);
+        widget->setCellWidget(i,2,m_cbButtons[i]);
+        widget->setCellWidget(i,3,button);
+        //connect(button, SIGNAL(clicked()), this, SLOT(buttonPushed()));
+    }
+
 }
 
 CDlgAppSettings::~CDlgAppSettings()
@@ -107,18 +192,16 @@ CDlgAppSettings::~CDlgAppSettings()
     if (m_hotkeys) {
         delete [] m_hotkeys;
     }
+    if (m_keys) {
+        delete [] m_keys;
+    }
+    if (m_cbButtons) {
+        delete [] m_cbButtons;
+    }
     if (m_defaultShortcuts) {
         delete m_defaultShortcuts;
     }
 }
-
-int CDlgAppSettings::m_gridSizes [] = {
-    16,
-    32,
-    64,
-    128,
-    256
-};
 
 void CDlgAppSettings::changeEvent(QEvent *e)
 {
@@ -203,26 +286,20 @@ void CDlgAppSettings::load(QStringList &listActions, QStringList &listShortcuts,
 {
     // save defaults
     (*m_defaultShortcuts) = defaults;
-    QStringList labels;
-    labels.append(tr("Action"));
-    labels.append(tr("Shortcut"));
-    labels.append(tr(""));
     m_signalMapper = new QSignalMapper(this);
     QTableWidget *widget = m_ui->tableWidget;
     widget->setSelectionBehavior(QAbstractItemView::SelectRows);
     widget->setSelectionMode(QAbstractItemView::NoSelection);
     widget->setColumnCount(3);
     widget->setRowCount(listActions.count());
-    widget->setHorizontalHeaderLabels(labels);
+    widget->setHorizontalHeaderLabels({tr("Actions"), tr("Shortcuts"), ""});
     widget->setColumnWidth(0, 200);
     widget->setColumnWidth(1, 228);
     widget->setColumnWidth(2, 16);
     widget->verticalHeader()->setVisible(false);
     m_count = listActions.count();
     m_hotkeys = new CWHotKey *[m_count];
-    QPixmap pixmap(":/images/pd/dagobert83_cancelx16.png");
-    QIcon icon;
-    icon.addPixmap(pixmap);
+    QIcon icon = QIcon(QPixmap(":/images/pd/dagobert83_cancelx16.png"));
     for (int i=0; i < listActions.count(); ++i){
         m_hotkeys[i] = new CWHotKey();
         m_hotkeys[i]->setText(listShortcuts[i]);
@@ -231,7 +308,6 @@ void CDlgAppSettings::load(QStringList &listActions, QStringList &listShortcuts,
         button->resize(16,16);
         button->setProperty("id", i);
         QLabel *label = new QLabel();
-        label->setBuddy(m_hotkeys[i]);
         label->setText(listActions[i]);
         widget->setCellWidget(i,0,label);
         widget->setCellWidget(i,1,m_hotkeys[i]);
@@ -519,3 +595,35 @@ bool CDlgAppSettings::lastFolder()
 {
     return m_ui->cLastFolder->isChecked();
 }
+
+bool CDlgAppSettings::getContinue()
+{
+    return m_ui->cContinue->isChecked();
+}
+
+void CDlgAppSettings::setContinue(bool c)
+{
+    return m_ui->cContinue->setChecked(c);
+}
+
+void CDlgAppSettings::setJoyButtons(const CGame::JoyStateEntry *map)
+{
+    for (int i=0; i < lgck::Player::Count; ++i) {
+        m_joyStates[i] = map[i];
+        m_cbButtons[i]->setCurrentIndex(map[i].button + 1);
+        QString qtKeyText;
+        int qtKeyCode = CKeyTranslator::translateLgck2Text(map[i].keyCode, qtKeyText);
+        Q_UNUSED(qtKeyCode);
+        m_keys[i]->setText(qtKeyText);
+    }
+}
+
+void CDlgAppSettings::getJoyButtons(CGame::JoyStateEntry *map)
+{
+    // https://stackoverflow.com/questions/14034209/convert-string-representation-of-keycode-to-qtkey-or-any-int-and-back
+    for (int i=0; i < lgck::Player::Count; ++i) {
+        map[i].button = static_cast<lgck::Button::JoyButton>(m_cbButtons[i]->currentIndex() - 1);
+        map[i].keyCode = static_cast<lgck::Key::Code>(CKeyTranslator::translateText2Lgck(m_keys[i]->text()));
+    }
+}
+

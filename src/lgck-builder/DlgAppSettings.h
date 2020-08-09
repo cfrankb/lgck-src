@@ -20,10 +20,13 @@
 #define DLGAPPSETTINGS_H
 
 #include <QDialog>
+#include "Game.h"
 class QStringList;
 class QSignalMapper;
 class QTableWidgetItem;
 class CWHotKey;
+class CWGetKey;
+class QComboBox;
 
 namespace Ui {
     class CDlgAppSettings;
@@ -84,25 +87,36 @@ public:
     void setLastFolder(bool set);
     bool lastFolder();
     static const char *defaultRuntimeArgs();
+    bool getContinue();
+    void setContinue(bool);
+    void setJoyButtons(const CGame::JoyStateEntry *map);
+    void getJoyButtons(CGame::JoyStateEntry *map);
 
     enum {
         TAB_EDITOR,
-        TAB_TEST,
+        TAB_CODEVIEW,
+        TAB_UPDATER,
+        TAB_TESTLEVEL,
         TAB_SHORTCUTS,
         TAB_DEFAULT=0
     };
 
 protected:
     void changeEvent(QEvent *e);
-    static int m_gridSizes [];
+    static const int m_gridSizes[];
     int m_gridSize;
     void enableGridOptions();
     void enableTriggerKeyOptions();
+    void initButtonTable();
+
+    CGame::JoyStateEntry m_joyStates[lgck::Player::Count];
 
 private:
     Ui::CDlgAppSettings *m_ui;
     QSignalMapper *m_signalMapper;
     CWHotKey **m_hotkeys;
+    CWGetKey **m_keys;
+    QComboBox **m_cbButtons;
     QStringList *m_defaultShortcuts;
     int m_count;
 

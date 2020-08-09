@@ -1206,7 +1206,7 @@ void MainWindow::on_actionTest_Level_triggered()
         dlg->setHP(O_INT(TESTLEVEL, START_HP));
         dlg->setScore(O_INT(TESTLEVEL, SCORE));
         dlg->setLives(O_INT(TESTLEVEL, LIVES));
-        dlg->setContinue(O_INT(TESTLEVEL, CONTINUE));
+        dlg->setContinue(O_BOOL(TESTLEVEL, CONTINUE));
         dlg->setExternal(m_runtimeExternal);
         dlg->setRez(m_rez);
         CLevel & level = m_doc.getCurrentLevel();
@@ -1319,7 +1319,7 @@ void MainWindow::handleGameEvents()
             break;
 
         case CGame::EVENT_TIMEOUT:
-            if (!O_INT(TESTLEVEL, CONTINUE)) {
+            if (!O_BOOL(TESTLEVEL, CONTINUE)) {
                 QMessageBox::information(this, tr(m_appName),
                                      tr("You ran out of time."));
             }
@@ -1327,7 +1327,7 @@ void MainWindow::handleGameEvents()
 
         case CGame::EVENT_PLAYER_DIED:
             --m_doc.counter("lives");
-            if (!O_INT(TESTLEVEL, CONTINUE)) {
+            if (!O_BOOL(TESTLEVEL, CONTINUE)) {
                 QMessageBox::information(this, tr(m_appName),
                                          tr("You were killed."));
             } else {
@@ -1430,9 +1430,11 @@ void MainWindow::showAppSettings(int tab)
     d->setHP(O_INT(TESTLEVEL, START_HP));
     d->setScore(O_INT(TESTLEVEL, SCORE));
     d->setLives(O_INT(TESTLEVEL, LIVES));
+    d->setContinue(O_BOOL(TESTLEVEL, CONTINUE));
     d->setRuntime(m_runtime, m_runtimeArgs);
     d->setSkipSplashScreen(O_BOOL(EDITOR, SKIP_SPLASH));
     d->setTriggerFontSize(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
+    d->setJoyButtons(& m_doc.joyStateEntry(0));
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
     if (d->exec() == QDialog::Accepted) {
@@ -1455,6 +1457,7 @@ void MainWindow::showAppSettings(int tab)
         O_SET(TESTLEVEL, START_HP, d->getHP());
         O_SET(TESTLEVEL, SCORE, d->getScore());
         O_SET(TESTLEVEL, LIVES, d->getLives());
+        O_SET(TESTLEVEL, CONTINUE, d->getContinue());
         O_SET(EDITOR, FONT_SIZE, d->getFontSize());
         O_SET(EDITOR, FONT_NAME, d->getFont());
         O_SET(EDITOR, SKIP_SPLASH, d->getSkipSplashScreen());
@@ -1474,6 +1477,7 @@ void MainWindow::showAppSettings(int tab)
         O_SET(GENERAL, XTICK_MAX_RATE, d->tickMaxRate());
         O_SET(GENERAL, LAST_FOLDER, d->lastFolder());
         changeTickMaxRate();
+        d->getJoyButtons(& m_doc.joyStateEntry(0));
     }
     delete d;
 }
@@ -2969,7 +2973,7 @@ void MainWindow::goExternalRuntime()
     }
     if (!errMsg.isEmpty()){
         warningMessage(errMsg);
-        showAppSettings(CDlgAppSettings::TAB_TEST);
+        showAppSettings(CDlgAppSettings::TAB_TESTLEVEL);
     }
 }
 
@@ -3202,6 +3206,7 @@ void MainWindow::memorizeFilePath()
 
 void MainWindow::notifyJoyEvent(lgck::Button::JoyButton button, char value)
 {
+    qDebug() << QString("Button %1 %2").arg(m_doc.buttonText(button)).arg(value);
     m_doc.setJoyButton(button, value);
 }
 
@@ -3218,58 +3223,45 @@ void MainWindow::wireGamePad()
     connect(this, &MainWindow::joyEventOccured, this, &MainWindow::notifyJoyEvent);
 
     connect(m_gamepad, &QGamepad::buttonAChanged, this, [](bool pressed){
-        qDebug() << "Button A" << pressed;
         emit me->joyEventOccured(lgck::Button::A, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonBChanged, this, [](bool pressed){
-        qDebug() << "Button B" << pressed;
         emit me->joyEventOccured(lgck::Button::B, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonXChanged, this, [](bool pressed){
-        qDebug() << "Button X" << pressed;
         emit me->joyEventOccured(lgck::Button::X, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonYChanged, this, [](bool pressed){
-        qDebug() << "Button Y" << pressed;
         emit me->joyEventOccured(lgck::Button::Y, pressed);
     });
 
     connect(m_gamepad, &QGamepad::buttonL1Changed, this, [](bool pressed){
-        qDebug() << "Button L1" << pressed;
         emit me->joyEventOccured(lgck::Button::L1, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonR1Changed, this, [](bool pressed){
-        qDebug() << "Button R1" << pressed;
         emit me->joyEventOccured(lgck::Button::R1, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonSelectChanged, this, [](bool pressed){
-        qDebug() << "Button Select" << pressed;
         emit me->joyEventOccured(lgck::Button::Select, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonStartChanged, this, [](bool pressed){
-        qDebug() << "Button Start" << pressed;
         emit me->joyEventOccured(lgck::Button::Start, pressed);
     });
 
     connect(m_gamepad, &QGamepad::buttonGuideChanged, this, [](bool pressed){
-        qDebug() << "Button Guide" << pressed;
         emit me->joyEventOccured(lgck::Button::Guide, pressed);
     });
 
     connect(m_gamepad, &QGamepad::buttonUpChanged, this, [](bool pressed){
-        qDebug() << "Button Up" << pressed;
         emit me->joyEventOccured(lgck::Button::Up, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonDownChanged, this, [](bool pressed){
-        qDebug() << "Button Down" << pressed;
         emit me->joyEventOccured(lgck::Button::Down, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonLeftChanged, this, [](bool pressed){
-        qDebug() << "Button Left" << pressed;
         emit me->joyEventOccured(lgck::Button::Left, pressed);
     });
     connect(m_gamepad, &QGamepad::buttonRightChanged, this, [](bool pressed){
-        qDebug() << "Button Right" << pressed;
         emit me->joyEventOccured(lgck::Button::Right, pressed);
     });
 }

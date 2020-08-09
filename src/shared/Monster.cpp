@@ -188,7 +188,7 @@ int CMonster::testSupport()
     CGame & game = * (CGame *) m_game;
     CFrame & frame = game.toFrame(*this);
     const Size sx = CMap::size(frame);
-    CMap & m = *(game.m_map);
+    CMap & m = game.map();
     const Pos p = m.toMap(m_nX, m_nY);
     int support = 0 ;
     for (int x = 0; x < sx.len; ++x) {

@@ -89,9 +89,9 @@ void IGraphics::drawScreen()
     m_colorMod.green = (colorMod & 0xff00) >> 8;
     m_colorMod.red = (colorMod >> 16) & 0xff;
 
-    for (int i = 0; i < m_game->m_layers->getSize(); ++i) {
+    for (int i = 0; i < m_game->layers()->getSize(); ++i) {
         int speeds[] = {0, 1, 2, 4, 8, 16, 32, 64, 128};
-        CLayer & layer = (*(m_game->m_layers))[i];
+        CLayer & layer = (*(m_game->layers()))[i];
         if (layer.getType() != CLayer::LAYER_MAIN) {
             // draw background and foreground layers
             int mx = 0, my = 0;
@@ -101,19 +101,19 @@ void IGraphics::drawScreen()
                 layer.getOffset(mx, my);
             } else {
                 if (h) {
-                    mx = m_game->m_mx / speeds[h];
+                    mx = m_game->_mx() / speeds[h];
                 }
                 if (v) {
-                    my = m_game->m_my / speeds[v];
+                    my = m_game->_my() / speeds[v];
                 }
             }
             drawSurface(dynamic_cast<ISurface*>(&layer), mx, my);
         } else {
             // draw main layer
-            int mx = m_game->m_mx;
-            int my = m_game->m_my;
-            drawSurface(dynamic_cast<ISurface*>(m_game->m_sBK), mx, my);
-            drawSurface(dynamic_cast<ISurface*>(m_game->m_sFW), mx, my);
+            int mx = m_game->_mx();
+            int my = m_game->_my();
+            drawSurface(dynamic_cast<ISurface*>(m_game->_bk()), mx, my);
+            drawSurface(dynamic_cast<ISurface*>(m_game->_fw()), mx, my);
         }
     };
     m_displayManager->draw();

@@ -94,12 +94,12 @@ void CSnapshot::take(CGame & game)
     m_fw = new CScene;
     m_bk = new CScene;
     m_layers = new CLevel;
-    *m_fw = *(game.m_sFW);
-    *m_bk = *(game.m_sBK);
-    *m_layers = *(game.m_layers);
+    *m_fw = *(game._fw());
+    *m_bk = *(game._bk());
+    *m_layers = *(game.layers());
     m_displayConf = new CDisplayConfig;
-    m_vars["__mx"] = game.m_mx;
-    m_vars["__my"] = game.m_my;
+    m_vars["__mx"] = game._mx();
+    m_vars["__my"] = game._my();
     m_vars["__levelTriggerCalled"] = game.var("__levelTriggerCalled");
     game.saveDisplays(m_displayConf);
 }
@@ -107,11 +107,11 @@ void CSnapshot::take(CGame & game)
 bool CSnapshot::reload(CGame & game)
 {
     if (has_snapshot()) {
-        *(game.m_sFW) = *m_fw;
-        *(game.m_sBK) = *m_bk;
-        *(game.m_layers) = *m_layers;
-        game.m_mx = m_vars["__mx"];
-        game.m_my = m_vars["__my"];
+        *(game._fw()) = *m_fw;
+        *(game._bk()) = *m_bk;
+        *(game.layers()) = *m_layers;
+        game._mx() = m_vars["__mx"];
+        game._my() = m_vars["__my"];
         game.var("__levelTriggerCalled") = m_vars["__levelTriggerCalled"];
         game.restoreDisplays(m_displayConf);
         // reMap collision map

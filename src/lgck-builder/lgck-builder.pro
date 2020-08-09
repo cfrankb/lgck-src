@@ -55,6 +55,7 @@ win32:LIBS += \
 
 SOURCES +=  mainwindow.cpp \
     #../shared/JoyState.cpp \
+    WGetKey.cpp \
     dlgindicator.cpp \
     optiongroup.cpp \
     options.cpp \
@@ -164,6 +165,7 @@ SOURCES +=  mainwindow.cpp \
 
 HEADERS  +=  mainwindow.h \
     #../shared/JoyState.h \
+    WGetKey.h \
     dlgindicator.h \
     optiongroup.h \
     options.h \

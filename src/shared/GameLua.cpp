@@ -1139,7 +1139,7 @@ int getTime(lua_State *L)
 {
     unsigned long long tm;
     microtime(&tm);
-    lua_pushnumber(L, tm - CGame::getGame().m_startTime);
+    lua_pushnumber(L, tm - CGame::getGame().startTime());
     return 1;
 }
 
@@ -1185,7 +1185,7 @@ int layer_new(lua_State *L)
             v = lua_tonumber(L, 4);
         }
 
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         CLayer * layer = new CLayer(name, type, h, v );
         int id = layers->addLayer( layer );
         lua_pushnumber(L, id);
@@ -1206,7 +1206,7 @@ int findLayer(lua_State *L)
         CGame::error(fnName, 1);
     } else {
         const char * name =  lua_tostring(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         for (int i=0; i < layers->getSize(); ++i) {
             if (!strcmp((*layers)[i].getName(), name)) {
                 lua_pushnumber(L, i);
@@ -1231,7 +1231,7 @@ int element_new(lua_State *L)
         CGame::error(fnName, 5);
     } else {
         int id =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
@@ -1263,7 +1263,7 @@ int layer_clear(lua_State *L)
         lua_pushboolean(L, false);
     } else {
         int id =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
@@ -1286,7 +1286,7 @@ int layer_getSize(lua_State *L)
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
@@ -1309,7 +1309,7 @@ int layer_getElement(lua_State *L)
         return 0;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
@@ -1348,7 +1348,7 @@ int element_setImage(lua_State *L)
         return 1;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
@@ -1385,7 +1385,7 @@ int element_setVisible(lua_State *L)
         return 1;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
@@ -1427,7 +1427,7 @@ int element_moveTo(lua_State *L)
         return 1;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
@@ -1465,7 +1465,7 @@ int element_move(lua_State *L)
         return 1;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
@@ -1528,7 +1528,7 @@ int element_moveBy(lua_State *L)
         return 1;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
@@ -3563,7 +3563,7 @@ int layer_getOffsetX(lua_State *L)
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
@@ -3587,7 +3587,7 @@ int layer_getOffsetY(lua_State *L)
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
@@ -3611,7 +3611,7 @@ int layer_setOffsetX(lua_State *L)
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
@@ -3634,7 +3634,7 @@ int layer_setOffsetY(lua_State *L)
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
@@ -3707,7 +3707,7 @@ int layer_setSpeed(lua_State *L)
         return 0;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
@@ -3732,7 +3732,7 @@ int layer_delete(lua_State *L)
         return 0;
     } else {
         int layerId =  lua_tonumber(L, 1);
-        CLevel * layers = CGame::getGame().getLayers();
+        CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
             sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);

@@ -216,7 +216,7 @@ const CScene & CScene::operator = (const CLayer & layer)
 void CScene::map()
 {
     CGame & game = *m_game;
-    CMap & rmap = (*game.m_map);
+    CMap & rmap = game.map();
     for (int n = 0; n < m_size; ++ n) {
         CActor & entry = *(m_actors [n]);
         CFrame & frame = game.toFrame(entry);

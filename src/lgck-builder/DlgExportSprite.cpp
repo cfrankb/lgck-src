@@ -3,6 +3,7 @@
 #include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/Frame.h"
+#include "../shared/qtgui/cheat.h"
 #include "OBL5File.h"
 #include <QFileDialog>
 
@@ -53,6 +54,7 @@ void CDlgExportSprite::reloadSprites()
             SLOT(updateBtnExport()));
     ui->cbFormat->addItem("PNG");
     ui->cbFormat->addItem("OBL5");
+    ui->cbFormat->addItem("META");
 }
 
 void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
@@ -108,26 +110,43 @@ void CDlgExportSprite::on_btnExport_clicked()
     char outFormat[5];
     if (!dir.isEmpty()) {
         outDir = dir;
-        if (ui->cbFormat->currentIndex()==0) {
-            strcpy(outFormat, "PNG");
-            suffix = "png";
-        } else {
-            strcpy(outFormat, "OBL5");
-            suffix = "obl";
-        }
+        typedef struct {
+            char format[5];
+            char suffix[6];
+            bool isObl;
+        } Format;
+
+        Format formats[] = {
+            {"PNG", "png", true},
+            {"OBL5", "obl", true},
+            {"META", "proto", false}
+        };
+
+        int formatId = ui->cbFormat->currentIndex();
+        suffix = formats[formatId].suffix;
+        strcpy(outFormat, formats[formatId].format);
+
         QList<QTreeWidgetItem *> itemList;
         itemList = ui->treeObjects->selectedItems();
-        COBL5File oblDoc;
         foreach(QTreeWidgetItem *item, itemList) {
-           ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
            CGameFile & gf = *m_gameFile;
+           ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
            CProto & proto = gf.toProto(data->protoId);
-           CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
            QString fileName = QDir(dir).filePath(QString(proto.m_szName) + "." + suffix);
-           oblDoc.setFormat(outFormat);
-           oblDoc.getImageSet() = frameSet;
-           oblDoc.setFileName(fileName);
-           oblDoc.write();
+           if (formats[formatId].isObl) {
+               CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
+               COBL5File oblDoc;
+               oblDoc.setFormat(outFormat);
+               oblDoc.getImageSet() = frameSet;
+               oblDoc.setFileName(fileName);
+               oblDoc.write();
+           } else {
+               CFileWrap file;
+               if (file.open(q2c(fileName), "wb")) {
+                   m_gameFile->protos().exportMeta(file, data->protoId);
+                   file.close();
+               }
+           }
         }
     }
 }

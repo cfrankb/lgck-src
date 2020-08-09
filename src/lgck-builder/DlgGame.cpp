@@ -186,7 +186,8 @@ void CDlgGame::on_btnAddObject_clicked()
 
     int j = gf.m_arrProto.getSize();
     CProto proto;
-    sprintf(proto.m_szName, q2c(tr("object_%d")), j);
+    proto.resetUUID();
+    sprintf(proto.m_szName, q2c(tr("sprite_%d")), j);
     gf.m_arrProto.add( proto );
 
     d->load( j );
