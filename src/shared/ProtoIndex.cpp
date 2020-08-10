@@ -1,0 +1,201 @@
+#include "../shared/ProtoIndex.h"
+#include "stdafx.h"
+#include <cstring>
+#include <string>
+#include "ProtoArray.h"
+#include "LevelEntry.h"
+#include "vlamits3.h"
+#include "Game.h"
+#include "../shared/IFile.h"
+#include "../shared/FileWrap.h"
+#include "helper.h"
+
+/////////////////////////////////////////////////////////////////////
+// CProtoIndex
+
+std::string CProtoIndex::m_arrFilters[] = {
+    "All Sprites",
+    "Background",
+    "Objects",
+    "Player",
+    "Monsters",
+    "Bullets"
+};
+
+const char *CProtoIndex::getFilterName(int i)
+{
+    return m_arrFilters[i].c_str();
+}
+
+int CProtoIndex::getFilterCount()
+{
+    return sizeof(m_arrFilters)/sizeof(std::string);
+}
+
+CProtoIndex::CProtoIndex(CProtoArray *parent, int custom)
+{
+    m_protoArray = parent;
+    m_index = NULL;
+    m_size = 0;
+    m_custom = custom;
+}
+
+void CProtoIndex::forget()
+{
+    if (m_index) {
+        delete m_index;
+        m_index = NULL;
+    }
+    m_size = 0;
+}
+
+CProtoIndex::~CProtoIndex()
+{
+    forget();
+}
+
+bool CProtoIndex::isAccepted(int protoId)
+{
+    CProto & proto = (*m_protoArray) [protoId];
+    int pClass =  proto.m_nClass ;
+
+    switch (m_custom) {
+    case FILTER_NONE:
+        return protoId != 0;
+
+    case FILTER_BACKGROUND:
+        return protoId != 0 && pClass < 0x10;
+
+    case FILTER_OBJECTS:
+        return pClass >= 0x10 && pClass < 0x1f;
+
+    case FILTER_PLAYER:
+        return pClass == 0x1f;
+
+    case FILTER_MONSTER:
+        return pClass >= 0x20 && pClass <= 0x40 ;
+
+    case FILTER_BULLET:
+        return pClass == CLASS_PLAYER_BULLET
+                || pClass == CLASS_CREATURE_BULLET;
+    }
+
+
+    return false;
+}
+
+void CProtoIndex::init()
+{
+    forget();
+    m_index = new int [ m_protoArray->getSize() ] ;
+    for (int j = 0; j < m_protoArray->getSize(); ++j) {
+        if (isAccepted(j)) {
+            insert(j);
+        }
+    }
+}
+
+// find the insert position for a new proto
+int CProtoIndex::findPos(int protoId)
+{
+    int i = 0;
+    int min = 0;
+    int max = m_size - 1;
+    const char *newName = m_protoArray->getObject(protoId).proto().getName();
+    while (max >= min) {
+        i = min + (max - min) / 2;
+        int result = strcasecmp( m_protoArray->getObject(m_index[i]).proto().getName(), newName );
+        if (result <= 0) {
+            min = i + 1;
+        } else {
+            max = i - 1;
+        }
+    }
+
+    if (m_size && (strcasecmp( m_protoArray->getObject(m_index[i]).proto().getName(), newName) <= 0)) {
+        ++i;
+    }
+    return i;
+}
+
+// find the position for a given protoId
+int CProtoIndex::findProto (int protoId)
+{
+    for (int i=0; i< m_size; ++i) {
+        if (m_index[i]==protoId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void CProtoIndex::removeIndex (int pos )
+{
+    for (int k = pos ; k < m_size - 1; ++k) {
+        m_index[k] = m_index[k + 1];
+    }
+    --m_size;
+}
+
+void CProtoIndex::removeFromIndex (int protoId)
+{
+    for (int k=0; k < m_size; ++k) {
+        if (m_index[k] > protoId) {
+            -- m_index[k];
+        } else {
+            if (m_index[k] == protoId) {
+                removeIndex ( k );
+                --k;
+            }
+        }
+    }
+}
+
+int CProtoIndex::insert(int protoId)
+{
+    int i = findPos( protoId );
+    for (int k = m_size ; k > i; --k) {
+        m_index[k] = m_index[k - 1];
+    }
+    m_index[i] = protoId;
+    ++m_size;
+
+    return i;
+}
+
+void CProtoIndex::resizeIndex(int newSize)
+{
+    int *t = new int [ newSize ] ;
+
+    for (int i = 0; i < m_size; ++i) {
+        t[i] = m_index[i] ;
+    }
+
+    delete [] m_index;
+    m_index = t;
+}
+
+int CProtoIndex::getSize()
+{
+    return m_size;
+}
+
+int CProtoIndex::operator [] (int i)
+{
+    return m_index[i];
+}
+
+void CProtoIndex::debug()
+{
+    CFileWrap file;
+    file.open("../debug/protoIndex.txt", "a");
+    char s[1024];
+    for (int k = 0 ; k < m_size; ++k) {
+        CLuaVM::debugv("index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
+        sprintf(s, "index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
+        file.write(s, strlen(s));
+    }
+
+    file += "\n--------------------------------------\n";
+    file.close();
+}

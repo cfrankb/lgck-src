@@ -280,6 +280,9 @@ public:
     const char *keys();
     JoyStateEntry & joyStateEntry(int i);
     const char * buttonText(int i);
+    int findButtonText(const char *text);
+    bool isJoyActionOn(int action);
+    void clearActionKey(int action);
 
     /////////////////////////////////////////////////////////////////
     // displayManager
@@ -350,8 +353,8 @@ protected:
 
     char *m_keys;
     char m_buttons[lgck::Button::Count];
-    static const JoyStateEntry m_defaultJoyStateMap[lgck::Player::Count];
-    JoyStateEntry m_joyStateMap[lgck::Player::Count];
+    static const JoyStateEntry m_defaultJoyStateMap[lgck::Input::Count];
+    JoyStateEntry m_joyStateMap[lgck::Input::Count];
     static const int m_arrPoints[];
     void copyDefaultJoyStateMap();
 

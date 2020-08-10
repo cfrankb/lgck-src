@@ -51,6 +51,7 @@
 #include "../shared/GameEvents.h"
 #include "../shared/ss_version.h"
 #include "../shared/Frame.h"
+#include "../shared/inputs/qt/kt_qt.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "DlgEditLevel.h"
@@ -123,11 +124,24 @@ constexpr char XTICK_MAX_RATE[] = "tick_max_rate";
 constexpr char LAST_FOLDER[] = "rememberLastFolder";
 constexpr char FOLDERS[] = "Folders";
 constexpr char FOLDER_LGCKDB[] = "lgckdb";
+constexpr char INPUTS [] = "Inputs";
 
 #define O_STR(s,k) (*m_options)[s].get(k).toString()
 #define O_INT(s,k) (*m_options)[s].get(k).toInt()
 #define O_BOOL(s,k) (*m_options)[s].get(k).toBool()
 #define O_SET(s,k,v) (*m_options)[s].set(k,v)
+
+constexpr char actionNames[][16] = {
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Jump",
+    "Fire",
+    "Action",
+    "Special1",
+    "Special2"
+};
 
 MainWindow *me = nullptr;
 
@@ -136,7 +150,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     // Gamepad
     m_gamepad = nullptr;
-    wireGamePad();
+    initGamePad();
 
     // Init Settings
     initSettings();
@@ -2559,6 +2573,9 @@ void MainWindow::saveSettings()
         settings.setValue("external", m_runtimeExternal);
         settings.setValue("rez", m_rez);
         settings.endGroup();
+
+        // inputs
+        writeButtonConfig(settings);
         settings.sync();
     }
 }
@@ -2695,6 +2712,9 @@ void MainWindow::reloadSettings()
     m_actionEraser->setChecked(settings.value("eraserTool", false).toBool());
     ui->actionSprite_Paint->setChecked(settings.value("paintTool", false).toBool());
     settings.endGroup();
+
+    // Inputs
+    readButtonConfig(settings);
 }
 
 void MainWindow::setVisible(bool visible)
@@ -3210,7 +3230,7 @@ void MainWindow::notifyJoyEvent(lgck::Button::JoyButton button, char value)
     m_doc.setJoyButton(button, value);
 }
 
-void MainWindow::wireGamePad()
+void MainWindow::initGamePad()
 {
     auto gamepads = QGamepadManager::instance()->connectedGamepads();
     qDebug(!gamepads.isEmpty() ? "gamepad found" : "no gamepad found");
@@ -3264,4 +3284,36 @@ void MainWindow::wireGamePad()
     connect(m_gamepad, &QGamepad::buttonRightChanged, this, [](bool pressed){
         emit me->joyEventOccured(lgck::Button::Right, pressed);
     });
+}
+
+void MainWindow::readButtonConfig(QSettings & settings)
+{
+    settings.beginGroup(INPUTS);
+    for (int i=0; i < lgck::Input::Count; ++i) {
+        const char *actionName = actionNames[i];
+        CGame::JoyStateEntry & entry = m_doc.joyStateEntry(i);
+        QString buttonText = settings.value(QString("button_%1").arg(actionName), "").toString();
+        QString qtKeyText = settings.value(QString("key_%1").arg(actionName), "").toString();
+        entry.keyCode = static_cast<lgck::Key::Code>(CKeyTranslator::translateText2Lgck(qtKeyText));
+        entry.button = static_cast<lgck::Button::JoyButton>(m_doc.findButtonText(q2c(buttonText)));
+    }
+    settings.endGroup();
+}
+
+void MainWindow::writeButtonConfig(QSettings &settings)
+{
+    settings.beginGroup(INPUTS);
+    for (int i=0; i < lgck::Input::Count; ++i) {
+        const char *actionName = actionNames[i];
+        CGame::JoyStateEntry & entry = m_doc.joyStateEntry(i);
+        const char *buttonText = entry.button >= 0 ? m_doc.buttonText(entry.button) : "";
+        //qDebug() << i << actionName << " button: " << buttonText;
+        QString qtKeyText;
+        int qtKeyCode = CKeyTranslator::translateLgck2Text(entry.keyCode, qtKeyText);
+        Q_UNUSED(qtKeyCode);
+        //qDebug() << i << actionName << " key: " << qtKeyText;
+        settings.setValue(QString("button_%1").arg(actionName), buttonText);
+        settings.setValue(QString("key_%1").arg(actionName), qtKeyText);
+    }
+    settings.endGroup();
 }

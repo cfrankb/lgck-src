@@ -97,7 +97,6 @@ int CKeyTranslator::translateLgck2Text(int key, QString & text)
             } else {
                 text = QKeySequence(qtKeyCode).toString();
             }
-            qDebug() << "qtKeyCode " << qtKeyCode << " " << text;
             return qtKeyCode;
         }
     }
@@ -121,4 +120,3 @@ int CKeyTranslator::translateText2Lgck(QString text)
     }
     return translate(qtKey);
 }
-

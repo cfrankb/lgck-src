@@ -82,16 +82,35 @@ const int CGame::m_arrPoints[]=
     10000
 };
 
-const CGame::JoyStateEntry CGame::m_defaultJoyStateMap[lgck::Player::Count] = {
+const CGame::JoyStateEntry CGame::m_defaultJoyStateMap[lgck::Input::Count] = {
     {lgck::Key::Up, lgck::Button::Up},
     {lgck::Key::Down, lgck::Button::Down},
     {lgck::Key::Left, lgck::Button::Left},
     {lgck::Key::Right, lgck::Button::Right},
     {lgck::Key::Space, lgck::Button::A},
     {lgck::Key::LShift, lgck::Button::B},
-    {lgck::Key::Invalid, lgck::Button::Invalid},
+    {lgck::Key::Z, lgck::Button::Invalid}, // action (z-key)
     {lgck::Key::Invalid, lgck::Button::Invalid},
     {lgck::Key::Invalid, lgck::Button::Invalid}
+};
+
+constexpr char gamePadButtons[][8]{
+    "A",
+    "B",
+    "X",
+    "Y",
+    "L1",
+    "L3",
+    "R1",
+    "R3",
+    "Select",
+    "Start",
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Center",
+    "Guide"
 };
 
 CGame::CGame():CGameFile()
@@ -188,6 +207,20 @@ void CGame::updateJoyState()
         flagValue *= 2;
     }
     var("joyState") = state;
+}
+
+bool CGame::isJoyActionOn(int action)
+{
+    const JoyStateEntry & entry = m_joyStateMap[action];
+    return ((entry.keyCode >= 0 ? m_keys[entry.keyCode] : 0) |
+        (entry.button >= 0 ? m_buttons[entry.button] : 0)) != 0;
+}
+
+void CGame::clearActionKey(int action)
+{
+    const JoyStateEntry & entry = m_joyStateMap[action];
+    entry.keyCode >= 0 ? m_keys[entry.keyCode] = 0: 0;
+    entry.button >= 0 ? m_buttons[entry.button] = 0 : 0;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -807,8 +840,8 @@ bool CGame::managePlayer()
     // Control Player movements (while alive)
     if (!(player.m_nStateFlag & CHitData::STATE_DEAD)) {
         // ZKey is not repeating
-        if (m_keys[lgck::Key::Z]) {
-            m_keys[lgck::Key::Z] = 0;
+        if (isJoyActionOn(lgck::Input::Action)) {
+            clearActionKey(lgck::Input::Action);
             playerZKey();
         }
         if (!bFall && player.m_nProto > 0) {
@@ -2278,26 +2311,19 @@ CGame::JoyStateEntry & CGame::joyStateEntry(int i)
 
 const char * CGame::buttonText(int i)
 {
-    static const char gamePadButtons[][16]{
-        "A",
-        "B",
-        "X",
-        "Y",
-        "L1",
-        "L3",
-        "R1",
-        "R3",
-        "Select",
-        "Start",
-        "Up",
-        "Down",
-        "Left",
-        "Right",
-        "Center",
-        "Guide"
-    };
-    return gamePadButtons[i];
+    return i >= 0 ? gamePadButtons[i] : "";
 }
+
+int CGame::findButtonText(const char *text)
+{
+    for (int i=0; i < lgck::Button::Count; ++i) {
+        if (strcmp(gamePadButtons[i], text) == 0) {
+            return i;
+        }
+    }
+    return CGame::INVALID;
+}
+
 
 CLuaVM & CGame::luaVM()
 {
@@ -2318,4 +2344,3 @@ CScene *CGame::_bk()
 {
     return m_sBK;
 }
-

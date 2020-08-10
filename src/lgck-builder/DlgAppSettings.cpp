@@ -157,14 +157,14 @@ void CDlgAppSettings::initButtonTable()
     widget->setColumnCount(4);
     widget->setRowCount(listActions.count());
     widget->setHorizontalHeaderLabels({tr("Actions"), tr("Keys"), tr("Gamepad"), ""});
-    widget->setColumnWidth(0, 150);
+    widget->setColumnWidth(0, 165);
     widget->setColumnWidth(1, 120);
     widget->setColumnWidth(2, 120);
     widget->setColumnWidth(3, 16);
     widget->verticalHeader()->setVisible(false);
     QIcon icon = QIcon(QPixmap(":/images/pd/dagobert83_cancelx16.png"));
-    m_keys = new CWGetKey *[lgck::Player::Count];
-    m_cbButtons = new QComboBox *[lgck::Player::Count];
+    m_keys = new CWGetKey *[lgck::Input::Count];
+    m_cbButtons = new QComboBox *[lgck::Input::Count];
     for (int i=0; i < listActions.count(); ++i){
         m_keys[i] = new CWGetKey(widget);
         QPushButton *button = new QPushButton(icon,"", this);
@@ -181,9 +181,8 @@ void CDlgAppSettings::initButtonTable()
         widget->setCellWidget(i,1,m_keys[i]);
         widget->setCellWidget(i,2,m_cbButtons[i]);
         widget->setCellWidget(i,3,button);
-        //connect(button, SIGNAL(clicked()), this, SLOT(buttonPushed()));
+        connect(button, SIGNAL(clicked()), this, SLOT(clearKey()));
     }
-
 }
 
 CDlgAppSettings::~CDlgAppSettings()
@@ -312,7 +311,7 @@ void CDlgAppSettings::load(QStringList &listActions, QStringList &listShortcuts,
         widget->setCellWidget(i,0,label);
         widget->setCellWidget(i,1,m_hotkeys[i]);
         widget->setCellWidget(i,2,button);
-        connect(button, SIGNAL(clicked()), this, SLOT(buttonPushed()));
+        connect(button, SIGNAL(clicked()), this, SLOT(clearHotkey()));
     }
 }
 
@@ -324,12 +323,22 @@ void CDlgAppSettings::save(QStringList &listShortcuts)
     }
 }
 
-void CDlgAppSettings::buttonPushed()
+void CDlgAppSettings::clearHotkey()
 {
     QPushButton *button = qobject_cast<QPushButton *>(QObject::sender());
     if (button) {
         int id = button->property("id").toInt();
         m_hotkeys[id]->setText("");
+    }
+}
+
+void CDlgAppSettings::clearKey()
+{
+    QPushButton *button = qobject_cast<QPushButton *>(QObject::sender());
+    if (button) {
+        int id = button->property("id").toInt();
+        m_cbButtons[id]->setCurrentIndex(0);
+        m_keys[id]->setText("");
     }
 }
 
@@ -608,7 +617,7 @@ void CDlgAppSettings::setContinue(bool c)
 
 void CDlgAppSettings::setJoyButtons(const CGame::JoyStateEntry *map)
 {
-    for (int i=0; i < lgck::Player::Count; ++i) {
+    for (int i=0; i < lgck::Input::Count; ++i) {
         m_joyStates[i] = map[i];
         m_cbButtons[i]->setCurrentIndex(map[i].button + 1);
         QString qtKeyText;
@@ -621,9 +630,8 @@ void CDlgAppSettings::setJoyButtons(const CGame::JoyStateEntry *map)
 void CDlgAppSettings::getJoyButtons(CGame::JoyStateEntry *map)
 {
     // https://stackoverflow.com/questions/14034209/convert-string-representation-of-keycode-to-qtkey-or-any-int-and-back
-    for (int i=0; i < lgck::Player::Count; ++i) {
+    for (int i=0; i < lgck::Input::Count; ++i) {
         map[i].button = static_cast<lgck::Button::JoyButton>(m_cbButtons[i]->currentIndex() - 1);
         map[i].keyCode = static_cast<lgck::Key::Code>(CKeyTranslator::translateText2Lgck(m_keys[i]->text()));
     }
 }
-

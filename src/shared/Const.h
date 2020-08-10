@@ -19,7 +19,7 @@
 #define _CONST_H
 
 namespace lgck {
-    struct Player {
+    struct Input {
         enum Action{
             Up,
             Down,
@@ -58,7 +58,7 @@ namespace lgck {
     };
 
     struct Key{
-        enum  	Code { 
+        enum Code {
             A = 'a', 
             B = 'b', 
             C = 'c', 

@@ -29,6 +29,7 @@
 #include "../shared/qtgui/cheat.h"
 #include "../shared/interfaces/ISound.h"
 #include "../shared/Proto.h"
+#include "../shared/ProtoIndex.h"
 #include <QMenu>
 #include <QMessageBox>
 #include <QFileDialog>

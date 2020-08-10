@@ -38,6 +38,7 @@ class QFont;
 class COptions;
 class COptionGroup;
 class QGamepad;
+class QSettings;
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -161,7 +162,9 @@ private:
     void markAsGoal(bool isGoal);
     static void newDebugString(const char *s);
     void memorizeFilePath();
-    void wireGamePad();
+    void initGamePad();
+    void readButtonConfig(QSettings & settings);
+    void writeButtonConfig(QSettings & settings);
 
 protected:
     void initializeGL();

@@ -101,6 +101,8 @@ SOURCES +=  mainwindow.cpp \
     ../shared/SndArray.cpp \
     ../shared/Settings.cpp \
     ../shared/ProtoArray.cpp \
+    ../shared/ProtoIndex.cpp \
+    ../shared/Proto.cpp \
     ../shared/FrameArray.cpp \
     ../shared/LuaVM.cpp \
     ../shared/LevelEntry.cpp \
@@ -209,6 +211,7 @@ HEADERS  +=  mainwindow.h \
     ../shared/Snd.h \
     ../shared/Settings.h \
     ../shared/ProtoArray.h \
+    ../shared/ProtoIndex.h \
     ../shared/Proto.h \
     ../shared/FrameArray.h \
     ../shared/LuaVM.h \

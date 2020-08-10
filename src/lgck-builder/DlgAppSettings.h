@@ -109,7 +109,7 @@ protected:
     void enableTriggerKeyOptions();
     void initButtonTable();
 
-    CGame::JoyStateEntry m_joyStates[lgck::Player::Count];
+    CGame::JoyStateEntry m_joyStates[lgck::Input::Count];
 
 private:
     Ui::CDlgAppSettings *m_ui;
@@ -125,7 +125,8 @@ signals:
 
 private slots:
     void on_cShowGrid_clicked();
-    void buttonPushed();
+    void clearHotkey();
+    void clearKey();
     void on_cCheckUpdate_clicked(bool checked);
     void on_btnCheckUpdate_clicked();
     void on_btnRuntime_clicked();
