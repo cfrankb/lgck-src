@@ -56,6 +56,8 @@
 #include "displayconfig.h"
 #include "fontmanager.h"
 
+constexpr char SIGNATURE_JOYSTATEMAP[] = "JOYS";
+
 #define JM_VLA3     0
 #define JM_GIANA    1
 #define JM_MIXED    2
@@ -2344,3 +2346,32 @@ CScene *CGame::_bk()
 {
     return m_sBK;
 }
+
+bool CGame::exportJoyStateMap(IFile & file)
+{
+    uint32_t version = getVersion();
+    file.write(SIGNATURE_JOYSTATEMAP, 4);
+    file.write(&version, sizeof(uint32_t));
+    file.write(m_joyStateMap, sizeof(m_joyStateMap));
+    return true;
+}
+
+bool CGame::importJoyStateMap(IFile & file)
+{
+    int32_t version = 0;
+    char signature[4];
+    file.read(signature, 4);
+    if (memcmp(signature, SIGNATURE_JOYSTATEMAP, 4)==0) {
+        file.read(&version, sizeof(int32_t));
+        if (version == getVersion()) {
+            file.read(m_joyStateMap, sizeof(m_joyStateMap));
+            return true;
+        } else {
+            m_lastError = "JoyState version is wrong";
+        }
+    } else {
+        m_lastError = "JoyState signature is wrong";
+    }
+    return false;
+}
+

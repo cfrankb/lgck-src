@@ -9,7 +9,6 @@
 #include <cstdio>
 #include <cmath>
 #include "CRC.h"
-//#include <QDebug>
 
 /* These describe the color_type field in png_info. */
 /* color type masks */
@@ -257,15 +256,15 @@ bool CPngMagic::_8bpp(
     //printf("pixelWidth: %d\n", pixelWidth);
     //printf("pitch: %d\n", pitch);
 
-    uint64_t dataSize = pitch * CFrame::toNet(ihdr.Height);
+    LONGUINT dataSize = pitch * CFrame::toNet(ihdr.Height);
     uint8_t *data = new uint8_t [ dataSize ];
     //    printf("total data:%d\n", ((int)dataSize));
 
     int err = uncompress(
                 (uint8_t *)data,
-                (uint64_t *)& dataSize,
+                (LONGUINT *)& dataSize,
                 (uint8_t *)cData,
-                (uint64_t) cDataSize);
+                (LONGUINT) cDataSize);
 
     if (err) {
 //        set.setLastError("error in decomp");
@@ -451,9 +450,9 @@ bool CPngMagic::_4bpp(
 
     int err = uncompress(
                 (uint8_t *)data,
-                (uint64_t *)& dataSize,
+                (LONGUINT *)& dataSize,
                 (uint8_t *)cData,
-                (uint64_t) cDataSize);
+                (LONGUINT) cDataSize);
 
     if (err) {
 //        set.setLastError("error in decomp");

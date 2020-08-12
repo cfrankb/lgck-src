@@ -57,7 +57,7 @@ public:
     /////////////////////////////////////////////////////////////////
     // public enums
 
-    enum {
+    enum: uint8_t {
         UP          	= 0,
         DOWN			= 1,
         LEFT			= 2,
@@ -70,8 +70,8 @@ public:
         RIGHT_UP		= 5,
         LEFT_DOWN		= 6,
         RIGHT_DOWN		= 7,
-        PAUSE			= -2,
-        SEPARATOR		= -1,
+        PAUSE			= 0xfe,
+        SEPARATOR		= 0xff,
         FALL            = 254,
         HERE			= 255
     } SPRITE_AIM;

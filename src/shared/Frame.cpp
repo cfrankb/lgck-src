@@ -148,7 +148,7 @@ void CFrame::write(IFile & file)
     file.write(&m_bCustomMap,4);
 
     if ((m_nLen>0) && (m_nHei>0)) {
-        uint64_t nDestLen;
+        LONGUINT nDestLen;
         uint8_t *pDest;
         int err = compressData((uint8_t *)m_rgb, 4 * m_nLen * m_nHei, &pDest, nDestLen);
         if (err != Z_OK) {
@@ -192,16 +192,16 @@ bool CFrame::read(IFile &file, int version)
             uint8_t *pSrc = new uint8_t [ nSrcLen ];
             file.read(pSrc, nSrcLen);
 
-            uint64_t nDestLen = m_nLen * m_nHei * 4;
+            LONGUINT nDestLen = m_nLen * m_nHei * 4;
 
             // create a new bitmap
             m_rgb = new uint32_t [ m_nLen * m_nHei ] ;
 
             int err = uncompress(
                     (uint8_t *)m_rgb,
-                    (uint64_t *)& nDestLen,
+                    (LONGUINT *)& nDestLen,
                     (uint8_t *)pSrc,
-                    (uint64_t)nSrcLen);
+                    (LONGUINT)nSrcLen);
 
             delete [] pSrc;
 
@@ -308,7 +308,7 @@ void CFrame::toPng(uint8_t * & png, int & totalSize, uint8_t *obl5data, int obl5
 
     // compress the data ....................................
     int scanLine = m_nLen * 4;
-    uint64_t dataSize = (scanLine + 1) * m_nHei;
+    LONGUINT dataSize = (scanLine + 1) * m_nHei;
     uint8_t * data = new uint8_t [ dataSize ];
     for (int y=0; y < m_nHei; ++y) {
         uint8_t * d = data + y * (scanLine + 1);
@@ -317,7 +317,7 @@ void CFrame::toPng(uint8_t * & png, int & totalSize, uint8_t *obl5data, int obl5
     }
 
     uint8_t * cData;
-    uint64_t cDataSize;
+    LONGUINT cDataSize;
     int err = compressData(data, dataSize, &cData, cDataSize);
     if (err != Z_OK) {
         CLuaVM::debugv("CFrame::toPng error: %d", err);

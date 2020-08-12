@@ -284,6 +284,9 @@ public:
     bool isJoyActionOn(int action);
     void clearActionKey(int action);
 
+    bool exportJoyStateMap(IFile & file);
+    bool importJoyStateMap(IFile & file);
+
     /////////////////////////////////////////////////////////////////
     // displayManager
     void setDisplayState(bool state, int alpha);

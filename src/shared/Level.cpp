@@ -112,8 +112,8 @@ bool CLevel::readLegacyV1(IFile & file)
     // legacy "level" w/o layer support
     int size = 0;
     int entrySize = 0;
-    uint64_t totalSize = 0;
-    uint64_t compressSize = 0;
+    LONGUINT totalSize = 0;
+    LONGUINT compressSize = 0;
 
     file.read(&size, sizeof (size));
     std::string t;

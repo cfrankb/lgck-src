@@ -163,7 +163,8 @@ SOURCES +=  mainwindow.cpp \
     wslider.cpp \
     ../shared/ss_build.cpp \
     ../shared/fontmanager.cpp \
-    ../shared/interfaces/IGraphics.cpp
+    ../shared/interfaces/IGraphics.cpp \
+    ../shared/compat/asprintf.cpp
 
 HEADERS  +=  mainwindow.h \
     #../shared/JoyState.h \
@@ -284,7 +285,8 @@ HEADERS  +=  mainwindow.h \
     wslider.h \
     ../shared/ss_build.h \
     ../shared/fontmanager.h \
-    ../shared/ISerial.h
+    ../shared/ISerial.h \
+    ../shared/compat/asprintf.h
 
 FORMS  += mainwindow.ui \
     DlgSource.ui \

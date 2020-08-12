@@ -216,7 +216,7 @@ bool CLevelViewGL::isGameMode()
     return gameMode;
 }
 
-void CLevelViewGL::uint2color(u_int32_t rgba, Color & out)
+void CLevelViewGL::uint2color(uint32_t rgba, Color & out)
 {
     uint8_t blue = rgba & 0xff;
     uint8_t green = (rgba & 0xff00) >> 8;
@@ -227,7 +227,7 @@ void CLevelViewGL::uint2color(u_int32_t rgba, Color & out)
     };
 }
 
-void CLevelViewGL::uint2rgba(u_int32_t rgba, float &red, float &green, float &blue, float &alpha)
+void CLevelViewGL::uint2rgba(uint32_t rgba, float &red, float &green, float &blue, float &alpha)
 {
     Color t;
     uint2color(rgba, t);

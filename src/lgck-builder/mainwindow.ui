@@ -153,6 +153,7 @@
      <addaction name="actionRuntime_Lua"/>
      <addaction name="actionExport_Sprite"/>
      <addaction name="actionExport_Game"/>
+     <addaction name="actionJoyState_Mapping"/>
     </widget>
     <widget class="QMenu" name="menuImport">
      <property name="title">
@@ -1100,6 +1101,11 @@
    </property>
    <property name="toolTip">
     <string>Toggle Sprite Paint</string>
+   </property>
+  </action>
+  <action name="actionJoyState_Mapping">
+   <property name="text">
+    <string>JoyState Mapping</string>
    </property>
   </action>
  </widget>

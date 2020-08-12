@@ -82,8 +82,8 @@ protected:
     void drawCheckers();
     void drawBackground();
     void drawItemRect();
-    void uint2color(u_int32_t rgba, Color &out);
-    void uint2rgba(u_int32_t rgba, float &red, float &green, float &blue, float &alpha);
+    void uint2color(uint32_t rgba, Color &out);
+    void uint2rgba(uint32_t rgba, float &red, float &green, float &blue, float &alpha);
 
 Q_SIGNALS:
     void focused(bool);

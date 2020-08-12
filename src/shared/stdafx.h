@@ -44,5 +44,6 @@
 #endif
 
 #define UNUSED(x) (void)x;
+#define LONGUINT long unsigned int
 
 #endif

@@ -97,9 +97,9 @@ void CFrameSet::write0x501(IFile & file)
         ptr += 4 * frame->m_nLen *  frame->m_nHei;
     }
 
-    uint64_t destSize;
+    LONGUINT destSize;
     uint8_t *dest;
-    int err = compressData((uint8_t *)buffer, (uint64_t) totalSize, &dest, destSize);
+    int err = compressData((uint8_t *)buffer, (LONGUINT) totalSize, &dest, destSize);
     if (err != Z_OK) {
         CLuaVM::debugv("CFrameSet::write0x501 error: %d", err);
     }
@@ -203,9 +203,9 @@ bool CFrameSet::read0x501(IFile &file, int size)
 
     int err = uncompress(
             (uint8_t *)buffer,
-            (uint64_t *)& totalSize,
+            (LONGUINT *)& totalSize,
             (uint8_t *)srcBuffer,
-            (uint64_t)srcSize);
+            (LONGUINT)srcSize);
 
     if (err) {
         printf("err: %d\n", err);
@@ -646,16 +646,16 @@ bool CFrameSet::extract(IFile &file, char *out_format)
             if (mode != CFrame::MODE_ZLIB_ALPHA) {
                 file.read(bitmap, frame->m_nLen * frame->m_nHei);
             } else {
-                uint64_t nSrcLen = 0;
+                LONGUINT nSrcLen = 0;
                 file.read(&nSrcLen,4);
                 uint8_t *pSrc = new uint8_t [ nSrcLen ];
                 file.read(pSrc, nSrcLen);
-                uint64_t nDestLen = frame->m_nLen * frame->m_nHei;
+                LONGUINT nDestLen = frame->m_nLen * frame->m_nHei;
                 int err = uncompress(
                         (uint8_t *)bitmap,
-                        (uint64_t *)& nDestLen,
+                        (LONGUINT *)& nDestLen,
                         (uint8_t *)pSrc,
-                        (uint64_t)nSrcLen);
+                        (LONGUINT)nSrcLen);
                 if (err) {
                     m_lastError = "CFrameSet::extract zlib error";
                 }

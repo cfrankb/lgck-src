@@ -5,6 +5,7 @@
 #include "Level.h"
 #include "Layer.h"
 #include <vector>
+#include "../shared/qtgui/cheat.h"
 
 constexpr int ICON_SIZE = 24;
 constexpr char WEB_PATH[] = "https://cfrankb.com/lgck/";
@@ -89,25 +90,18 @@ void CGameFixer::addSampleSprites()
         CFrameSet *frameSet = new CFrameSet;
         int frameSetId = 0;
         metaItem & item = items[i];
-        char *oblPath = nullptr;
-        if (asprintf(&oblPath, ":res/meta/%s.obl", item.name) == -1) {
-            qDebug("asprintf alloc failed");
-        }
-        if (oblPath && file.open(oblPath, "rb")) {
+        QString oblPath = QString::asprintf(":res/meta/%s.obl", item.name);
+        if (file.open(q2c(oblPath), "rb")) {
             frameSet->read(file);
             frameSet->setName(item.name);
             frameSetId = m_game->addFrameSet(frameSet);
             file.close();
         } else {
-            qWarning("failed to read: %s", oblPath);
+            qWarning("failed to read: %s", q2c(oblPath));
         }
-        free(oblPath);
 
-        char *metaPath = nullptr;
-        if (asprintf(&metaPath, ":res/meta/%s.proto", item.name) == -1) {
-            qDebug("asprintf alloc failed");
-        }
-        if (metaPath && file.open(metaPath, "rb")) {
+        QString metaPath = QString::asprintf(":res/meta/%s.proto", item.name);
+        if (file.open(q2c(metaPath), "rb")) {
             m_game->m_arrProto.getSize();
             CProtoArray t;
             t.importMeta(file);
@@ -126,9 +120,8 @@ void CGameFixer::addSampleSprites()
             m_game->m_arrProto += t;
             file.close();
         } else {
-            qWarning("failed to read: %s", metaPath);
+            qWarning("failed to read: %s", q2c(metaPath));
         }
-        free(metaPath);
     }
 }
 

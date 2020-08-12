@@ -281,6 +281,8 @@ private slots:
     void updateIndicator();
     void indicatorTriggered();
 
+    void on_actionJoyState_Mapping_triggered();
+
 signals:
     void levelDeleted(int index);
     void levelMoved(int fromIndex, int toIndex);

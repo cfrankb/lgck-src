@@ -2857,7 +2857,6 @@ void MainWindow::checkVersion()
         version /= 256;
     }
 
-    QOperatingSystemVersion os = QOperatingSystemVersion::current();
     QString productVersion = QSysInfo::productVersion();
     QString productType = QSysInfo::productType();
     QString ver = QString::asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
@@ -2865,7 +2864,7 @@ void MainWindow::checkVersion()
     QString url = QString::asprintf(q2c(m_updateURL),
                                     q2c(ver),
                                     q2c(driver),
-                                    q2c(os.name().replace(" ", "+")),
+                                    q2c(QSysInfo::kernelType()),
                                     q2c(m_uuid),
                                     q2c(QString(productType + "+" + productVersion)));
     while (m_updater->isRunning());
@@ -3013,6 +3012,11 @@ void MainWindow::on_actionSprite_Editor_triggered()
 
 void MainWindow::exportGame()
 {
+    if (QSysInfo::kernelType()=="linux") {
+        QMessageBox::warning(this, m_appTitle, tr("Export game is unavailable on linux at this time."));
+        return;
+    }
+
     if (m_doc.isDirty() || m_doc.m_path.empty()) {
         if (!saveAs()) {
             return;
@@ -3307,13 +3311,16 @@ void MainWindow::writeButtonConfig(QSettings &settings)
         const char *actionName = actionNames[i];
         CGame::JoyStateEntry & entry = m_doc.joyStateEntry(i);
         const char *buttonText = entry.button >= 0 ? m_doc.buttonText(entry.button) : "";
-        //qDebug() << i << actionName << " button: " << buttonText;
         QString qtKeyText;
         int qtKeyCode = CKeyTranslator::translateLgck2Text(entry.keyCode, qtKeyText);
         Q_UNUSED(qtKeyCode);
-        //qDebug() << i << actionName << " key: " << qtKeyText;
         settings.setValue(QString("button_%1").arg(actionName), buttonText);
         settings.setValue(QString("key_%1").arg(actionName), qtKeyText);
     }
     settings.endGroup();
+}
+
+void MainWindow::on_actionJoyState_Mapping_triggered()
+{
+
 }

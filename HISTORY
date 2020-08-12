@@ -7,6 +7,7 @@ HISTORY OF LGCK BUILDER
 - ENGINE: overlays now support multiline text
 - ENGINE: overlays can have custom fonts
 - ENGINE: major code clean up
+- ENGINE: abstracted keys and buttons
 - EDITOR: mark/unmark all goals matching a sprite 
 - EDITOR: added debug output window
 - EDITOR: tile paint, eraser modes added
@@ -14,6 +15,7 @@ HISTORY OF LGCK BUILDER
 - EDITOR: added GameFixer that report and help fix common design errors
 - EDITOR: added sample sprite to New Games
 - EDITOR: replaced QScintilla with a native Qt solution
+- EDITOR: added GamePad support
 - LUA: display_setFlagXY, display_setFont
 - LUA: spriteIdFromUuid
 
