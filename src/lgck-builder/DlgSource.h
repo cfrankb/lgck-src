@@ -43,7 +43,7 @@ public:
     static void setOptions(COptionGroup &options);
 
 signals:
-    void textInserted(const char *);
+    void textInserted(const QString &);
     void fontChanged(const QFont &);
 
 protected:

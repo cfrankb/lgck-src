@@ -63,7 +63,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -815,6 +815,41 @@
    <header location="global">wbtncolor.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>cShowGrid</tabstop>
+  <tabstop>cbGridSize</tabstop>
+  <tabstop>eGridColor</tabstop>
+  <tabstop>btnGridColor</tabstop>
+  <tabstop>cbShowTriggerKey</tabstop>
+  <tabstop>eTriggerKeyColor</tabstop>
+  <tabstop>btnTriggerKeyColor</tabstop>
+  <tabstop>cbTriggerKeyFontSize</tabstop>
+  <tabstop>cbProjects</tabstop>
+  <tabstop>cLastFolder</tabstop>
+  <tabstop>cbTickMaxRate</tabstop>
+  <tabstop>cbFontSize</tabstop>
+  <tabstop>cbFontFamily</tabstop>
+  <tabstop>cHighlight</tabstop>
+  <tabstop>cWordWrap</tabstop>
+  <tabstop>cWhiteSpace</tabstop>
+  <tabstop>cAutoComplete</tabstop>
+  <tabstop>cCheckUpdate</tabstop>
+  <tabstop>eApiURL</tabstop>
+  <tabstop>btnCheckUpdate</tabstop>
+  <tabstop>cSkipSplashScreen</tabstop>
+  <tabstop>eRuntime</tabstop>
+  <tabstop>btnRuntime</tabstop>
+  <tabstop>eRuntimeArgs</tabstop>
+  <tabstop>btnRestore</tabstop>
+  <tabstop>cbSkill</tabstop>
+  <tabstop>eScore</tabstop>
+  <tabstop>eHitPoints</tabstop>
+  <tabstop>cbLives</tabstop>
+  <tabstop>cContinue</tabstop>
+  <tabstop>tableButtons</tabstop>
+  <tabstop>tableWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

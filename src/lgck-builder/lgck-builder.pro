@@ -53,267 +53,264 @@ win32:LIBS += \
     -lz \
     -lopengl32
 
-SOURCES +=  mainwindow.cpp \
-    #../shared/JoyState.cpp \
-    WGetKey.cpp \
+SOURCES += \
+    ../shared/Actor.cpp \
+    ../shared/Animation.cpp \
+    ../shared/Attacker.cpp \
+    ../shared/compat/asprintf.cpp \
+    ../shared/Display.cpp \
+    ../shared/displayconfig.cpp \
+    ../shared/DisplayManager.cpp \
+    ../shared/DotArray.cpp \
+    ../shared/Drone.cpp \
+    ../shared/FileMem.cpp \
+    ../shared/FileWrap.cpp \
+    ../shared/Folders.cpp \
+    ../shared/Font.cpp \
+    ../shared/fontmanager.cpp \
+    ../shared/Frame.cpp \
+    ../shared/FrameArray.cpp \
+    ../shared/FrameSet.cpp \
+    ../shared/Game.cpp \
+    ../shared/GameEvents.cpp \
+    ../shared/GameFile.cpp \
+    ../shared/GameLua.cpp \
+    ../shared/helper.cpp \
+    ../shared/implementers/opengl/gr_opengl.cpp \
+    ../shared/implementers/opengl/im_opengl.cpp \
+    ../shared/implementers/sdl/gr_sdl.cpp \
+    ../shared/implementers/sdl/im_sdl.cpp \
+    ../shared/implementers/sdl/mu_sdl.cpp \
+    ../shared/implementers/sdl/sn_sdl.cpp \
+    ../shared/inputs/qt/kt_qt.cpp \
+    ../shared/interfaces/IGraphics.cpp \
+    ../shared/Inventory.cpp \
+    ../shared/inventoryTable.cpp \
+    ../shared/Layer.cpp \
+    ../shared/Level.cpp \
+    ../shared/LevelEntry.cpp \
+    ../shared/LuaVM.cpp \
+    ../shared/Map.cpp \
+    ../shared/Monster.cpp \
+    ../shared/Object.cpp \
+    ../shared/Path.cpp \
+    ../shared/PathBlock.cpp \
+    ../shared/PngMagic.cpp \
+    ../shared/Proto.cpp \
+    ../shared/ProtoArray.cpp \
+    ../shared/ProtoIndex.cpp \
+    ../shared/qtgui/qtlua.cpp \
+    ../shared/Scene.cpp \
+    ../shared/Selection.cpp \
+    ../shared/Settings.cpp \
+    ../shared/Snapshot.cpp \
+    ../shared/SndArray.cpp \
+    ../shared/ss_build.cpp \
+    ../shared/StringTable.cpp \
+    ../shared/Tasks.cpp \
+    DlgAbout.cpp \
+    DlgAnimation.cpp \
+    DlgAppSettings.cpp \
+    dlgdisplay.cpp \
+    DlgDistributeGame.cpp \
+    DlgEditLevel.cpp \
+    DlgEntry.cpp \
+    DlgExportSprite.cpp \
+    DlgFrameSet.cpp \
+    DlgGame.cpp \
+    DlgGotoLevel.cpp \
     dlgindicator.cpp \
-    optiongroup.cpp \
-    options.cpp \
+    DlgLayer.cpp \
+    DlgObject.cpp \
+    DlgPath.cpp \
+    DlgPathDir.cpp \
+    DlgSelect.cpp \
+    DlgSkill.cpp \
+    DlgSource.cpp \
+    DlgTestLevel.cpp \
+    exportgame.cpp \
     gamefixer.cpp \
     infodock.cpp \
     launcher.cpp \
+    levelscroll.cpp \
+    levelviewgl.cpp \
     luahighlighter.cpp \
     main.cpp \
-    levelviewgl.cpp \
-    levelscroll.cpp \
-    DlgSource.cpp \
-    DlgSkill.cpp \
-    DlgGotoLevel.cpp \
-    DlgEditLevel.cpp \
-    DlgGame.cpp \
-    DlgAppSettings.cpp \
-    DlgAbout.cpp \
-    DlgObject.cpp \
-    DlgLayer.cpp \
-    DlgFrameSet.cpp \
-    DlgEntry.cpp \
-    DlgAnimation.cpp \
-    DlgPath.cpp \
-    DlgPathDir.cpp \
+    mainwindow.cpp \
+    OBL5File.cpp \
+    optiongroup.cpp \
+    options.cpp \
+    Pixel.cpp \
+    thread_updater.cpp \
     ToolBoxDock.cpp \
-    WSpriteList.cpp \
-    WizSprite.cpp \
-    WFrameSet.cpp \
+    WAnimation.cpp \
+    wbtncolor.cpp \
     WEdit.cpp \
     WEditEvents.cpp \
-    DlgTestLevel.cpp \
+    WFileDialog.cpp \
+    WFrameSet.cpp \
+    WGetKey.cpp \
+    WHotKey.cpp \
+    WizFont.cpp \
+    WizFrameSet.cpp \
+    WizGame.cpp \
+    wizhead.cpp \
     WizPageEasy.cpp \
     WizPageGeneral.cpp \
     WizPageImages.cpp \
-    WizFrameSet.cpp \
     WizPageImport.cpp \
-    DlgSelect.cpp \
-    WizGame.cpp \
-    WAnimation.cpp \
-    WHotKey.cpp \
-    Pixel.cpp \
-    WFileDialog.cpp \
-    ../shared/SndArray.cpp \
-    ../shared/Settings.cpp \
-    ../shared/ProtoArray.cpp \
-    ../shared/ProtoIndex.cpp \
-    ../shared/Proto.cpp \
-    ../shared/FrameArray.cpp \
-    ../shared/LuaVM.cpp \
-    ../shared/LevelEntry.cpp \
-    ../shared/Level.cpp \
-    ../shared/Layer.cpp \
-    ../shared/Game.cpp \
-    ../shared/Folders.cpp \
-    ../shared/FileWrap.cpp \
-    ../shared/Animation.cpp \
-    ../shared/Object.cpp \
-    ../shared/Path.cpp \
-    ../shared/GameFile.cpp \
-    ../shared/GameLua.cpp \
-    ../shared/GameEvents.cpp \
-    ../shared/Scene.cpp \
-    ../shared/Actor.cpp \
-    ../shared/Map.cpp \
-    ../shared/FrameSet.cpp \
-    ../shared/Frame.cpp \
-    ../shared/Inventory.cpp \
-    ../shared/Monster.cpp \
-    ../shared/Drone.cpp \
-    ../shared/Selection.cpp \
-    ../shared/PngMagic.cpp \
-    ../shared/StringTable.cpp \
-    ../shared/Tasks.cpp \
-    ../shared/DotArray.cpp \
-    ../shared/Attacker.cpp \
-    ../shared/PathBlock.cpp \
-    ../shared/inventoryTable.cpp \
-    ../shared/Display.cpp \
-    ../shared/DisplayManager.cpp \
-    ../shared/Font.cpp \
-    ../shared/implementers/opengl/im_opengl.cpp \
-    ../shared/implementers/opengl/gr_opengl.cpp \
-    ../shared/implementers/sdl/mu_sdl.cpp \
-    ../shared/implementers/sdl/sn_sdl.cpp \
-    ../shared/implementers/sdl/im_sdl.cpp \
-    ../shared/implementers/sdl/gr_sdl.cpp \
-  # ../shared/implementers/sfml/mu_sfml.cpp \
-  #  ../shared/implementers/sfml/sn_sfml.cpp \
-    ../shared/inputs/qt/kt_qt.cpp \
-    ../shared/qtgui/qtlua.cpp \
-    ../shared/helper.cpp \
     WizScript.cpp \
-    wizhead.cpp \
-    wbtncolor.cpp \
-    thread_updater.cpp \
-    ../shared/Snapshot.cpp \
-    ../shared/FileMem.cpp \
-    OBL5File.cpp \
-    WizFont.cpp \
-    DlgExportSprite.cpp \
-    DlgDistributeGame.cpp \
-    exportgame.cpp \
-    ../shared/displayconfig.cpp \
-    dlgdisplay.cpp \
+    WizSprite.cpp \
     wslider.cpp \
-    ../shared/ss_build.cpp \
-    ../shared/fontmanager.cpp \
-    ../shared/interfaces/IGraphics.cpp \
-    ../shared/compat/asprintf.cpp
+    WSpriteList.cpp
 
-HEADERS  +=  mainwindow.h \
-    #../shared/JoyState.h \
-    WGetKey.h \
-    dlgindicator.h \
-    optiongroup.h \
-    options.h \
-    gamefixer.h \
-    luahighlighter.h \
-    infodock.h \
-    launcher.h \
-    levelviewgl.h \
-    levelscroll.h \
-    DlgSource.h \
-    DlgSkill.h \
-    DlgObject.h \
-    DlgGotoLevel.h \
-    DlgAppSettings.h \
-    DlgGame.h \
+HEADERS += \
+    ../shared/Actor.h \
+    ../shared/Animation.h \
+    ../shared/Attacker.h \
+    ../shared/compat/asprintf.h \
+    ../shared/Credits.h \
+    ../shared/Display.h \
+    ../shared/displayconfig.h \
+    ../shared/DisplayManager.h \
+    ../shared/DotArray.h \
+    ../shared/Drone.h \
+    ../shared/Extra.h \
+    ../shared/FileMem.h \
+    ../shared/FileWrap.h \
+    ../shared/Folders.h \
+    ../shared/Font.h \
+    ../shared/fontmanager.h \
+    ../shared/Frame.h \
+    ../shared/FrameArray.h \
+    ../shared/FrameSet.h \
+    ../shared/Game.h \
+    ../shared/GameEvents.h \
+    ../shared/GameFile.h \
+    ../shared/GameLua.h \
+    ../shared/helper.h \
+    ../shared/IFile.h \
+    ../shared/implementers/opengl/glhelper.h \
+    ../shared/implementers/opengl/gr_opengl.h \
+    ../shared/implementers/opengl/im_opengl.h \
+    ../shared/implementers/sdl/gr_sdl.h \
+    ../shared/implementers/sdl/im_sdl.h \
+    ../shared/implementers/sdl/mu_sdl.h \
+    ../shared/implementers/sdl/sn_sdl.h \
+    ../shared/inputs/qt/kt_qt.h \
+    ../shared/interfaces/IDisplayManager.h \
+    ../shared/interfaces/IGraphics.h \
+    ../shared/interfaces/IImageManager.h \
+    ../shared/interfaces/IMusic.h \
+    ../shared/interfaces/ISound.h \
+    ../shared/Inventory.h \
+    ../shared/inventoryTable.h \
+    ../shared/ISerial.h \
+    ../shared/Layer.h \
+    ../shared/Level.h \
+    ../shared/LevelEntry.h \
+    ../shared/LuaVM.h \
+    ../shared/Map.h \
+    ../shared/Monster.h \
+    ../shared/Object.h \
+    ../shared/Path.h \
+    ../shared/PathBlock.h \
+    ../shared/PngMagic.h \
+    ../shared/Proto.h \
+    ../shared/ProtoArray.h \
+    ../shared/ProtoIndex.h \
+    ../shared/qtgui/qtlua.h \
+    ../shared/Scene.h \
+    ../shared/Selection.h \
+    ../shared/Settings.h \
+    ../shared/Snapshot.h \
+    ../shared/Snd.h \
+    ../shared/SndArray.h \
+    ../shared/ss_build.h \
+    ../shared/ss_version.h \
+    ../shared/StringTable.h \
+    ../shared/Tasks.h \
+    ../shared/vlamits3.h \
     DlgAbout.h \
-    DlgLayer.h \
-    DlgFrameSet.h \
-    DlgEntry.h \
-    DlgEditLevel.h \
     DlgAnimation.h \
+    DlgAppSettings.h \
+    dlgdisplay.h \
+    DlgDistributeGame.h \
+    DlgEditLevel.h \
+    DlgEntry.h \
+    DlgExportSprite.h \
+    DlgFrameSet.h \
+    DlgGame.h \
+    DlgGotoLevel.h \
+    dlgindicator.h \
+    DlgLayer.h \
+    DlgObject.h \
     DlgPath.h \
     DlgPathDir.h \
+    DlgSelect.h \
+    DlgSkill.h \
+    DlgSource.h \
+    DlgTestLevel.h \
+    exportgame.h \
+    gamefixer.h \
+    infodock.h \
+    launcher.h \
+    levelscroll.h \
+    levelviewgl.h \
+    luahighlighter.h \
+    mainwindow.h \
+    OBL5File.h \
+    optiongroup.h \
+    options.h \
+    thread_updater.h \
     ToolBoxDock.h \
-    WSpriteList.h \
-    WizSprite.h \
-    WFrameSet.h \
+    WAnimation.h \
+    wbtncolor.h \
     WEdit.h \
     WEditEvents.h \
-    DlgTestLevel.h \
+    WFileDialog.h \
+    WFrameSet.h \
+    WGetKey.h \
+    WHotKey.h \
+    WizFont.h \
+    WizFrameSet.h \
+    WizGame.h \
     WizPageEasy.h \
     WizPageGeneral.h \
     WizPageImages.h \
-    WizFrameSet.h \
     WizPageImport.h \
-    DlgSelect.h \
-    WizGame.h \
-    WAnimation.h \
-    WHotKey.h \
-    ../shared/SndArray.h \
-    ../shared/Snd.h \
-    ../shared/Settings.h \
-    ../shared/ProtoArray.h \
-    ../shared/ProtoIndex.h \
-    ../shared/Proto.h \
-    ../shared/FrameArray.h \
-    ../shared/LuaVM.h \
-    ../shared/vlamits3.h \
-    ../shared/LevelEntry.h \
-    ../shared/Level.h \
-    ../shared/Layer.h \
-    ../shared/Game.h \
-    ../shared/Folders.h \
-    ../shared/FileWrap.h \
-    ../shared/Animation.h \
-    ../shared/Object.h \
-    ../shared/Path.h \
-    ../shared/GameFile.h \
-    ../shared/GameLua.h \
-    ../shared/GameEvents.h \
-    ../shared/Scene.h \
-    ../shared/Actor.h \
-    ../shared/Map.h \
-    ../shared/Credits.h \
-    ../shared/FrameSet.h \
-    ../shared/Frame.h \
-    ../shared/Inventory.h \
-    ../shared/Monster.h \
-    ../shared/Drone.h \
-    ../shared/Tasks.h \
-    ../shared/DotArray.h \
-    ../shared/Attacker.h \
-    ../shared/PathBlock.h \
-    ../shared/Selection.h \
-    ../shared/PngMagic.h \
-    ../shared/StringTable.h \
-    ../shared/ss_version.h \
-    ../shared/inventoryTable.h \
-    ../shared/interfaces/IImageManager.h \
-    ../shared/interfaces/IGraphics.h \
-    ../shared/implementers/opengl/im_opengl.h \
-    ../shared/implementers/opengl/gr_opengl.h \
-    ../shared/implementers/sdl/mu_sdl.h \
-    ../shared/implementers/sdl/sn_sdl.h \
-    ../shared/implementers/sdl/im_sdl.h \
-    ../shared/implementers/sdl/gr_sdl.h \
-  #  ../shared/implementers/sfml/mu_sfml.h \
-  #  ../shared/implementers/sfml/sn_sfml.h \
-    ../shared/interfaces/IMusic.h \
-    ../shared/Display.h \
-    ../shared/DisplayManager.h \
-    ../shared/interfaces/IDisplayManager.h \
-    ../shared/interfaces/ISound.h \
-    ../shared/inputs/qt/kt_qt.h \
-    ../shared/qtgui/qtlua.h \
-    ../shared/helper.h \
     WizScript.h \
-    wbtncolor.h \
-    thread_updater.h \
-    ../shared/Snapshot.h \
-    ../shared/Extra.h \
-    ../shared/FileMem.h \
-    ../shared/IFile.h \
-    ../shared/Font.h \
-    ../shared/implementers/opengl/glhelper.h \
-    WFileDialog.h \
-    OBL5File.h \
-    WizFont.h \
-    DlgExportSprite.h \
-    DlgDistributeGame.h \
-    exportgame.h \
-    ../shared/displayconfig.h \
-    dlgdisplay.h \
+    WizSprite.h \
     wslider.h \
-    ../shared/ss_build.h \
-    ../shared/fontmanager.h \
-    ../shared/ISerial.h \
-    ../shared/compat/asprintf.h
+    WSpriteList.h
 
-FORMS  += mainwindow.ui \
-    DlgSource.ui \
-    DlgSkill.ui \
-    DlgObject.ui \
-    DlgGotoLevel.ui \
-    DlgAppSettings.ui \
-    DlgGame.ui \
-    DlgFrameSet.ui \
+FORMS += \
     DlgAbout.ui \
-    DlgLayer.ui \
-    DlgEntry.ui \
-    DlgEditLevel.ui \
     DlgAnimation.ui \
+    DlgAppSettings.ui \
+    dlgdisplay.ui \
+    DlgDistributeGame.ui \
+    DlgEditLevel.ui \
+    DlgEntry.ui \
+    DlgExportSprite.ui \
+    DlgFrameSet.ui \
+    DlgGame.ui \
+    DlgGotoLevel.ui \
+    dlgindicator.ui \
+    DlgLayer.ui \
+    DlgObject.ui \
     DlgPath.ui \
     DlgPathDir.ui \
     DlgSelect.ui \
+    DlgSkill.ui \
+    DlgSource.ui \
     DlgTestLevel.ui \
+    infodock.ui \
+    mainwindow.ui \
     ToolBoxDock.ui \
-    WizSprite.ui \
     WEditEvents.ui \
+    WizFont.ui \
     WizFrameSet.ui \
     WizGame.ui \
     WizScript.ui \
-    WizFont.ui \
-    DlgExportSprite.ui \
-    DlgDistributeGame.ui \
-    dlgdisplay.ui \
-    dlgindicator.ui \
-    infodock.ui
+    WizSprite.ui

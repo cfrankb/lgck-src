@@ -3209,6 +3209,7 @@ void MainWindow::indicatorTriggered()
 {
     if (m_fixer->ready()){
         CDlgIndicator dlg;
+        dlg.setWindowTitle(tr("Project Fixer"));
         dlg.setText(m_fixer->getText());
         dlg.exec();
     }
