@@ -55,7 +55,7 @@ with open('../lgck-builder/scripts/common.lua') as s:
             a = line.split('=',2)
             print(a[0].strip())
             c.append(a[0].strip())
-            
+
 for line in classes.strip().split('\n'):
     a = line.split('=',2)
     print(a[0].strip())
