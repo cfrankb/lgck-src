@@ -49,7 +49,7 @@ with open('../lgck-builder/lgck-builder.pro') as s:
 
 print(lines)
 
-with open('../lgck-builder/lgck-builder-clean.pro', 'w') as t:
+with open('../lgck-builder/lgck-builder.pro', 'w') as t:
     t.write('\n'.join([x for x in preface]))
 
     for g in groups:

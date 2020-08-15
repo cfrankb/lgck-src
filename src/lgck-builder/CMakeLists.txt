@@ -31,11 +31,6 @@ set(CMAKE_BUILD_TYPE
     Release
 )
 
-set(CMAKE_LIBRARY_PATH 
-    ${CMAKE_LIBRARY_PATH}
-    /opt/local/lib
-)
-
 set(lgckb_SRCS 
     DlgAbout.cpp
     DlgAnimation.cpp

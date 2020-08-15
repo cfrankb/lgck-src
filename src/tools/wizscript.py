@@ -18,33 +18,15 @@
 from datetime import date
 import json
 import os
+from lgckutil.license import *
 
 WIZSCRIPT_CONF = 'conf/wizscript.json'
-
-def write_GPL(tfile, start, end):
-    tfile.write('''%s
-    LGCK Builder Runtime
-    Copyright (C) 1999, %d  Francois Blanchette
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-%s\n''' % (start, date.today().year, end))
 
 def makesafe(code):
     return code.strip().replace('"', '\\"').replace('\n', '\\n')
 
 def write_file(tfile):
-    write_GPL(tfile, '/*', '*/')
+    tfile.write(license_cpp)
     tfile.write('''
 #include "stdafx.h"
 #include "WizScript.h"

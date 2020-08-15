@@ -20,25 +20,7 @@ import argparse
 from datetime import date
 import os.path
 import collections
-
-def write_GPL(tfile, start, end):
-    tfile.write('''%s
-    LGCK Builder Runtime
-    Copyright (C) 1999, %d  Francois Blanchette
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-%s\n''' % (start, date.today().year, end))
+from lgckutil.license import *
 
 #http://www.dailycoding.com/Posts/enum_coversion_operations_int_to_enum_enum_to_int_string_to_enum_enum_to_string.aspx
 #http://www.lua.org/manual/5.2/manual.html#lua_pushnumber
@@ -51,7 +33,9 @@ class GenLua():
         ltypes = self.data['types']['ltypes']
         outt = self.data['types']['outt']
         tf_lua = open(self.data['output']['lua'], 'w')
-        write_GPL(tf_lua, '--[[', ']]--')
+        print("OUT LUA: {}".format(self.data['output']['lua']))
+        #write_GPL(tf_lua, '--[[', ']]--')
+        tf_lua.write(license_lua)
         tf_lua.write('-- auto-generated\n')
         tf_lua.write('''
 if unpack == nil then
@@ -60,6 +44,7 @@ if unpack == nil then
 end
         ''')
         cpp_file = self.data['output']['cpp']
+        print("OUT CPP: {}".format(self.data['output']['cpp']))
         src = ''
         if os.path.isfile(cpp_file):
             sf_cpp = open(cpp_file, 'r')
@@ -70,10 +55,11 @@ end
         if src and len(src)>1:
             tf_cpp.write(src[0])
         else:
-            write_GPL(tf_cpp, '/*', '*/')
+            #write_GPL(tf_cpp, '/*', '*/')
+            tf_cpp.write(license_cpp)
         tf_cpp.write('// auto-generated\n')
         cl_dict = {}
-        for cl, v in self.data['classes'].iteritems():
+        for cl, v in self.data['classes'].items():
             cl_dict[cl] = {
                 "delete":{'outv':'', 'args': []},
                 "use":{'outv':'', 'args': []},
@@ -85,19 +71,19 @@ end
                 fct = vv[0]
                 args = vv[1] if len(vv) > 1 else []
                 if fct in cl_dict[cl]:
-                    print '%s already defined for %s' % (fct, cl)
+                    print ('%s already defined for %s' % (fct, cl))
                 cl_dict[cl][fct]={ 'args': args.split(',') if args else [], 'outv': outv }
         for ch,pa in self.data['inheritance'].items():
-            cl_dict[ch] = dict(cl_dict[pa].items() + cl_dict[ch].items())
+            cl_dict[ch] = { **cl_dict[pa], **cl_dict[ch] }
         for cl,v in sorted(cl_dict.items()):
             if self.args.verbose:
-                print cl
+                print (cl)
             tf_lua.write('%s = {};\n' % cl)
             tf_lua.write('%s.__index = %s;\n\n' % (cl, cl))
             ### cpp code
             for fct in sorted(v):
                 if self.args.verbose:
-                    print '    %s' % fct
+                    print ('    %s' % fct)
                 if fct == 'use':
                     continue
                 outv = cl_dict[cl][fct]['outv']
@@ -220,7 +206,7 @@ end
         tf_lua.close()
     
     def main(self):
-        parser = argparse.ArgumentParser(description='genLua utility for LGCK Builder')
+        parser = argparse.ArgumentParser(description='Utility to generate lua binding for QT')
         parser.add_argument('file', default='conf/genlua.json', help='The json file to parse (genlua.json)')
         parser.add_argument('-v', dest='verbose', action='store_true', help= "verbose")
         self.args = parser.parse_args()        
@@ -229,7 +215,7 @@ end
             raw = f.read() 
             f.close()
         except:
-            print "can't open %s" % args.file
+            print ("can't open %s" % args.file)
             exit(-1)
         self.data = json.loads(raw)
         self.process()

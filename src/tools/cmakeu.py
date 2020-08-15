@@ -48,9 +48,8 @@ class CMakeU():
                         for k in l:
                             if ':' in j:
                                 try:
-                                    f = open(k) 
-                                    text = f.read() 
-                                    f.close()
+                                    with open(k) as f:
+                                        text = f.read()
                                     if v[1] in text:
                                         self.lines.append('    ' + k)
                                 except:
@@ -64,7 +63,7 @@ class CMakeU():
             self.lines.append(el + '(' + self.data[el] + ')')
 
     def main(self):
-        parser = argparse.ArgumentParser(description='CMakeFile utility for LGCK Builder')
+        parser = argparse.ArgumentParser(description='CMakeLists utility for LGCK Builder')
         parser.add_argument('file', default='cmakeu.json', help='The json file to parse (cmakeu.json)')
         parser.add_argument('-o', '--output', required=False, default='CMakeLists.txt')
         args = parser.parse_args()

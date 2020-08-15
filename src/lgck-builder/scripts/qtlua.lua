@@ -1,6 +1,6 @@
 --[[
     LGCK Builder Runtime
-    Copyright (C) 1999, 2015  Francois Blanchette
+    Copyright (C) 1999, 2020  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,8 +21,7 @@ if unpack == nil then
     -- to keep lua 5.2 happy
     unpack = table.unpack;
 end
-
-CWBtnColor = {};
+        CWBtnColor = {};
 CWBtnColor.__index = CWBtnColor;
 
 function CWBtnColor:color()

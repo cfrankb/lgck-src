@@ -51,7 +51,7 @@ def process_files(files, update):
 
 def main():
     parser = argparse.ArgumentParser(description='utility')
-    parser.add_argument('file', default='', nargs='?', help='file to patse')
+    parser.add_argument('file', default='', nargs='?', help='file to parse')
     parser.add_argument('-u', dest='update', action='store_true', help= "update")
     args = parser.parse_args()
     

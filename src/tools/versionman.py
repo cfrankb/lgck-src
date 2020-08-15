@@ -22,6 +22,7 @@ import datetime
 import json
 import uuid
 import re
+from lgckutil.license import *
 
 VERSIONMAN_CONF = "conf/versionman.json"
 SS_VERSION_H = '../shared/ss_version.h'
@@ -39,7 +40,7 @@ TEMPL = r'''#ifndef VERSION_H
 #define VER_FILEDESCRIPTION_STR     "{file_desc}"
 #define VER_INTERNALNAME_STR        "{int_file_desc}"
 #define VER_LEGALCOPYRIGHT_STR      "Copyright {c} {year} Francois Blanchette"
-#define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
+#define VER_LEGALTRADEMARKS1_STR    ""
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "{app_exe}"
 #define VER_PRODUCTNAME_STR         "LGCK builder"
@@ -70,7 +71,7 @@ for f in files:
     int_file_desc = f['int_file_desc']
 
     with open(file_path, 'w') as t:
-        t.write(TEMPL.format(
+        t.write(license_cpp + TEMPL.format(
             version=version,
             version_str=version_str,
             year=now.year,
