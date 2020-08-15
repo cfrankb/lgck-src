@@ -1,4 +1,20 @@
-#!/usr/bin/python
+'''
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
 import json
 import argparse
 from datetime import date
@@ -205,7 +221,7 @@ end
     
     def main(self):
         parser = argparse.ArgumentParser(description='genLua utility for LGCK Builder')
-        parser.add_argument('file', default='genlua.json', help='The json file to parse (genlua.json)')
+        parser.add_argument('file', default='conf/genlua.json', help='The json file to parse (genlua.json)')
         parser.add_argument('-v', dest='verbose', action='store_true', help= "verbose")
         self.args = parser.parse_args()        
         try:

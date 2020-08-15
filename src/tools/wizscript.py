@@ -1,7 +1,25 @@
-#!/usr/bin/python
+'''
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
 from datetime import date
 import json
 import os
+
+WIZSCRIPT_CONF = 'conf/wizscript.json'
 
 def write_GPL(tfile, start, end):
     tfile.write('''%s
@@ -33,18 +51,18 @@ def write_file(tfile):
 
 WIZACTION CWizScript::m_actions[]=
 {\n''')
-    with open('wizscript.json') as sfile:
+    with open(WIZSCRIPT_CONF) as sfile:
         raw = sfile.read()
     data = json.loads(raw)
     for k,v in sorted(data.items()):
         name = k
-        print name
+        print(name)
         t = v['type']
         fname = v['fname']
         descr = v['descr']
         sampleName = 'wizscript/%s.sample.lua' % fname
         if not os.path.isfile(sampleName):
-            print 'creating: %s' % sampleName
+            print('creating: %s' % sampleName)
             tfileTmp = open(sampleName, 'a')
             tfileTmp.close()
         sfile = open(sampleName)

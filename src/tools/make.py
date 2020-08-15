@@ -1,4 +1,3 @@
-#!/usr/bin/python
 '''
     LGCK Builder Runtime
     Copyright (C) 1999, 2016  Francois Blanchette
