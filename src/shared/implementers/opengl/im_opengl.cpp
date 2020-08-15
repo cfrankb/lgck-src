@@ -216,10 +216,10 @@ int CIMOpengl::add(const char *uuid, CFont *font)
 {
     makeCurrent();
     GLuint textureId = -1;
-    GLint maxSize;
+    //GLint maxSize;
     glEnable(GL_TEXTURE_2D); GLDEBUG();
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize); GLDEBUG();
-    CLuaVM::debugv("MAXSIZE: %u", maxSize);
+    //glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize); GLDEBUG();
+    //CLuaVM::debugv("MAXSIZE: %u", maxSize);
 
     glGenTextures(1, &textureId); GLDEBUG();
     CLuaVM::debugv("texture: %.8x", textureId);

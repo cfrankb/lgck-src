@@ -2,9 +2,7 @@
 #include <qdebug.h>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
+#include <QtNetwork/QtNetwork>
 #include <QUrl>
 #include <QUrlQuery>
 #include "../shared/qtgui/cheat.h"

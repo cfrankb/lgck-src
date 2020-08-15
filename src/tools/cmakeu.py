@@ -17,8 +17,12 @@ class CMakeU():
             for i in self.data[el]:
                 self.lines.append('')
                 self.lines.append(el + '(' + i + ' ')
-                for j in self.data[el][i]:
-                    if '*' in j:
+                w = self.data[el][i]
+                p = w if type(w) is list else [w]
+                for j in p:
+                    if type(j) is not str:
+                        self.lines.append('    ' + str(j))
+                    elif '*' in j:
                         if ':' in j:
                             v = j.split(':',2)
                         else:
@@ -34,7 +38,7 @@ class CMakeU():
                                     if v[1] in text:
                                         self.lines.append('    ' + k)
                                 except:
-                                    print "fail to read {k}".format(k=k)
+                                    print ("fail to read {k}".format(k=k))
                             else:
                                 self.lines.append('    ' + k)
                     else:
@@ -50,22 +54,25 @@ class CMakeU():
         args = parser.parse_args()
         try:
             with open(args.file, 'r') as f:
-                raw = f.read() 
+                raw = f.read()
+            raw = raw.replace('\r\n', '\n')
+            a = raw.split('\n')
+            raw = '\n'.join([x for x in a if not x.strip() or x.strip()[0] != '#'])
         except:
-            print "can't open %s" % args.file
+            print ("can't open %s" % args.file)
             exit(-1)
         self.data = json.loads(raw)
         for el in self.data['__elements']:
-            if self.data.has_key(el):
+            if el in self.data:
                 self.process_element(el)
             else:
-                print 'missing element:' + el
+                print ('missing element:' + el)
         try:
             with open(args.output, 'w') as f:
                 f.write('\n'.join([e for e in self.lines]))
-            print "completed"
+            print ("completed")
         except:
-            print "can't write target {f}".format(f=args.output)
+            print ("can't write target {f}".format(f=args.output))
             exit(-1)
 
 cmakeu = CMakeU()

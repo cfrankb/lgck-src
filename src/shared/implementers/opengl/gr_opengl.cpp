@@ -20,18 +20,19 @@
 #include "im_opengl.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"
+
+#ifdef LGCK_QT
+    #include <QGLWidget>
+#endif
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+    #include <OpenGL/gl.h>
+    #include <OpenGL/glu.h>
 #else
-#ifdef _WIN32
-  #include <windows.h>
-#endif
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-#ifdef USE_QFILE
-#include <QGLWidget>
+    #ifdef _WIN32
+      #include <windows.h>
+    #endif
+    #include <GL/gl.h>
+    #include <GL/glu.h>
 #endif
 
 #include "im_opengl.h"
@@ -71,7 +72,7 @@ const char* CGROpenGL::signature()
 void CGROpenGL::getScreenSize(int & len, int & hei)
 {
     GLint viewport[4];
-    glGetIntegerv( GL_VIEWPORT, viewport );
+    glGetIntegerv(GL_VIEWPORT, viewport);
     len = viewport[2];
     hei = viewport[3];
 }

@@ -551,7 +551,7 @@ bool MainWindow::saveAs()
             );
     if (fileName.isEmpty())
         return false;
-    if (!fileName.endsWith(".lgckdb")) {
+    if (!fileName.toLower().endsWith(".lgckdb")) {
         fileName.append(".lgckdb");
     }
     m_doc.setFileName(q2c(fileName));
@@ -1692,7 +1692,7 @@ void MainWindow::on_actionC_declarations_triggered()
     QString fileFilter = tr("Header files (*.h)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(".h")) {
+        if (!fileName.toLower().endsWith(".h")) {
             fileName.append(".h");
         }
         CFileWrap file;
@@ -1736,7 +1736,7 @@ void MainWindow::on_actionRuntime_Lua_triggered()
     QString fileFilter = tr("Lua script (*.lua)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(".lua")) {
+        if (!fileName.toLower().endsWith(".lua")) {
             fileName.append(".lua");
         }
         CFileWrap file;
@@ -1812,7 +1812,7 @@ void MainWindow::initToolBar()
     m_levelToolbar->addAction(ui->actionSprite_Paint);
     ui->actionSprite_Paint->setIcon(QIcon(":/images/strawberrypntbrush.png"));
     ui->actionSprite_Paint->setStatusTip(tr("Paint the tile under the cursor with the given sprite"));
-    m_actionEraser = m_levelToolbar->addAction(QIcon(":/images/icons8-erase-40.png"), tr("Erase"));
+    m_actionEraser = m_levelToolbar->addAction(QIcon(":/images/icons8-erase-40.png"), tr("Eraser"));
     m_actionEraser->setCheckable(true);
     m_actionEraser->setStatusTip(tr("Erase the sprite under the cursor"));
     connect(m_actionEraser, SIGNAL(toggled(bool)), this, SLOT(eraserToggled(bool)));
@@ -3323,5 +3323,19 @@ void MainWindow::writeButtonConfig(QSettings &settings)
 
 void MainWindow::on_actionJoyState_Mapping_triggered()
 {
-
+    QString fileFilter = tr("JoyState Dump (*.bin)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
+    if (!fileName.isEmpty()) {
+        if (!fileName.toLower().endsWith(".bin")) {
+            fileName.append(".bin");
+        }
+        CFileWrap file;
+        if (file.open(q2c(fileName), "wb")) {
+            m_doc.exportJoyStateMap(file);
+            file.close();
+        }  else {
+            // write error
+            warningMessage( QString(tr("can't write to %1")).arg(fileName) );
+        }
+    }
 }

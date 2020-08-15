@@ -14,7 +14,6 @@
     "libDir": "./",
     "recursiveDepth": "3",
     "extraLibs": [
-        "libqscintilla2_qt5",
         "liblua5.2",
         "libSDL2_mixer-2.0",
         "libSDL2-2.0",
