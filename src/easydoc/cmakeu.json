@@ -1,0 +1,58 @@
+{
+    "project": "easydoc",
+    "cmake_minimum_required": "VERSION 3.10",
+    "include" : ["CMakePackageConfigHelpers"],
+    "find_library" : [],
+    "find_package" : [
+        "Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Widgets"
+    ],
+    "include_directories": [
+        "${QT_INCLUDES}",
+        "./",
+        "../shared"
+    ],
+    "add_definitions" : [
+        "${QT_DEFINITIONS}",
+        "-DUSE_QFILE=1",
+        "-DLGCK_QT=1"
+    ],
+    "set" : { 
+        "QT_MIN_VERSION" : "5.15.0",
+        "CMAKE_CXX_STANDARD" : "17",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CXX_FLAGS" : "\"${CMAKE_CXX_FLAGS} -std=c++0x -O3 -fPIE\"",
+        "CMAKE_INCLUDE_CURRENT_DIR": "ON",
+        "CMAKE_AUTOMOC": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        "lgckb_SRCS" : [
+            "*.cpp"
+        ],
+        "lgckb_ui_files": "*.ui",
+        "lgckb_MOC_HEADERS" : [
+            "*.h:Q_OBJECT"
+        ],
+        "lgckb_RCS" : "easydoc.qrc"
+    },
+    "QT5_AUTOMOC" : "${lgckb_SRCS}",
+    "QT5_WRAP_UI" : "lgckb_SRCS ${lgckb_ui_files}",
+    "QT5_WRAP_CPP" : "lgckb_MOC_OUTFILES ${lgckb_MOC_HEADERS}",
+    "QT5_ADD_RESOURCES" : "lgckb_RC_SRCS ${lgckb_RCS}",
+    "qt5_use_modules" : "app Core Gui Widgets",
+    "add_executable" : "easydoc ${lgckb_SRCS} ${lgckb_MOC_OUTFILES} ${lgckb_MOC_HEADERS} ${lgckb_RC_SRCS}",
+    "target_link_libraries" : "easydoc Qt5::Core Qt5::Widgets Qt5::Gui z lua5.2",
+    "__elements" : [
+        "cmake_minimum_required",
+        "project",
+        "include",
+        "set",
+        "find_package",
+        "find_library",
+        "include_directories",
+        "add_definitions",
+        "QT5_WRAP_UI",
+        "QT5_ADD_RESOURCES",
+        "add_executable",
+        "target_link_libraries"
+    ],
+    "__output": "CMakeLists.txt"
+} 

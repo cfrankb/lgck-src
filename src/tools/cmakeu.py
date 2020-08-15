@@ -53,7 +53,7 @@ class CMakeU():
                                     if v[1] in text:
                                         self.lines.append('    ' + k)
                                 except:
-                                    print ("fail to read {k}".format(k=k))
+                                    print ("failed to read {k}".format(k=k))
                             else:
                                 self.lines.append('    ' + k)
                     else:
