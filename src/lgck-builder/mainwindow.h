@@ -162,7 +162,9 @@ private:
     void markAsGoal(bool isGoal);
     static void newDebugString(const char *s);
     void memorizeFilePath();
+#ifdef LGCK_GAMEPAD
     void initGamePad();
+#endif
     void readButtonConfig(QSettings & settings);
     void writeButtonConfig(QSettings & settings);
 
@@ -173,8 +175,9 @@ protected:
     virtual void changeEvent(QEvent* e);
 
     QOpenGLContext *m_context;
+#ifdef LGCK_GAMEPAD
     QGamepad *m_gamepad;
-    bool hasGamepad;
+#endif
 
 public slots:
     void addLevel();

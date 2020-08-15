@@ -21,6 +21,7 @@ win32:RC_FILE       = lgck-builder.rc
 unix:DEFINES        += MAKE_LINUX=1
 DEFINES             += USE_QFILE=1
 DEFINES             += LGCK_QT=1
+#DEFINES             += LGCK_GAMEPAD=1
 QT                  += core gui opengl network gamepad
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET              = lgck-builder

@@ -1,14 +1,10 @@
 {
-    "project": "lgck_builder",
+    "project": "obl5edit",
     "cmake_minimum_required": "VERSION 3.10",
     "include" : ["CMakePackageConfigHelpers"],
-    "find_library" : [
-        "SDL_MIXER_LIBRARY NAMES SDL2_mixer HINTS ENV SDLMIXERDIR ENV SDLDIR PATH_SUFFIXES lib"
-    ],
+    "find_library" : [],
     "find_package" : [
-#        "Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui OpenGL Widgets Network Gamepad",
-        "Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui OpenGL Widgets Network",
-        "SDL REQUIRED",
+        "Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui OpenGL Widgets",
         "OpenGL REQUIRED"
     ],
     "include_directories": [
@@ -16,14 +12,14 @@
         #"~/Qt/5.15.0/gcc_64/include",
         "${QT_INCLUDES}",
         "../shared",
+        "../shared/qtgui/ColorPicker/",
+        "../shared/qtgui",
         "./"
     ],
     "add_definitions" : [
         "${QT_DEFINITIONS}",
         "-DUSE_QFILE=1",
-        "-DLGCK_QT=1",
-        #"-DLGCK_GAMEPAD=1",
-        "-D_GLIBCXX_USE_CXX11_ABI=0"
+        "-DLGCK_QT=1"
     ],
     "set" : { 
         "QT_MIN_VERSION" : "5.15.0",
@@ -41,26 +37,29 @@
         ],
         "lgckb_SRCS" : [
             "*.cpp",
-            "../shared/*.cpp",
-            "../shared/implementers/opengl/*.cpp",
-            "../shared/implementers/sdl/*.cpp",
-            "../shared/interfaces/*.cpp",
-            "../shared/inputs/qt/*.cpp",
-            "../shared/qtgui/*.cpp"
+            "../shared/FileWrap.cpp",
+            "../shared/Frame.cpp",
+            "../shared/FrameSet.cpp",
+            "../shared/DotArray.cpp",
+            "../shared/qtgui/ColorPicker/*.cpp",
+            "../shared/PngMagic.cpp",
+            "../shared/helper.cpp",
+            "../shared/LuaVM.cpp"
         ],
         "lgckb_ui_files": "*.ui",
-        "lgckb_MOC_HEADERS" : "*.h:Q_OBJECT",
-        "lgckb_RCS" : "lgck-builder.qrc"
+        "lgckb_MOC_HEADERS" : [
+            "*.h:Q_OBJECT",
+            "../shared/qtgui/ColorPicker/*.h:Q_OBJECT"
+        ],
+        "lgckb_RCS" : "obl5edit.qrc"
     },
     "QT5_AUTOMOC" : "${lgckb_SRCS}",
     "QT5_WRAP_UI" : "lgckb_SRCS ${lgckb_ui_files}",
     "QT5_WRAP_CPP" : "lgckb_MOC_OUTFILES ${lgckb_MOC_HEADERS}",
     "QT5_ADD_RESOURCES" : "lgckb_RC_SRCS ${lgckb_RCS}",
-#    "qt5_use_modules" : "app Core Gui Widgets OpenGL Network Gamepad",
-    "qt5_use_modules" : "app Core Gui Widgets OpenGL Network",
-    "add_executable" : "lgck-builder ${lgckb_SRCS} ${lgckb_MOC_OUTFILES} ${lgckb_MOC_HEADERS} ${lgckb_RC_SRCS}",
-#    "target_link_libraries" : "lgck-builder Qt5::Gamepad Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL ${SDL2mixer_LIBRARIES} lua5.2",
-    "target_link_libraries" : "lgck-builder Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL ${SDL2mixer_LIBRARIES} lua5.2",
+    "qt5_use_modules" : "app Core Gui Widgets OpenGL",
+    "add_executable" : "obl5edit ${lgckb_SRCS} ${lgckb_MOC_OUTFILES} ${lgckb_MOC_HEADERS} ${lgckb_RC_SRCS}",
+    "target_link_libraries" : "obl5edit Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Gui ${OPENGL_LIBRARIES} z lua5.2",
     "__elements" : [
         "cmake_minimum_required",
         "project",

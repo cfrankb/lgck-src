@@ -33,6 +33,7 @@ build dependencies:
     sdl2
     sdl2_mixer
     zlib
+    qt5-gamepad
 
 runtime dependencies:
 

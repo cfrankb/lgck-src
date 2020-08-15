@@ -10,7 +10,7 @@
 #define VER_COMPANYNAME_STR         "Francois Blanchette"
 #define VER_FILEDESCRIPTION_STR     "easydoc"
 #define VER_INTERNALNAME_STR        "easydoc"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2018 Francois Blanchette"
+#define VER_LEGALCOPYRIGHT_STR      "Copyright Â© 2020 Francois Blanchette"
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "easydoc.exe"

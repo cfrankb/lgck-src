@@ -114,6 +114,18 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     m_ui->btnGridColor->setBuddy(m_ui->eGridColor);
     m_ui->btnTriggerKeyColor->setBuddy(m_ui->eTriggerKeyColor);
 
+#ifndef LGCK_RUNTIME
+    m_ui->eRuntime->setDisabled(true);
+    m_ui->eRuntimeArgs->setDisabled(true);
+    m_ui->btnRestore->setDisabled(true);
+    m_ui->btnRuntime->setDisabled(true);
+#endif
+
+#ifndef LGCK_GAMEPAD
+    m_ui->tableButtons->hide();
+    m_ui->sButtonConfig->hide();
+#endif
+
     initButtonTable();
 }
 

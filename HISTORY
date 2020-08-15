@@ -16,6 +16,7 @@ HISTORY OF LGCK BUILDER
 - EDITOR: added sample sprite to New Games
 - EDITOR: replaced QScintilla with a native Qt solution
 - EDITOR: added GamePad support
+- EDITOR: builder can export sprite meta (proto)
 - LUA: display_setFlagXY, display_setFont
 - LUA: spriteIdFromUuid
 

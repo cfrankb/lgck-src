@@ -11,13 +11,13 @@ TARGET = obl5edit
 TEMPLATE = app
 INCLUDEPATH += ../shared/qtgui/ColorPicker
 INCLUDEPATH += ../shared
-win32:INCLUDEPATH += ../../redist/include
+win32:INCLUDEPATH += ../../../redist/include
 RESOURCES +=  obl5edit.qrc
 win32:RC_FILE = obl5edit.rc
 OTHER_FILES +=  TODO
 DEFINES += USE_QFILE=1
 win32:DEFINES += MAKE_WIN32
-win32:LIBS += -L../../redist/lib
+win32:LIBS += -L../../../redist/lib
 LIBS += -lz -llua5.2
 QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3

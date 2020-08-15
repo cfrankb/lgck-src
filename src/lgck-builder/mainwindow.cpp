@@ -85,7 +85,9 @@
 #include "dlgindicator.h"
 #include "launcher.h"
 #include "options.h"
+#ifdef LGCK_GAMEPAD
 #include <QtGamepad/QGamepad>
+#endif
 
 const char MainWindow::m_appName[] = "LGCK builder";
 const char MainWindow::m_author[] = "cfrankb";
@@ -149,8 +151,10 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     // Gamepad
+#ifdef LGCK_GAMEPAD
     m_gamepad = nullptr;
     initGamePad();
+#endif
 
     // Init Settings
     initSettings();
@@ -180,6 +184,9 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setApplicationVersion(appVersion);
 
     ui->setupUi(this);
+#ifndef LGCK_RUNTIME
+    ui->actionDistribution_Package->setDisabled(true);
+#endif
     m_proto = CGame::INVALID;
     m_event = CGame::INVALID;
     m_viewMode = VM_EDITOR;
@@ -3235,6 +3242,7 @@ void MainWindow::notifyJoyEvent(lgck::Button::JoyButton button, char value)
     m_doc.setJoyButton(button, value);
 }
 
+#ifdef LGCK_GAMEPAD
 void MainWindow::initGamePad()
 {
     auto gamepads = QGamepadManager::instance()->connectedGamepads();
@@ -3290,6 +3298,7 @@ void MainWindow::initGamePad()
         emit me->joyEventOccured(lgck::Button::Right, pressed);
     });
 }
+#endif
 
 void MainWindow::readButtonConfig(QSettings & settings)
 {
