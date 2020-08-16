@@ -785,11 +785,10 @@ void MainWindow::updateMenus()
         ui->actionDebug,
         ui->actionQuit_Game,
         ui->actionPause,
-        ui->actionRestart,
-        NULL
+        ui->actionRestart
     };
 
-    for (int i=0; actionsGame[i]; ++i) {
+    for (uint32_t i=0; i < sizeof(actionsGame)/sizeof(QAction*); ++i) {
         actionsGame[i]->setEnabled( m_viewMode == VM_GAME );
     }
 
@@ -843,10 +842,9 @@ void MainWindow::updateMenus()
             ui->actionSearch,
             ui->actionDelete,
             ui->actionEdit_Path,
-            ui->actionView_Code,
-            NULL
+            ui->actionView_Code
         };
-        for (int i=0; actionsEditor[i]; ++i) {
+        for (uint32_t i=0; i < sizeof(actionsEditor)/sizeof(QAction*); ++i) {
             actionsEditor[i]->setEnabled(false);
         }
         m_comboEvents->setEnabled(false);
@@ -964,6 +962,10 @@ void MainWindow::on_actionCreate_Level_triggered()
     dlg->setNewLevel();
     dlg->load( level );
     if (dlg->exec() == QDialog::Accepted) {
+        if (m_doc.getSize()==0) {
+            // init font on first level
+            m_doc.initFonts();
+        }
         dlg->save( level );
         m_doc.addLevel( level );
         m_doc.setDirty( true );

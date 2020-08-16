@@ -21,16 +21,12 @@
 
 #include <inttypes.h>
 
-#ifndef NULL
-#define NULL 0
-#endif
-
 // 
 // Select the target QT or GCC
 // 
 
 #define microtime(___time) struct timeval tm_time; \
-    gettimeofday(&tm_time, NULL); \
+    gettimeofday(&tm_time, nullptr); \
     *___time = tm_time.tv_usec / 1000 + tm_time.tv_sec * 1000;
 
 #ifdef USE_QFILE

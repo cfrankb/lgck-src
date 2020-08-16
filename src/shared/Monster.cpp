@@ -42,27 +42,27 @@ void CMonster::doManage()
     int nAim = m_nAim;
 
     unMap();
-    if (m_propi[EXTRA_ANIMSEQ] != CObject::AS_MOVE + nAim) {
+    if (m_propi[lgck::EXTRA_ANIMSEQ] != CObject::AS_MOVE + nAim) {
         tryAnimation( CObject::AS_MOVE + nAim);
     }
 
     if (canFall() ) {
         if ( !proto.m_nFallSpeed || ticks % proto.m_nFallSpeed == 0 ) {
 
-            if (!m_propi[EXTRA_FALLHEIGHT]) {
+            if (!m_propi[lgck::EXTRA_FALLHEIGHT]) {
                 callEvent(CObject::EO_FALL);
             }
 
             moveBy(0,8);
-            ++m_propi[EXTRA_FALLHEIGHT];
+            ++m_propi[lgck::EXTRA_FALLHEIGHT];
         }
     } else {
 
-        if (m_propi[EXTRA_FALLHEIGHT]) {
+        if (m_propi[lgck::EXTRA_FALLHEIGHT]) {
             land();
         }
 
-        m_propi[EXTRA_FALLHEIGHT] = 0;
+        m_propi[lgck::EXTRA_FALLHEIGHT] = 0;
         if ( !getState(CHitData::STATE_DEAD) &&
                 ((proto.m_nMoveSpeed == 0) || (ticks % (proto.m_nMoveSpeed) == 0))) {
 
@@ -80,8 +80,8 @@ void CMonster::doManage()
                     aim ^= 1;
                 }
 
-                if (!x && (aim ^ 1) == m_propi[EXTRA_OLDAIM2]) {
-                    aim = m_propi[EXTRA_OLDAIM2];
+                if (!x && (aim ^ 1) == m_propi[lgck::EXTRA_OLDAIM2]) {
+                    aim = m_propi[lgck::EXTRA_OLDAIM2];
                     flipMe = aim;
                 }
 
@@ -106,9 +106,9 @@ void CMonster::doManage()
                     move(aim ^ CGame::LEAP) ;
                 }
 
-                if ((aim & CGame::AIM_MASK) != m_propi[EXTRA_OLDAIM1] ) {
-                    m_propi[EXTRA_OLDAIM2] = m_propi[EXTRA_OLDAIM1];
-                    m_propi[EXTRA_OLDAIM1] = aim & CGame::AIM_MASK;
+                if ((aim & CGame::AIM_MASK) != m_propi[lgck::EXTRA_OLDAIM1] ) {
+                    m_propi[lgck::EXTRA_OLDAIM2] = m_propi[lgck::EXTRA_OLDAIM1];
+                    m_propi[lgck::EXTRA_OLDAIM1] = aim & CGame::AIM_MASK;
                 }
 
                 m_nAim = aim & CGame::AIM_MASK;

@@ -31,7 +31,6 @@
         <file>images/ronnie/properties.png</file>
         <file>images/ronnie/save.png</file>
         <file>images/ronnie/saveas.png</file>
-        <file>images/export.png</file>
         <file>res/gpl.txt</file>
         <file>images/girlsm-tr.png</file>
         <file>images/check.png</file>
@@ -41,7 +40,6 @@
         <file>res/functions.txt</file>
         <file>images/icon64.png</file>
         <file>res/license.txt</file>
-        <file>scripts/mobdebug.lua</file>
         <file>scripts/templates/player_bullet.lua</file>
         <file>images/pd/dagobert83_cancelx16.png</file>
         <file>images/tango/document-new.png</file>

@@ -36,7 +36,7 @@ int vasprintf(char** strp, const char* fmt, va_list ap)
     size_t requiredSize;
 
     // be paranoid
-    *strp = NULL;
+    *strp = nullptr;
 
     // copy va_list, as it is used twice 
     va_copy(ap_copy, ap);
@@ -56,7 +56,7 @@ int vasprintf(char** strp, const char* fmt, va_list ap)
     *strp = (char*)malloc(requiredSize);
 
     // bail out on failed memory allocation
-    if (*strp == NULL)
+    if (*strp == nullptr)
     {
         errno = ENOMEM;
         return -1;
@@ -69,7 +69,7 @@ int vasprintf(char** strp, const char* fmt, va_list ap)
     if (actualLength != formattedLength)
     {
         free(*strp);
-        *strp = NULL;
+        *strp = nullptr;
         errno = ENOMEM;
         return -1;
     }

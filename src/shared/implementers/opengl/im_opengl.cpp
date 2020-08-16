@@ -51,7 +51,7 @@ CIMOpengl::~CIMOpengl()
     forget();
     if (m_imageSets) {
         delete [] m_imageSets;
-        m_imageSets = NULL;
+        m_imageSets = nullptr;
     }
 }
 
@@ -145,7 +145,7 @@ bool CIMOpengl::hasInverse( int imageSet )
         imageSet = 0;
     }
 
-    return m_imageSets [ imageSet ]->inverse != NULL;
+    return m_imageSets [ imageSet ]->inverse != nullptr;
 }
 
 void CIMOpengl::replace(int i, CFrameSet *filter)
@@ -173,7 +173,7 @@ int CIMOpengl::insertAt(int i, CFrameSet *filter)
     is->size = filter->getSize();
     is->images = new unsigned int [ is->size ];
     memset(is->images, 0, sizeof(unsigned int)*is->size);
-    is->inverse = NULL;
+    is->inverse = nullptr;
     glGenTextures(is->size, is->images);
 
     for (int j=0; j < filter->getSize(); ++j) {

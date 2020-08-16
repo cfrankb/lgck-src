@@ -91,10 +91,10 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
     bool trns_found = false;
     //bool oblt_found = false;
 
-    uint8_t *cData = NULL;
+    uint8_t *cData = nullptr;
     int obl5t_count = 0;
-    short *obl5t_xx = NULL;
-    short *obl5t_yy = NULL;
+    short *obl5t_xx = nullptr;
+    short *obl5t_yy = nullptr;
     int cDataSize = 0;
 
     while (pos < fileSize) {
@@ -295,7 +295,7 @@ bool CPngMagic::_8bpp(
 
     for (int y=0; y < (int) CFrame::toNet(ihdr.Height); y++) {
         uint8_t *line = & data[pitch * y + 1];
-        uint8_t *prLine = NULL;
+        uint8_t *prLine = nullptr;
         if (y) {
             prLine = & data[pitch * (y - 1) + 1];
         }
@@ -483,7 +483,7 @@ bool CPngMagic::_4bpp(
 
     for (int y=0; y < height; y++) {
         uint8_t *line = & data[pitch * y + 1];
-        //uint8_t *prLine = NULL;
+        //uint8_t *prLine = nullptr;
         //if (y) {
           //  prLine = & data[pitch * (y - 1) + 1];
         //}

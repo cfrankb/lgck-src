@@ -47,7 +47,7 @@ CInventory * CInventoryTable::operator[] (const char *s)
             return & m_inventories[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void CInventoryTable::reset(bool hard)

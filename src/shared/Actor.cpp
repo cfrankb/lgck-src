@@ -41,7 +41,7 @@
 #include "Extra.h"
 #include "IFile.h"
 
-CGame *CActor::m_game = NULL;
+CGame *CActor::m_game = nullptr;
 
 void CActor::read(IFile & file, int version)
 {
@@ -130,8 +130,8 @@ void CActor::copyFrom(const CActor & s)
 void CActor::init()
 {
     m_id = 0;
-    m_propi[EXTRA_TAGFLAGS] = 0;
-    m_propi[EXTRA_INVENTORY] = 0;
+    m_propi[lgck::EXTRA_TAGFLAGS] = 0;
+    m_propi[lgck::EXTRA_INVENTORY] = 0;
 }
 
 CActor::CActor():CLevelEntry()
@@ -157,11 +157,11 @@ void CActor::spawn()
 {
     if (m_nProto >= 0) {
         const CProto & p = proto();
-        m_propi[EXTRA_HP] = p.m_nHP;
-        m_propi[EXTRA_ANIMSPEED] = p.m_nAniSpeed;
+        m_propi[lgck::EXTRA_HP] = p.m_nHP;
+        m_propi[lgck::EXTRA_ANIMSPEED] = p.m_nAniSpeed;
         if (p.m_nClass != CLASS_PLAYER_OBJECT
                 && !isTagged(TAG_REBORN)) {
-            m_propi[EXTRA_LIVES] = p.m_nRebirths;
+            m_propi[lgck::EXTRA_LIVES] = p.m_nRebirths;
         }
         setTag(TAG_ACTIVATED, p.getOption(CProto::OPTION_INACTIVE) == 0);
         if (!CGame::isBackgroundClass(p.m_nClass) &&
@@ -169,33 +169,33 @@ void CActor::spawn()
             callEvent(CObject::EO_ACTIVATE);
         }
     } else {
-        m_propi[EXTRA_ANIMSPEED]= CGame::INVALID;
+        m_propi[lgck::EXTRA_ANIMSPEED]= CGame::INVALID;
     }
     m_nStateFlag = 0;
 
-    m_propi[EXTRA_TIMEOUT] = 0;
-    m_propi[EXTRA_ORGX] = m_nX;
-    m_propi[EXTRA_ORGY] = m_nY;
-    m_propi[EXTRA_ORGPROTO] = m_nProto;
+    m_propi[lgck::EXTRA_TIMEOUT] = 0;
+    m_propi[lgck::EXTRA_ORGX] = m_nX;
+    m_propi[lgck::EXTRA_ORGY] = m_nY;
+    m_propi[lgck::EXTRA_ORGPROTO] = m_nProto;
 
     // reset animation seq
-    m_propi[EXTRA_ANIMPTR] = 0;
-    m_propi[EXTRA_ANIMSEQ] = CGame::INVALID;
-    m_propi[EXTRA_DEATHINDICATOR] = CGame::DI_NONE;
+    m_propi[lgck::EXTRA_ANIMPTR] = 0;
+    m_propi[lgck::EXTRA_ANIMSEQ] = CGame::INVALID;
+    m_propi[lgck::EXTRA_DEATHINDICATOR] = CGame::DI_NONE;
 
     // path
-    m_propi[EXTRA_FLAGS] = 0;
+    m_propi[lgck::EXTRA_FLAGS] = 0;
     if (m_path && (m_playback & CPathBlock::PB_PLAYBACK)
             && tryPath(CObject::PS_SPRITE_CUSTOM)) {
-        m_propi[EXTRA_PATHDIR] = CObject::PS_SPRITE_CUSTOM;
+        m_propi[lgck::EXTRA_PATHDIR] = CObject::PS_SPRITE_CUSTOM;
     } else {
-        m_propi[EXTRA_PATHDIR] = CGame::INVALID;
-        m_propi[EXTRA_PATHPTR] = 0;
+        m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
+        m_propi[lgck::EXTRA_PATHPTR] = 0;
     }
-    m_propi[EXTRA_BULLETCOUNT] = 0;
-    m_propi[EXTRA_AGE] = 0;
-    m_propi[EXTRA_ACTIVE] = 0;
-    m_propi[EXTRA_OWNER] = 0;
+    m_propi[lgck::EXTRA_BULLETCOUNT] = 0;
+    m_propi[lgck::EXTRA_AGE] = 0;
+    m_propi[lgck::EXTRA_ACTIVE] = 0;
+    m_propi[lgck::EXTRA_OWNER] = 0;
     if (m_nProto > 0 && !proto().isBkClass()) {
         tryAnimation(CObject::AS_DEFAULT);
         callEvent(CObject::EO_SPAWN);
@@ -237,8 +237,8 @@ bool CActor::tryAnimation(int seq)
     if (seq >= 0 && seq <= CObject::AS_MAX_VALUE) {
         const CAnimation & animation = object().getAnimation( seq );
         if ( animation.getSize() ) {
-            m_propi[EXTRA_ANIMSEQ] = seq;
-            m_propi[EXTRA_ANIMPTR] = 0;
+            m_propi[lgck::EXTRA_ANIMSEQ] = seq;
+            m_propi[lgck::EXTRA_ANIMPTR] = 0;
             return true;
         }
     } else {
@@ -249,8 +249,8 @@ bool CActor::tryAnimation(int seq)
 
 void CActor::stopAnimation()
 {
-    m_propi[EXTRA_ANIMSEQ] = CGame::INVALID;
-    m_propi[EXTRA_ANIMPTR] = 0;
+    m_propi[lgck::EXTRA_ANIMSEQ] = CGame::INVALID;
+    m_propi[lgck::EXTRA_ANIMPTR] = 0;
 }
 
 void CActor::kill()
@@ -264,7 +264,7 @@ void CActor::kill()
     const CProto & p = proto();
     if (p.m_nClass == CLASS_PLAYER_OBJECT) {
         setState(CHitData::STATE_DEAD, true);
-        set(EXTRA_HP,0);
+        set(lgck::EXTRA_HP,0);
         return;
     }
 
@@ -272,25 +272,25 @@ void CActor::kill()
     bool is_pickup = p.m_nClass == CLASS_PICKUP_TRIGGERS;
 
     const CProto & newproto =  m_game->m_arrProto[p.m_nChProto];
-    m_propi[EXTRA_OWNER] = 0;
+    m_propi[lgck::EXTRA_OWNER] = 0;
     // test if a rebirth is possible
     if (m_nProto > 0 && p.m_nClass != CLASS_PLAYER_OBJECT
-            && m_propi[EXTRA_LIVES]) {
-        --m_propi[EXTRA_LIVES];
+            && m_propi[lgck::EXTRA_LIVES]) {
+        --m_propi[lgck::EXTRA_LIVES];
         CTask * task = new CTask;
         CActor & actor = *this;
         actor.setTag(TAG_REBORN);
         switch (p.m_rebirthLocation) {
             case CProto::REBIRTH_ORIGIN:
-            actor.m_nX = m_propi[EXTRA_ORGX];
-            actor.m_nY = m_propi[EXTRA_ORGY];
+            actor.m_nX = m_propi[lgck::EXTRA_ORGX];
+            actor.m_nY = m_propi[lgck::EXTRA_ORGY];
             break;
             case CProto::REBIRTH_RANDOM:
             actor.m_nX = (::rand() % m_game->BUFFERLEN) & 0xfff8;
             actor.m_nY = (::rand() % m_game->BUFFERHEI) & 0xfff8;
             break;
         }
-        actor.m_nProto = actor.m_propi[EXTRA_ORGPROTO];
+        actor.m_nProto = actor.m_propi[lgck::EXTRA_ORGPROTO];
         task->m_actor = actor;
         task->m_task = CTask::TASK_REBIRTH;
         task->m_ticks = m_game->var("ticks") + p.m_nRbDelay * 20;
@@ -304,8 +304,8 @@ void CActor::kill()
         m_nFrameNo = newproto.m_nFrameNo;
         m_nFrameSet = newproto.m_nFrameSet;
         m_nAim = p.m_nDefaultAim;
-        m_propi[EXTRA_ANIMSEQ] = CObject::AS_DEFAULT;
-        m_propi[EXTRA_ANIMPTR] = 0;
+        m_propi[lgck::EXTRA_ANIMSEQ] = CObject::AS_DEFAULT;
+        m_propi[lgck::EXTRA_ANIMPTR] = 0;
     }
 
     if (isGoal()) {
@@ -324,7 +324,7 @@ void CActor::kill()
         newSprite.m_nProto = CGame::PROTO_POINTS;
         newSprite.moveTo(*this);
         newSprite.m_nAim = CGame::UP;
-        newSprite.m_propi[EXTRA_LIVES] = 0;
+        newSprite.m_propi[lgck::EXTRA_LIVES] = 0;
         m_game->addToScore(m_game->m_arrPoints[p.m_nPoints]);
         m_game->m_tasks->createTask(newSprite);
     }
@@ -423,7 +423,7 @@ void CActor::attackPlayer()
         (protoActor.m_nPowerLevel >= protoPlayer.m_nPowerLevel)) ) {
         if (protoActor.m_nPowerLevel <= protoPlayer.m_nPowerLevel) {
             m_game->triggerPlayerHitState();
-            player.m_propi[EXTRA_TIMEOUT] = m_game->var("CONST_TIMEOUT");
+            player.m_propi[lgck::EXTRA_TIMEOUT] = m_game->var("CONST_TIMEOUT");
             m_game->addToHP(- protoActor.m_nDamages);
         } else {
             m_game->killPlayer(player);
@@ -642,7 +642,7 @@ void CActor::triggerHitState()
     callEvent(CObject::EO_HURT);
     setState(CHitData::STATE_HIT, true);
     tryAnimation(CObject::AS_HURT + m_nAim);
-    m_propi[EXTRA_TIMEOUT] = m_game->var("CONST_TIMEOUT");
+    m_propi[lgck::EXTRA_TIMEOUT] = m_game->var("CONST_TIMEOUT");
 }
 
 void CActor::move()
@@ -702,16 +702,16 @@ void CActor::land()
 {
     callEvent(CObject::EO_LAND);
     const CProto & p = proto();
-    if (p.m_nMaxFall && m_propi[EXTRA_FALLHEIGHT] > p.m_nMaxFall) {
+    if (p.m_nMaxFall && m_propi[lgck::EXTRA_FALLHEIGHT] > p.m_nMaxFall) {
         callEvent(CObject::EO_DEATH);
         if (!tryAnimation(CObject::AS_DEAD + m_nAim)) {
             stopAnimation();
         }
         setState(CHitData::STATE_DEAD, true);
-        m_propi[EXTRA_HP] = 0;
+        m_propi[lgck::EXTRA_HP] = 0;
     }
 
-    m_propi[EXTRA_FALLHEIGHT] = 0;
+    m_propi[lgck::EXTRA_FALLHEIGHT] = 0;
 }
 
 bool CActor::isDead()
@@ -739,8 +739,8 @@ void CActor::attack(CActor &t)
     const CProto & p = proto();
     const CProto & tp = t.proto();
     if (p.m_nPowerLevel >= tp.m_nPowerLevel) {
-        t.m_propi[EXTRA_HP] -= p.m_nDamages;
-        if (t.m_propi[EXTRA_HP] <= 0) {
+        t.m_propi[lgck::EXTRA_HP] -= p.m_nDamages;
+        if (t.m_propi[lgck::EXTRA_HP] <= 0) {
             t.setState( CHitData::STATE_DEAD, true );
             if (!t.tryAnimation(CObject::AS_DEAD + t.m_nAim)) {
                 t.stopAnimation();
@@ -890,12 +890,12 @@ bool CActor::tryPath(int pathId, int aim)
             callEvent(CObject::EO_MOVE);
         }
         if (aim != CGame::INVALID
-                && m_propi[EXTRA_PATHDIR] == CGame::INVALID) {
+                && m_propi[lgck::EXTRA_PATHDIR] == CGame::INVALID) {
             tryAnimation(animSeqBase + aim);
             m_nAim = aim;
         }
-        m_propi[EXTRA_PATHDIR] = pathId;
-        m_propi[EXTRA_PATHPTR] = 0;
+        m_propi[lgck::EXTRA_PATHDIR] = pathId;
+        m_propi[lgck::EXTRA_PATHPTR] = 0;
         return true;
     }
     return false;
@@ -903,14 +903,14 @@ bool CActor::tryPath(int pathId, int aim)
 
 void CActor::followPath()
 {
-    if (m_propi[EXTRA_PATHDIR] != CGame::INVALID) {
-        CPath & path = getPath(m_propi[EXTRA_PATHDIR]);
-        if (m_propi[EXTRA_PATHPTR] >= path.getSize()) {
-            m_propi[EXTRA_PATHDIR] = CGame::INVALID;
+    if (m_propi[lgck::EXTRA_PATHDIR] != CGame::INVALID) {
+        CPath & path = getPath(m_propi[lgck::EXTRA_PATHDIR]);
+        if (m_propi[lgck::EXTRA_PATHPTR] >= path.getSize()) {
+            m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
             return;
         }
 
-        int aim = path[m_propi[EXTRA_PATHPTR]];
+        int aim = path[m_propi[lgck::EXTRA_PATHPTR]];
         if (aim != CGame::PAUSE &&
                 (m_playback & CPathBlock::PB_IGNORE_SOLID || canMove(aim, isMonster()))) {
             m_nAim = aim;
@@ -930,18 +930,18 @@ void CActor::followPath()
         PB_RETURN_ORIGIN = 64,
         PB_CUSTOM_HANDLER = 128*/
 
-        ++m_propi[EXTRA_PATHPTR];
-        if (m_propi[EXTRA_PATHPTR] >= path.getSize()) {
+        ++m_propi[lgck::EXTRA_PATHPTR];
+        if (m_propi[lgck::EXTRA_PATHPTR] >= path.getSize()) {
             if (m_playback & CPathBlock::PB_RETURN_ORIGIN) {
                 unMap();
-                m_nX = m_propi[EXTRA_ORGX];
-                m_nY = m_propi[EXTRA_ORGY];
+                m_nX = m_propi[lgck::EXTRA_ORGX];
+                m_nY = m_propi[lgck::EXTRA_ORGY];
                 map();
             }
             if (m_playback & CPathBlock::PB_LOOP) {
-                m_propi[EXTRA_PATHPTR] = 0;
+                m_propi[lgck::EXTRA_PATHPTR] = 0;
             } else {
-                m_propi[EXTRA_PATHDIR] = CGame::INVALID;
+                m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
             }
         }
     }
@@ -949,28 +949,28 @@ void CActor::followPath()
 
 void CActor::managePath()
 {
-    if (m_propi[EXTRA_PATHDIR] == CGame::INVALID) {
+    if (m_propi[lgck::EXTRA_PATHDIR] == CGame::INVALID) {
         setState(CHitData::STATE_JUMP, false);
         return;
     }
 
-    CPath & path = getPath(m_propi[EXTRA_PATHDIR]);
-    if (m_propi[EXTRA_PATHPTR] >= path.getSize()) {
+    CPath & path = getPath(m_propi[lgck::EXTRA_PATHDIR]);
+    if (m_propi[lgck::EXTRA_PATHPTR] >= path.getSize()) {
         setState(CHitData::STATE_JUMP, false);
-        m_propi[EXTRA_PATHDIR] = CGame::INVALID;
+        m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
         return;
     }
 
-    while (path[m_propi[EXTRA_PATHPTR]] == CGame::SEPARATOR) {
-        ++m_propi[EXTRA_PATHPTR];
-        if (m_propi[EXTRA_PATHPTR] >= path.getSize()) {
+    while (path[m_propi[lgck::EXTRA_PATHPTR]] == CGame::SEPARATOR) {
+        ++m_propi[lgck::EXTRA_PATHPTR];
+        if (m_propi[lgck::EXTRA_PATHPTR] >= path.getSize()) {
             setState(CHitData::STATE_JUMP, false);
-            m_propi[EXTRA_PATHDIR] = CGame::INVALID;
+            m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
             return;
         }
     }
 
-    int nAim = path[m_propi[EXTRA_PATHPTR]];
+    int nAim = path[m_propi[lgck::EXTRA_PATHPTR]];
     bool bcanWalk = canMove(nAim);
 
     CFrame & frame = m_game->toFrame(m_nFrameSet, m_nFrameNo);
@@ -1011,23 +1011,23 @@ void CActor::managePath()
             map();
         }
 
-        ++m_propi[EXTRA_PATHPTR];
-        if (m_propi[EXTRA_PATHPTR] >= path.getSize()) {
+        ++m_propi[lgck::EXTRA_PATHPTR];
+        if (m_propi[lgck::EXTRA_PATHPTR] >= path.getSize()) {
             setState(CHitData::STATE_JUMP, false);
-            m_propi[EXTRA_PATHDIR] = CGame::INVALID;
+            m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
             return;
         }
 
     } else  {
         setState(CHitData::STATE_JUMP, false);
-        m_propi[EXTRA_PATHDIR] = CGame::INVALID;
+        m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
         crash();
     }
 }
 
 void CActor::doManage()
 {
-    ++m_propi[EXTRA_AGE];
+    ++m_propi[lgck::EXTRA_AGE];
     CActor & player = m_game->getPlayer();
     const CProto & po = proto();
     int nAim = m_nAim;
@@ -1059,7 +1059,7 @@ void CActor::doManage()
             }
         }
 
-        if (m_path && m_propi[EXTRA_PATHDIR] == CObject::PS_SPRITE_CUSTOM ) {
+        if (m_path && m_propi[lgck::EXTRA_PATHDIR] == CObject::PS_SPRITE_CUSTOM ) {
             if ((po.m_nMoveSpeed==0) || (ticks % (po.m_nMoveSpeed) ==0)) {
                 followPath();
             }
@@ -1119,7 +1119,7 @@ void CActor::doManage()
                 }
             }
             map();
-            if (m_propi[EXTRA_ANIMSEQ] == CGame::INVALID || CObject::AS_MOVE + m_nAim != m_propi[EXTRA_ANIMSEQ]) {
+            if (m_propi[lgck::EXTRA_ANIMSEQ] == CGame::INVALID || CObject::AS_MOVE + m_nAim != m_propi[lgck::EXTRA_ANIMSEQ]) {
                 tryAnimation(CObject::AS_MOVE + m_nAim);
             }
             break;
@@ -1155,7 +1155,7 @@ void CActor::doManage()
                 }
             }
             map();
-            if (m_propi[EXTRA_ANIMSEQ] == CGame::INVALID || CObject::AS_MOVE + m_nAim != m_propi[EXTRA_ANIMSEQ]) {
+            if (m_propi[lgck::EXTRA_ANIMSEQ] == CGame::INVALID || CObject::AS_MOVE + m_nAim != m_propi[lgck::EXTRA_ANIMSEQ]) {
                 tryAnimation(CObject::AS_MOVE + m_nAim);
             }
 
@@ -1201,7 +1201,7 @@ void CActor::doManage()
         }
     } else{
         if (getState(CHitData::STATE_DEAD)
-            && m_propi[EXTRA_ANIMSEQ] == CGame::INVALID
+            && m_propi[lgck::EXTRA_ANIMSEQ] == CGame::INVALID
                 && po.m_nClass != CLASS_PLAYER_OBJECT) {
             unMap();
             kill();
@@ -1215,7 +1215,7 @@ int CActor::childCount()
     int count = 0;
     for (int i=0; i < scene.getSize(); ++i) {
         CActor & actor = scene [ i ];
-        if (static_cast<unsigned int>(actor.m_propi[EXTRA_OWNER]) == m_id) {
+        if (static_cast<unsigned int>(actor.m_propi[lgck::EXTRA_OWNER]) == m_id) {
             ++count;
         }
     }
@@ -1260,34 +1260,34 @@ void CActor::animate()
         const CProto & p = proto();
         if ( (!p.m_nAniSpeed || (m_game->getTickCount() % p.m_nAniSpeed == 0))
             && !isFrozen()
-            && m_propi[EXTRA_ANIMPTR]!= CGame::INVALID
-            && m_propi[EXTRA_ANIMSEQ]!= CGame::INVALID) {
-            CAnimation & animation = object().getAnimation(m_propi[EXTRA_ANIMSEQ]);
-            if (m_propi[EXTRA_ANIMPTR] >= animation.getSize()) {
+            && m_propi[lgck::EXTRA_ANIMPTR]!= CGame::INVALID
+            && m_propi[lgck::EXTRA_ANIMSEQ]!= CGame::INVALID) {
+            CAnimation & animation = object().getAnimation(m_propi[lgck::EXTRA_ANIMSEQ]);
+            if (m_propi[lgck::EXTRA_ANIMPTR] >= animation.getSize()) {
                 switch ( p.m_nClass ) {
                 case CLASS_ANIMATE_ONCE:
                     callEvent( CObject::EO_DEATH);
                     kill();
                     break;
                 }
-                if (m_propi[EXTRA_DEATHINDICATOR]) {
-                    m_propi[EXTRA_DEATHINDICATOR] = CGame::DI_REMOVAL;
+                if (m_propi[lgck::EXTRA_DEATHINDICATOR]) {
+                    m_propi[lgck::EXTRA_DEATHINDICATOR] = CGame::DI_REMOVAL;
                 }
                 if (animation.getOptions() & CObject::ASO_REPETE
                     && !getState( CHitData::STATE_DEAD)) {
-                    m_propi[EXTRA_ANIMPTR] = 0;
+                    m_propi[lgck::EXTRA_ANIMPTR] = 0;
                 } else {
-                    m_propi[EXTRA_ANIMSEQ] = CGame::INVALID;
+                    m_propi[lgck::EXTRA_ANIMSEQ] = CGame::INVALID;
                 }
             } else {
                 if (!getState( CHitData::STATE_DEAD)) {
                     unMap();
-                    m_nFrameNo = animation[m_propi[EXTRA_ANIMPTR]];
+                    m_nFrameNo = animation[m_propi[lgck::EXTRA_ANIMPTR]];
                     map();
                 } else {
-                    m_nFrameNo = animation[m_propi[EXTRA_ANIMPTR]];
+                    m_nFrameNo = animation[m_propi[lgck::EXTRA_ANIMPTR]];
                 }
-                ++m_propi[EXTRA_ANIMPTR];
+                ++m_propi[lgck::EXTRA_ANIMPTR];
             }
         }
     }
@@ -1337,15 +1337,15 @@ void CActor::crash()
 void CActor::setTag(int flag, bool bit)
 {
     if (bit) {
-        m_propi[EXTRA_TAGFLAGS] |= flag;
+        m_propi[lgck::EXTRA_TAGFLAGS] |= flag;
     } else {
-        m_propi[EXTRA_TAGFLAGS] -= m_propi[EXTRA_TAGFLAGS] & flag;
+        m_propi[lgck::EXTRA_TAGFLAGS] -= m_propi[lgck::EXTRA_TAGFLAGS] & flag;
     }
 }
 
 bool CActor::isTagged(int flag)
 {
-    return (m_propi[EXTRA_TAGFLAGS] & flag) != 0;
+    return (m_propi[lgck::EXTRA_TAGFLAGS] & flag) != 0;
 }
 
 int CActor::getSeed()
@@ -1448,7 +1448,7 @@ void CActor::autoCenter()
 
     if (!getState(CHitData::STATE_LOOKUP) &&
             (!speed || m_game->getTicks() % speed == 0)) {
-        if (m_propi[EXTRA_PATHPTR] == CGame::INVALID) {
+        if (m_propi[lgck::EXTRA_PATHPTR] == CGame::INVALID) {
             autoCenter(CGame::UP);
             autoCenter(CGame::DOWN);
         }
@@ -1460,7 +1460,7 @@ void CActor::autoCenter()
 void CActor::setOwner(int ownerEntry)
 {
     // TODO: change ownerId from id to uid
-    m_propi[EXTRA_OWNER] = ownerEntry;
+    m_propi[lgck::EXTRA_OWNER] = ownerEntry;
 }
 
 bool CActor::isSolid(const CMapEntry *pMap, int aim)
@@ -1633,27 +1633,27 @@ bool CActor::isGoal()
 
 int CActor::getHP()
 {
-    return m_propi[EXTRA_HP];
+    return m_propi[lgck::EXTRA_HP];
 }
 
 void CActor::setHP(int hp)
 {
-    m_propi[EXTRA_HP] = hp;
+    m_propi[lgck::EXTRA_HP] = hp;
 }
 
 int CActor::getFlags()
 {
-    return m_propi[EXTRA_FLAGS];
+    return m_propi[lgck::EXTRA_FLAGS];
 }
 
 unsigned int CActor::getAge()
 {
-    return m_propi[EXTRA_AGE];
+    return m_propi[lgck::EXTRA_AGE];
 }
 
 void CActor::getExtra(int * &extra, int * &index, int &size)
 {
-    size = EXTRA_COUNT;
+    size = lgck::EXTRA_COUNT;
     extra = new int[size];
     index = new int[size];
     for (int i=0; i < size; ++i) {
@@ -1744,10 +1744,10 @@ void CActor::togglePathPlayback(bool enable)
 
     if (m_path && (m_playback & CPathBlock::PB_PLAYBACK)
             && tryPath(CObject::PS_SPRITE_CUSTOM)) {
-        m_propi[EXTRA_PATHDIR] = CObject::PS_SPRITE_CUSTOM;
+        m_propi[lgck::EXTRA_PATHDIR] = CObject::PS_SPRITE_CUSTOM;
     } else {
-        m_propi[EXTRA_PATHDIR] = CGame::INVALID;
-        m_propi[EXTRA_PATHPTR] = 0;
+        m_propi[lgck::EXTRA_PATHDIR] = CGame::INVALID;
+        m_propi[lgck::EXTRA_PATHPTR] = 0;
     }
 }
 

@@ -74,7 +74,7 @@ class CFrame
 {
     // Construction
 public:
-    CFrame(CFrame* src=NULL);
+    CFrame(CFrame* src=nullptr);
     CFrame(int p_nLen, int p_nHei);
 
     // Attributes
@@ -105,7 +105,7 @@ public:
 public:
     CFrame & operator = (const CFrame &src);
     void forget();
-    void detach() { m_rgb = NULL;}
+    void detach() { m_rgb = nullptr;}
     void updateMap();
     void resize( int len, int hei );
     void setTransparency( uint32_t rgba );
@@ -142,13 +142,13 @@ public:
     void write (IFile &file);
 
     void toBmp(uint8_t * & bmp, int & size);
-    void toPng(uint8_t * & png, int & size, uint8_t *obl5data=NULL, int obl5size=0);
+    void toPng(uint8_t * & png, int & size, uint8_t *obl5data=nullptr, int obl5size=0);
     static uint32_t toNet(const uint32_t a);
     static const uint32_t *dosPal();
     bool draw(CDotArray * dots, int size, int mode=MODE_NORMAL);
     void save(CDotArray * dots, CDotArray * dotsOrg, int size);
     CFrame *clip(int mx, int my, int cx=-1, int cy=-1);
-    CFrameSet *explode(int count, short *xx, short *yy, CFrameSet *set=NULL);    
+    CFrameSet *explode(int count, short *xx, short *yy, CFrameSet *set=nullptr);
 
     void copy(CFrame *);
     void push();

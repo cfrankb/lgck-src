@@ -47,7 +47,7 @@ CFolder * CFolders::operator [] (const char * name)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CFolders::open(const char* fileName, bool create)
@@ -244,7 +244,7 @@ CFolder::CFileEntry * CFolders::checkOut(const char * filePath)
     if (folder) {
         return (*folder)[fileName.c_str()] ;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -263,7 +263,7 @@ CFolder::~CFolder()
 {
     if (m_files) {
         delete [] m_files;
-        m_files = NULL;
+        m_files = nullptr;
     }
 }
 
@@ -367,12 +367,12 @@ CFolder::CFileEntry * CFolder::operator [] (const char* fileName)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 CFolder::CFileEntry * CFolder::operator [] (int i)
 {
-    if ( i <0 || i >= m_size) return NULL;
+    if ( i <0 || i >= m_size) return nullptr;
     return & m_files[i];
 }
 

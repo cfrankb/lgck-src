@@ -59,7 +59,7 @@ public:
     void insertAt(int n, CFrame *pFrame);
     void forget();
     void removeAll ();
-    bool extract (IFile & file, char *format=NULL);
+    bool extract (IFile & file, char *format=nullptr);
     bool extractPNG(IFile & file);
 
     static char *ima2bitmap(char *ImaData, int len, int hei);

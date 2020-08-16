@@ -219,7 +219,7 @@ void CDlgPath::on_btnRaw_clicked()
 
         // decode the string
         for (int k=0; k < result.length(); k +=3) {
-            char aim = strtol(q2c(result.mid(k, 2)), NULL, 16);
+            char aim = strtol(q2c(result.mid(k, 2)), nullptr, 16);
 //            qDebug("%s = %2.2x ", q2c(result.mid(k, 2)), aim);
             if (CPath::isValidAim(aim)) {
                 tmp.add(aim);

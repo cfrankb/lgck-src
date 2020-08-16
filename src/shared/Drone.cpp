@@ -46,17 +46,17 @@ void CDrone::doManage()
         if (canFall () ) {
             if ( !proto.m_nFallSpeed || ticks % proto.m_nFallSpeed == 0 ) {
                 moveBy(0,8);
-                if (!m_propi[EXTRA_FALLHEIGHT]) {
+                if (!m_propi[lgck::EXTRA_FALLHEIGHT]) {
                     callEvent(CObject::EO_FALL);
                 }
-                ++m_propi[EXTRA_FALLHEIGHT];
+                ++m_propi[lgck::EXTRA_FALLHEIGHT];
             }
         } else {
             // TODO: implement MaxFall
-            if (m_propi[EXTRA_FALLHEIGHT]) {
+            if (m_propi[lgck::EXTRA_FALLHEIGHT]) {
                 land();
             }
-            m_propi[EXTRA_FALLHEIGHT] = 0;
+            m_propi[lgck::EXTRA_FALLHEIGHT] = 0;
             if ((proto.m_nMoveSpeed==0)|| (ticks % (proto.m_nMoveSpeed) == 0))  {
                 if ( (!game.gravity() && canMove (nAim)) ||
                     testAim (nAim, m_nAim)) {
@@ -74,7 +74,7 @@ void CDrone::doManage()
         }
         map();
 
-        if (m_propi[EXTRA_ANIMSEQ] == -1 || CObject::AS_MOVE + nAim != m_propi[EXTRA_ANIMSEQ]) {
+        if (m_propi[lgck::EXTRA_ANIMSEQ] == -1 || CObject::AS_MOVE + nAim != m_propi[lgck::EXTRA_ANIMSEQ]) {
             tryAnimation(CObject::AS_MOVE + nAim);
         }
         break; // CLASS_DRONE_UP_DOWN && LEFT_RIGHT

@@ -531,5 +531,5 @@ static FUNCTION exports [] = {
     fn ( qwizardpage_setSubTitle )
     fn ( qwizardpage_setTitle )
     fn ( rgb2tuple )
-    { NULL, 0 }
+    { nullptr, 0 }
 };

@@ -56,7 +56,7 @@ void CSndArray::forget()
     for (int i=0; i < m_nSize; ++i) {
         if (m_arrSnds[i]) {
             delete m_arrSnds[i];
-            m_arrSnds[i] = NULL;
+            m_arrSnds[i] = nullptr;
          }
     }
     m_nSize = 0;
@@ -70,7 +70,7 @@ void CSndArray::removeAt(int n)
     }
 
     --m_nSize;
-    m_arrSnds[m_nSize] = NULL;
+    m_arrSnds[m_nSize] = nullptr;
 }
 
 void CSndArray::add(CSnd * pSnd)
@@ -83,7 +83,7 @@ void CSndArray::add(CSnd * pSnd)
         }
 
         for (int i=0; i < m_nSize; i++) {
-            m_arrSnds[i] = NULL;
+            m_arrSnds[i] = nullptr;
         }
         delete [] m_arrSnds;
         m_arrSnds = t;
@@ -167,7 +167,7 @@ CSnd::~CSnd()
 {
     if (m_data) {
         delete [] m_data;
-        m_data = NULL;
+        m_data = nullptr;
     }
 
     m_size = 0;
@@ -175,7 +175,7 @@ CSnd::~CSnd()
 
 void CSnd::init()
 {
-    m_data = NULL;
+    m_data = nullptr;
     m_size = 0;
     m_uid = rand();
 }
@@ -228,7 +228,7 @@ CSnd & CSnd::copy(const CSnd & src)
 {
     if (m_data) {
         delete [] m_data;
-        m_data = NULL;
+        m_data = nullptr;
     }
 
     m_size = src.getSize();

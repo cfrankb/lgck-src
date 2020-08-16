@@ -105,7 +105,7 @@ void CTasks::forget()
 {
     for (int i=0; i< m_size; ++i) {
         delete m_tasks[i];
-        m_tasks[i] = NULL;
+        m_tasks[i] = nullptr;
     }
     m_size = 0;
 }

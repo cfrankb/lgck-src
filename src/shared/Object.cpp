@@ -30,7 +30,7 @@
 
 CObject::CObject()
 {
-    m_events = NULL;
+    m_events = nullptr;
     m_eventCount = 0;
 
     m_animations = new CAnimation[ getAnimationCount()];

@@ -2032,7 +2032,7 @@ int alert(lua_State * L)
         CGame::error(fnName, 1);
     } else {
 #ifdef USE_QFILE
-        QMessageBox::warning(NULL, QString(""),
+        QMessageBox::warning(nullptr, QString(""),
                      QString(lua_tostring(L, 1)),
                      QMessageBox::Ok );
 #endif

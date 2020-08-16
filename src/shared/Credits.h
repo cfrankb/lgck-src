@@ -34,6 +34,6 @@ const MEMBER team [] =
 
    { "", "", "", ""},
    { "Your name here!", "", "", ""},
-   { NULL, NULL, NULL, NULL }
+   { nullptr, nullptr, nullptr, nullptr }
 };
 

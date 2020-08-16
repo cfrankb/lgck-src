@@ -53,5 +53,5 @@ WIZACTION CWizScript::m_actions[]=
     {"Sprite Fall Into The Abyss", "sprite_fallAbyss", "This is a template for handling falling off the screen. This should be added to the `OnLanding` event", "S", "-- add this to event OnLanding\nlocal s = getSprite(self);\nlocal sx, sy = getImageSize(s.imageSet, s.imageNo);\nif s.y + sy >= var_get(\"BUFFERHEI\") then\n  s:setState(STATE_DEAD);\n  s:hide();\nelse\n  -- add code here\n  -- playSound(\"POUFLIGHT\");\n  local extra = getExtra(self);\n  if extra.fallHeight >= 20 then\n    -- uncomment these lines if needed\n    -- triggerPlayerHitState();\n    -- addToHP( -25 );\n  end\nend", "", ""},
     {"Stop Music", "stopMusic", "", "N", "stopStream();", "", ""},
     {"Unmark as goal", "sprite_unMarkAsGoal", "A sprite can be marked as goal toward completing the level. You can flip off this flag.", "S", "local sprite = getSprite(self);\nsprite:unmarkAsGoal();", "", ""},
-    { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+    { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }
 };

@@ -51,7 +51,7 @@ CDisplay * CDisplayConfig::find(const char *name)
     if (i != NOT_FOUND) {
         return m_displays[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -111,7 +111,7 @@ void CDisplayConfig::forget()
 {
     for (int i=0; i < m_size; ++i) {
         delete m_displays[i];
-        m_displays[i] = NULL;
+        m_displays[i] = nullptr;
     }
     m_size = 0;
 }
@@ -201,7 +201,7 @@ CDisplay *CDisplayConfig::operator[](int i)
     if (i >= 0 && i < m_size) {
         return m_displays[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 

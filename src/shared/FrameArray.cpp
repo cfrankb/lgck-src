@@ -68,7 +68,7 @@ void CFrameArray::removeAt(int n)
     }
 
     --m_nSize;
-    m_arrFilters[m_nSize] = NULL;
+    m_arrFilters[m_nSize] = nullptr;
 }
 
 int CFrameArray::add(CFrameSet *pFilter)
@@ -131,7 +131,7 @@ CFrameSet * CFrameArray::operator [] (const char* name)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
  int CFrameArray::indexOfUUID(const char *uuid)

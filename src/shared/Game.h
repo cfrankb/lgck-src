@@ -306,7 +306,7 @@ public:
     bool loadScript(const char *scriptName);
     void exec(const char* luaCode);
     void generateRuntimeLua(std::string & str);
-    CInventory *getInventory(const char *name=NULL);
+    CInventory *getInventory(const char *name=nullptr);
     int & counter(const char *s);
     unsigned long long & var(const char *s);
     long long & svar(const char *s);

@@ -27,7 +27,7 @@
 
 CFont::CFont()
 {
-    m_pixels = NULL;
+    m_pixels = nullptr;
     m_text = "";
     m_textureId = 0;
 }
@@ -41,7 +41,7 @@ void CFont::forget()
 {
     if (m_pixels) {
         delete [] m_pixels;
-        m_pixels= NULL;
+        m_pixels= nullptr;
     }
     m_width = 0;
     m_height = 0;
@@ -55,7 +55,7 @@ void CFont::setPixmap(const char *glyphs, unsigned int *pixmap, int width, int h
 {
     if (m_pixels) {
         delete [] m_pixels;
-        m_pixels= NULL;
+        m_pixels= nullptr;
     }
     m_pixels = new unsigned int[width*height];
     m_width = width;

@@ -121,11 +121,6 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
     m_ui->btnRuntime->setDisabled(true);
 #endif
 
-#ifndef LGCK_GAMEPAD
-    m_ui->tableButtons->hide();
-    m_ui->sButtonConfig->hide();
-#endif
-
     initButtonTable();
 }
 
@@ -181,6 +176,9 @@ void CDlgAppSettings::initButtonTable()
         m_keys[i] = new CWGetKey(widget);
         QPushButton *button = new QPushButton(icon,"", this);
         m_cbButtons[i] = new QComboBox(widget);
+#ifndef LGCK_GAMEPAD
+        m_cbButtons[i]->setDisabled(true);
+#endif
         for (int j=0; j < buttonText.size(); ++j) {
             m_cbButtons[i]->addItem(buttonText[j]);
         }

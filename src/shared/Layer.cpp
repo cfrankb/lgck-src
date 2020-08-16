@@ -54,7 +54,7 @@ CLayer::~CLayer()
 {
     if (m_arrEntries) {
         delete [] m_arrEntries;
-        m_arrEntries = NULL;
+        m_arrEntries = nullptr;
     }
 }
 
@@ -152,7 +152,7 @@ CLayer & CLayer::operator=(CLayer & s)
 {
     if (m_arrEntries) {
         delete [] m_arrEntries;
-        m_arrEntries = NULL;
+        m_arrEntries = nullptr;
     }
     m_selection.clear();
     m_size = s.getSize();
@@ -241,7 +241,7 @@ bool CLayer::write(IFile &file, bool compr)
     int version = LAYER_VER;
     LONGUINT nTotalSize = 0;
     LONGUINT nCompressSize = 0;
-    uint8_t *pCompressData = NULL;
+    uint8_t *pCompressData = nullptr;
     file.write(&version,4);           // layer version
     file.write(&m_size,4);
     file << m_name;

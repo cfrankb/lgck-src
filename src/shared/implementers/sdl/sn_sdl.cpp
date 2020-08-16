@@ -64,7 +64,7 @@ void CSndSDL::add(unsigned char *data, unsigned int size, unsigned int uid)
     }
     SND *snd = new SND;
     snd->channel = -1;
-    snd->chunk = NULL;
+    snd->chunk = nullptr;
     bool fail = false;
     SDL_RWops *rw = SDL_RWFromConstMem((void*) data,  size);
     if (!rw) {
@@ -79,13 +79,13 @@ void CSndSDL::add(unsigned char *data, unsigned int size, unsigned int uid)
         }
     }
     if (fail) {
-        snd->chunk = NULL;
+        snd->chunk = nullptr;
     }
     m_sounds[uid] = snd;
 }
 
 void CSndSDL::replace(unsigned char *data, unsigned int size, unsigned int uid)
-{\
+{
     // TODO: get rid of replace
     remove(uid);
     add(data,size,uid);

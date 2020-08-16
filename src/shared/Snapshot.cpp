@@ -26,10 +26,10 @@
 
 CSnapshot::CSnapshot()
 {
-    m_bk = NULL;
-    m_fw = NULL;
-    m_layers = NULL;
-    m_displayConf = NULL;
+    m_bk = nullptr;
+    m_fw = nullptr;
+    m_layers = nullptr;
+    m_displayConf = nullptr;
 }
 
 CSnapshot::~CSnapshot()
@@ -42,19 +42,19 @@ void CSnapshot::forget()
     m_vars.clear();
     if (m_bk) {
         delete m_bk;
-        m_bk = NULL;
+        m_bk = nullptr;
     }
     if (m_fw) {
         delete m_fw;
-        m_fw = NULL;
+        m_fw = nullptr;
     }
     if (m_layers) {
         delete m_layers;
-        m_layers = NULL;
+        m_layers = nullptr;
     }
     if (m_displayConf) {
         delete m_displayConf;
-        m_displayConf = NULL;
+        m_displayConf = nullptr;
     }
 
     m_vars.clear();
@@ -101,8 +101,8 @@ void CSnapshot::write(IFile &file)
 
 bool CSnapshot::has_snapshot()
 {
-    return m_bk != NULL && m_fw != NULL
-            && m_layers != NULL;
+    return m_bk != nullptr && m_fw != nullptr
+            && m_layers != nullptr;
 }
 
 void CSnapshot::take(CGame & game)

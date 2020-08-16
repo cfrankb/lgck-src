@@ -43,11 +43,11 @@ void CAttacker::doManage()
 
     unMap();
 
-    if (m_propi[EXTRA_ACTIVE]) {
-        if (m_propi[EXTRA_TIMEOUT]) {
-            --m_propi[EXTRA_TIMEOUT];
+    if (m_propi[lgck::EXTRA_ACTIVE]) {
+        if (m_propi[lgck::EXTRA_TIMEOUT]) {
+            --m_propi[lgck::EXTRA_TIMEOUT];
         } else {
-            switch (m_propi[EXTRA_ACTIVE]) {
+            switch (m_propi[lgck::EXTRA_ACTIVE]) {
 
             case 1:
 
@@ -76,7 +76,7 @@ void CAttacker::doManage()
                     break;
                 }
 
-                ++m_propi[EXTRA_ACTIVE];
+                ++m_propi[lgck::EXTRA_ACTIVE];
 
                 m_nFrameSet = proto.m_nFrameSet;
                 m_nFrameNo = proto.m_nFrameNo;
@@ -87,7 +87,7 @@ void CAttacker::doManage()
             case 3:
 
                 int speed = proto.m_nMoveSpeed;
-                if (m_propi[EXTRA_ACTIVE] == 3) {
+                if (m_propi[lgck::EXTRA_ACTIVE] == 3) {
                     speed /= 2;
                 }
 
@@ -98,12 +98,12 @@ void CAttacker::doManage()
                         attackPlayer();
                     }
 
-                    if (m_propi[EXTRA_ACTIVE] == 2
+                    if (m_propi[lgck::EXTRA_ACTIVE] == 2
                             && (m_nAim == CGame::LEFT || m_nAim == CGame::RIGHT)) {
                         if ( ((player.m_nX <= m_nX) && (player.m_nX + playerFrame.m_nLen > m_nX))
                              || ((player.m_nX > m_nX) && (player.m_nX < m_nX + monsterFrame.m_nLen))) {
 
-                            ++m_propi[EXTRA_ACTIVE];
+                            ++m_propi[lgck::EXTRA_ACTIVE];
 
                             if ( player.m_nY < m_nY ) {
                                 m_nAim = CGame::UP;
@@ -114,13 +114,13 @@ void CAttacker::doManage()
                         }
                     }
 
-                    if (m_propi[EXTRA_ACTIVE] == 2
+                    if (m_propi[lgck::EXTRA_ACTIVE] == 2
                             && (m_nAim == CGame::UP || m_nAim == CGame::DOWN)) {
 
                         if ( ((player.m_nY <= m_nY) && (player.m_nY + playerFrame.m_nHei > m_nY))
                              || ((player.m_nY > m_nY) && (player.m_nY < m_nY + monsterFrame.m_nHei))) {
 
-                            ++m_propi[EXTRA_ACTIVE];
+                            ++m_propi[lgck::EXTRA_ACTIVE];
 
                             if ( player.m_nX < m_nX ) {
                                 m_nAim = CGame::LEFT;
@@ -135,28 +135,28 @@ void CAttacker::doManage()
                     case CGame::UP:
                         m_nY -= 8;
                         if (m_nY < 0) {
-                            m_propi[EXTRA_ACTIVE] = 0;
+                            m_propi[lgck::EXTRA_ACTIVE] = 0;
                         }
                         break;
 
                     case CGame::DOWN:
                         m_nY += 8;
                         if (m_nY + frame.m_nHei > game.BUFFERHEI) {
-                            m_propi[EXTRA_ACTIVE] = 0;
+                            m_propi[lgck::EXTRA_ACTIVE] = 0;
                         }
                         break;
 
                     case CGame::LEFT:
                         m_nX -= 8;
                         if (m_nX < 0) {
-                            m_propi[EXTRA_ACTIVE] = 0;
+                            m_propi[lgck::EXTRA_ACTIVE] = 0;
                         }
                         break;
 
                     case CGame::RIGHT:
                         m_nX += 8;
                         if (m_nX + frame.m_nLen > game.BUFFERLEN) {
-                            m_propi[EXTRA_ACTIVE] = 0;
+                            m_propi[lgck::EXTRA_ACTIVE] = 0;
                         }
                         break;
                     }
@@ -167,9 +167,9 @@ void CAttacker::doManage()
         }
     }
 
-    if (!m_propi[EXTRA_ACTIVE]) {
-        m_propi[EXTRA_TIMEOUT] = 20 + ::rand() % 240;
-        m_propi[EXTRA_ACTIVE] = 1;
+    if (!m_propi[lgck::EXTRA_ACTIVE]) {
+        m_propi[lgck::EXTRA_TIMEOUT] = 20 + ::rand() % 240;
+        m_propi[lgck::EXTRA_ACTIVE] = 1;
         m_nFrameSet = 0;
         m_nFrameNo = 0;
     }

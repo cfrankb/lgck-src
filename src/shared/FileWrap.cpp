@@ -26,7 +26,7 @@
 
 CFileWrap::CFileWrap()
 {   
-    m_file = NULL;
+    m_file = nullptr;
 }
 
 CFileWrap::~CFileWrap()
@@ -36,8 +36,8 @@ CFileWrap::~CFileWrap()
 
 #define _ptr m_memFile->ptr
 
-CFileWrap::MEMFILE * CFileWrap::m_head = NULL;
-CFileWrap::MEMFILE * CFileWrap::m_tail = NULL;
+CFileWrap::MEMFILE * CFileWrap::m_head = nullptr;
+CFileWrap::MEMFILE * CFileWrap::m_tail = nullptr;
 
 void CFileWrap::addFile(const char *fileName, const char *data, const int size)
 {
@@ -50,7 +50,7 @@ void CFileWrap::addFile(const char *fileName, const char *data, const int size)
         m_tail = mf;
     }
 
-    mf->next = NULL;
+    mf->next = nullptr;
     mf->fileName = (char*)fileName;
     mf->data = (unsigned char*)data;
     mf->size = size;
@@ -66,8 +66,8 @@ void CFileWrap::freeFiles()
         delete pp;
     }
 
-    m_head = NULL;
-    m_tail = NULL;
+    m_head = nullptr;
+    m_tail = nullptr;
 }
 
 CFileWrap::MEMFILE * CFileWrap::findFile(const char *fileName)
@@ -80,7 +80,7 @@ CFileWrap::MEMFILE * CFileWrap::findFile(const char *fileName)
         p = (MEMFILE*)p->next;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 #ifdef USE_QFILE
@@ -286,7 +286,7 @@ bool CFileWrap::open(const char *fileName, const char *mode)
         return !strcmp(mode, "rb");
     } else {
         m_file = fopen(fileName, mode);
-        return m_file != NULL;
+        return m_file != nullptr;
     }
 }
 
@@ -294,7 +294,7 @@ void CFileWrap::close()
 {
     if (m_file) {
         fclose(m_file);
-        m_file = NULL;
+        m_file = nullptr;
     }
 }
 

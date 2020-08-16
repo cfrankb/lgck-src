@@ -15,29 +15,32 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#define EXTRA_ORGPROTO          0x01
-#define EXTRA_ORGX              0x02
-#define EXTRA_ORGY              0x03
-#define EXTRA_HP                0x04
-#define EXTRA_OLDAIM1           0x05
-#define EXTRA_OLDAIM2           0x06
-#define EXTRA_FALLHEIGHT        0x07
-#define EXTRA_LIVES             0x08
-#define EXTRA_ACTIVE            0x09
-#define EXTRA_BULLETCOUNT       0x0a
-#define EXTRA_OWNER             0x0b
-#define EXTRA_FLAGS             0x0c
-#define EXTRA_PATHDIR           0x0d
-#define EXTRA_PATHPTR           0x0e
-#define EXTRA_ANIMSEQ           0x0f
-#define EXTRA_ANIMPTR           0x10
-#define EXTRA_ANIMSPEED         0x11
-#define EXTRA_DEATHINDICATOR    0x12
-#define EXTRA_AGE               0x13
-#define EXTRA_TIMEOUT           0x14
-#define EXTRA_TAGFLAGS          0x15
-#define EXTRA_INVENTORY         0x16
-// this is the last item
-#define EXTRA_COUNT             0x17
-
+namespace lgck {
+    enum Extra
+    {
+        EXTRA_ORGPROTO          = 0x01,
+        EXTRA_ORGX              = 0x02,
+        EXTRA_ORGY              = 0x03,
+        EXTRA_HP                = 0x04,
+        EXTRA_OLDAIM1           = 0x05,
+        EXTRA_OLDAIM2           = 0x06,
+        EXTRA_FALLHEIGHT        = 0x07,
+        EXTRA_LIVES             = 0x08,
+        EXTRA_ACTIVE            = 0x09,
+        EXTRA_BULLETCOUNT       = 0x0a,
+        EXTRA_OWNER             = 0x0b,
+        EXTRA_FLAGS             = 0x0c,
+        EXTRA_PATHDIR           = 0x0d,
+        EXTRA_PATHPTR           = 0x0e,
+        EXTRA_ANIMSEQ           = 0x0f,
+        EXTRA_ANIMPTR           = 0x10,
+        EXTRA_ANIMSPEED         = 0x11,
+        EXTRA_DEATHINDICATOR    = 0x12,
+        EXTRA_AGE               = 0x13,
+        EXTRA_TIMEOUT           = 0x14,
+        EXTRA_TAGFLAGS          = 0x15,
+        EXTRA_INVENTORY         = 0x16,
+        // this is the last item
+        EXTRA_COUNT
+    };
+}

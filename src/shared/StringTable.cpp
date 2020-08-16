@@ -33,7 +33,7 @@ CStringTable::~CStringTable()
     if (m_strings) {
         delete [] m_strings;
     }
-    m_strings = NULL;
+    m_strings = nullptr;
 }
 
 bool CStringTable::read(IFile &file)

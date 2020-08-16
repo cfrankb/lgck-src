@@ -22,7 +22,7 @@
 CWBtnColor::CWBtnColor(QWidget *parent) :
     QPushButton(parent)
 {
-    m_buddy = NULL;
+    m_buddy = nullptr;
     m_red = 0;
     m_blue = 0;
     m_red = 0;

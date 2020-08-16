@@ -110,7 +110,7 @@ CGameFile::CGameFile()
     m_strings = new CStringTable;
     m_events = new CGameEvents;
     m_settings = new CSettings;
-    m_imageManager = NULL;
+    m_imageManager = nullptr;
     m_displayConfig = new CDisplayConfig;
     m_displayConfig->reset();
     m_fontManager = new CFontManager;
@@ -186,7 +186,7 @@ void CGameFile::init()
 
     m_fileName = "";
     m_nLevels = 0;
-    m_arrLevels = NULL;
+    m_arrLevels = nullptr;
     m_nCurrLevel = 0;
 
     // Add the default frames set
@@ -232,10 +232,10 @@ void CGameFile::initDefaultSounds()
                 file.close();
                 m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), data, size));
             } else {
-                m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), NULL, 0));
+                m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), nullptr, 0));
             }
         } else {
-            m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), NULL, 0));
+            m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), nullptr, 0));
         }
     }
 }
@@ -337,7 +337,7 @@ void CGameFile::addLevel(CLevel *level)
 
 void CGameFile::insertLevel (int n, CLevel *level)
 {
-    addLevel (NULL);
+    addLevel (nullptr);
 
     for (int i=m_nLevels-1; i > n ; --i) {
         m_arrLevels [i] = m_arrLevels [i-1];

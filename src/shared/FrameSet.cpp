@@ -338,7 +338,7 @@ void CFrameSet::forget()
     for (int i = 0; i < m_size; ++i) {
         if (m_arrFrames [i]) {
             delete m_arrFrames [i];
-            m_arrFrames[i] = NULL;
+            m_arrFrames[i] = nullptr;
         }
     }
     m_size = 0;
@@ -387,7 +387,7 @@ void CFrameSet::insertAt(int n, CFrame *pFrame) {
         add (pFrame);
     } else  {
         if (m_size== m_max) {
-            add (NULL);
+            add (nullptr);
         } else {
             m_size++;
         }
@@ -410,7 +410,7 @@ CFrame * CFrameSet::removeAt(int n) {
         }
     }
     --m_size;
-    m_arrFrames[m_size] = NULL;
+    m_arrFrames[m_size] = nullptr;
     return rm;
 }
 
@@ -427,7 +427,7 @@ void CFrameSet::setName(const char *str)
 void CFrameSet::removeAll ()
 {
     for (int n = 0; n < m_size; ++n) {
-        m_arrFrames[n] = NULL;
+        m_arrFrames[n] = nullptr;
     }
 
     m_size=0;
@@ -443,10 +443,10 @@ char * CFrameSet::ima2bitmap(char *ImaData, int len, int hei)
     int x2;
     int y2;
 
-    if (ImaData == NULL) return NULL;
+    if (ImaData == nullptr) return nullptr;
 
     char *dest = new char [ len * hei * 64 ];
-    if (dest==NULL) return NULL;
+    if (dest==nullptr) return nullptr;
 
     for (y=0; y<hei; y++) {
         for (x=0; x<len; x++) {
@@ -882,7 +882,7 @@ void CFrameSet::toPng(unsigned char * &data, int &size)
         if (m_size) {
             m_arrFrames[0]->toPng(data, size);
         } else {
-            data = NULL;
+            data = nullptr;
             size = 0;
         }
     }

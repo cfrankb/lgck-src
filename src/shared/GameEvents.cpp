@@ -44,7 +44,7 @@ CGameEvents::CGameEvents()
 CGameEvents::~CGameEvents()
 {
     delete [] m_events;
-    m_events = NULL;
+    m_events = nullptr;
 }
 
 bool CGameEvents::read(IFile & file)

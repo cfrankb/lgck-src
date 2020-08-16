@@ -123,11 +123,11 @@ CGame::CGame():CGameFile()
     setLevel ( 0 );
     m_keys = new char[lgck::Key::Count];
     clearKeys();
-    m_music = NULL;
+    m_music = nullptr;
     m_inventoryTable = new CInventoryTable();
     //m_counters = new CCounters;
     m_inventoryTable->reset(true);
-    m_points = NULL;
+    m_points = nullptr;
     m_game = this;
     var("skill") = 0;
     var("level") = 0;
@@ -142,8 +142,8 @@ CGame::CGame():CGameFile()
     m_sBK->setOwner( this, true );
     m_sFW->setOwner( this, false );
     CActor::setGame( this );
-    m_graphics = NULL;
-    m_sound = NULL;
+    m_graphics = nullptr;
+    m_sound = nullptr;
     svar("WarpTo") = INVALID;
     m_snapshot = new CSnapshot;
     m_tasks = new CTasks;
@@ -157,12 +157,12 @@ CGame::~CGame()
 
     if (m_points) {
         delete m_points;
-        m_points = NULL;
+        m_points = nullptr;
     }
 
     if (m_layers) {
         delete m_layers;
-        m_layers = NULL;
+        m_layers = nullptr;
     }
 
     if (m_imageManager) {
@@ -443,7 +443,7 @@ void CGame::setHealth(int hp)
     if ( svar("playerEntry") ) {
         CActor & player = (*m_sFW) [ svar("playerEntry") ];
         //player.m_hp = hp;
-        player.set(EXTRA_HP, hp);
+        player.set(lgck::EXTRA_HP, hp);
     }
 }
 
@@ -671,13 +671,13 @@ bool CGame::initLevel(int n)
     svar("WarpTo") = INVALID;
 
     // Save the background rgb value for future use
-    var("bkColor") = bgr2rgb(strtol(s->getSetting("bkcolor"), NULL, 16));
+    var("bkColor") = bgr2rgb(strtol(s->getSetting("bkcolor"), nullptr, 16));
 
     // Save the border rgb value for future use
-    var("borderColor") = bgr2rgb(strtol(s->getSetting("borderColor"), NULL, 16));
+    var("borderColor") = bgr2rgb(strtol(s->getSetting("borderColor"), nullptr, 16));
 
     // Save colorMod
-    var("colorMod") = strtol(s->getSetting("colorMod"), NULL, 16);
+    var("colorMod") = strtol(s->getSetting("colorMod"), nullptr, 16);
 
     // allocate the collision map
     if (!snapshotReloading) {
@@ -701,7 +701,7 @@ bool CGame::initLevel(int n)
     m_sBK->hideSystemObject(true);
     m_sFW->hideSystemObject(true);
 
-    setWrap(strtol(s->getSetting("wrap"), NULL, 10)) ;
+    setWrap(strtol(s->getSetting("wrap"), nullptr, 10)) ;
     if (!snapshotReloading) {
         if (!resetDefaultDisplays()) {
             m_lastError = "Display Manager not attached!";
@@ -721,9 +721,9 @@ bool CGame::initLevel(int n)
         centerOnPlayer(player);
         player.setState(CHitData::STATE_HIT | CHitData::STATE_BEGINNING, true);
         if (!snapshotReloading) {
-            player.set(EXTRA_HP, 50);
+            player.set(lgck::EXTRA_HP, 50);
         }
-        player.set(EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
+        player.set(lgck::EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
     }
 
     int tick_rate = s->getSettingInt( CLevel::SPARAM_TICK_RATE );
@@ -777,18 +777,18 @@ bool CGame::managePlayer()
     }
 
     CActor & player = getPlayer();
-    player.set(EXTRA_FLAGS, player.checkHit());
+    player.set(lgck::EXTRA_FLAGS, player.checkHit());
     player.callEvent(CObject::EO_HANDLER);
 
     /////////////////////////////////////////////////////////////////
     // if the death flag is on, set the death state
-    if (player.get(EXTRA_FLAGS) & CHitData::FLAG_DEATH) {
+    if (player.get(lgck::EXTRA_FLAGS) & CHitData::FLAG_DEATH) {
         player.setState(CHitData::STATE_DEAD, true);
     }
 
     /////////////////////////////////////////////////////////////////
     // Check if player is falling
-    int bFall = player.canFall() && player.get(EXTRA_PATHDIR) == -1;
+    int bFall = player.canFall() && player.get(lgck::EXTRA_PATHDIR) == -1;
     /*
     if (bFall) {
         qDebug("grace:%d",player.m_fallGrace);
@@ -809,7 +809,7 @@ bool CGame::managePlayer()
         if (!player.getState(CHitData::STATE_DEAD)) {
             player.callEvent(CObject::EO_FALL);
         }
-        player.set(EXTRA_FALLHEIGHT, 0);
+        player.set(lgck::EXTRA_FALLHEIGHT, 0);
     } else {
         if (player.getState(CHitData::STATE_FALL) && !bFall) {
             if (!player.getState(CHitData::STATE_DEAD)) {
@@ -817,11 +817,11 @@ bool CGame::managePlayer()
                 player.crash();
                 CProto & proto = m_arrProto[player.m_nProto];
                 if (proto.m_nMaxFall &&
-                        player.get(EXTRA_FALLHEIGHT) > proto.m_nMaxFall) {
+                        player.get(lgck::EXTRA_FALLHEIGHT) > proto.m_nMaxFall) {
                     killPlayer(player);
                 }
             }
-            player.get(EXTRA_FALLHEIGHT) = 0;
+            player.get(lgck::EXTRA_FALLHEIGHT) = 0;
         }
     }
     player.setState(CHitData::STATE_FALL, bFall);
@@ -829,13 +829,13 @@ bool CGame::managePlayer()
     /////////////////////////////////////////////////////////////////
     // handle death sequence
     if (player.getState(CHitData::STATE_DEAD)
-        && !player.get(EXTRA_DEATHINDICATOR)) {
-        player.set(EXTRA_DEATHINDICATOR, DI_ANIMATION);
+        && !player.get(lgck::EXTRA_DEATHINDICATOR)) {
+        player.set(lgck::EXTRA_DEATHINDICATOR, DI_ANIMATION);
         player.unMap();
         player.callEvent(CObject::EO_DEATH);
         if (!player.tryAnimation(CObject::AS_DEAD + player.m_nAim)) {
             CLuaVM::debugv("player death animation failed (aim=0x%x)", player.m_nAim);
-            player.set(EXTRA_DEATHINDICATOR, DI_REMOVAL);
+            player.set(lgck::EXTRA_DEATHINDICATOR, DI_REMOVAL);
         }
     }
 
@@ -851,7 +851,7 @@ bool CGame::managePlayer()
             CProto & proto = m_arrProto[player.m_nProto];
             if (((!proto.m_nMoveSpeed) ||
                  (var("ticks") % proto.m_nMoveSpeed == 0))
-                    && !(player.get(EXTRA_FLAGS) & CHitData::FLAG_TELEPORT)) {
+                    && !(player.get(lgck::EXTRA_FLAGS) & CHitData::FLAG_TELEPORT)) {
                 managePlayerMovements(player);
             }
         }
@@ -859,7 +859,7 @@ bool CGame::managePlayer()
 
     /////////////////////////////////////////////////////////////////
     // Manage Player Jumping
-    if (player.get(EXTRA_PATHDIR) != -1 && gravity()) {
+    if (player.get(lgck::EXTRA_PATHDIR) != -1 && gravity()) {
         player.managePath();
     }
 
@@ -876,7 +876,7 @@ bool CGame::managePlayer()
             player.move(DOWN);
             player.map();
             player.autoCenter(DOWN);
-            ++player.get(EXTRA_FALLHEIGHT);
+            ++player.get(lgck::EXTRA_FALLHEIGHT);
         }
     }
 
@@ -957,10 +957,10 @@ void CGame::managePlyTimerOutCounter(CActor & player)
     uint32_t joyState = getJoyState();
     // Check hit - Dec TimeOutDelay
     if (!player.getState(CHitData::STATE_BEGINNING)) {
-        if (player.get(EXTRA_TIMEOUT) == 0) {
+        if (player.get(lgck::EXTRA_TIMEOUT) == 0) {
             player.setState(CHitData::STATE_HIT, false);
         } else {
-           player.get(EXTRA_TIMEOUT)--;
+           player.get(lgck::EXTRA_TIMEOUT)--;
         }
     }
 
@@ -1038,13 +1038,13 @@ void CGame::managePlayerMovements(CActor & player)
     // vla3 disallows control of movement during paths and fall
     CProto & proto = m_arrProto[player.m_nProto];
     if (proto.m_nJumpMode == JM_VLA3 &&
-            (player.get(EXTRA_PATHDIR) != -1 || player.getState(CHitData::STATE_FALL))) {
+            (player.get(lgck::EXTRA_PATHDIR) != -1 || player.getState(CHitData::STATE_FALL))) {
         return;
     }
     if (joyState){// && player.m_pathDir == INVALID) {
         // manage player jump
         int nNewAim = INVALID;
-        if (player.get(EXTRA_PATHDIR) == INVALID) {
+        if (player.get(lgck::EXTRA_PATHDIR) == INVALID) {
             if (joyState & JOY_DOWN) {
                 nNewAim = DOWN;
             }
@@ -1061,14 +1061,14 @@ void CGame::managePlayerMovements(CActor & player)
         }
         // activate other animation sequences
         if ( (nNewAim != INVALID) && (player.m_nAim != nNewAim
-           || player.get(EXTRA_ANIMSEQ) == CObject::AS_DEFAULT) ) {
+           || player.get(lgck::EXTRA_ANIMSEQ) == CObject::AS_DEFAULT) ) {
             player.m_nAim = nNewAim;
             player.tryAnimation(CObject::AS_MOVE + nNewAim);
         } else {
-            if (player.m_nAim != HERE && player.get(EXTRA_ANIMSEQ) == INVALID
-                    && player.get(EXTRA_PATHDIR) == INVALID) {
+            if (player.m_nAim != HERE && player.get(lgck::EXTRA_ANIMSEQ) == INVALID
+                    && player.get(lgck::EXTRA_PATHDIR) == INVALID) {
                 int animSeq = CObject::AS_MOVE + player.m_nAim;
-                if (player.get(EXTRA_ANIMSEQ) != animSeq) {
+                if (player.get(lgck::EXTRA_ANIMSEQ) != animSeq) {
                     player.tryAnimation(animSeq);
                 }
             }
@@ -1077,7 +1077,7 @@ void CGame::managePlayerMovements(CActor & player)
         int & my = m_my;
         CFrame & frame = * m_arrFrames.getFrame( player );
         if (joyState & JOY_UP
-                && player.get(EXTRA_PATHDIR) == -1) {
+                && player.get(lgck::EXTRA_PATHDIR) == -1) {
             CActor t_player;
             t_player.copyFrom(player);
             t_player.move(UP);
@@ -1103,7 +1103,7 @@ void CGame::managePlayerMovements(CActor & player)
         player.setState(CHitData::STATE_LOOKUP, lookup);
 
         if (joyState & JOY_DOWN
-                && player.get(EXTRA_PATHDIR) == -1) {
+                && player.get(lgck::EXTRA_PATHDIR) == -1) {
             if (player.canMove(DOWN, false)) {
                 player.unMap();
                 player.move(DOWN);
@@ -1212,7 +1212,7 @@ void CGame::triggerPlayerHitState()
     if (!player.tryAnimation(CObject::AS_HURT + player.m_nAim )) {
         // the hurt animation didn't work ! :(
     }
-    player.set(EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
+    player.set(lgck::EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
 }
 
 int CGame::manageKeyEvents()
@@ -1307,7 +1307,7 @@ bool CGame::initSettings()
     // find points
     if (m_points) {
         delete m_points;
-        m_points = NULL;
+        m_points = nullptr;
     }
 
     if (settings[PARAM_POINTS].value[0] == ':') {
@@ -1348,7 +1348,7 @@ void CGame::removePointsOBL()
         var("pointsOBL_frameSet") = 0;
         if (m_points) {
             delete m_points;
-            m_points = NULL;
+            m_points = nullptr;
         }
     }
 }
@@ -1395,10 +1395,10 @@ bool CGame::initLevelTest( int level,  int skill,  bool initSound)
 void CGame::addToHP(int hp)
 {
     CActor & player = getPlayer();
-    player.get(EXTRA_HP) = std::max(0, player.get(EXTRA_HP) + hp);
-    player.get(EXTRA_HP) = std::min((int)player.get(EXTRA_HP), (int) MAX_HP);
+    player.get(lgck::EXTRA_HP) = std::max(0, player.get(lgck::EXTRA_HP) + hp);
+    player.get(lgck::EXTRA_HP) = std::min((int)player.get(lgck::EXTRA_HP), (int) MAX_HP);
     setDisplayState( true, std::max(getDisplayAlpha(), 0x80) );
-    if (!player.get(EXTRA_HP)) {
+    if (!player.get(lgck::EXTRA_HP)) {
         killPlayer(player);
     }
 }
@@ -1670,7 +1670,7 @@ void CGame::generateRuntimeLua(std::string & s)
         {"FULLSCREEN", (int) var("FULLSCREEN") },
         {"CONST_TIMEOUT", (int) var("CONST_TIMEOUT") },
         {"SKILL", static_cast<int>(svar("skill")) },
-        { NULL, 0 }
+        { nullptr, 0 }
     };
 
     s += "-- GENERAL GAME SETTINGS (deprecated)\n";
@@ -1936,7 +1936,7 @@ IDisplayManager * CGame::displays()
     if (m_graphics) {
         return m_graphics->displayManager();
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1953,7 +1953,7 @@ bool CGame::playSound(const char *name)
     } else {
         CLuaVM::debugv("invalid requested sound: %s", name);
     }
-    return snd != NULL;
+    return snd != nullptr;
 }
 
 bool CGame::playSound(int index)
@@ -1964,7 +1964,7 @@ bool CGame::playSound(int index)
     } else {
         CLuaVM::debugv("invalid requested sound: %d", index);
     }
-    return snd != NULL;
+    return snd != nullptr;
 }
 
 ISound * CGame::sound()
@@ -2035,7 +2035,7 @@ void CGame::updateScreen()
     case ES_TIMEOUT:
         level = m_arrLevels[getLevel()];
         char text[32];
-        graphics()->clear(CGame::bgr2rgb(strtol(level->getSetting("introBkColor"), NULL, 16)));
+        graphics()->clear(CGame::bgr2rgb(strtol(level->getSetting("introBkColor"), nullptr, 16)));
         if (svar("WarpTo") == INVALID) {
             sprintf(text, "Level %.2d", getLevel() + 1);
         } else {
@@ -2045,7 +2045,7 @@ void CGame::updateScreen()
             strcpy(text, "Ran out of time");
         }
         displays()->drawText(-1,-1,text, 0, 15,
-                             CGame::bgr2rgb(strtol(level->getSetting("introTextColor"), NULL, 16)));
+                             CGame::bgr2rgb(strtol(level->getSetting("introTextColor"), nullptr, 16)));
         callLvEvent(CLevel::EL_INTRO_DRAW);
         break;
     default:

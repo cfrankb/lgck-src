@@ -52,7 +52,7 @@ int CProtoIndex::getFilterCount()
 CProtoIndex::CProtoIndex(CProtoArray *parent, int custom)
 {
     m_protoArray = parent;
-    m_index = NULL;
+    m_index = nullptr;
     m_size = 0;
     m_custom = custom;
 }
@@ -61,7 +61,7 @@ void CProtoIndex::forget()
 {
     if (m_index) {
         delete m_index;
-        m_index = NULL;
+        m_index = nullptr;
     }
     m_size = 0;
 }

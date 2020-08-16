@@ -188,8 +188,8 @@ public:
     /////////////////////////////////////////////////////////////////
     // i/o
 
-    bool read(const char *filepath=NULL);
-    bool write(const char *filepath=NULL);
+    bool read(const char *filepath=nullptr);
+    bool write(const char *filepath=nullptr);
 
     /////////////////////////////////////////////////////////////////
     // settings

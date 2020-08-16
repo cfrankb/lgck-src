@@ -331,8 +331,8 @@ void CScene::manageAuto()
                     entry.m_nProto = proto.m_nAutoProto;
 
                     if (!entry.tryAnimation(CObject::AS_DEFAULT)) {
-                        entry.set(EXTRA_ANIMPTR, 0);
-                        entry.set(EXTRA_ANIMSEQ, -1);
+                        entry.set(lgck::EXTRA_ANIMPTR, 0);
+                        entry.set(lgck::EXTRA_ANIMSEQ, -1);
                     }
 
                     entry.map();

@@ -32,7 +32,7 @@ CMusicSDL::CMusicSDL()
         CLuaVM::debugv("Mix_OpenAudio failed: %s", SDL_GetError());
         m_valid = false;
     }
-    m_music = NULL;
+    m_music = nullptr;
 }
 
 CMusicSDL::~CMusicSDL()
@@ -48,7 +48,7 @@ bool CMusicSDL::open(const char *file)
     } else {
         CLuaVM::debugv("Mix_LoadMUS(\"%s\"): %s\n", file, Mix_GetError());
     }
-    return m_music != NULL;
+    return m_music != nullptr;
 }
 
 bool CMusicSDL::play(int loop)
@@ -72,7 +72,7 @@ void CMusicSDL::close()
     stop();
     if (m_music) {
         Mix_FreeMusic(m_music);
-        m_music = NULL;
+        m_music = nullptr;
     }
 }
 

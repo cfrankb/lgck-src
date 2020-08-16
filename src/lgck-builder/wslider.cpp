@@ -22,7 +22,7 @@
 CWSlider::CWSlider(QWidget *parent):
     QSlider(parent)
 {
-    m_buddy = NULL;
+    m_buddy = nullptr;
 }
 
 void CWSlider::setBuddy(QLineEdit *q)

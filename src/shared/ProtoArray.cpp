@@ -43,7 +43,7 @@ CProtoArray::CProtoArray()
     m_nMax = GROWBY;
     m_objects = new CObject [ m_nMax ];
 
-    m_index = NULL;
+    m_index = nullptr;
     m_indexSize = 0;
 }
 
@@ -565,7 +565,7 @@ void CProtoArray::forgetIndex ()
     m_indexSize = 0;
     if (m_index) {
         delete [] m_index;
-        m_index = NULL;
+        m_index = nullptr;
     }
 }
 
@@ -644,7 +644,7 @@ void CProtoArray::resizeIndex(int newSize)
 
 bool CProtoArray::isIndexed()
 {
-    return m_index != NULL;
+    return m_index != nullptr;
 }
 
 void CProtoArray::debugIndex()

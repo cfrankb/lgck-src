@@ -60,7 +60,7 @@ CFrame::CFrame(int p_nLen, int p_nHei)
     m_map.resize(m_nLen, m_nHei);
     m_bCustomMap = false;
 
-    m_undoFrames = NULL;
+    m_undoFrames = nullptr;
     m_undoSize = 0;
     m_undoPtr = 0;
 }
@@ -86,7 +86,7 @@ CFrame::CFrame(CFrame* src)
          init();
     }
     // create undo buffer
-    m_undoFrames = NULL;
+    m_undoFrames = nullptr;
     m_undoSize = 0;
     m_undoPtr = 0;
 }
@@ -114,14 +114,14 @@ void CFrame::init()
     m_nHei = 0;
     m_nLen = 0;
     m_bCustomMap = false;
-    m_rgb = NULL;
+    m_rgb = nullptr;
 }
 
 void CFrame::forget()
 {
-    if (m_rgb != NULL) {
+    if (m_rgb != nullptr) {
         delete [] m_rgb;
-        m_rgb = NULL;
+        m_rgb = nullptr;
     }
 
     if (m_undoFrames) {
@@ -129,7 +129,7 @@ void CFrame::forget()
             delete m_undoFrames[i];
         }
         delete [] m_undoFrames;
-        m_undoFrames = NULL;
+        m_undoFrames = nullptr;
         m_undoSize = 0;
         m_undoPtr = 0;
     }
@@ -170,7 +170,7 @@ bool CFrame::read(IFile &file, int version)
     // clear existing bitmap and map
     if (m_rgb) {
         delete [] m_rgb;
-        m_rgb = NULL;
+        m_rgb = nullptr;
     }
 
     m_nLen = 0;
@@ -1033,13 +1033,13 @@ void CFrame::push()
 
 bool CFrame::canUndo()
 {
-    return m_undoFrames != NULL
+    return m_undoFrames != nullptr
             && m_undoPtr < m_undoSize;
 }
 
 bool CFrame::canRedo()
 {
-    return m_undoFrames != NULL
+    return m_undoFrames != nullptr
             && m_undoPtr>0 && m_undoSize;
 }
 
@@ -1142,14 +1142,14 @@ void CFrame::fill(unsigned int rgba)
 
 CSS3Map::CSS3Map()
 {
-    m_map = NULL;
+    m_map = nullptr;
     m_len = 0;
     m_hei = 0;
 }
 
 CSS3Map::CSS3Map(const int px, const int py)
 {
-    m_map = NULL;
+    m_map = nullptr;
     resize(px, py);
 }
 

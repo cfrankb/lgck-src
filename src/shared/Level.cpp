@@ -259,7 +259,7 @@ bool CLevel::read(IFile &file)
 
 void CLevel::insertAt(int i, CLayer *layer)
 {
-    addLayer(NULL);
+    addLayer(nullptr);
     for (int j = m_size - 1; j > i; --j) {
         m_layers[j] = m_layers[j-1];
     }
@@ -293,7 +293,7 @@ CLayer *CLevel::getMainLayer()
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int CLevel::getMainLayerId()
@@ -420,7 +420,7 @@ CLevel & CLevel::operator = (CLevel & s)
 
     if (m_layers) {
         delete [] m_layers;
-        m_layers = NULL;
+        m_layers = nullptr;
     }
 
     m_mx = s.m_mx;
@@ -454,7 +454,7 @@ int CLevel::getSettingInt(const char *param)
 void CLevel::setSetting(const char*param, const char *value, int mask)
 {
     m_settings [ param ].value = value;
-    m_settings [ param ].valueInt = strtol(value, NULL, 10) & mask;
+    m_settings [ param ].valueInt = strtol(value, nullptr, 10) & mask;
 }
 
 CSettings & CLevel::getSettings()

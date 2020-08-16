@@ -532,5 +532,5 @@ static FUNCTION exports [] = {
     alias ( "tryPath", sprite_tryPath )
     alias ( "unFreezeSprite", sprite_unFreeze )
     alias ( "unMapSprite", sprite_unMap )
-    { NULL, 0 }
+    { nullptr, 0 }
 };

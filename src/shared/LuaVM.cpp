@@ -115,7 +115,7 @@ CLuaVM::CLuaVM()
 
 CLuaVM::~CLuaVM() {
     if (m_luaState) {
-        m_luaState = NULL;
+        m_luaState = nullptr;
     }
 }
 

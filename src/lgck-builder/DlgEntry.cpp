@@ -418,7 +418,7 @@ void CDlgEntry::on_btnRawPath_clicked()
         result = result.trimmed();
         // decode the string
         for (int k=0; k < result.length(); k +=3) {
-            char aim = strtol(q2c(result.mid(k, 2)), NULL, 16);
+            char aim = strtol(q2c(result.mid(k, 2)), nullptr, 16);
             if (CPath::isValidAim(aim)) {
                 tmp.add(aim);
             }

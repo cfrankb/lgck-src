@@ -32,7 +32,7 @@ CIMSdl::CIMSdl()
     m_max = GROWBY;
     m_imageSets = new ImageSet * [ m_max ];
     m_nextTexture = 0;
-    m_renderer = NULL;
+    m_renderer = nullptr;
 }
 
 CIMSdl::~CIMSdl()
@@ -40,7 +40,7 @@ CIMSdl::~CIMSdl()
     forget();
     if (m_imageSets) {
         delete [] m_imageSets;
-        m_imageSets = NULL;
+        m_imageSets = nullptr;
     }
 }
 
@@ -134,7 +134,7 @@ bool CIMSdl::hasInverse( int imageSet )
         imageSet = 0;
     }
 
-    return m_imageSets [ imageSet ]->inverse != NULL;
+    return m_imageSets [ imageSet ]->inverse != nullptr;
 }
 
 void CIMSdl::replace(int i, CFrameSet *filter)
@@ -162,7 +162,7 @@ int CIMSdl::insertAt(int i, CFrameSet *filter)
     is->size = filter->getSize();
     is->images = new unsigned int [ is->size ];
     memset(is->images, 0, sizeof(unsigned int)*is->size);
-    is->inverse = NULL;
+    is->inverse = nullptr;
 
     for (int x=0; x < filter->getSize(); ++x) {
         CFrame frame;

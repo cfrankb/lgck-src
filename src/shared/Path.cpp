@@ -25,14 +25,14 @@ CPath::CPath()
 {
     m_size = 0;
     m_max = 0;
-    m_path = NULL;
+    m_path = nullptr;
 }
 
 CPath::~CPath()
 {
     if (m_path) {
         delete [] m_path;
-        m_path = NULL;
+        m_path = nullptr;
     }
 }
 
@@ -112,7 +112,7 @@ void CPath::forget()
 {
     if (m_path) {
         delete [] m_path;
-        m_path = NULL;
+        m_path = nullptr;
     }
     m_size = 0;
     m_max = 0;

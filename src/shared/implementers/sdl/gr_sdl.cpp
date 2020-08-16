@@ -33,7 +33,7 @@
 
 CGRSdl::CGRSdl()
 {
-    m_game = NULL;
+    m_game = nullptr;
 }
 
 bool CGRSdl::init(CGame *game, int w, int h, const char*title)
