@@ -30,11 +30,16 @@ class CProto;
 /////////////////////////////////////////////////////////////////////////////
 // CLevelEntry 
 
-constexpr int TRIGGER_KEYS    = 0x1f;
-constexpr int TRIGGER_GOAL    = 0x20;
-constexpr int TRIGGER_FROZEN  = 0x40;
-constexpr int TRIGGER_HIDDEN  = 0x80;
-constexpr int TRIGGER_MASK    = 0xe0;
+constexpr uint8_t TRIGGER_KEYS    = 0x1f;
+constexpr uint8_t TRIGGER_GOAL    = 0x20;
+constexpr uint8_t TRIGGER_FROZEN  = 0x40;
+constexpr uint8_t TRIGGER_HIDDEN  = 0x80;
+constexpr uint8_t TRIGGER_MASK    = 0xe0;
+
+constexpr uint8_t DIFFICULTY_NORMAL = 0x01;
+constexpr uint8_t DIFFICULTY_NIGHTMARE = 0x02;
+constexpr uint8_t DIFFICULTY_HELL   = 0x04;
+constexpr uint8_t DIFFICULTY_INSANE = 0x08;
 
 class CLevelEntry 
 {

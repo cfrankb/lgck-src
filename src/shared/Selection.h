@@ -18,6 +18,14 @@
 #ifndef __CSELECTION__
 #define __CSELECTION__
 class CLevelEntry;
+class CProto;
+
+typedef struct {
+    unsigned char actionMaskDiff;
+    unsigned char triggerKeyDiff;
+    unsigned char sameImage;
+    unsigned char sameProto;
+} TriggerMask;
 
 class CSelection
 {
@@ -28,6 +36,8 @@ public:
     CLevelEntry & operator[] (int i);
     void operator = (CSelection & src);
     void operator += (CSelection & src);
+    bool operator == (CSelection & src);
+    bool operator != (CSelection & src);
     void addEntry(const CLevelEntry & entry, int index=-1);
     void clear();
     bool isSingle();
@@ -40,6 +50,9 @@ public:
     void removeProto(int proto);
     void applyDelta(int dx, int dy);
     void forget();
+    TriggerMask compareMask();
+    void resync(const CLevelEntry & entry, int index);
+    CLevelEntry & cacheAtIndex(int index);
 
 protected:
 

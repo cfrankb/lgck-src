@@ -67,7 +67,8 @@ public:
     int getSelectionSize();
     bool isInSelection(int index);
     void removeFromSelection(int index);
-    void unSelectedAt(int i);    
+    void unSelectedAt(int i);
+    CSelection & selection();
 
     void setOffset(int mx, int my);
     void getOffset(int & mx, int & my);

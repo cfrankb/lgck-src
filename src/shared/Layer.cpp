@@ -429,3 +429,8 @@ int CLayer::countGoals()
     }
     return count;
 }
+
+CSelection & CLayer::selection()
+{
+    return m_selection;
+}

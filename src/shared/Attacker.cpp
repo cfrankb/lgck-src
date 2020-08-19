@@ -128,7 +128,6 @@ void CAttacker::doManage()
                                 m_nAim = CGame::RIGHT;
                             }
                             callEvent(CObject::EO_ATTACK);
-                            // game.m_arrSounds["pow.ogg"]->play();
                         }
                     }
                     switch ( m_nAim ) {

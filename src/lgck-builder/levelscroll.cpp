@@ -212,7 +212,7 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
 
         if (oldCurrEntry != layer.getSelectionIndex(0)
                 || selCount != layer.getSelectionSize()) {
-            qDebug("menu changed");
+            //qDebug("menu changed");
             emit menuChanged();
         }
 

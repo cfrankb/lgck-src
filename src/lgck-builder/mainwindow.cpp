@@ -893,7 +893,7 @@ void MainWindow::updateMenus()
         }
 
         bool enable = resultSingle;
-        bool enableMulti = resultMulti;       
+        bool enableMulti = resultMulti;
         if (m_viewMode == VM_SPRITE_EVENTS) {
             enable = false;
             enableMulti = false;
@@ -918,7 +918,7 @@ void MainWindow::updateMenus()
         ui->actionSend_to_back->setEnabled( enableMulti );
         ui->actionCopy_Object->setEnabled( enableMulti );
         ui->actionDelete_Object->setEnabled( enableMulti );
-        ui->actionCustomize->setEnabled( enable );
+        ui->actionCustomize->setEnabled( enableMulti );
         ui->actionEdit_Object->setEnabled( enable );
         ui->actionEdit_Images->setEnabled( enable );
         ui->actionEdit_Path->setEnabled( enable );
@@ -1947,26 +1947,25 @@ void MainWindow::on_actionCustomize_triggered()
     if (m_doc.getSize()) {
         CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
-        if (layer.isSingleSelection()) {
+        if (layer.selection().getSize()) {
             CDlgEntry *d = new CDlgEntry(this);
             d->setGameDB( & m_doc);
-
-            int triggers[TRIGGER_KEYS + 1];
-            memset(&triggers, 0, sizeof(triggers));
-            for (int i=0; i < layer.getSize(); ++i) {
-                int trigger = layer[i].m_nTriggerKey & TRIGGER_KEYS;
-                ++triggers[trigger];
-            }
-            d->init(triggers);
             d->load(layer.getSelectionIndex(0));
-            CLevelEntry entry = layer.getSelection(0);
+            if (layer.isMultiSelection()) {
+                d->loadMultiSelection(layer.selection());
+            }
             if (d->exec() == QDialog::Accepted) {
-                d->save(layer.getSelectionIndex(0));
-                if (entry != layer.getSelection(0)) {
-                    m_doc.setDirty( true );
+                CSelection & selection = layer.selection();
+                for (int i=0; i < selection.getSize(); ++i) {
+                    int j = layer.getSelectionIndex(i);
+                    d->save(j, layer.isMultiSelection());
+                    if (selection.cacheAtIndex(i) != layer[j]) {
+                        selection.resync(layer[j], i);
+                        m_doc.setDirty(true);
+                    }
+                    emit spriteUpdated(layer[j].m_nProto);
                 }
             }
-            emit spriteUpdated(entry.m_nProto);
             delete d;
         }
     }

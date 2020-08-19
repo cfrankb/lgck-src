@@ -23,6 +23,7 @@
 
 class CGameFile;
 class CPath;
+class CSelection;
 
 namespace Ui {
     class CDlgEntry;
@@ -38,11 +39,13 @@ public:
         m_gameFile = p;
     }
 
-    void init(const int *triggers);
     void load(const int entryPos);
-    void save(const int entryPos);
+    void save(const int entryPos, bool isMulti);
+    void loadMultiSelection(CSelection & selection);
 
 protected:
+    void saveNonCombining(const int entryPos);
+    void init();
     void changeEvent(QEvent *e);
     void updateText();
     void enableCheckboxes();

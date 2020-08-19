@@ -191,3 +191,47 @@ void CSelection::forget()
 {
     clear();
 }
+
+/* compare the bitwise mask of selectionItems */
+TriggerMask CSelection::compareMask()
+{
+    TriggerMask mask = {0,0,1,1};
+    CLevelEntry & entry0 = m_entries[0];
+    for (int i=1; i < getSize(); ++i) {
+        CLevelEntry & entry = m_entries[i];
+        mask.actionMaskDiff |= (entry.m_nActionMask ^ entry0.m_nActionMask);
+        mask.triggerKeyDiff |= (entry.m_nTriggerKey ^ entry0.m_nTriggerKey);
+        mask.sameImage &= (entry.m_nFrameNo == entry0.m_nFrameNo)
+                && (entry.m_nFrameSet == entry0.m_nFrameSet) ? 1 : 0;
+        mask.sameProto &= (entry.m_nProto == entry0.m_nProto) ? 1 : 0;
+    }
+    return mask;
+}
+
+bool CSelection::operator == (CSelection & src)
+{
+    if (src.getSize() != getSize()) {
+        return false;
+    }
+    for (int i=0; i < getSize(); ++i) {
+        if (m_entries[i] != src[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CSelection::operator != (CSelection & src)
+{
+    return !(*this == src);
+}
+
+void CSelection::resync(const CLevelEntry & entry, int index)
+{
+    m_entries[index] = entry;
+}
+
+CLevelEntry &CSelection::cacheAtIndex(int index)
+{
+    return m_entries[index];
+}

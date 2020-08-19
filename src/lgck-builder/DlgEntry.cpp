@@ -60,8 +60,18 @@ void CDlgEntry::changeEvent(QEvent *e)
     }
 }
 
-void CDlgEntry::init(const int *triggers)
+/* track trigger keys in-use */
+void CDlgEntry::init()
 {
+    CLevel & level = m_gameFile->getCurrentLevel();
+    CLayer & layer = * level.getCurrentLayer();
+    int triggers[TRIGGER_KEYS + 1];
+    memset(&triggers, 0, sizeof(triggers));
+    for (int i=0; i < layer.getSize(); ++i) {
+        int trigger = layer[i].m_nTriggerKey & TRIGGER_KEYS;
+        ++triggers[trigger];
+    }
+
     QIcon iconBlank;
     iconBlank.addFile(":/images/blank.png");
     QIcon iconCheck;
@@ -71,21 +81,21 @@ void CDlgEntry::init(const int *triggers)
         if (n) {
             QString s = QString(tr("%1")).arg(n);
             if (triggers[n]) {
-                m_ui->cbTriggerKey->addItem(iconCheck, s);
+                m_ui->cbTriggerKey->addItem(iconCheck, s, QVariant(n));
             } else {
-                m_ui->cbTriggerKey->addItem(iconBlank, s);
+                m_ui->cbTriggerKey->addItem(iconBlank, s, QVariant(n));
             }
         }
         else {
-            m_ui->cbTriggerKey->addItem(tr("(none)"));
+            m_ui->cbTriggerKey->addItem(tr("(none)"), QVariant(n));
         }
     }
-
     m_ui->tabWidget->setCurrentIndex(0);
 }
 
 void CDlgEntry::load(const int entryPos)
 {
+    init();
     m_entry = entryPos;
     CGameFile &gf = *((CGameFile*)m_gameFile);
     CLevel & level = m_gameFile->getCurrentLevel();
@@ -95,51 +105,47 @@ void CDlgEntry::load(const int entryPos)
 
     // attributs
 
-    if (entry.m_nTriggerKey & 0x80) {
+    if (entry.m_nTriggerKey & TRIGGER_HIDDEN) {
        m_ui->cHidden->setChecked( true );
     }
 
-    if (entry.m_nTriggerKey & 0x40) {
+    if (entry.m_nTriggerKey & TRIGGER_FROZEN) {
        m_ui->cFrozen->setChecked( true );
     }
 
-    if (entry.m_nTriggerKey & 0x20) {
+    if (entry.m_nTriggerKey & TRIGGER_GOAL) {
        m_ui->cExtra2->setChecked( true );
     }
 
-    //if (entry.m_nTriggerKey & 0x10) {
-       //m_ui->cExtra1->setChecked( true );
-    //}
-
     // difficulty levels
 
-    if (entry.m_nActionMask & 0x1) {
+    if (entry.m_nActionMask & DIFFICULTY_NORMAL) {
        m_ui->cD01->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x2) {
+    if (entry.m_nActionMask & DIFFICULTY_NIGHTMARE) {
        m_ui->cD02->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x4) {
+    if (entry.m_nActionMask & DIFFICULTY_HELL) {
        m_ui->cD04->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x8) {
+    if (entry.m_nActionMask & DIFFICULTY_INSANE) {
        m_ui->cD08->setChecked( true );
     }
 
     // trigger flip
 
-    if (entry.m_nActionMask & 0x20) {
+    if (entry.m_nActionMask & TRIGGER_GOAL) {
        m_ui->cF20->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x40) {
+    if (entry.m_nActionMask & TRIGGER_FROZEN) {
        m_ui->cF40->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x80) {
+    if (entry.m_nActionMask & TRIGGER_HIDDEN) {
        m_ui->cF80->setChecked( true );
     }
 
@@ -214,11 +220,10 @@ void CDlgEntry::enableCheckboxes()
    // trigger key
    m_ui->cbTriggerKey->setEnabled( result );
 
-   // attributs
+   // attributes
    m_ui->cHidden->setEnabled( result ) ;
    m_ui->cFrozen->setEnabled( result ) ;
    m_ui->cExtra2->setEnabled( result ) ;
-   //m_ui->cExtra1->setEnabled( result ) ;
 
    // trigger flip
    m_ui->cF20->setEnabled( result ) ;
@@ -226,64 +231,76 @@ void CDlgEntry::enableCheckboxes()
    m_ui->cF80->setEnabled( result ) ;
 }
 
-void CDlgEntry::save(const int entryPos)
+void CDlgEntry::save(const int entryPos, bool isMulti)
+{
+    CLevel & level = m_gameFile->getCurrentLevel();
+    CLayer & layer = * level.getCurrentLayer();
+    CLevelEntry & entry = layer[entryPos];
+    int triggerKeyId = m_ui->cbTriggerKey->itemData(m_ui->cbTriggerKey->currentIndex()).toInt();
+    entry.m_nTriggerKey = triggerKeyId == -1 ?
+                entry.m_nTriggerKey :
+                (entry.m_nTriggerKey & (0xff ^ TRIGGER_KEYS)) | triggerKeyId;
+
+    // attributes
+    typedef struct {
+        uint8_t *target;
+        uint8_t mask;
+        QCheckBox * cbox;
+    } Control;
+
+    Control controls[] = {
+        // trigger state
+        {& entry.m_nTriggerKey, TRIGGER_GOAL, m_ui->cExtra2},
+        {& entry.m_nTriggerKey, TRIGGER_FROZEN, m_ui->cFrozen},
+        {& entry.m_nTriggerKey, TRIGGER_HIDDEN, m_ui->cHidden},
+
+        // difficulty level
+        {& entry.m_nActionMask, DIFFICULTY_NORMAL, m_ui->cD01},
+        {& entry.m_nActionMask, DIFFICULTY_NIGHTMARE, m_ui->cD02},
+        {& entry.m_nActionMask, DIFFICULTY_HELL, m_ui->cD04},
+        {& entry.m_nActionMask, DIFFICULTY_INSANE, m_ui->cD08},
+
+        // flip
+        {& entry.m_nActionMask, TRIGGER_GOAL, m_ui->cF20},
+        {& entry.m_nActionMask, TRIGGER_FROZEN, m_ui->cF40},
+        {& entry.m_nActionMask, TRIGGER_HIDDEN, m_ui->cF80},
+    };
+
+    for (unsigned int i = 0; i < sizeof(controls)/sizeof(Control); ++i) {
+        Control & c = controls[i];
+        uint8_t & t = *c.target;
+        if (c.cbox->isTristate()) {
+            if (c.cbox->checkState()==Qt::Unchecked) {
+                t &= (0xff ^ c.mask);
+            } else if (c.cbox->checkState()==Qt::Checked) {
+                t |= c.mask;
+            }
+        } else {
+            if (c.cbox->isChecked()) {
+                t |= c.mask;
+            } else {
+                t &= (0xff ^ c.mask);
+            }
+        }
+    }
+
+    if (m_ui->btnNextImage->isEnabled() || m_ui->btnPrevImage->isEnabled()
+            || m_ui->btnObject->isEnabled()) {
+        entry.m_nFrameSet = m_currSet;
+        entry.m_nFrameNo = m_currImage;
+    }
+
+    if (!isMulti) {
+        saveNonCombining(entryPos);
+    }
+}
+
+void CDlgEntry::saveNonCombining(const int entryPos)
 {
     CGameFile &gf = *((CGameFile*)m_gameFile);
     CLevel & level = m_gameFile->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];
-    entry.m_nTriggerKey = m_ui->cbTriggerKey->currentIndex();
-
-    // attributs
-
-    if (m_ui->cHidden->isChecked()) {
-       entry.m_nTriggerKey += 0x80;
-    }
-
-    if (m_ui->cFrozen->isChecked()) {
-       entry.m_nTriggerKey += 0x40;
-    }
-
-    if (m_ui->cExtra2->isChecked()) {
-       entry.m_nTriggerKey += 0x20;
-    }
-
-    // difficulty levels
-
-    entry.m_nActionMask = 0;
-
-    if (m_ui->cD01->isChecked()) {
-       entry.m_nActionMask += 0x1;
-    }
-
-    if (m_ui->cD02->isChecked()) {
-       entry.m_nActionMask += 0x2;
-    }
-
-    if (m_ui->cD04->isChecked()) {
-       entry.m_nActionMask += 0x4;
-    }
-
-    if (m_ui->cD08->isChecked()) {
-       entry.m_nActionMask += 0x8;
-    }
-
-    // trigger flip
-
-    if (m_ui->cF20->isChecked()) {
-       entry.m_nActionMask += 0x20;
-    }
-
-    if (m_ui->cF40->isChecked()) {
-       entry.m_nActionMask += 0x40;
-    }
-
-    if (m_ui->cF80->isChecked()) {
-       entry.m_nActionMask += 0x80;
-    }
-
-    entry.m_nFrameSet = m_currSet;
-    entry.m_nFrameNo = m_currImage;
 
     // save string to string table
     CStringTable *table = gf.getStringTable();
@@ -431,5 +448,63 @@ void CDlgEntry::on_btnRawPath_clicked()
             s = QString(tr("path size: %1 move").arg(0));
         }
         m_ui->sPathSize->setText(s);
+    }
+}
+
+void CDlgEntry::loadMultiSelection(CSelection & selection)
+{
+    TriggerMask mask = selection.compareMask();
+    m_ui->tabWidget->removeTab(2);
+    m_ui->tabWidget->removeTab(1);
+    m_ui->btnObject->setDisabled(true);
+    setWindowTitle(tr("Multiple Selections [%1]").arg(selection.getSize()));
+
+    // attributs
+    typedef struct {
+        int state;
+        QCheckBox * cbox;
+    } Control;
+
+    Control controls[] = {
+        // trigger state
+        {mask.triggerKeyDiff & TRIGGER_HIDDEN, m_ui->cHidden},
+        {mask.triggerKeyDiff & TRIGGER_FROZEN, m_ui->cFrozen},
+        {mask.triggerKeyDiff & TRIGGER_GOAL, m_ui->cExtra2},
+
+        // difficulty level
+        {mask.actionMaskDiff & DIFFICULTY_NORMAL, m_ui->cD01},
+        {mask.actionMaskDiff & DIFFICULTY_NIGHTMARE, m_ui->cD02},
+        {mask.actionMaskDiff & DIFFICULTY_HELL, m_ui->cD04},
+        {mask.actionMaskDiff & DIFFICULTY_INSANE, m_ui->cD08},
+
+        // flip
+        {mask.actionMaskDiff & TRIGGER_GOAL, m_ui->cF20},
+        {mask.actionMaskDiff & TRIGGER_FROZEN, m_ui->cF40},
+        {mask.actionMaskDiff & TRIGGER_HIDDEN, m_ui->cF80},
+    };
+
+    for (unsigned int i = 0; i < sizeof(controls)/sizeof(Control); ++i) {
+        if (controls[i].state) {
+            controls[i].cbox->setTristate(true);
+            controls[i].cbox->setCheckState(Qt::PartiallyChecked);
+        }
+    }
+
+    // is triggerKeyId in a cloud state
+    if (mask.triggerKeyDiff & TRIGGER_KEYS) {
+        m_ui->cbTriggerKey->insertItem(0, tr("???"), QVariant(-1));
+        m_ui->cbTriggerKey->setCurrentIndex(0);
+    }
+
+    // image is in cloud state
+    if (!mask.sameImage) {
+        m_ui->sImage->setPixmap(QPixmap());
+        m_ui->btnNextImage->setDisabled(true);
+        m_ui->btnPrevImage->setDisabled(true);
+    }
+
+    m_ui->sObject->setText("-");
+    if (!mask.sameProto) {
+        m_ui->sClass->setText("-");
     }
 }
