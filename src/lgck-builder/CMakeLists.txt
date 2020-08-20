@@ -137,8 +137,8 @@ set(lgckb_SRCS
     ../shared/ss_build.cpp
     ../shared/implementers/opengl/gr_opengl.cpp
     ../shared/implementers/opengl/im_opengl.cpp
-    ../shared/implementers/sdl/gr_sdl.cpp
-    ../shared/implementers/sdl/im_sdl.cpp
+    #../shared/implementers/sdl/gr_sdl.cpp
+    #../shared/implementers/sdl/im_sdl.cpp
     ../shared/implementers/sdl/mu_sdl.cpp
     ../shared/implementers/sdl/sn_sdl.cpp
     ../shared/interfaces/IGraphics.cpp
@@ -234,7 +234,7 @@ set(lgckb_RCS
     lgck-builder.qrc
 )
 find_package(Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui OpenGL Widgets Network)
-find_package(SDL REQUIRED)
+find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 find_library(SDL_MIXER_LIBRARY NAMES SDL2_mixer HINTS ENV SDLMIXERDIR ENV SDLDIR PATH_SUFFIXES lib)
@@ -251,4 +251,4 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 QT5_WRAP_UI(lgckb_SRCS ${lgckb_ui_files})
 QT5_ADD_RESOURCES(lgckb_RC_SRCS ${lgckb_RCS})
 add_executable(lgck-builder ${lgckb_SRCS} ${lgckb_MOC_OUTFILES} ${lgckb_MOC_HEADERS} ${lgckb_RC_SRCS})
-target_link_libraries(lgck-builder Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL ${SDL2mixer_LIBRARIES} lua5.2)
+target_link_libraries(lgck-builder Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL2 ${SDL2mixer_LIBRARIES} lua5.2)
