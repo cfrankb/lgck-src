@@ -498,13 +498,17 @@ void CDlgEntry::loadMultiSelection(CSelection & selection)
 
     // image is in cloud state
     if (!mask.sameImage) {
-        m_ui->sImage->setPixmap(QPixmap());
+        m_ui->sImage->setPixmap(QPixmap(":/images/pd/primary-gnome-question.svg"));
         m_ui->btnNextImage->setDisabled(true);
         m_ui->btnPrevImage->setDisabled(true);
     }
 
-    m_ui->sObject->setText("-");
     if (!mask.sameProto) {
+        QStringList list;
+        for (int i=0; i< selection.getSize(); ++i) {
+            list << QString("%1").arg(selection.getIndex(i));
+        }
+        m_ui->sObject->setText(list.join(", "));
         m_ui->sClass->setText("-");
     }
 }

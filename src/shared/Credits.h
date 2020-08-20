@@ -15,6 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _TEAM
+#define _TEAM
 
 typedef struct {
     const char * name;
@@ -25,7 +27,7 @@ typedef struct {
 
 const MEMBER team [] =
 {
-   { "Francois Blanchette", "Team Leader/programmer", "lgckbuilder@yahoo.ca", "http://www.sassociations.net/cfrankb" },
+   { "Francois Blanchette", "Team Leader/programmer", "lgckbuilder@yahoo.ca", "https://cfrankb.com" },
    { "Jonathan Vaughn", "Sprite Animator", "", ""},
    { "David Rosen", "Composer", "", ""},
    { "Ronnie Edwards", "GUI/Background Artist", "", ""},
@@ -37,3 +39,4 @@ const MEMBER team [] =
    { nullptr, nullptr, nullptr, nullptr }
 };
 
+#endif

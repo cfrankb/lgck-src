@@ -4,10 +4,10 @@
 #
 #-------------------------------------------------
 
-build_nr.commands = python ../tools/buildcount.py
-build_nr.depends = FORCE
-QMAKE_EXTRA_TARGETS += build_nr
-PRE_TARGETDEPS += build_nr
+#build_nr.commands = python ../tools/buildcount.py
+#build_nr.depends = FORCE
+#QMAKE_EXTRA_TARGETS += build_nr
+#PRE_TARGETDEPS += build_nr
 
 #win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
@@ -58,6 +58,7 @@ SOURCES += \
     ../shared/Actor.cpp \
     ../shared/Animation.cpp \
     ../shared/Attacker.cpp \
+#    ../shared/Credit.cpp \
     ../shared/compat/asprintf.cpp \
     ../shared/Display.cpp \
     ../shared/displayconfig.cpp \
@@ -170,6 +171,7 @@ HEADERS += \
     ../shared/Animation.h \
     ../shared/Attacker.h \
     ../shared/compat/asprintf.h \
+#    ../shared/Credit.h \
     ../shared/Credits.h \
     ../shared/Display.h \
     ../shared/displayconfig.h \

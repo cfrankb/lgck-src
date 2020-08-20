@@ -43,6 +43,7 @@
 #include "interfaces/IDisplayManager.h"
 #include "interfaces/IGraphics.h"
 #include "Const.h"
+#include "fontmanager.h"
 
 #ifdef USE_QFILE
     #include <QMessageBox>
@@ -945,7 +946,6 @@ int display_setFontSize(lua_State *L)
         if (CGame::getGame().displays()->isValidIndex( id )) {
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setFontSize((int) lua_tonumber(L, 2) );
-
         } else {
             char tmp[1024];
             sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
@@ -3773,15 +3773,25 @@ int display_setFont(lua_State *L)
     if (argc != 2) {
         CGame::error(fnName, 2);
     } else {
-        int id = (int) lua_tonumber(L, 1);
-        IDisplayManager * manager = CGame::getGame().displays();
-        if (manager->isValidIndex( id )) {
-            CDisplay & display = manager->getAt(id);
-            display.setFont((int) lua_tonumber(L, 2));
+        char tmp[1024];
+        int id = -1;
+        if (lua_isnumber(L, 1)) {
+            id = (int) lua_tonumber(L, 1);
+        } else if (lua_isstring(L, 1)) {
+            id = CGame::getGame().getFonts()->indexOf((const char*) lua_tostring(L, 1));
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId invalid arg type for ``%s``", fnName);
             CGame::debug(tmp);
+        }
+        if (id != -1) {
+            IDisplayManager * manager = CGame::getGame().displays();
+            if (manager->isValidIndex( id )) {
+                CDisplay & display = manager->getAt(id);
+                display.setFont((int) lua_tonumber(L, 2));
+            } else {
+                sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+                CGame::debug(tmp);
+            }
         }
     }
     return 0;

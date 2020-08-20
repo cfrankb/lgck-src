@@ -60,7 +60,7 @@ WIZACTION CWizScript::m_actions[]=
             print('   not defined: %s' % ('wizscript/%s.lua' % fname))
         tfile.write('    {"%s", "%s", "%s", "%s", "%s", "%s", "%s"},\n' % (name, fname, makesafe(descr), t, makesafe(sample), makesafe(code), makesafe(loader)))
         
-    tfile.write('    { NULL, NULL, NULL, NULL, NULL, NULL, NULL }\n')
+    tfile.write('    { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }\n')
     tfile.write('};\n')
 
 def main():

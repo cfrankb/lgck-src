@@ -25,7 +25,7 @@
 #include <QGLWidget>
 #include <QSettings>
 #include "WizGame.h"
-#include "ss_build.h"
+//#include "ss_build.h"
 #include <ctime>
 #include <QMessageBox>
 #include <QDesktopWidget>
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     bool newProject = false;
     if (!skipSplash && fileName.isEmpty()) {
         do {
-            QString ver = SS_BUILD_STR;
+            QString ver = "0.6.0.9";
             CDlgSelect * dlg = new CDlgSelect(&w);
             dlg->setWindowTitle(MainWindow::m_appTitle + " " + ver);
             dlg->raise();

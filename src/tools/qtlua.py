@@ -64,7 +64,7 @@ typedef struct  {
     for k,v in srt:
         tfile.write('    alias ( "%s", %s )\n' % (k,v))
 
-    tfile.write('    { NULL, 0 }\n')
+    tfile.write('    { nullptr, 0 }\n')
     tfile.write('};\n')
     tfile.close()
 
