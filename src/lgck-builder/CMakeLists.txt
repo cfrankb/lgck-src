@@ -237,7 +237,7 @@ find_package(Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui OpenGL Widgets N
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-find_library(SDL_MIXER_LIBRARY NAMES SDL2_mixer HINTS ENV SDLMIXERDIR ENV SDLDIR PATH_SUFFIXES lib)
+find_library(SDL_MIXER_LIBRARY NAMES SDL2_mixer HINTS ENV SDLMIXERDIR ENV SDLDIR PATH_SUFFIXES lib REQUIRED)
 
 include_directories(${QT_INCLUDES})
 include_directories(../shared)
@@ -251,4 +251,4 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 QT5_WRAP_UI(lgckb_SRCS ${lgckb_ui_files})
 QT5_ADD_RESOURCES(lgckb_RC_SRCS ${lgckb_RCS})
 add_executable(lgck-builder ${lgckb_SRCS} ${lgckb_MOC_OUTFILES} ${lgckb_MOC_HEADERS} ${lgckb_RC_SRCS})
-target_link_libraries(lgck-builder Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL2 ${SDL2mixer_LIBRARIES} lua5.2)
+target_link_libraries(lgck-builder Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL2 ${SDL_MIXER_LIBRARY} lua5.2)
