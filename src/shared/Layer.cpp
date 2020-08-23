@@ -434,3 +434,11 @@ CSelection & CLayer::selection()
 {
     return m_selection;
 }
+
+void CLayer::resyncSelection()
+{
+    for (int i=0; i < m_selection.getSize(); ++i) {
+        int j = m_selection.getIndex(i);
+        m_selection.resync(m_arrEntries[j], i);
+    }
+}

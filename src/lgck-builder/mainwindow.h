@@ -129,7 +129,8 @@ private:
     QAction **actionShortcuts();
     QAction *m_actionEraser;
     QStringList & defaultShortcuts();
-    QLabel *m_protoIcon;
+    //QLabel *m_protoIcon;
+    QToolButton *m_protoIcon;
     CGameFixer * m_fixer;
     QToolButton *m_btnIndicator;
     bool m_ready;
@@ -283,8 +284,8 @@ private slots:
     void changeProtoIcon(int protoId);
     void updateIndicator();
     void indicatorTriggered();
-
     void on_actionJoyState_Mapping_triggered();
+    void toggleProtoFrame();
 
 signals:
     void levelDeleted(int index);
@@ -321,6 +322,7 @@ signals:
     void triggerKeyShow(bool state);
     void triggerKeyFontSizeChanged(int size);
     void joyEventOccured(lgck::Button::JoyButton button, char value);
+    void currentFrameChanged(int protoId, int frameId);
 };
 
 #endif // MAINWINDOW_H

@@ -458,40 +458,35 @@ bool CProtoArray::importMeta(IFile &file)
 }
 
 typedef struct {
-    std::unordered_map<int, std::string> protoFix;
+    std::unordered_map<std::string, std::string> protoFix;
 } FixUpTable;
 
-void CProtoArray::createFixUpTable(CProtoArray &slave)
+void CProtoArray::createFixUpTable(CProtoArray &s)
 {
-    qDebug("createFixUpTable(CProtoArray &slave)");
+    typedef struct {
+        const char * el;
+        int protoId;
+    } FixUp;
     FixUpTable table;
-    for (int i=0; i < slave.getSize(); ++i) {
-        CProto & proto = slave.getObject(i).proto();
-        const int protoValues[] = {
-            proto.m_nChProto,
-            proto.m_nAutoProto,
-            proto.m_nAutoBullet,
-            proto.m_nProtoBuddy
+    for (int i=0; i < s.getSize(); ++i) {
+        CProto & proto = s.getObject(i).proto();
+        const FixUp protoValues[] = {
+            {"chProto", proto.m_nChProto},
+            {"autoProto", proto.m_nAutoProto},
+            {"autoBullet", proto.m_nAutoBullet},
+            {"protoBuddy", proto.m_nProtoBuddy}
         };
         for (unsigned int j=0; j < sizeof(protoValues)/sizeof(int); ++j) {
-            int v = protoValues[j];
+            const FixUp & pv = protoValues[j];
+            int v = pv.protoId;
             if (v) {
-                table.protoFix[v] = getObject(v).proto().m_uuid;
+                table.protoFix[pv.el] = getObject(v).proto().m_uuid;
             }
         }
-        /*
-        proto.m_nChProto = 0;
-        proto.m_nChSound = 0;
-        proto.m_nAutoProto = 0;
-        proto.m_nAutoSound = 0;
-        proto.m_nAutoBullet = 0;
-        proto.m_nProtoBuddy = 0;
-        proto.m_bulletSound = 0;
-        */
     }
-    std::unordered_map<int, std::string>::iterator it = table.protoFix.begin();
+    std::unordered_map<std::string, std::string>::iterator it = table.protoFix.begin();
     while(it != table.protoFix.end()) {
-        qDebug("proto %d >> uuid: %s", it->first, it->second.c_str());
+        qDebug("proto %s >> uuid: %s", it->first.c_str(), it->second.c_str());
         ++it;
     }
 }

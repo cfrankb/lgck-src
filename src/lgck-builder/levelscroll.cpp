@@ -140,11 +140,9 @@ void CLevelScroll::paintSprite()
         layer.removeSelectedSprites();
     }
     if (m_proto > 0 && !m_bErase) {
-        CLevelEntry entry;
-        entryFromProto(m_proto, entry);
-        entry.m_nX = x;
-        entry.m_nY = y;
-        layer.add(entry);
+        m_entry.m_nX = x;
+        m_entry.m_nY = y;
+        layer.add(m_entry);
     }
     m_game->setDirty( true );
 }
@@ -947,7 +945,16 @@ void CLevelScroll::setPaintState(bool state)
 void CLevelScroll::changeProto(int proto)
 {
     m_proto = proto;
+    entryFromProto(m_proto, m_entry);
     qDebug("changeProto: %d", m_proto);
+}
+
+void CLevelScroll::changeProtoFrame(int proto, int frameId)
+{
+    m_proto = proto;
+    entryFromProto(m_proto, m_entry);
+    m_entry.m_nFrameNo = frameId;
+    qDebug("changeProto: %d - frameId: %d", m_proto, frameId);
 }
 
 void CLevelScroll::setGridSize(int size)

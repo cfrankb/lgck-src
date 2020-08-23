@@ -323,6 +323,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_toolBox, SIGNAL(currentProtoChanged(int)),
             this, SLOT(changeProtoIcon(int)));
 
+    connect(this, &MainWindow::currentFrameChanged,
+            m_scroll, &CLevelScroll::changeProtoFrame);
+
     connect(this, SIGNAL(eraserStateChanged(bool)),
             m_scroll, SLOT(setEraserState(bool)));
 
@@ -1826,9 +1829,11 @@ void MainWindow::initToolBar()
     m_actionEraser->setStatusTip(tr("Erase the sprite under the cursor"));
     connect(m_actionEraser, SIGNAL(toggled(bool)), this, SLOT(eraserToggled(bool)));
     addToolBar(m_levelToolbar);
-    m_protoIcon = new QLabel();
+    //m_protoIcon = new QLabel();
+    m_protoIcon = new QToolButton();
     m_protoIcon->setToolTip(tr("Sprite painter"));
     m_protoIcon->setStatusTip(tr("Current Sprite selected for painting"));
+    m_protoIcon->setPopupMode(QToolButton::MenuButtonPopup);
     m_levelToolbar->addWidget(m_protoIcon);
 
     connect(m_comboEvents, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
@@ -2221,6 +2226,7 @@ void MainWindow::deleteSprite(int sprite)
 {
     updateMenus();
     emit spriteDeleted(sprite);
+    emit changeProtoIcon(CGame::INVALID);
 }
 
 void MainWindow::changeSprite(int sprite)
@@ -3131,6 +3137,7 @@ void MainWindow::changeEvent(QEvent* e)
                          }
                      }
                  }
+                 layer.resyncSelection();
                  m_doc.setDirty(true);
              }
              m_lview->repaint();
@@ -3187,7 +3194,47 @@ void MainWindow::changeProtoIcon(int protoId)
 
     QPixmap pm = QPixmap::fromImage(img);
     m_protoIcon->setToolTip(proto.getName());
-    m_protoIcon->setPixmap(pm.scaled(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE, Qt::IgnoreAspectRatio));
+    m_protoIcon->setIcon(QIcon(pm));
+    QMenu *menu = new QMenu();;
+    for (int i=0; i < m_doc.toFrameSet(proto.m_nFrameSet).getSize(); ++i) {
+        m_doc.toFrame(proto.m_nFrameSet, i).toPng(png, size);
+        if (!img.loadFromData(png, size)) {
+            qWarning("failed to load png");
+        }
+        delete [] png;
+        QPixmap pm = QPixmap::fromImage(img);
+        QAction *action = new QAction(QIcon(pm), QString("%1").arg(i + 1));
+        uint w = (protoId << 16) + i;
+        action->setData(w);
+        menu->addAction(action);
+        connect(action, &QAction::triggered, this, &MainWindow::toggleProtoFrame);
+    }
+    m_protoIcon->setMenu(menu);
+}
+
+void MainWindow::toggleProtoFrame()
+{
+    // https://stackoverflow.com/questions/28646914/qaction-with-custom-parameter
+
+    QAction *act = qobject_cast<QAction *>(sender());
+    QVariant v = act->data();
+    uint32_t w = v.toUInt();
+    uint8_t *png;
+    int size;
+    qDebug("w: 0x%x", w);
+
+    int protoId = w >> 16;
+    int frameId = w & 0xffff;
+    CProto proto = m_doc.toProto(protoId > 0 ? protoId : 0);
+    m_doc.toFrame(proto.m_nFrameSet, frameId).toPng(png, size);
+    QImage img;
+    if (!img.loadFromData(png, size)) {
+        qWarning("failed to load png");
+    }
+    delete [] png;
+    QPixmap pm = QPixmap::fromImage(img);
+    m_protoIcon->setIcon(QIcon(pm));
+    emit currentFrameChanged(protoId, frameId);
 }
 
 void MainWindow::updateIndicator()

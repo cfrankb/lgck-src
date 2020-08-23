@@ -96,7 +96,7 @@ protected:
         void forgetIndex();
         bool readEx (IFile & file, int version);
         void fixUUIDs();
-        void createFixUpTable(CProtoArray & slave);
+        void createFixUpTable(CProtoArray & s);
 
         int *m_index;
         int m_indexSize;

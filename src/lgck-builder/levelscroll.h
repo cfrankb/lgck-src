@@ -19,6 +19,7 @@
 #define CLEVELSCROLL_H
 
 #include <QAbstractScrollArea>
+#include "LevelEntry.h"
 class CGame;
 class CLevelEntry;
 class CSelection;
@@ -81,6 +82,7 @@ protected:
     bool m_gameMode;
     bool m_paintSprite;
     int m_proto;
+    CLevelEntry m_entry;
     int m_gridSize;
     bool m_bErase;
 
@@ -103,6 +105,9 @@ Q_SIGNALS:
     void viewSizeChanged(int len, int hei);
     void newLevelReq();
     void keyChanged(int, int);
+
+public slots:
+    void changeProtoFrame(int proto, int frameId);
 
 protected slots:
     void setGameMode(bool gm);

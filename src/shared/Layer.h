@@ -69,6 +69,7 @@ public:
     void removeFromSelection(int index);
     void unSelectedAt(int i);
     CSelection & selection();
+    void resyncSelection();
 
     void setOffset(int mx, int my);
     void getOffset(int & mx, int & my);

@@ -123,14 +123,21 @@
     <property name="title">
      <string>&amp;Settings</string>
     </property>
+    <widget class="QMenu" name="menuToolBar">
+     <property name="title">
+      <string>ToolBar</string>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionMainToolbar"/>
+     <addaction name="actionLayer_ToolBar"/>
+     <addaction name="actionLevelToolbar"/>
+    </widget>
     <addaction name="action_ShowToolbox"/>
     <addaction name="actionStatus_bar"/>
-    <addaction name="actionMainToolbar"/>
-    <addaction name="actionLayer_ToolBar"/>
-    <addaction name="actionLevelToolbar"/>
-    <addaction name="actionDebugOutput"/>
     <addaction name="separator"/>
+    <addaction name="menuToolBar"/>
     <addaction name="action_ShowGrid"/>
+    <addaction name="actionDebugOutput"/>
     <addaction name="actionSave_Settings"/>
     <addaction name="separator"/>
     <addaction name="actionConfigure_LGCK_Builder"/>
