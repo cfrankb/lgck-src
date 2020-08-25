@@ -1269,6 +1269,7 @@ void MainWindow::on_actionTest_Level_triggered()
 
             if (errMsg.isEmpty()) {
                 m_doc.clearKeys();
+                m_doc.resetAllCounters();
                 m_doc.setVitals(
                             O_INT(TESTLEVEL, START_HP),
                             O_INT(TESTLEVEL, LIVES),
@@ -1829,7 +1830,6 @@ void MainWindow::initToolBar()
     m_actionEraser->setStatusTip(tr("Erase the sprite under the cursor"));
     connect(m_actionEraser, SIGNAL(toggled(bool)), this, SLOT(eraserToggled(bool)));
     addToolBar(m_levelToolbar);
-    //m_protoIcon = new QLabel();
     m_protoIcon = new QToolButton();
     m_protoIcon->setToolTip(tr("Sprite painter"));
     m_protoIcon->setStatusTip(tr("Current Sprite selected for painting"));
@@ -3193,10 +3193,10 @@ void MainWindow::changeProtoIcon(int protoId)
     delete [] png;
 
     QPixmap pm = QPixmap::fromImage(img);
-    m_protoIcon->setToolTip(proto.getName());
+    m_protoIcon->setToolTip(protoId > 0 ? proto.getName() : "");
     m_protoIcon->setIcon(QIcon(pm));
-    QMenu *menu = new QMenu();;
-    for (int i=0; i < m_doc.toFrameSet(proto.m_nFrameSet).getSize(); ++i) {
+    QMenu *menu = new QMenu();
+    for (int i=0; protoId >0 && i < m_doc.toFrameSet(proto.m_nFrameSet).getSize(); ++i) {
         m_doc.toFrame(proto.m_nFrameSet, i).toPng(png, size);
         if (!img.loadFromData(png, size)) {
             qWarning("failed to load png");

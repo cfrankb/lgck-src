@@ -244,6 +244,25 @@ void CDlgObject::load(const int index)
     m_ui->cbBonusHP->setCurrentIndex(proto.m_nBonusHP);
     m_ui->cbHP->setCurrentIndex(proto.m_nHP);
 
+    // bonus coins and lives
+    uint8_t coinsOptions[] = {0, 1, 2, 3, 4, 5, 10, 25, 50, 100, 200, 250};
+    for (uint32_t i=0; i < sizeof(coinsOptions)/sizeof (uint8_t); ++i) {
+        uint8_t c = coinsOptions[i];
+        m_ui->cbCoins->addItem(c ? QString("+%1").arg(c) : "", c);
+        if (c == proto.m_coins) {
+            m_ui->cbCoins->setCurrentIndex(i);
+        }
+    }
+
+    uint8_t livesOptions[] = {0, 1, 2, 3, 4, 5, 10, 20, 25, 50};
+    for (uint32_t i=0; i < sizeof(livesOptions)/sizeof (uint8_t); ++i) {
+        uint8_t c = livesOptions[i];
+        m_ui->cbLives->addItem(c ? QString("+%1").arg(c) : "", c);
+        if (c == proto.m_lives) {
+            m_ui->cbLives->setCurrentIndex(i);
+        }
+    }
+
     // power level
 
     for (int n = 0; n < 255; ++n) {
@@ -586,6 +605,8 @@ void CDlgObject::save(const int index)
 
     proto.m_nBonusHP = m_ui->cbBonusHP->currentIndex();
     proto.m_nHP = m_ui->cbHP->currentIndex();
+    proto.m_coins = m_ui->cbCoins->currentData().toUInt();
+    proto.m_lives = m_ui->cbLives->currentData().toUInt();
 
     // power level
 

@@ -137,6 +137,10 @@ void CDlgEntry::load(const int entryPos)
 
     // trigger flip
 
+    if (entry.m_nActionMask & TRIGGER_DEATH_FLIP) {
+        m_ui->cDeathFlip->setChecked(true);
+    }
+
     if (entry.m_nActionMask & TRIGGER_GOAL) {
        m_ui->cF20->setChecked( true );
     }
@@ -261,6 +265,7 @@ void CDlgEntry::save(const int entryPos, bool isMulti)
         {& entry.m_nActionMask, DIFFICULTY_INSANE, m_ui->cD08},
 
         // flip
+        {& entry.m_nActionMask, TRIGGER_DEATH_FLIP, m_ui->cDeathFlip},
         {& entry.m_nActionMask, TRIGGER_GOAL, m_ui->cF20},
         {& entry.m_nActionMask, TRIGGER_FROZEN, m_ui->cF40},
         {& entry.m_nActionMask, TRIGGER_HIDDEN, m_ui->cF80},
@@ -478,6 +483,7 @@ void CDlgEntry::loadMultiSelection(CSelection & selection)
         {mask.actionMaskDiff & DIFFICULTY_INSANE, m_ui->cD08},
 
         // flip
+        {mask.actionMaskDiff & TRIGGER_DEATH_FLIP, m_ui->cDeathFlip},
         {mask.actionMaskDiff & TRIGGER_GOAL, m_ui->cF20},
         {mask.actionMaskDiff & TRIGGER_FROZEN, m_ui->cF40},
         {mask.actionMaskDiff & TRIGGER_HIDDEN, m_ui->cF80},

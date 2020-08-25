@@ -268,6 +268,14 @@ function Display:setImage(imageSet, imageNo)
     displaySetImage(self.id, imageSet, imageNo );
 end
 
+function Display:setImage(source)
+    display_setSource(self.id, source);
+end
+
+function Display:find(name)
+    return getDisplayById(findDisplay(name));
+end
+
 --[[
 
     Extra ------------------------------------------------------------

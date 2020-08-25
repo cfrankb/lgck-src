@@ -68,7 +68,8 @@ void CDlgDisplay::load(CDisplay & d)
         tr("Hit Points / Health"),
         tr("Debug"),
         tr("Image"),
-        tr("Healthbar")
+        tr("Healthbar"),
+        tr("Counter")
     };
 
     for (unsigned int i=0; i < sizeof(types)/sizeof(QString); ++i) {
@@ -123,6 +124,7 @@ void CDlgDisplay::load(CDisplay & d)
     // page 3
     ui->eTemplate->setText(d.templateStr());
     ui->eText->setPlainText(d.text());
+    ui->eSource->setText(d.source());
     CFontManager & fonts = *(gf.getFonts());
     for (int i=0; i < fonts.getSize(); ++i) {
         ui->cbFont->addItem(fonts.nameAt(i));
@@ -180,6 +182,7 @@ void CDlgDisplay::save(CDisplay & d)
     // page 3
     d.setTemplate(TEXT1(ui->eTemplate));
     d.setFont(ui->cbFont->currentIndex());
+    d.setSource(q2c(ui->eSource->text()));
 
     // page 4
     if (d.type() == CDisplay::DISPLAY_IMAGE) {
@@ -195,6 +198,7 @@ void CDlgDisplay::enableType(int type)
     ui->eText->setEnabled(true);
     ui->cbBaseFrame->setEnabled(false);
     ui->cbFrameSet->setEnabled(false);
+    ui->eSource->setEnabled(false);
     bool keepIcon = false;
 
     switch(type) {
@@ -218,6 +222,10 @@ void CDlgDisplay::enableType(int type)
         ui->eText->setEnabled(false);
         ui->eTemplate->setEnabled(false);
         break;
+    case CDisplay::DISPLAY_COUNTER:
+        ui->eText->setEnabled(false);
+        ui->eSource->setEnabled(true);
+        break;
     case CDisplay::DISPLAY_IMAGE:
         ui->eText->setEnabled(false);
         ui->eTemplate->setEnabled(false);
@@ -228,6 +236,7 @@ void CDlgDisplay::enableType(int type)
         int frameNo = ui->cbBaseFrame->currentIndex();
         setImage(frameSet, frameNo);
         break;
+
     }
 
     if (!keepIcon) {

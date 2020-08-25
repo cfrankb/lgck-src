@@ -40,6 +40,7 @@ public:
     virtual void draw();
     virtual void drawText(CDisplay & display);
     virtual void drawLives(CDisplay & display);
+    virtual void drawCounter(CDisplay & display);
     virtual void drawImage(CDisplay & display);
     virtual void drawText(int x, int y, const char *text, int fontID=0, int fontSize=10, unsigned int rgba=0xffffff, int shadowOffset=0, unsigned int shadowColor=0);
     virtual CDisplay & operator [] (int i);

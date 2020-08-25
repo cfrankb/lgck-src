@@ -2150,7 +2150,9 @@ int proto_get(lua_State *L)
             { CProto::PPARAM_FIRE_RATES    , src.m_nFireRate },
             { CProto::PPARAM_EXTRA1        , src.m_extra[0] },
             { CProto::PPARAM_EXTRA2        , src.m_extra[1] },
-            { CProto::PPARAM_B_SOUND       , src.m_bulletSound},
+            { CProto::PPARAM_B_SOUND       , src.m_bulletSound },
+            { CProto::PPARAM_COINS_BONUS   , src.m_coins },
+            { CProto::PPARAM_LIVES_BONUS   , src.m_lives },
             { 0,0 },
         };
         lua_pushstring(L, src.m_szName);
@@ -3832,4 +3834,25 @@ int spriteIdFromUuid(lua_State *L)
         lua_pushinteger(L, id);
         return 1;
     }
+}
+
+int display_setSource(lua_State *L)
+{
+    const char *fnName = "display_setSource";
+    int argc = lua_gettop(L);
+    if (argc != 2) {
+        CGame::error(fnName, 2);
+    } else {
+        int id = (int) lua_tonumber(L, 1);
+        IDisplayManager * manager = CGame::getGame().displays();
+        if (manager->isValidIndex( id )) {
+            CDisplay & display = manager->getAt(id);
+            display.setSource(lua_tostring(L, 2));
+        } else {
+            char tmp[1024];
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            CGame::debug(tmp);
+        }
+    }
+    return 0;
 }

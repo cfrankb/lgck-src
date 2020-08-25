@@ -110,6 +110,7 @@ void CDisplay::setType(int type, bool resetTemplate)
             case DISPLAY_SCORE:
                 set(DI_TEMPLATE, "%.8d");
             break;
+            case DISPLAY_COUNTER:
             case DISPLAY_LIVES:
                 set(DI_TEMPLATE, "%.2d");
             break;
@@ -258,9 +259,10 @@ bool CDisplay::write(IFile & file)
 
     int stringList [] = {
         // strings
-        DI_NAME    ,
-        DI_CONTENT  ,
-        DI_TEMPLATE
+        DI_NAME,
+        DI_CONTENT,
+        DI_TEMPLATE,
+        DI_SOURCE
     };
 
     unsigned int count = sizeof(intList) / sizeof(int);
@@ -478,4 +480,14 @@ int CDisplay::rgb()
      return (geti(DI_R) & 0xff)
              + ((geti(DI_G) & 0xff) << 8)
              + ((geti(DI_B) & 0xff) << 16);
+}
+
+const char *CDisplay::source()
+{
+    return gets(DI_SOURCE);
+}
+
+void CDisplay::setSource(const char * s)
+{
+    set(DI_SOURCE, s);
 }

@@ -129,7 +129,6 @@ private:
     QAction **actionShortcuts();
     QAction *m_actionEraser;
     QStringList & defaultShortcuts();
-    //QLabel *m_protoIcon;
     QToolButton *m_protoIcon;
     CGameFixer * m_fixer;
     QToolButton *m_btnIndicator;

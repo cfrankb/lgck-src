@@ -343,6 +343,7 @@ public:
     void saveGame(IFile &file);
     void loadGame(IFile & file);
     void remap();
+    void resetAllCounters();
 
 protected:
     std::unordered_map<std::string, int> m_counters;

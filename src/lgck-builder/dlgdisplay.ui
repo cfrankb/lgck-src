@@ -61,7 +61,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tabGeneral">
     <attribute name="title">
@@ -578,7 +578,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>217</y>
+       <y>197</y>
        <width>71</width>
        <height>20</height>
       </rect>
@@ -591,7 +591,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>220</y>
+       <y>200</y>
        <width>113</width>
        <height>20</height>
       </rect>
@@ -611,8 +611,8 @@
       <rect>
        <x>80</x>
        <y>20</y>
-       <width>281</width>
-       <height>151</height>
+       <width>271</width>
+       <height>121</height>
       </rect>
      </property>
     </widget>
@@ -620,7 +620,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>180</y>
+       <y>160</y>
        <width>271</width>
        <height>22</height>
       </rect>
@@ -630,13 +630,45 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>180</y>
+       <y>160</y>
        <width>47</width>
        <height>13</height>
       </rect>
      </property>
      <property name="text">
       <string>Font</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>237</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Source</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eSource">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>240</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>

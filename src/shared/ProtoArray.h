@@ -22,6 +22,7 @@
 #include "LevelEntry.h"
 #include "Object.h"
 #include "ISerial.h"
+#include <unordered_map>
 
 // ProtoArray.h : header file
 //
@@ -44,6 +45,9 @@ public:
         int getProtoIdFromUuid (const char* uuid);
         CProtoArray();
 
+        typedef std::unordered_map<std::string, std::string> FixUpBlock;
+        typedef std::unordered_map<std::string, FixUpBlock> FixUpTable;
+
 // Attributes
 public:
         int getSize() const;
@@ -57,7 +61,7 @@ public:
         void forget();
         void removeAt (int n);
         bool exportMeta(IFile & file, int i);
-        bool importMeta(IFile & file);
+        bool importMeta(IFile & file, FixUpTable *table=nullptr);
         CObject & getObject(int i);
         CProto & operator [] (int n);
         CProtoArray & operator += (CProtoArray & src);
@@ -96,7 +100,8 @@ protected:
         void forgetIndex();
         bool readEx (IFile & file, int version);
         void fixUUIDs();
-        void createFixUpTable(CProtoArray & s);
+        void writeFixUpTable(IFile &file, CProtoArray & s);
+        bool readFixUpTable(IFile &file, FixUpTable & table);
 
         int *m_index;
         int m_indexSize;

@@ -261,6 +261,17 @@ void CDisplayManager::drawLives(CDisplay & display)
     drawText(display);
 }
 
+void CDisplayManager::drawCounter(CDisplay & display)
+{
+    char *tmp = nullptr;
+    if (asprintf(&tmp, display.templateStr(), m_game->counter(display.source())) == -1) {
+        qDebug("asprintf alloc failure in CDisplayManager::drawLives");
+    }
+    display.setText(tmp, CDisplay::DISPLAY_SAME);
+    free(tmp);
+    drawText(display);
+}
+
 const char* CDisplayManager::signature()
 {
     return "dm-opengl";
@@ -424,6 +435,10 @@ void CDisplayManager::drawDisplay(CDisplay & display)
 
     case CDisplay::DISPLAY_MESSAGE:
         drawText(display);
+        break;
+
+    case CDisplay::DISPLAY_COUNTER:
+        drawCounter(display);
         break;
 
     default:

@@ -31,7 +31,7 @@
 
 CProto::CProto()
 {
-    memset (this, 0, sizeof(CProto));
+    memset(static_cast<void*>(this), 0, sizeof(CProto));
 }
 
 CProto::~CProto()
@@ -40,7 +40,7 @@ CProto::~CProto()
 
 CProto & CProto::operator = (const CProto proto)
 {
-    memcpy (this, &proto, sizeof (CProto));
+    memcpy(static_cast<void*>(this), &proto, sizeof (CProto));
     return *this;
 }
 
@@ -56,13 +56,13 @@ bool CProto::operator != (const CProto proto) const
 
 CProto::CProto (const CProto & proto)
 {
-    memcpy (this, &proto, sizeof (CProto));
+    memcpy(static_cast<void*>(this), &proto, sizeof (CProto));
    // resetUUID();
 }
 
 CProto::CProto (const char* s)
 {
-    memset (this, 0, sizeof(CProto));
+    memset(static_cast<void*>(this), 0, sizeof(CProto));
     strcpy (m_szName, s);
     resetUUID();
 }

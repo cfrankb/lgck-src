@@ -36,6 +36,7 @@
 // CProtoArray
 
 constexpr const char * PRTO_SIGNATURE = "PRTO";
+constexpr const char * FIXU_SIGNATURE = "FIXU";
 
 CProtoArray::CProtoArray()
 {
@@ -431,13 +432,13 @@ bool CProtoArray::exportMeta(IFile &file, int i)
     t.getObject(n) = this->getObject(i);
     file.write(PRTO_SIGNATURE, 4);
     uint32_t version = PROTO_VERSION;
-    createFixUpTable(t);
     file.write(&version, sizeof(uint32_t));
     t.write(file);
+    writeFixUpTable(file, t);
     return true;
 }
 
-bool CProtoArray::importMeta(IFile &file)
+bool CProtoArray::importMeta(IFile &file, FixUpTable *table)
 {
     char sig[4];
     file.read(sig, sizeof(sig));
@@ -454,19 +455,19 @@ bool CProtoArray::importMeta(IFile &file)
     CProtoArray t;
     t.read(file);
     *this += t;
+    if (table) {
+        readFixUpTable(file, *table);
+    }
     return true;
 }
 
-typedef struct {
-    std::unordered_map<std::string, std::string> protoFix;
-} FixUpTable;
-
-void CProtoArray::createFixUpTable(CProtoArray &s)
+void CProtoArray::writeFixUpTable(IFile & file, CProtoArray &s)
 {
     typedef struct {
         const char * el;
         int protoId;
     } FixUp;
+
     FixUpTable table;
     for (int i=0; i < s.getSize(); ++i) {
         CProto & proto = s.getObject(i).proto();
@@ -476,19 +477,66 @@ void CProtoArray::createFixUpTable(CProtoArray &s)
             {"autoBullet", proto.m_nAutoBullet},
             {"protoBuddy", proto.m_nProtoBuddy}
         };
-        for (unsigned int j=0; j < sizeof(protoValues)/sizeof(int); ++j) {
+        FixUpBlock & block = table[proto.m_uuid];
+        for (unsigned int j=0; j < sizeof(protoValues)/sizeof(FixUp); ++j) {
             const FixUp & pv = protoValues[j];
             int v = pv.protoId;
             if (v) {
-                table.protoFix[pv.el] = getObject(v).proto().m_uuid;
+                block[pv.el] = getObject(v).proto().m_uuid;
             }
         }
     }
-    std::unordered_map<std::string, std::string>::iterator it = table.protoFix.begin();
-    while(it != table.protoFix.end()) {
-        qDebug("proto %s >> uuid: %s", it->first.c_str(), it->second.c_str());
+    file.write(FIXU_SIGNATURE, 4);
+    FixUpTable::iterator it = table.begin();
+    uint32_t count = 0;
+    while(it != table.end()) {
+        count += it->second.size() ? 1 : 0;
         ++it;
     }
+    qDebug("table block count: %u", count);
+    file.write(&count, sizeof(count));
+    it = table.begin();
+    while(it != table.end()) {
+        FixUpBlock::iterator block_it = it->second.begin();
+        qDebug("sprite uuid %s [count: %u]", it->first.c_str(), static_cast<uint32_t>(it->second.size()));
+        uint32_t count = it->second.size();
+        if (count) {
+            file << it->first;
+            file.write(&count, sizeof(count));
+            while(block_it != it->second.end()) {
+                qDebug("    proto %s >> uuid: %s", block_it->first.c_str(), block_it->second.c_str());
+                file << block_it->first; // protoRole
+                file << block_it->second; // proto uuid
+                ++block_it;
+            }
+        }
+        ++it;
+    }
+}
+
+bool CProtoArray::readFixUpTable(IFile &file, FixUpTable & table)
+{
+    char signature[4];
+    file.read(signature, 4);
+    if (memcmp(signature, FIXU_SIGNATURE, 4)==0) {
+        uint32_t count = 0;
+        file.write(&count, sizeof(count));
+        for (uint32_t i=0; i < count; ++i) {
+            std::string protoUuid;
+            file >> protoUuid;
+            uint32_t keyCount = 0;
+            file.read(&keyCount, sizeof(keyCount));
+            for (uint32_t j=0; j < keyCount; ++j) {
+                std::string role;
+                std::string uuid;
+                file >> role;
+                file >> uuid;
+                table[protoUuid][role] = uuid;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 void CProtoArray::debug()
@@ -670,4 +718,3 @@ CProtoIndex * CProtoArray::createIndex(int pattern)
     index->init();
     return index;
 }
-

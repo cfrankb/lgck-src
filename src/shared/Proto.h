@@ -100,7 +100,13 @@ public:
     uint8_t m_rebirthLocation;
     uint8_t m_solidState;     // flag see SOLID_XXXX
 
-    uint8_t m_extra[2];
+    union{
+        uint8_t m_extra[2];
+        struct {
+            uint8_t m_coins;
+            uint8_t m_lives;
+        };
+    };
     uint16_t m_bulletSound;
     char m_uuid[40];
 
@@ -179,7 +185,9 @@ public:
         PPARAM_FIRE_RATES    = 0x20,
         PPARAM_EXTRA1        = 0x21,
         PPARAM_EXTRA2        = 0x22,
-        PPARAM_B_SOUND       = 0x23
+        PPARAM_B_SOUND       = 0x23,
+        PPARAM_COINS_BONUS   = 0x24,
+        PPARAM_LIVES_BONUS   = 0x25,
     };
 
     bool getOption(int option) const;

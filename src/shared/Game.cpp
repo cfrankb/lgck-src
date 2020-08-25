@@ -125,7 +125,6 @@ CGame::CGame():CGameFile()
     clearKeys();
     m_music = nullptr;
     m_inventoryTable = new CInventoryTable();
-    //m_counters = new CCounters;
     m_inventoryTable->reset(true);
     m_points = nullptr;
     m_game = this;
@@ -133,6 +132,7 @@ CGame::CGame():CGameFile()
     var("level") = 0;
     m_mx = 0;
     m_my = 0;
+    counter("coins") = 0;
     counter("lives") = 0;
     counter("endLevel") = 0;
     m_layers = new CLevel;
@@ -1197,7 +1197,11 @@ void CGame::callTrigger (const int nKey)
                 (entry.m_nTriggerKey & TRIGGER_KEYS) == nKey) {
                 entry.unMap();
                 entry.m_nTriggerKey ^= entry.m_nActionMask & TRIGGER_MASK;
-                entry.callEvent(CObject::EO_TRIGGER );
+                entry.callEvent(CObject::EO_TRIGGER);
+                if (entry.m_nActionMask & TRIGGER_DEATH_FLIP) {
+                    entry.m_nActionMask ^= TRIGGER_DEATH_FLIP;
+                    entry.kill();
+                }
                 entry.map();
             }
         }
@@ -2377,4 +2381,9 @@ bool CGame::importJoyStateMap(IFile & file)
         m_lastError = "JoyState signature is wrong";
     }
     return false;
+}
+
+void CGame::resetAllCounters()
+{
+    m_counters.clear();
 }

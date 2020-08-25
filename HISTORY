@@ -16,9 +16,11 @@ HISTORY OF LGCK BUILDER
 - EDITOR: added sample sprite to New Games
 - EDITOR: replaced QScintilla with a native Qt solution
 - EDITOR: added GamePad support
-- EDITOR: builder can export sprite meta (proto)
+- EDITOR: lgck builder can export sprite meta (proto)
 - EDITOR: customize multiselection
-- LUA: display_setFlagXY, display_setFont
+- EDITOR: new Overlay type Counter
+- EDITOR: added coins and lives bonuses
+- LUA: display_setFlagXY, display_setFont, display_setSource
 - LUA: spriteIdFromUuid
 
 

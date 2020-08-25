@@ -185,8 +185,10 @@
     DISPLAY_SCORE       = 2;
     DISPLAY_LIVES       = 3;
     DISPLAY_HP          = 4;
-    DISPLAY_DEBUG	    = 5;
-    DISPLAY_IMAGE	    = 6;
+    DISPLAY_DEBUG       = 5;
+    DISPLAY_IMAGE       = 6;
+    DISPLAY_HEALTH_BAR  = 7;
+    DISPLAY_COUNTER     = 8;
 
 -- SECTION: Flags for Display X/Y alignment
     FLAG_X_NONE         = 0;
@@ -369,6 +371,8 @@
     PPARAM_EXTRA1        = 0x21;
     PPARAM_EXTRA2        = 0x22;
     PPARAM_B_SOUND       = 0x23;
+    PPARAM_COINS_BONUS   = 0x24;
+    PPARAM_LIVES_BONUS   = 0x25;
 
 ---------------------------------------------------------------------
 -- SECTION: Sprite tags (see EXTRA_TAGFLAGS)
