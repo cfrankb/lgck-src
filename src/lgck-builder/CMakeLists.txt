@@ -92,6 +92,7 @@ set(lgckb_SRCS
     ../shared/Animation.cpp
     ../shared/Attacker.cpp
     ../shared/Const.cpp
+    ../shared/Credit.cpp
     ../shared/Display.cpp
     ../shared/DisplayManager.cpp
     ../shared/DotArray.cpp
@@ -137,12 +138,11 @@ set(lgckb_SRCS
     ../shared/ss_build.cpp
     ../shared/implementers/opengl/gr_opengl.cpp
     ../shared/implementers/opengl/im_opengl.cpp
-    #../shared/implementers/sdl/gr_sdl.cpp
-    #../shared/implementers/sdl/im_sdl.cpp
     ../shared/implementers/sdl/mu_sdl.cpp
     ../shared/implementers/sdl/sn_sdl.cpp
     ../shared/interfaces/IGraphics.cpp
     ../shared/inputs/qt/kt_qt.cpp
+    ../shared/qtgui/qthelper.cpp
     ../shared/qtgui/qtlua.cpp
 )
 
