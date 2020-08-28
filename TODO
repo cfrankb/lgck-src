@@ -48,6 +48,7 @@ sprites
   [ ] honor the state_dead flag
   [x] lives bonus (as in extra life)
   [x] coin bonus
+  [x] ammo bonus
 
 [ ] idle time counter for objects
 
@@ -81,6 +82,7 @@ player
   [x] damage to monsters or enemy bullets
   [ ] ammo left or unlimited
   [ ] powerlevel
+  [ ] automatically managed without scripting
 
 [ ] improved jump code
 [ ] jump grace period
@@ -112,18 +114,20 @@ engine
 [ ] hint messages like info bubbles, or message orb in cosmo / hocus pocus
 [ ] bounce object class e.g. trampoline ?
 [ ] particle effects
-[ ] ui for custom display
+[x] ui for custom display
 [ ] improved inventory system
     [x] inventory for player
     [ ] inventory for monster
         [ ] pickup
         [ ] drop
 [x] counters
+    [ ] countdown
 [ ] object action tab ???
 [ ] custom object maps
 [ ] merge Proto, ImageSet and Object into `Sprite`
 [ ] extended music support
 [ ] JOYSTICK support
+    [x] experimental
 [ ] Decor engine (e.g. like a weather engine).
 [ ] slide tiles
 [ ] follow object
@@ -131,7 +135,7 @@ engine
      [ ] follow any sprite (customizable through scripting)
 [ ] tasks
     [x] for rebirths
-    [ ] and removing displays
+    [ ] and removing displays (expire/timeout)
     [ ] and other script events
   
 editor
@@ -195,4 +199,5 @@ Fresh bugs
 [ ] BUG: when restoring to a way point, state of displays not restored
 [ ] BUG: when restoring to a way point, end of level trigger not firing (after being triggered)
 [ ] BUG: inventory not preserved when restoring from waypoint
+[ ] BUG: onleftClick/onRightClick doesn't work anymore
 

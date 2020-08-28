@@ -19,7 +19,8 @@ HISTORY OF LGCK BUILDER
 - EDITOR: lgck builder can export sprite meta (proto)
 - EDITOR: customize multiselection
 - EDITOR: new Overlay type Counter
-- EDITOR: added coins and lives bonuses
+- EDITOR: added coins, lives and ammo bonuses
+- EDITOR: integrating player fire bullet w/ editSprite
 - LUA: display_setFlagXY, display_setFont, display_setSource
 - LUA: spriteIdFromUuid
 

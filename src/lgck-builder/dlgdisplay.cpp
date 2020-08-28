@@ -206,7 +206,7 @@ void CDlgDisplay::enableType(int type)
         ui->eText->setEnabled(false);
         break;
     case CDisplay::DISPLAY_MESSAGE:
-        ui->eTemplate->setEnabled(true);
+        ui->eTemplate->setEnabled(false);
         break;
     case CDisplay::DISPLAY_LIVES:
         ui->eText->setEnabled(false);
@@ -236,7 +236,6 @@ void CDlgDisplay::enableType(int type)
         int frameNo = ui->cbBaseFrame->currentIndex();
         setImage(frameSet, frameNo);
         break;
-
     }
 
     if (!keepIcon) {

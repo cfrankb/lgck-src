@@ -157,7 +157,6 @@ private:
     void goExternalRuntime();
     bool checkExecutible(const QString exec, QString & errMsg);
     void showAppSettings(int tab);
-    void formatVersion(QString &ver);
     void loadFileName(const QString &fileName);
     void markAsGoal(bool isGoal);
     static void newDebugString(const char *s);

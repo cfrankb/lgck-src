@@ -268,7 +268,7 @@ function Display:setImage(imageSet, imageNo)
     displaySetImage(self.id, imageSet, imageNo );
 end
 
-function Display:setImage(source)
+function Display:setSource(source)
     display_setSource(self.id, source);
 end
 
@@ -407,6 +407,10 @@ function Layer:new(name, layerType, hSpeed, vSpeed)
   return layer;
 end
 
+function Layer:find(name)
+    return getLayer(name);
+end
+
 --[[
 
     Element ----------------------------------------------------------
@@ -534,6 +538,8 @@ function HitTest:hasSprite(spriteID)
 end
 
 
+
+
 --[[
 
     Inventory ---------------------------------------------------------
@@ -605,7 +611,10 @@ function getProto(objType)
     proto.extra1 = items[PPARAM_EXTRA1];
     proto.extra1 = items[PPARAM_EXTRA2];
     proto.bulletSound = items[PPARAM_B_SOUND];
-           
+    proto.coinBonus = items[PPARAM_COINS_BONUS];
+    proto.livesBonus = items[PPARAM_LIVES_BONUS];
+    proto.ammoBonus = items[PPARAM_AMMO_BONUS];
+    proto.bulletOptions = items[PPARAM_BULLET_OPTIONS];
     return proto;
 end
 
@@ -1003,6 +1012,49 @@ System.__index = System;
 
 function isPaused()
     return ss_getPause();
+end
+
+function firePlayerBullet(id, ticks)
+    local sprite = getSprite( id );
+    local proto = sprite:getProto();
+    local ammo = Counters:get("ammo")
+    if ((proto.fireRate == 0 ) or (ticks % proto.fireRate == 0))
+        and testJoyState( JOY_FIRE )
+        and ammo > 0 then
+        local x , y, aim = getSpriteVars( id );
+        if testJoyState( JOY_LEFT ) then
+            aim = LEFT;
+            x = x - 8;
+            y = y + 16;
+        elseif testJoyState( JOY_RIGHT ) then
+            aim = RIGHT;
+            x = x + sprite:width();
+            y = y + 16;
+        elseif testJoyState( JOY_UP ) then
+            aim = UP;
+            x = x + 8;
+            y = y - 8;
+        elseif testJoyState( JOY_DOWN ) then
+            aim = DOWN;
+            x = x + 8;
+            y = y + sprite:height();
+        end
+        local activeBullets = sprite:childCount();
+        Counters:dec("ammo");
+        if aim ~= HERE  and activeBullets < proto.maxBullets then
+            local bullet = addSprite (
+                x,
+                y,
+                aim,
+                proto.buddy
+                --spriteIdFromUuid("2b611fd2-0696-2065-2980-706e3f9539a3")
+            );
+            bullet:setOwner( sprite );
+            if proto.bulletSound > 0 then
+                playSound(proto.bulletSound);
+            end
+        end
+    end
 end
 
 function unfoldEvents1()

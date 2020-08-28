@@ -218,11 +218,9 @@ void CGameFile::initDefaultSounds()
 
     for (int i=0; !m_defaultSounds[i].name.empty(); ++i) {
         if (!m_defaultSounds[i].src.empty()) {
-            //QString fileName;
             int len = m_defaultSounds[i].src.size() + 16;
             char tmp[len];
             sprintf(tmp, ":/res/%s", m_defaultSounds[i].src.c_str());
-            //fileName = tmp;
 
             CFileWrap file;
             if (file.open(tmp)) {

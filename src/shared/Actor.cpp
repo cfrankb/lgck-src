@@ -332,8 +332,9 @@ void CActor::kill()
     if (p.m_nBonusHP) {
         m_game->addToHP(p.m_nBonusHP);
     }
-    m_game->m_counters["coins"] += p.m_coins;
-    m_game->m_counters["lives"] += p.m_lives;
+    m_game->m_counters["coins"] += p.m_coinsBonus;
+    m_game->m_counters["lives"] += p.m_livesBonus;
+    m_game->m_counters["ammo"] += p.m_ammoBonus;
 
     int nChSound = p.m_nChSound;
     if (nChSound) {

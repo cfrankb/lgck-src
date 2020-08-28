@@ -75,6 +75,7 @@ public:
     void callObjEvent(int objId, int eventId);
     void callLvEvent(int eventId);
     void callGameEvent(int eventId);
+    void callStaticHandler(const char *fnName, int objId);
     void clearKeys();
     int call(const char *fnName);
     int unfoldEvents();

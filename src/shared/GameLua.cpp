@@ -304,7 +304,6 @@ int setTickScale(lua_State *L)
     } else {
         game.var("TICK_SCALE") = (int) lua_tonumber(L, 1);
     }
-
     return 0;
 }
 
@@ -324,7 +323,6 @@ int setSpeed(lua_State *L)
             CGame::debug("-- Game speed cannot be zero");
         }
     }
-
     return 0;
 }
 
@@ -338,7 +336,6 @@ int sprite_getObjType(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, n) ];
         lua_pushnumber(L, entry.m_nProto);
     }
-
     return argc;
 }
 
@@ -356,7 +353,6 @@ int sprite_testFlags(lua_State *L)
         int mask = (int) lua_tonumber(L, 2);
         lua_pushboolean(L, entry.getFlags() & mask);
     }
-
     return 1;
 }
 
@@ -384,7 +380,6 @@ int sprite_new(lua_State *L)
         }
         lua_pushnumber(L, game.scene().add( entry ));
     }
-
     return 1;
 }
 
@@ -533,7 +528,6 @@ int sprite_moveTo(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         entry.moveTo( (int) lua_tonumber(L, 2), (int) lua_tonumber(L, 3));
     }
-
     return 0;
 }
 
@@ -566,7 +560,6 @@ int sprite_canMove(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         lua_pushboolean(L, entry.canMove((int) lua_tonumber(L, 2) , true));
     }
-
     return 1;
 }
 
@@ -583,7 +576,6 @@ int sprite_canFall(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         lua_pushboolean(L, entry.canFall() );
     }
-
     return 1;
 }
 
@@ -638,7 +630,6 @@ int XOR(lua_State *L)
         int b = (int) lua_tonumber(L, 2);
         lua_pushnumber(L, a ^ b);
     }
-
     return 1;
 }
 
@@ -667,7 +658,6 @@ int AND(lua_State *L)
         int b = (int) lua_tonumber(L, 2);
         lua_pushnumber(L, a & b);
     }
-
     return 1;
 }
 
@@ -683,7 +673,6 @@ int sprite_setAim(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         entry.m_nAim = (int) lua_tonumber(L, 2);
     }
-
     return 0;
 }
 
@@ -700,7 +689,6 @@ int sprite_isPlayerThere(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         lua_pushboolean(L, entry.isPlayerThere( (int) lua_tonumber(L, 2)));
     }
-
     return 1;
 }
 
@@ -732,7 +720,6 @@ int sprite_isVisible(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         lua_pushboolean(L, entry.isVisible());
     }
-
     return 1;
 }
 
@@ -749,7 +736,6 @@ int sprite_getTriggerKey(lua_State *L)
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
         lua_pushnumber(L, (int)entry.m_nTriggerKey & TRIGGER_KEYS);
     }
-
     return 1;
 }
 
@@ -764,7 +750,6 @@ int addToScore(lua_State *L)
         game.addToScore( (int) lua_tonumber(L, 1) );
         lua_pushnumber(L, game.getScore());
     }
-
     return 1;
 }
 
@@ -795,7 +780,6 @@ int setHP(lua_State *L)
         CActor & player = scene [ game.svar("playerEntry") ];
         player.setHP((int) lua_tonumber(L, 1));
     }
-
     return 0;
 }
 
@@ -833,7 +817,6 @@ int display_new(lua_State *L)
         int id = game.displays()->indexOf(lua_tostring(L, 1));
         lua_pushnumber(L, id);
     }
-
     return 1;
 }
 
@@ -855,7 +838,6 @@ int display_move(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -879,7 +861,6 @@ int display_setType(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -907,7 +888,6 @@ int display_setColor(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -930,7 +910,6 @@ int display_setExpireTime(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -973,7 +952,6 @@ int display_setAlpha(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -995,7 +973,6 @@ int display_setVisible(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -1017,7 +994,6 @@ int display_setText(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -1029,17 +1005,27 @@ int display_setImage(lua_State *L)
     if (argc != 3) {
         CGame::error(fnName, 3);
     } else {
+        char tmp[1024];
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
             CDisplay & display = CGame::getGame().displays()->getAt(id);
-            display.setImage(lua_tonumber(L, 2), lua_tonumber(L, 3) );
+            int imageId = CGame::INVALID;
+            if (lua_isnumber(L, 2)) {
+                imageId = lua_tonumber(L, 2);
+            } else if (lua_isstring(L, 2)) {
+                imageId = CGame::getGame().frames().indexOfUUID(lua_tostring(L, 2));
+            }
+            if (imageId != CGame::INVALID) {
+                display.setImage(imageId, lua_tonumber(L, 3));
+            } else {
+                sprintf(tmp, "-- frameSet value is not valid for ``%s``", fnName);
+                CGame::debug(tmp);
+            }
         } else {
-            char tmp[1024];
             sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -1104,7 +1090,6 @@ int display_enableShadows(lua_State *L)
             CGame::debug(tmp);
         }
     }
-
     return 0;
 }
 
@@ -1412,7 +1397,6 @@ int element_setVisible(lua_State *L)
             }
         }
     }
-
     lua_pushboolean(L, true);
     return 1;
 }
@@ -1450,7 +1434,6 @@ int element_moveTo(lua_State *L)
             }
         }
     }
-
     lua_pushboolean(L, true);
     return 1;
 }
@@ -1513,7 +1496,6 @@ int element_move(lua_State *L)
             }
         }
     }
-
     lua_pushboolean(L, true);
     return 1;
 }
@@ -1551,7 +1533,6 @@ int element_moveBy(lua_State *L)
             }
         }
     }
-
     lua_pushboolean(L, true);
     return 1;
 }
@@ -2151,8 +2132,10 @@ int proto_get(lua_State *L)
             { CProto::PPARAM_EXTRA1        , src.m_extra[0] },
             { CProto::PPARAM_EXTRA2        , src.m_extra[1] },
             { CProto::PPARAM_B_SOUND       , src.m_bulletSound },
-            { CProto::PPARAM_COINS_BONUS   , src.m_coins },
-            { CProto::PPARAM_LIVES_BONUS   , src.m_lives },
+            { CProto::PPARAM_COINS_BONUS   , src.m_coinsBonus },
+            { CProto::PPARAM_LIVES_BONUS   , src.m_livesBonus },
+            { CProto::PPARAM_AMMO_BONUS    , src.m_ammoBonus },
+            { CProto::PPARAM_BULLET_OPTIONS, src.m_bulletOptions },
             { 0,0 },
         };
         lua_pushstring(L, src.m_szName);
@@ -2242,7 +2225,7 @@ int sprite_land(lua_State *L)
         return 0;
     } else {
         CGame & game = CGame::getGame();
-        int objId = (int) lua_tonumber(L, 1);        
+        int objId = (int) lua_tonumber(L, 1);
         game.scene()[objId].land();
         return 0;
     }
@@ -3413,7 +3396,6 @@ int saveGame(lua_State *L)
             CFileWrap file;
             char fname[filename.length()+1];
             strcpy(fname, filename.c_str());
-            //qDebug(fname);
             if (file.open(fname, "wb")) {
                 game.saveGame(file);
                 file.close();
@@ -3440,7 +3422,6 @@ int loadGame(lua_State *L)
             CFileWrap file;
             char fname[filename.length()+1];
             strcpy(fname, filename.c_str());
-         //   qDebug(fname);
             if (file.open(fname, "rb")) {
                 game.loadGame(file);
                 file.close();

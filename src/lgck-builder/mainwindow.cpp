@@ -49,9 +49,9 @@
 #include "../shared/implementers/sdl/mu_sdl.h"
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/GameEvents.h"
-#include "../shared/ss_version.h"
 #include "../shared/Frame.h"
 #include "../shared/inputs/qt/kt_qt.h"
+#include "../shared/qtgui/qthelper.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "DlgEditLevel.h"
@@ -133,6 +133,7 @@ constexpr char INPUTS [] = "Inputs";
 #define O_BOOL(s,k) (*m_options)[s].get(k).toBool()
 #define O_SET(s,k,v) (*m_options)[s].set(k,v)
 
+/* do not translate */
 constexpr char actionNames[][16] = {
     "Up",
     "Down",
@@ -165,18 +166,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_timerIndicator.stop();
     m_ready = false;
     me = this;
-    QString s;
-    QString appVersion;
-    int version = SS_LGCK_VERSION;
-    for (int i=0; i < 4; ++i) {
-        s = QString("%1").arg(version % 256);
-        version /= 256;
-        if (i) {
-            appVersion = s + "." + appVersion  ;
-        } else {
-            appVersion = s + appVersion ;
-        }
-    }
+    QString appVersion = formatVersion();
 
     QCoreApplication::setOrganizationDomain("");
     QCoreApplication::setOrganizationName(m_author);
@@ -1291,7 +1281,7 @@ void MainWindow::on_actionTest_Level_triggered()
         }
         delete dlg;
     }
-    //m_lview->setFocus();
+    m_lview->setFocus();
 }
 
 void MainWindow::testLevel(bool initSound)
@@ -1931,13 +1921,14 @@ void MainWindow::on_actionEdit_Object_triggered()
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             CLevelEntry entry = layer.getSelection(0);
+            CProto & currProto = m_doc.m_arrProto[entry.m_nProto];
             const CProto proto = m_doc.m_arrProto[entry.m_nProto];
             CDlgObject *d = new CDlgObject (this);
             d->setGameDB(&m_doc);
             d->load( entry.m_nProto );
             if (d->exec() == QDialog::Accepted) {
                 d->save( entry.m_nProto );
-                if (proto != m_doc.m_arrProto[ entry.m_nProto ]) {
+                if (proto != currProto) {
                     m_doc.setDirty(true);
                 }
                 emit spriteUpdated(entry.m_nProto);
@@ -2572,8 +2563,7 @@ void MainWindow::saveSettings()
         settings.setValue("updater_check", m_bUpdate);
         settings.setValue("updater_url", m_updateURL);
         settings.setValue("uuid", m_uuid);
-        QString ver;
-        formatVersion(ver);
+        QString ver = formatVersion();
         settings.setValue("version", ver);
         settings.endGroup();
 
@@ -2592,17 +2582,6 @@ void MainWindow::saveSettings()
         writeButtonConfig(settings);
         settings.sync();
     }
-}
-
-void MainWindow::formatVersion(QString &ver)
-{
-    int version = SS_LGCK_VERSION;
-    int vv[4]={0,0,0,0};
-    for (int i=3; i >= 0; --i) {
-        vv[i] = version & 0xff;
-        version /= 256;
-    }
-    ver = QString::asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
 }
 
 void MainWindow::initSettings()
@@ -2702,8 +2681,7 @@ void MainWindow::reloadSettings()
     char *uuid = getUUID();
     m_uuid = settings.value("uuid", uuid).toString();
     delete []uuid;
-    QString currVersion;
-    formatVersion(currVersion);
+    QString currVersion = formatVersion();
     if (currVersion != savedVersion) {
         m_updateURL = UPDATER_URL;
     }
@@ -2864,16 +2842,9 @@ void MainWindow::updateEditor(const QString &url, const QString &ver)
 
 void MainWindow::checkVersion()
 {
-    int version = SS_LGCK_VERSION;
-    int vv[4]={0,0,0,0};
-    for (int i=3; i >= 0; --i) {
-        vv[i] = version & 0xff;
-        version /= 256;
-    }
-
     QString productVersion = QSysInfo::productVersion();
     QString productType = QSysInfo::productType();
-    QString ver = QString::asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+    QString ver = formatVersion();
     QString driver = QGuiApplication::platformName();
     QString url = QString::asprintf(q2c(m_updateURL),
                                     q2c(ver),

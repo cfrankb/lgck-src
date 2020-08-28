@@ -23,7 +23,7 @@
 #include <QUrl>
 #include "../shared/FileWrap.h"
 #include "../shared/Credits.h"
-#include "../shared/ss_version.h"
+#include "../shared/qtgui/qthelper.h"
 
 CDlgAbout::CDlgAbout(QWidget *parent) :
     QDialog(parent),
@@ -32,21 +32,7 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     m_ui->setupUi(this);
 
     // About
-    QString s;
-    QString ver;
-    int version = SS_LGCK_VERSION;
-    for (int i=0; i < 4; ++i) {
-        s = QString("%1").arg(version % 256);
-        version /= 256;
-        if (i) {
-            ver =  s + "." + ver  ;
-        } else {
-            ver = s + ver ;
-        }
-    }
-    ver = "<b>" + tr("Version %1").arg(ver) + "</b>";
-
-    m_ui->sVersion->setText(ver);
+    m_ui->sVersion->setText("<b>" + tr("Version %1").arg(formatVersion()) + "</b>");
 
     // license GPL
     CFileWrap file;

@@ -125,7 +125,7 @@
     </property>
     <widget class="QMenu" name="menuToolBar">
      <property name="title">
-      <string>ToolBar</string>
+      <string>ToolBars</string>
      </property>
      <addaction name="separator"/>
      <addaction name="actionMainToolbar"/>
@@ -134,8 +134,8 @@
     </widget>
     <addaction name="action_ShowToolbox"/>
     <addaction name="actionStatus_bar"/>
-    <addaction name="separator"/>
     <addaction name="menuToolBar"/>
+    <addaction name="separator"/>
     <addaction name="action_ShowGrid"/>
     <addaction name="actionDebugOutput"/>
     <addaction name="actionSave_Settings"/>

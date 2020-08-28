@@ -31,8 +31,11 @@
 #include "../shared/Snd.h"
 #include "../shared/interfaces/IImageManager.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "../shared/Frame.h"
 #include "../shared/Path.h"
+
+#define VALUES(x) x, sizeof(x)
 
 CDlgObject::CDlgObject(QWidget *parent) :
     QDialog(parent),
@@ -90,6 +93,24 @@ void CDlgObject::changeEvent(QEvent *e)
     }
 }
 
+void CDlgObject::populateCombo(uint8_t *values, uint valueCount, uint8_t selected, QComboBox *combo, const QString & zero, const QString & format)
+{
+    bool first = true;
+    for (uint32_t i=0; i < valueCount; ++i) {
+        uint8_t c = values[i];
+        if (selected < c && first) {
+            combo->addItem(format.arg(selected));
+            combo->setCurrentIndex(combo->count() - 1);
+            first = false;
+        }
+        combo->addItem(c ? format.arg(c) : zero, c);
+        if (c == selected) {
+            combo->setCurrentIndex(combo->count() - 1);
+            first = false;
+        }
+    }
+}
+
 void CDlgObject::load(const int index)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
@@ -118,19 +139,7 @@ void CDlgObject::load(const int index)
 
     for (int n=0; n < gf.frames().getSize(); ++n) {
         CFrameSet & frameSet = gf.toFrameSet(n);
-        uint8_t *png;
-        int size;
-        gf.toFrame(n, 0).toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qWarning("failed to load png (%d)\n", n);
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+        QIcon icon = frame2icon(gf.toFrame(n, 0));
         m_ui->cbFrameSet->addItem(icon, frameSet.getName() );
     }
 
@@ -209,62 +218,29 @@ void CDlgObject::load(const int index)
     QString aims[] = {
         tr("UP"), tr("DOWN"), tr("LEFT"), tr("RIGHT")
     };
-
     for (int i = 0; i < 4; ++i) {
-        m_ui->cbDefaultAim->addItem(aims[i]);
+        m_ui->cbDefaultAim->addItem(aims[i], i);
     }
-
     m_ui->cbDefaultAim->setCurrentIndex(proto.m_nDefaultAim);
 
     // damages
-
-    for (int n = 0; n < 255; ++n) {
-        if (n != 0) {
-            m_ui->cbDamages->addItem(tr("%1 pts").arg(n));
-        } else {
-            m_ui->cbDamages->addItem(tr("(none)"));
-        }
-    }
-
-    m_ui->cbDamages->setCurrentIndex(proto.m_nDamages);
+    uint8_t damageOptions[] = {0,1,2,3,4,5,10,12,15,20,25,30,35,40,50,75,100,125,150,200,240,250,255};
+    populateCombo(VALUES(damageOptions),proto.m_nDamages, m_ui->cbDamages, tr("(none)"), tr("%1 pts"));
 
     // BonusHP (hit points)
+    uint8_t hpOptions[] = {0,1,2,3,4,5,10,12,15,20,25,30,35,40,50,75,100,125,150,200,240,250,255};
+    populateCombo(VALUES(hpOptions),proto.m_nBonusHP, m_ui->cbBonusHP, "", tr("+%1 pts"));
+    populateCombo(VALUES(hpOptions),proto.m_nHP, m_ui->cbHP, tr("(none)"), tr("%1 pts"));
 
-    for (int n = 0; n < 255; ++n) {
-        if (n != 0) {
-            m_ui->cbBonusHP->addItem(tr("%1 pts").arg(n));
-            m_ui->cbHP->addItem(tr("%1 pts").arg(n));
-        }
-        else {
-            m_ui->cbBonusHP->addItem(tr("(none)"));
-            m_ui->cbHP->addItem(tr("(none)"));
-        }
-    }
-
-    m_ui->cbBonusHP->setCurrentIndex(proto.m_nBonusHP);
-    m_ui->cbHP->setCurrentIndex(proto.m_nHP);
-
-    // bonus coins and lives
-    uint8_t coinsOptions[] = {0, 1, 2, 3, 4, 5, 10, 25, 50, 100, 200, 250};
-    for (uint32_t i=0; i < sizeof(coinsOptions)/sizeof (uint8_t); ++i) {
-        uint8_t c = coinsOptions[i];
-        m_ui->cbCoins->addItem(c ? QString("+%1").arg(c) : "", c);
-        if (c == proto.m_coins) {
-            m_ui->cbCoins->setCurrentIndex(i);
-        }
-    }
-
+    // bonus coins, lives and ammo
+    uint8_t coinsOptions[] = {0, 1, 2, 3, 4, 5, 10, 20, 25, 50, 100, 200, 250};
     uint8_t livesOptions[] = {0, 1, 2, 3, 4, 5, 10, 20, 25, 50};
-    for (uint32_t i=0; i < sizeof(livesOptions)/sizeof (uint8_t); ++i) {
-        uint8_t c = livesOptions[i];
-        m_ui->cbLives->addItem(c ? QString("+%1").arg(c) : "", c);
-        if (c == proto.m_lives) {
-            m_ui->cbLives->setCurrentIndex(i);
-        }
-    }
+    uint8_t ammoOptions[] = {0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 40, 50, 100, 150, 200, 250, 255};
+    populateCombo(VALUES(coinsOptions), proto.m_coinsBonus, m_ui->cbCoins, "", QString("+%1"));
+    populateCombo(VALUES(livesOptions), proto.m_livesBonus, m_ui->cbLives, "", QString("+%1"));
+    populateCombo(VALUES(ammoOptions), proto.m_ammoBonus, m_ui->cbAmmo, "", QString("+%1"));
 
     // power level
-
     for (int n = 0; n < 255; ++n) {
         if (n != 0) {
             m_ui->cbPowerLevel->addItem(tr("Level %1").arg(n));
@@ -272,11 +248,9 @@ void CDlgObject::load(const int index)
             m_ui->cbPowerLevel->addItem(tr("(ignored)"));
         }
     }
-
     m_ui->cbPowerLevel->setCurrentIndex(proto.m_nPowerLevel);
 
     // max bullets
-
     for (int n = 0; n <= 255; ++n) {
         if (n != 0) {
             m_ui->cbMaxBullets->addItem(QString("%1").arg(n));
@@ -347,38 +321,30 @@ void CDlgObject::load(const int index)
         m_ui->cbPlaySound->addItem(gf.m_arrSounds[i]->getName());
         // page 4
         m_ui->cbAutoSound->addItem(gf.m_arrSounds[i]->getName());
+        m_ui->cbSound_bullet->addItem(gf.m_arrSounds[i]->getName());
     }
 
     m_ui->cbPlaySound->setCurrentIndex(proto.m_nChSound);
-
+    m_ui->cbSound_bullet->setCurrentIndex(proto.m_bulletSound);
     // proto (changeto)
 
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
-        CProto & proto = gf.m_arrProto[i];
-        uint8_t *png;
-        int size;
-        gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qWarning("failed to load png $\n");
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
-        m_ui->cbChangeTo->addItem(icon, proto.getName());
+        CProto & protoSpr = gf.m_arrProto[i];
+        QIcon icon = frame2icon(gf.toFrame(protoSpr.m_nFrameSet, protoSpr.m_nFrameNo));
+        m_ui->cbChangeTo->addItem(icon, protoSpr.getName());
 
         // from page 2
-        m_ui->cbBuddy->addItem(icon, proto.getName());
-        m_ui->cbBullet->addItem(icon, proto.getName());
+        m_ui->cbBuddy->addItem(icon, protoSpr.getName(), i);
+        if (i == 0 || protoSpr.m_nClass == CLASS_PLAYER_BULLET) {
+            m_ui->cbBullet->addItem(icon, protoSpr.getName(), i);
+            if (proto.m_nProtoBuddy == i) {
+                m_ui->cbBullet->setCurrentIndex(m_ui->cbBullet->count() - 1);
+            }
+        }
 
         // from page 4
-
-        m_ui->cbAutoBullet->addItem(icon, proto.getName());
-        m_ui->cbAutoChangeTo->addItem(icon, proto.getName());
+        m_ui->cbAutoBullet->addItem(icon, protoSpr.getName());
+        m_ui->cbAutoChangeTo->addItem(icon, protoSpr.getName());
     }
 
     m_ui->cNoChangeAtDeath->setChecked( proto.getOption(CProto::OPTION_NO_SHIFT_AT_DEATH) );
@@ -392,7 +358,6 @@ void CDlgObject::load(const int index)
     m_ui->cbChangeTo->setCurrentIndex( proto.m_nChProto );
     // from page 2
     m_ui->cbBuddy->setCurrentIndex(proto.m_nProtoBuddy);
-    m_ui->cbBullet->setCurrentIndex(proto.m_nProtoBuddy);
 
     // nbr of rebirth
 
@@ -548,6 +513,9 @@ void CDlgObject::load(const int index)
 
     // connect slots
     m_ui->treeAnimations->connectSlots(this);
+
+    // bullet options
+    m_ui->cBulletEnabled->setChecked(proto.m_bulletOptions & CProto::BULLET_ENABLED);
 }
 
 void CDlgObject::save(const int index)
@@ -599,14 +567,17 @@ void CDlgObject::save(const int index)
 
     // damages
 
-    proto.m_nDamages = m_ui->cbDamages->currentIndex();
+    proto.m_nDamages = m_ui->cbDamages->currentData().toUInt();
 
     // hit points
 
-    proto.m_nBonusHP = m_ui->cbBonusHP->currentIndex();
-    proto.m_nHP = m_ui->cbHP->currentIndex();
-    proto.m_coins = m_ui->cbCoins->currentData().toUInt();
-    proto.m_lives = m_ui->cbLives->currentData().toUInt();
+    proto.m_nBonusHP = m_ui->cbBonusHP->currentData().toUInt();
+    proto.m_nHP = m_ui->cbHP->currentData().toUInt();
+
+    // coins, lives and ammo
+    proto.m_coinsBonus = m_ui->cbCoins->currentData().toUInt();
+    proto.m_livesBonus = m_ui->cbLives->currentData().toUInt();
+    proto.m_ammoBonus = m_ui->cbAmmo->currentData().toUInt();
 
     // power level
 
@@ -615,10 +586,11 @@ void CDlgObject::save(const int index)
     // proto buddy
 
     if (proto.m_nClass==CLASS_PLAYER_OBJECT) {
-        proto.m_nProtoBuddy = m_ui->cbBullet->currentIndex();
+        proto.m_nProtoBuddy = m_ui->cbBullet->currentData().toUInt();
     } else {
         proto.m_nProtoBuddy = m_ui->cbBuddy->currentIndex();
     }
+    proto.m_bulletSound = m_ui->cbSound_bullet->currentIndex();
 
     // page 3 ****************************************************************
 
@@ -743,24 +715,14 @@ void CDlgObject::save(const int index)
             | m_ui->cSolidLEFT->isChecked() * CProto::SOLID_LEFT
             | m_ui->cSolidRIGHT->isChecked() * CProto::SOLID_RIGHT;
 
+    // bullet options
+    proto.m_bulletOptions = m_ui->cBulletEnabled->isChecked() ? CProto::BULLET_ENABLED : 0;
+
 }
 
 void CDlgObject::setImage(int frameSet, int frameNo)
 {
-    CGameFile & gf = *m_gameFile;
-    uint8_t *png;
-    int size;
-    gf.toFrame(frameSet, frameNo).toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qWarning("failed to load png $$\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-
-    m_ui->sImage->setPixmap(pm);
+    m_ui->sImage->setPixmap(frame2pixmap(m_gameFile->toFrame(frameSet, frameNo)));
 }
 
 void CDlgObject::fillFrameCombo(int frameSet)
@@ -1012,7 +974,7 @@ void CDlgObject::on_btnAddObject_clicked()
         qDebug("on_btnAddFrameSet_clicked() -> save\n");
 
         // add new FrameSet
-        CGameFile & gf = *((CGameFile*)m_gameFile);
+        CGameFile & gf = *m_gameFile;
 
         int frameSet = gf.frames().getSize();
         gf.frames().add(new CFrameSet (&fs));
@@ -1021,20 +983,7 @@ void CDlgObject::on_btnAddObject_clicked()
         gf.cache()->add( &fs);
 
         // add new ImageSet UI
-
-        uint8_t *png;
-        int size;
-        fs[0]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qWarning("failed to load png");
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+        QIcon icon = frame2icon(* fs[0]);
         m_ui->cbFrameSet->addItem(icon, fs.getName() );
         m_ui->cbFrameSet->setCurrentIndex(frameSet);
 

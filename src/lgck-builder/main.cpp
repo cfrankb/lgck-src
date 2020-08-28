@@ -19,13 +19,13 @@
 #include <QApplication>
 #include "../shared/stdafx.h"
 #include "../shared/Credits.h"
+#include "../shared/qtgui/qthelper.h"
 #include "mainwindow.h"
 #include "DlgSelect.h"
 #include <QFileDialog>
 #include <QGLWidget>
 #include <QSettings>
 #include "WizGame.h"
-//#include "ss_build.h"
 #include <ctime>
 #include <QMessageBox>
 #include <QDesktopWidget>
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     bool newProject = false;
     if (!skipSplash && fileName.isEmpty()) {
         do {
-            QString ver = "0.6.0.9";
+            QString ver = formatVersion();
             CDlgSelect * dlg = new CDlgSelect(&w);
             dlg->setWindowTitle(MainWindow::m_appTitle + " " + ver);
             dlg->raise();

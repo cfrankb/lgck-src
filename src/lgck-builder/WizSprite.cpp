@@ -605,11 +605,11 @@ void CWizSprite::save(const int index)
     } SOUND;
 
     SOUND sounds[] = {
-        { ui->cbSound_death, CObject::EO_DEATH, tr("play sound when sprite dies") },
-        { ui->cbSound_fall, CObject::EO_FALL, tr("play sound when sprite falls") },
-        { ui->cbSound_jumo, CObject::EO_JUMP, tr("play sound when sprite jumos") },
-        { ui->cbSound_move, CObject::EO_MOVE, tr("play sound when sprite moves") },
-        { ui->cbSound_spawn, CObject::EO_SPAWN, tr("play sound when sprite is created") }
+        { ui->cbSound_death, CObject::EO_DEATH, tr("play sound when the sprite dies") },
+        { ui->cbSound_fall, CObject::EO_FALL, tr("play sound when the sprite falls") },
+        { ui->cbSound_jumo, CObject::EO_JUMP, tr("play sound when the sprite jumps") },
+        { ui->cbSound_move, CObject::EO_MOVE, tr("play sound when the sprite moves") },
+        { ui->cbSound_spawn, CObject::EO_SPAWN, tr("play sound when the sprite is created") }
     };
 
     for (unsigned int i=0; i < sizeof(sounds) / sizeof(SOUND); ++i) {
@@ -684,22 +684,11 @@ void CWizSprite::save(const int index)
 
     // if player firing is enable
     // we assign bullet to buddy slot
+    proto.m_bulletOptions = 0;
     if (ui->cPlayerFire->isChecked()) {
         proto.m_nProtoBuddy = ui->cbPlayerBullet->currentIndex();
         proto.m_bulletSound = ui->cbSound_bullet->currentIndex();
-        CFileWrap file;
-        if (file.open(":/scripts/templates/player_bullet.lua")) {
-            int size=file.getSize();
-            char *buf = new char[size+1];
-            buf[size]=0;
-            file.read(buf,size);
-            file.close();
-            qDebug("event:%s", buf);
-            object.setEvent(CObject::EO_FIRE, buf);
-            delete[]buf;
-        } else {
-            qWarning("can't open");
-        }
+        proto.m_bulletOptions |= CProto::BULLET_ENABLED;
     }
 
     if (getClass() != CLASS_PLAYER_OBJECT &&

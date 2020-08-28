@@ -100,15 +100,24 @@ public:
     uint8_t m_rebirthLocation;
     uint8_t m_solidState;     // flag see SOLID_XXXX
 
-    union{
+    uint8_t m_coinsBonus;
+    uint8_t m_livesBonus;
+    uint16_t m_bulletSound;
+
+    char m_uuid[37];          // 36 digits + zero terminator
+    uint8_t m_ammoBonus;      // padded on 4 bytes
+    union {
         uint8_t m_extra[2];
         struct {
-            uint8_t m_coins;
-            uint8_t m_lives;
+            uint8_t m_bulletOptions;
+            uint8_t m_padding;
         };
     };
-    uint16_t m_bulletSound;
-    char m_uuid[40];
+
+    enum:uint8_t {
+        BULLET_ENABLED          = 0x0001,
+        BULLET_UNLIMITED        = 0x0002
+    };
 
     enum:uint16_t {
         OPTION_NO_GRAVITY       = 0x0001,  // antigravity flag
@@ -144,7 +153,7 @@ public:
     enum {
         PPARAM_NAME          = 0x01,
         PPARAM_CLASS         = 0x02,
-        PPARAM_NO_SMART_MAP  = 0x03 ,
+        PPARAM_NO_SMART_MAP  = 0x03,
         PPARAM_JUMP_MODE     = 0x04,
         PPARAM_MAX_FALL      = 0x05,
 
@@ -188,6 +197,8 @@ public:
         PPARAM_B_SOUND       = 0x23,
         PPARAM_COINS_BONUS   = 0x24,
         PPARAM_LIVES_BONUS   = 0x25,
+        PPARAM_AMMO_BONUS    = 0x26,
+        PPARAM_BULLET_OPTIONS= 0x27
     };
 
     bool getOption(int option) const;

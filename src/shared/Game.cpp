@@ -1182,6 +1182,12 @@ bool CGame::managePlayerFiring(CActor & player)
     }  else  {
         player.setState(CHitData::STATE_FIRING, false);
     }
+    // if a bulletProto was specified in properties
+    // and bullet is enabled
+    if (player.proto().m_nProtoBuddy &&
+            player.proto().m_bulletOptions & CProto::BULLET_ENABLED) {
+        callStaticHandler("firePlayerBullet", svar("playerEntry"));
+    }
     player.callEvent(CObject::EO_FIRE);
     return true;
 }
@@ -1854,17 +1860,22 @@ void CGame::callObjEvent(int objId, int eventId)
         CActor & entry = scene[objId];
         char fnName [255];
         sprintf(fnName, "event_obj_%d_%s", entry.m_nProto, CProtoArray::getEventName(eventId));
-        // the function name
-        lua_getglobal(m_lua.getState(), fnName);
-        // the first argument
-        lua_pushnumber(m_lua.getState(), objId);
-        // the second argument
-        lua_pushnumber(m_lua.getState(), var("ticks"));
-        // do the call (2 arguments, 1 result)
-        int status = lua_pcall(m_lua.getState(), 2, 0, 0);
-        if ( status != 0) {
-            m_lua.reportErrors(status);
-        }
+        callStaticHandler(fnName, objId);
+    }
+}
+
+void CGame::callStaticHandler(const char *fnName, int objId)
+{
+    // the function name
+    lua_getglobal(m_lua.getState(), fnName);
+    // the first argument
+    lua_pushnumber(m_lua.getState(), objId);
+    // the second argument
+    lua_pushnumber(m_lua.getState(), var("ticks"));
+    // do the call (2 arguments, 1 result)
+    int status = lua_pcall(m_lua.getState(), 2, 0, 0);
+    if ( status != 0) {
+        m_lua.reportErrors(status);
     }
 }
 

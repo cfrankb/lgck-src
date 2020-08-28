@@ -2,7 +2,7 @@
 
 --[[
     LGCK Builder Runtime
-    Copyright (C) 1999, 2013  Francois Blanchette
+    Copyright (C) 1999, 2020  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,152 +20,152 @@
 
 ----------------------------------------------------------------------
 -- SECTION: General
-    TRUE		        = 1;
-    FALSE 		        = 0;
-    NULL 		        = 0;
-    INVALID				= -1;
+    TRUE                        = 1;
+    FALSE                       = 0;
+    NULL                        = 0;
+    INVALID                     = -1;
 
 ----------------------------------------------------------------------
 -- EVENTS
 
 -- SECTION: Sprite Events
-    EO_SPAWN   		    = 0;
-    EO_ACTIVATE		    = 1;
-    EO_DEATH		    = 2;
-    EO_HURT	    	    = 3;
-    EO_TOUCH		    = 4;
-    EO_TRIGGER		    = 5;
-    EO_HANDLER		    = 6;
-    EO_SPLAT		    = 7;
-    EO_HIT_TEST		    = 8;
-    EO_ZKEY		        = 9;
-    EO_AUTO		        = 10;
-    EO_JUMP		        = 11;
-    EO_FALL		        = 12;
-    EO_LAND		        = 13;
-    EO_LEAP		        = 14;
-    EO_MOVE		        = 15;
-    EO_FIRE		        = 16;
-    EO_LEFTCLICK        = 17;
-    EO_RIGHTCLICK       = 18;
-    EO_NOTIFYCLOSURE    = 19;
+    EO_SPAWN                    = 0;
+    EO_ACTIVATE                 = 1;
+    EO_DEATH                    = 2;
+    EO_HURT                     = 3;
+    EO_TOUCH                    = 4;
+    EO_TRIGGER                  = 5;
+    EO_HANDLER                  = 6;
+    EO_SPLAT                    = 7;
+    EO_HIT_TEST                 = 8;
+    EO_ZKEY                     = 9;
+    EO_AUTO                     = 10;
+    EO_JUMP                     = 11;
+    EO_FALL                     = 12;
+    EO_LAND                     = 13;
+    EO_LEAP                     = 14;
+    EO_MOVE                     = 15;
+    EO_FIRE                     = 16;
+    EO_LEFTCLICK                = 17;
+    EO_RIGHTCLICK               = 18;
+    EO_NOTIFYCLOSURE            = 19;
 
 -- SECTION: Engine Events
-    EVENT_NO_EVENT          = 0;
-    EVENT_QUIT              = 1;
-    EVENT_LEVEL_COMPLETED   = 2;
-    EVENT_TIMEOUT           = 3;
-    EVENT_PLAYER_DIED       = 4;
-    EVENT_NO_PLAYER         = 5;
+    EVENT_NO_EVENT              = 0;
+    EVENT_QUIT                  = 1;
+    EVENT_LEVEL_COMPLETED       = 2;
+    EVENT_TIMEOUT               = 3;
+    EVENT_PLAYER_DIED           = 4;
+    EVENT_NO_PLAYER             = 5;
 
 -- SECTION: Level Events
-    EL_CREATE 			= 0;
-    EL_DRAW 			= 1;
-    EL_RESTART 			= 2;
-    EL_GOAL_COLLECTED 	= 3;
-    EL_LEVEL_COMPLETED 	= 4;
-    EL_TIMEOUT 			= 5;
-    EL_KEY_PRESSED 		= 6;
-    EL_KEY_UP 			= 7;
-    EL_GOAL_KILLED      = 8;
-    EL_HANDLER          = 9;
+    EL_CREATE                   = 0;
+    EL_DRAW                     = 1;
+    EL_RESTART                  = 2;
+    EL_GOAL_COLLECTED           = 3;
+    EL_LEVEL_COMPLETED          = 4;
+    EL_TIMEOUT                  = 5;
+    EL_KEY_PRESSED              = 6;
+    EL_KEY_UP                   = 7;
+    EL_GOAL_KILLED              = 8;
+    EL_HANDLER                  = 9;
 
 -- SECTION: Game Events
-    EG_INIT_GAME        = 0;
-    EG_PREPARE_LEVEL    = 1;
-    EG_COMPLETE_LEVEL   = 2;
-    EG_DEATH            = 3;
-    EG_GOAL_COLLECTED   = 4;
-    EG_GOAL_KILLED      = 5;
-    EG_PICKUP           = 6;
-    EG_LOADGAME         = 7;
-    EG_SAVEGAME         = 8;
-    EG_RESTART_LEVEL    = 9;
-    EG_NOTIFYCLOSURE    = 10;
+    EG_INIT_GAME                = 0;
+    EG_PREPARE_LEVEL            = 1;
+    EG_COMPLETE_LEVEL           = 2;
+    EG_DEATH                    = 3;
+    EG_GOAL_COLLECTED           = 4;
+    EG_GOAL_KILLED              = 5;
+    EG_PICKUP                   = 6;
+    EG_LOADGAME                 = 7;
+    EG_SAVEGAME                 = 8;
+    EG_RESTART_LEVEL            = 9;
+    EG_NOTIFYCLOSURE            = 10;
 
 ----------------------------------------------------------------------
 -- aims
 -- SECTION: Basic Aims
-    UP			        = 0x00;
-    DOWN		        = 0x01;
-    LEFT		        = 0x02;
-    RIGHT               = 0x03;
-    AIM_MASK            = 0x03;
+    UP                          = 0x00;
+    DOWN                        = 0x01;
+    LEFT                        = 0x02;
+    RIGHT                       = 0x03;
+    AIM_MASK                    = 0x03;
 -- SECTION: Extended Aims
-    LEFT_UP	        	= 0x04;
-    RIGHT_UP	    	= 0x05;
-    LEFT_DOWN	    	= 0x06;
-    RIGHT_DOWN	    	= 0x07;
-    LEAP                = 0x10;
-    LEAP_LEFT	    	= 0x12;
-    LEAP_RIGHT	    	= 0x13;
+    LEFT_UP                     = 0x04;
+    RIGHT_UP                    = 0x05;
+    LEFT_DOWN                   = 0x06;
+    RIGHT_DOWN                  = 0x07;
+    LEAP                        = 0x10;
+    LEAP_LEFT                   = 0x12;
+    LEAP_RIGHT                  = 0x13;
 
-    PAUSE	          	= -2;
-    SEPARATOR   		= -1;
-    HERE	        	= 255;
+    PAUSE                       = -2;
+    SEPARATOR                   = -1;
+    HERE                        = 255;
 
 ----------------------------------------------------------------------
 -- SECTION: Joy States
-    JOY_UP	    	    = 1;
-    JOY_DOWN    		= 2;
-    JOY_LEFT	    	= 4;
-    JOY_RIGHT	    	= 8;
-    JOY_JUMP    		= 16;
-    JOY_FIRE	    	= 32;
-    JOY_ZKEY    		= 64;
+    JOY_UP                      = 1;
+    JOY_DOWN                    = 2;
+    JOY_LEFT                    = 4;
+    JOY_RIGHT                   = 8;
+    JOY_JUMP                    = 16;
+    JOY_FIRE                    = 32;
+    JOY_ZKEY                    = 64;
 
 ----------------------------------------------------------------------
 -- SECTION: Flags
 
-    FLAG_NONE		    = 0x00;
-    FLAG_METAL		    = 0x01;
-    FLAG_NOSOUND        = 0x02;
-    FLAG_WATER		    = 0x04;
-    FLAG_DEATH		    = 0x08;
-    FLAG_HIT		    = 0x10;
-    FLAG_TELEPORT       = 0x20;
+    FLAG_NONE                   = 0x00;
+    FLAG_METAL                  = 0x01;
+    FLAG_NOSOUND                = 0x02;
+    FLAG_WATER                  = 0x04;
+    FLAG_DEATH                  = 0x08;
+    FLAG_HIT                    = 0x10;
+    FLAG_TELEPORT               = 0x20;
 
 ----------------------------------------------------------------------
 -- SECTION: Player States
 
-    STATE_NONE		    = 0x0;
-    STATE_FALL		    = 0x1;
-    STATE_DEAD		    = 0x2;
-    STATE_HIT		    = 0x4;
-    STATE_JUMP		    = 0x8;
-    STATE_BEGINNING     = 0x10;
-    STATE_FIRING        = 0x20;
-    STATE_LOOKUP        = 0x40;
+    STATE_NONE                  = 0x0;
+    STATE_FALL                  = 0x1;
+    STATE_DEAD                  = 0x2;
+    STATE_HIT                   = 0x4;
+    STATE_JUMP                  = 0x8;
+    STATE_BEGINNING             = 0x10;
+    STATE_FIRING                = 0x20;
+    STATE_LOOKUP                = 0x40;
 
 -- SECTION: Proto
-    PROTO_POINTS        = 0xffff;
-    PROTO_DEAD_PLAYER   = 0xfffe;
+    PROTO_POINTS                = 0xffff;
+    PROTO_DEAD_PLAYER           = 0xfffe;
 
 -----------------------------------------------------------------------
 -- SECTION: Death Indicator
 
-    DI_NONE             = 0;
-    DI_ANIMATION        = 1;
-    DI_REMOVAL          = 2;
+    DI_NONE                     = 0;
+    DI_ANIMATION                = 1;
+    DI_REMOVAL                  = 2;
 
 ----------------------------------------------------------------------
 -- SECTION: Level Params
 
-    SPARAM_TITLE        = 0;
-    SPARAM_BKCOLOR      = 1;
-    SPARAM_HINT         = 2;
-    SPARAM_GOAL         = 3;
-    SPARAM_TIME         = 4;
-    SPARAM_TRIGGER      = 5;
-    SPARAM_WRAP         = 6;
-    SPARAM_NO_GRAVITY   = 7;
+    SPARAM_TITLE                = 0;
+    SPARAM_BKCOLOR              = 1;
+    SPARAM_HINT                 = 2;
+    SPARAM_GOAL                 = 3;
+    SPARAM_TIME                 = 4;
+    SPARAM_TRIGGER              = 5;
+    SPARAM_WRAP                 = 6;
+    SPARAM_NO_GRAVITY           = 7;
 
 -- SECTION: Level Wrap
 
-    WRAP_UP             = 1;
-    WRAP_DOWN           = 2;
-    WRAP_LEFT           = 4;
-    WRAP_RIGHT          = 8;
+    WRAP_UP                     = 1;
+    WRAP_DOWN                   = 2;
+    WRAP_LEFT                   = 4;
+    WRAP_RIGHT                  = 8;
 
 -- SECTION: Level Goal
 
@@ -204,10 +204,10 @@
 ----------------------------------------------------------------------
 -- SECTION: Skills
 
-    SKILL_NORMAL	    = 0;
-    SKILL_NIGHTMARE	    = 1;
-    SKILL_HELL		    = 2;
-    SKILL_INSANE	    = 3;
+    SKILL_NORMAL                = 0;
+    SKILL_NIGHTMARE             = 1;
+    SKILL_HELL                  = 2;
+    SKILL_INSANE                = 3;
 
 ----------------------------------------------------------------------
 -- layers
@@ -373,12 +373,20 @@
     PPARAM_B_SOUND       = 0x23;
     PPARAM_COINS_BONUS   = 0x24;
     PPARAM_LIVES_BONUS   = 0x25;
+    PPARAM_AMMO_BONUS    = 0x26;
+    PPARAM_BULLET_OPTIONS= 0x27;
+
+---------------------------------------------------------------------
+-- SECTION: BulletOptions
+
+    BULLET_ENABLED              = 0x0001;
+    BULLET_UNLIMITED            = 0x0002;
 
 ---------------------------------------------------------------------
 -- SECTION: Sprite tags (see EXTRA_TAGFLAGS)
 
-    TAG_REBORN           = 0x0001;
-    TAG_ACTIVATED        = 0x0002;
+    TAG_REBORN                  = 0x0001;
+    TAG_ACTIVATED               = 0x0002;
 
 ---------------------------------------------------------------------
 -- SECTION: Keycodes

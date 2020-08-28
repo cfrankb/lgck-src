@@ -26,6 +26,7 @@
 
 class CPath;
 class CGameFile;
+class QComboBox;
 
 namespace Ui {
     class CDlgObject;
@@ -78,7 +79,7 @@ protected:
     };
 
     void setJumpText(int index);
-
+    void populateCombo(uint8_t *values, uint valueCount, uint8_t selected, QComboBox *combo, const QString & zero, const QString & format);
 
 private:
     Ui::CDlgObject *m_ui;

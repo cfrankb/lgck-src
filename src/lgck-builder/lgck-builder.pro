@@ -101,6 +101,7 @@ SOURCES += \
     ../shared/Proto.cpp \
     ../shared/ProtoArray.cpp \
     ../shared/ProtoIndex.cpp \
+    ../shared/qtgui/qthelper.cpp \
     ../shared/qtgui/qtlua.cpp \
     ../shared/Scene.cpp \
     ../shared/Selection.cpp \
@@ -222,6 +223,7 @@ HEADERS += \
     ../shared/Proto.h \
     ../shared/ProtoArray.h \
     ../shared/ProtoIndex.h \
+    ../shared/qtgui/qthelper.h \
     ../shared/qtgui/qtlua.h \
     ../shared/Scene.h \
     ../shared/Selection.h \
