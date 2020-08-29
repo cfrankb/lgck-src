@@ -28,6 +28,7 @@
 
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "GameFile.h"
 #include "Frame.h"
 
@@ -136,20 +137,8 @@ void CDlgDisplay::load(CDisplay & d)
     setImage(d.imageSet(), d.imageNo());
     for (int n=0; n < gf.frames().getSize(); ++n) {
         CFrameSet & frameSet = *gf.frames()[n];
-        uint8_t *png;
-        int size;
-        frameSet[0]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qWarning("failed to load png (%d)\n", n);
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-        ui->cbFrameSet->addItem(icon, frameSet.getName() );
+        QIcon icon = frame2icon(* frameSet[0]);
+        ui->cbFrameSet->addItem(icon, frameSet.getName());
     }
     ui->cbFrameSet->setCurrentIndex( d.imageSet() );
 
@@ -257,18 +246,7 @@ void CDlgDisplay::setImage(int frameSet, int frameNo)
     }
     CGameFile & gf = *m_gameFile;
     CFrameSet & fs = *gf.frames()[frameSet];
-
-    uint8_t *png;
-    int size;
-    fs[frameNo]->toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qWarning("failed to load png $$\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
+    QPixmap pm = frame2pixmap(* fs[frameNo]);
     ui->sImage->setPixmap(pm);
 }
 
@@ -276,42 +254,15 @@ void CDlgDisplay::fillFrameCombo(int frameSet)
 {
     CGameFile & gf = *(m_gameFile);
     CFrameSet & fs = *gf.frames()[frameSet];
-
     ui->cbBaseFrame->clear();
     if (!frameSet) {
         return;
     }
-
     int imgCount = fs.getSize();
-    unsigned char **imgPng = new uint8_t *[imgCount];
-    int *imgSize = new int [imgCount];
-
     for (int i=0; i < imgCount; ++i) {
-        fs[i]->toPng((imgPng)[i], imgSize[i]);
-        QIcon icon = makeIcon(imgPng[i], imgSize[i]);
+        QIcon icon = frame2icon(* fs[i]);
         ui->cbBaseFrame->addItem(icon, QString("%1").arg(i + 1));
     }
-
-    // free imageSet
-    delete [] imgSize;
-    for (int i=0; i < imgCount; ++i) {
-        delete [] imgPng[i];
-        imgPng[i] = nullptr;
-    }
-    delete [] imgPng;
-}
-
-QIcon CDlgDisplay::makeIcon(void *png, int size)
-{
-    QImage img;
-    if (!img.loadFromData( (uint8_t*)png, size )) {
-        qWarning("failed to load png");
-    }
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-    return icon;
 }
 
 void CDlgDisplay::setGameFile(CGameFile *gf)

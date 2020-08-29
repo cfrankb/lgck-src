@@ -9,5 +9,5 @@ class QString;
 
 QIcon frame2icon(CFrame & frame);
 QPixmap frame2pixmap(CFrame & frame);
-QString formatVersion();
+QString formatVersion(bool singleDigit=false);
 #endif

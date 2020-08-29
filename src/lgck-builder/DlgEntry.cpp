@@ -30,6 +30,7 @@
 #include "../shared/PathBlock.h"
 #include "../shared/Path.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include <stdio.h>
 
 CDlgEntry::CDlgEntry(QWidget *parent) :
@@ -77,9 +78,10 @@ void CDlgEntry::init()
     QIcon iconCheck;
     iconCheck.addFile(":/images/check.png");
 
+    char s[3];
     for (int n = 0; n <= TRIGGER_KEYS; ++n) {
         if (n) {
-            QString s = QString(tr("%1")).arg(n);
+            sprintf(s, "%.2d", n);
             if (triggers[n]) {
                 m_ui->cbTriggerKey->addItem(iconCheck, s, QVariant(n));
             } else {
@@ -370,15 +372,7 @@ void CDlgEntry::on_btnObject_clicked()
 void CDlgEntry::setImage(int frameSet, int frameNo)
 {
     CFrameSet & fs = m_gameFile->toFrameSet(frameSet);
-    uint8_t *png;
-    int size;
-    fs[frameNo]->toPng(png, size);
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qWarning("failed to load png $$\n");
-    }
-    delete [] png;
-    QPixmap pm = QPixmap::fromImage(img);
+    QPixmap pm = frame2pixmap(* fs[frameNo]);
     m_ui->sImage->setPixmap(pm);
 }
 

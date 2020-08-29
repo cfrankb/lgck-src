@@ -27,6 +27,7 @@
 #include "../shared/Layer.h"
 #include "../shared/GameEvents.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "../shared/interfaces/ISound.h"
 #include "../shared/Proto.h"
 #include "../shared/ProtoIndex.h"
@@ -369,19 +370,7 @@ void CToolBoxDock::updateIcon(QTreeWidgetItem *itm, int protoId)
     CProto & proto = gf.m_arrProto[ protoId ];
 
     CFrameSet & filter = *gf.frames()[proto.m_nFrameSet];
-    uint8_t *png;
-    int size;
-    filter[proto.m_nFrameNo]->toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qWarning("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    QIcon icon = frame2icon(* filter[proto.m_nFrameNo]);
     icon.actualSize(QSize(32,32));
 
     QString className;

@@ -143,7 +143,7 @@ public:
     uint8_t m_classType [ MAX_CLASSES ];
     uint8_t m_classLock [ MAX_CLASSES ];
 
-    static unsigned int getVersion();
+    static uint32_t getEngineVersion();
     bool isUntitled ();
     bool isDirty() const;
     void setDirty(const bool dirty);

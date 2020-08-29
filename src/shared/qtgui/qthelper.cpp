@@ -1,6 +1,6 @@
 #include "qthelper.h"
 #include "../Frame.h"
-#include "../ss_version.h"
+#include "../GameFile.h"
 #include <QtDebug>
 #include <QString>
 
@@ -24,13 +24,14 @@ QPixmap frame2pixmap(CFrame & frame)
     return QPixmap::fromImage(img);
 }
 
-QString formatVersion()
+QString formatVersion(bool singleDigit)
 {
-    int version = SS_LGCK_VERSION;
+    int version = CGameFile::getEngineVersion();
     int vv[4]={0,0,0,0};
     for (int i=3; i >= 0; --i) {
         vv[i] = version & 0xff;
         version /= 256;
     }
-    return QString::asprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+    const char *fmt = singleDigit ? "%.1d.%.1d.%.1d.%.1d" : "%.2d.%.2d.%.2d.%.2d";
+    return QString::asprintf(fmt, vv[0], vv[1], vv[2], vv[3]);
 }

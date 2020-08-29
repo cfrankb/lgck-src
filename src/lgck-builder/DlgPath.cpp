@@ -173,29 +173,10 @@ void CDlgPath::updateIcon(QTreeWidgetItem *item, int aim)
         i = 4;
     }
 
-    CFileWrap file;
-
-    QIcon icon;
-    if (file.open(q2c(QString(":/images/%1").arg(m_iconNames[i])))) {
-
-        int size = file.getSize();
-        uint8_t *png = new uint8_t [ size ];
-        file.read(png, size);
-        file.close();
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qWarning("failed to load png\n");
-        }
-
-        QPixmap pm = QPixmap::fromImage(img);
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
-        delete [] png;
-    } else {
+    QIcon icon = QPixmap(QString(":/images/%1").arg(m_iconNames[i]));
+    if (icon.isNull()) {
         qWarning("failed to load resource icon: %s\n", q2c(m_iconNames[i]));
     }
-
     item->setIcon(0, icon);
     item->setText(0, m_iconText[i]);
 }

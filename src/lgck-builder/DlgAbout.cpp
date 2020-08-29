@@ -32,7 +32,7 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     m_ui->setupUi(this);
 
     // About
-    m_ui->sVersion->setText("<b>" + tr("Version %1").arg(formatVersion()) + "</b>");
+    m_ui->sVersion->setText("<b>" + tr("Version %1").arg(formatVersion(true)) + "</b>");
 
     // license GPL
     CFileWrap file;

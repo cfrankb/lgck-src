@@ -133,6 +133,7 @@ private:
     CGameFixer * m_fixer;
     QToolButton *m_btnIndicator;
     bool m_ready;
+    QByteArray m_state;
     void saveSettings();
     enum {
         MAX_PROJECTS        = 16,

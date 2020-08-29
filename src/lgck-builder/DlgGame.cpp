@@ -39,6 +39,7 @@
 #include "../shared/interfaces/ISound.h"
 #include "../shared/GameEvents.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "../shared/Game.h"
 
 CDlgGame::CDlgGame(QWidget *parent) :
@@ -255,21 +256,7 @@ void CDlgGame::updateIcon(QTreeWidgetItem * itm, int protoId)
     QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
     CGameFile & gf = *m_gameFile;
     CProto & proto = gf.m_arrProto[ protoId ];
-
-    uint8_t *png;
-    int size;
-    gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qWarning("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
+    QIcon icon = frame2icon(gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo));
     item->setText(0, proto.m_szName);
     if (gf.m_className[proto.m_nClass].empty()) {
         item->setText(1, tr("Unknown class %1").arg( proto.m_nClass ));
@@ -559,19 +546,7 @@ void CDlgGame::updateIconFrameSet(QTreeWidgetItem * itm, int fs)
     QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
 
     CFrameSet & frameSet = gf.toFrameSet(fs);
-    uint8_t *png;
-    int size;
-    gf.toFrame(fs, 0).toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qWarning("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    QIcon icon = frame2icon(gf.toFrame(fs, 0));
 
     QString s;
     if (frameSet.getSize() < 2) {

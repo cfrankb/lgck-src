@@ -137,7 +137,7 @@ void CWEditEvents::insertText(const char *text)
 
 void CWEditEvents::setFont(const QFont &font)
 {
-    qDebug("setFont: %s %d", q2c(font.family()), font.pixelSize());
+    qDebug("setFont: %s", q2c(font.toString()));
     ui->eSource->setFont(font);
     CDlgSource::setFont(font);
 }

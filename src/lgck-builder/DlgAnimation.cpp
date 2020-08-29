@@ -22,46 +22,46 @@
 #include "../shared/Animation.h"
 #include "../shared/Object.h"
 #include "../shared/FileWrap.h"
+#include "../shared/qtgui/qthelper.h"
 
 QString CDlgAnimation::m_sequences[] =
 {
-
 // AS_DEFAULT      = 0x00,
-    "This is the default animation that will run when this object is first spawned.",
+    tr("This is the default animation that will run when this object is first spawned."),
 // AS_IDLE         = 0x01,
-    "This is the idle animation that will switch on when this object has been idle for some time.",
+    tr("This is the idle animation that will switch on when this object has been idle for some time."),
 // AS_CUSTOM1      = 0x02,
-    "This is a custom animation reserved for user extensions.",
+    tr("This is a custom animation reserved for user extensions."),
 // AS_CUSTOM2      = 0x03,
-    "This is a custom animation reserved for user extensions."
+    tr("This is a custom animation reserved for user extensions.")
 };
 
 QString CDlgAnimation::m_sequenceGroups[] =
 {
     // AS_DEFAULT      = 0x00,
-    "Default group",
+    tr("Default group"),
     // AS_STAND        = 0x04,
-    "The engine will switch to running this animation when the object has stopped motion after moving %1.",
+    tr("The engine will switch to running this animation when the object has stopped motion after moving %1."),
     // AS_MOVE         = 0x08,
-    "The engine will switch to running this animation when the object is moving %1.",
+    tr("The engine will switch to running this animation when the object is moving %1."),
     // AS_JUMP         = 0x0c,
-    "The engine will switch to running this animation when the object is jumping %1.",
+    tr("The engine will switch to running this animation when the object is jumping %1."),
     // AS_HURT         = 0x10,
-    "The engine will switch to running this animation when the object is hurt %1.",
+    tr("The engine will switch to running this animation when the object is hurt %1."),
     // AS_ATTACK       = 0x14,
-    "The engine will switch to running this animation when the object is attacked %1.",
+    tr("The engine will switch to running this animation when the object is attacked %1."),
     // AS_RUN          = 0x18,
-    "The engine will switch to running this animation when the object is running %1.",
+    tr("The engine will switch to running this animation when the object is running %1."),
     // AS_DEAD         = 0x1c,
-    "The engine will switch to running this animation when the object is death %1.",
+    tr("The engine will switch to running this animation when the object is death %1."),
 };
 
 QString CDlgAnimation::m_aims[] =
 {
-    "up",
-    "down",
-    "left",
-    "right"
+    tr("up"),
+    tr("down"),
+    tr("left"),
+    tr("right")
 };
 
 CDlgAnimation::CDlgAnimation(QWidget *parent) :

@@ -66,7 +66,6 @@ public:
     CMap & map();
     void removePointsOBL();
     void cacheImages();
-    static int getVersion();
     int testKey(int keyCode);
     void setKey(int keyCode, char value);
     void setJoyButton(lgck::Button::JoyButton button, char value);

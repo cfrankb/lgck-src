@@ -22,6 +22,7 @@
 #include "../shared/Frame.h"
 #include "../shared/FileWrap.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "DlgGotoLevel.h"
 #include <QMessageBox>
 #include <QMenu>
@@ -176,19 +177,7 @@ void CWFrameSet::addFrame(int index)
 
 void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
 {
-    uint8_t *png;
-    int pngSize;
-    (*m_frameSet)[j]->toPng(png, pngSize);
-
-    QImage img;
-    if (!img.loadFromData( png, pngSize )) {
-        qWarning("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    QIcon icon = frame2icon(*(*m_frameSet)[j]);
     icon.actualSize(QSize(32,32));
 
     QString s = QString(tr("%1 x %2")) .arg( (*m_frameSet)[j]->m_nLen) . arg((*m_frameSet)[j]->m_nHei);

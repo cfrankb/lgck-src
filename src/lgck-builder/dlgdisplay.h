@@ -49,7 +49,6 @@ private slots:
 
 private:
     void setImage(int frameSet, int frameNo);
-    QIcon makeIcon(void *png, int size);
     void fillFrameCombo(int frameSet);
     CGameFile *m_gameFile;
     Ui::CDlgDisplay *ui;

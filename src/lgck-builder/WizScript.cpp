@@ -21,6 +21,7 @@
 #include "FileWrap.h"
 #include "GameFile.h"
 #include "qtgui/cheat.h"
+#include "qtgui/qthelper.h"
 #include "Frame.h"
 
 void qtLua_init();
@@ -152,17 +153,7 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
         for (int i=0; data[i].name != ""; ++i) {
             CProto & proto = gf.toProto(i);
             CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
-            uint8_t *png;
-            int size;
-            frameSet[0]->toPng(png, size);
-            QImage img;
-            if (!img.loadFromData( png, size )) {
-                qWarning("failed to load png (%d)\n", i);
-            }
-            delete [] png;
-            QPixmap pm = QPixmap::fromImage(img);
-            QIcon icon;
-            icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+            QIcon icon = frame2icon(* frameSet[0]);
             combo->addItem(icon, data[i].value.c_str());
         }
         delete [] data;
@@ -182,17 +173,7 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
         CONST_DATA *data = gf.getImageList();
         for (int i=0; data[i].name != ""; ++i) {
             CFrameSet & frameSet = gf.toFrameSet(i);
-            uint8_t *png;
-            int size;
-            frameSet[0]->toPng(png, size);
-            QImage img;
-            if (!img.loadFromData( png, size )) {
-                qWarning("failed to load png (%d)\n", i);
-            }
-            delete [] png;
-            QPixmap pm = QPixmap::fromImage(img);
-            QIcon icon;
-            icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+            QIcon icon = frame2icon(* frameSet[0]);
             combo->addItem(icon, data[i].value.c_str());
         }
         delete [] data;

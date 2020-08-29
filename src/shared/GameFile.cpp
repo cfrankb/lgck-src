@@ -442,7 +442,8 @@ bool CGameFile::read(const char *filepath)
             file.read(&version, sizeof(VERSION));
         }
 
-        if (version.id > ((unsigned)SS_LGCK_VERSION)) {
+        uint32_t engineVersion = getEngineVersion();
+        if (version.id > engineVersion) {
             CLuaVM::debugv("Unsupported version of LGCK: 0x%.8x\n", version.id);
             const char msg[] = "Unsupported version of LGCK: 0x%.8x\nYou'll need to upgrade to use this file!";
             int len = strlen(msg) + 16;
@@ -646,7 +647,7 @@ bool CGameFile::write(const char *filepath)
         // version.dat
         VERSION version;
         memset(&version, 0, sizeof(VERSION));
-        version.id = SS_LGCK_VERSION;
+        version.id = getEngineVersion();
         version.game_uid = ::rand();
 
         bSize = fs.getSize();
@@ -694,7 +695,7 @@ bool CGameFile::write(const char *filepath)
     return false;
 }
 
-unsigned int CGameFile::getVersion()
+uint32_t CGameFile::getEngineVersion()
 {
     return SS_LGCK_VERSION;
 }

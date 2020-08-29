@@ -21,6 +21,7 @@
 #include "../shared/GameFile.h"
 #include "../shared/Frame.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "OBL5File.h"
 #include <QFileDialog>
 
@@ -92,19 +93,7 @@ void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
     CGameFile & gf = *m_gameFile;
     CProto & proto = gf.toProto(protoId);
 
-    uint8_t *png;
-    int size;
-    gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo).toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qWarning("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    QIcon icon = frame2icon(gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo));
     icon.actualSize(QSize(32,32));
     QString className;
     if (gf.m_className[proto.m_nClass].empty()) {

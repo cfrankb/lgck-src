@@ -93,9 +93,8 @@ const char MainWindow::m_appName[] = "LGCK builder";
 const char MainWindow::m_author[] = "cfrankb";
 const QString MainWindow::m_appTitle = MainWindow::tr("LGCK builder IDE");
 
-#define WEB_PATH QString("https://cfrankb.com/lgck/")
-#define UPDATER_URL "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
-
+constexpr const char WEB_PATH[] = "https://cfrankb.com/lgck/";
+constexpr const char UPDATER_URL[] = "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s";
 constexpr const char EDITOR[] = "Editor";
 constexpr int MIN_FONT_SIZE = 10;
 constexpr int MAX_FONT_SIZE = 50;
@@ -166,7 +165,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_timerIndicator.stop();
     m_ready = false;
     me = this;
-    QString appVersion = formatVersion();
+    QString appVersion = formatVersion(false);
 
     QCoreApplication::setOrganizationDomain("");
     QCoreApplication::setOrganizationName(m_author);
@@ -1286,8 +1285,7 @@ void MainWindow::on_actionTest_Level_triggered()
 
 void MainWindow::testLevel(bool initSound)
 {   
-    QPixmap pixmap(":/images/0000-1.png");
-    QSplashScreen splash(pixmap);
+    QSplashScreen splash(QPixmap(":/images/0000-1.png"));
     splash.show();
     splash.showMessage(tr("Please wait..."));
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -2265,21 +2263,13 @@ void MainWindow::on_actionCreateSprite_triggered()
 
 void MainWindow::on_actionDocumentation_triggered()
 {
-    QString url = QString("%1manual.htm?v=%2.%3.%4.%5").arg(WEB_PATH)
-            .arg(CGame::getVersion() >> 24 & 0xff)
-            .arg(CGame::getVersion() >> 16 & 0xff)
-            .arg(CGame::getVersion() >> 8 & 0xff)
-            .arg(CGame::getVersion() & 0xff);
+    QString url = QString("%1manual.htm?v=%2").arg(WEB_PATH).arg(formatVersion(true));
     QDesktopServices::openUrl(url);
 }
 
 void MainWindow::on_actionTutorials_triggered()
 {
-    QString url = QString("%1tutorial.htm?v=%2.%3.%4.%5").arg(WEB_PATH)
-            .arg(CGame::getVersion() >> 24 & 0xff)
-            .arg(CGame::getVersion() >> 16 & 0xff)
-            .arg(CGame::getVersion() >> 8 & 0xff)
-            .arg(CGame::getVersion() & 0xff);
+    QString url = QString("%1tutorial.htm?v=%2").arg(WEB_PATH).arg(formatVersion(true));
     QDesktopServices::openUrl(url);
 }
 
@@ -2563,7 +2553,7 @@ void MainWindow::saveSettings()
         settings.setValue("updater_check", m_bUpdate);
         settings.setValue("updater_url", m_updateURL);
         settings.setValue("uuid", m_uuid);
-        QString ver = formatVersion();
+        QString ver = formatVersion(false);
         settings.setValue("version", ver);
         settings.endGroup();
 
@@ -2681,7 +2671,7 @@ void MainWindow::reloadSettings()
     char *uuid = getUUID();
     m_uuid = settings.value("uuid", uuid).toString();
     delete []uuid;
-    QString currVersion = formatVersion();
+    QString currVersion = formatVersion(false);
     if (currVersion != savedVersion) {
         m_updateURL = UPDATER_URL;
     }
@@ -2844,7 +2834,7 @@ void MainWindow::checkVersion()
 {
     QString productVersion = QSysInfo::productVersion();
     QString productType = QSysInfo::productType();
-    QString ver = formatVersion();
+    QString ver = formatVersion(false);
     QString driver = QGuiApplication::platformName();
     QString url = QString::asprintf(q2c(m_updateURL),
                                     q2c(ver),
@@ -3035,13 +3025,12 @@ void MainWindow::updateFrameSet(const QString & fileName)
     qDebug() << QString("frameset updated: %1").arg(fileName);
 }
 
-QByteArray state;
 void MainWindow::showEvent(QShowEvent* pEvent)
 {
     QMainWindow::showEvent(pEvent);
-    if (state.length()) {
-        this->restoreState(state);
-        state.clear();
+    if (m_state.length()) {
+        this->restoreState(m_state);
+        m_state.clear();
     }
 }
 
@@ -3062,7 +3051,7 @@ void MainWindow::changeEvent(QEvent* e)
         }
     } else if (e->type() == QEvent::ActivationChange) {
         // ActivationChange = 99,                  // window activation has changed
-        state = this->saveState();
+        m_state = this->saveState();
     }
     QMainWindow::changeEvent(e);
 }
@@ -3152,29 +3141,12 @@ void MainWindow::eraserToggled(bool checked)
 
 void MainWindow::changeProtoIcon(int protoId)
 {
-    uint8_t *png;
-    int size;
     CProto proto = m_doc.toProto(protoId > 0 ? protoId : 0);
-    m_doc.toFrame(proto).toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData(png, size)) {
-        qWarning("failed to load png");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
     m_protoIcon->setToolTip(protoId > 0 ? proto.getName() : "");
-    m_protoIcon->setIcon(QIcon(pm));
+    m_protoIcon->setIcon(frame2icon(m_doc.toFrame(proto)));
     QMenu *menu = new QMenu();
     for (int i=0; protoId >0 && i < m_doc.toFrameSet(proto.m_nFrameSet).getSize(); ++i) {
-        m_doc.toFrame(proto.m_nFrameSet, i).toPng(png, size);
-        if (!img.loadFromData(png, size)) {
-            qWarning("failed to load png");
-        }
-        delete [] png;
-        QPixmap pm = QPixmap::fromImage(img);
-        QAction *action = new QAction(QIcon(pm), QString("%1").arg(i + 1));
+        QAction *action = new QAction(frame2icon(m_doc.toFrame(proto.m_nFrameSet, i)), QString("%1").arg(i + 1));
         uint w = (protoId << 16) + i;
         action->setData(w);
         menu->addAction(action);
@@ -3190,21 +3162,12 @@ void MainWindow::toggleProtoFrame()
     QAction *act = qobject_cast<QAction *>(sender());
     QVariant v = act->data();
     uint32_t w = v.toUInt();
-    uint8_t *png;
-    int size;
     qDebug("w: 0x%x", w);
 
     int protoId = w >> 16;
     int frameId = w & 0xffff;
     CProto proto = m_doc.toProto(protoId > 0 ? protoId : 0);
-    m_doc.toFrame(proto.m_nFrameSet, frameId).toPng(png, size);
-    QImage img;
-    if (!img.loadFromData(png, size)) {
-        qWarning("failed to load png");
-    }
-    delete [] png;
-    QPixmap pm = QPixmap::fromImage(img);
-    m_protoIcon->setIcon(QIcon(pm));
+    m_protoIcon->setIcon(frame2icon(m_doc.toFrame(proto.m_nFrameSet, frameId)));
     emit currentFrameChanged(protoId, frameId);
 }
 

@@ -58,6 +58,7 @@ SOURCES += \
     ../shared/Actor.cpp \
     ../shared/Animation.cpp \
     ../shared/Attacker.cpp \
+    ../shared/Countdown.cpp \
 #    ../shared/Credit.cpp \
     ../shared/compat/asprintf.cpp \
     ../shared/Display.cpp \
@@ -172,6 +173,7 @@ HEADERS += \
     ../shared/Animation.h \
     ../shared/Attacker.h \
     ../shared/compat/asprintf.h \
+    ../shared/Countdown.h \
 #    ../shared/Credit.h \
     ../shared/Credits.h \
     ../shared/Display.h \

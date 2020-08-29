@@ -43,12 +43,9 @@ protected:
     enum {
         MAX_ICONS = 5
     };
-   // QIcon m_icons[MAX_ICONS];
     static QString m_iconNames[];
     static QString m_iconText[];
     static int m_iconValues[];
-
-    //bool loadIcon(int i);
 
 private:
     Ui::CDlgPathDir *ui;

@@ -181,11 +181,6 @@ CGame::~CGame()
 /////////////////////////////////////////////////////////////////////
 // attributes
 
-int CGame::getVersion()
-{
-    return CGameFile::getVersion();
-}
-
 int CGame::getTicks()
 {
     return getTickCount();
@@ -2073,7 +2068,7 @@ void CGame::saveGame(IFile & file)
 {
     // main headers
     file.write("LGCK",4);
-    unsigned int version = getVersion();
+    unsigned int version = getEngineVersion();
     unsigned int uuid = 0;
     unsigned int size;
     file.write(&version, sizeof(version));
@@ -2153,7 +2148,7 @@ void CGame::loadGame(IFile &file)
     std::string fileName;
     std::string path;
     file.read(&version,4);
-    ASSERT(version == static_cast<unsigned int>(getVersion()));
+    ASSERT(version == getEngineVersion());
     file.read(&uuid, 4);
     file >> fileName;
     file >> path;
@@ -2365,7 +2360,7 @@ CScene *CGame::_bk()
 
 bool CGame::exportJoyStateMap(IFile & file)
 {
-    uint32_t version = getVersion();
+    uint32_t version = getEngineVersion();
     file.write(SIGNATURE_JOYSTATEMAP, 4);
     file.write(&version, sizeof(uint32_t));
     file.write(&REVISION_JOYSTATEMAP, sizeof(uint32_t));
@@ -2375,14 +2370,14 @@ bool CGame::exportJoyStateMap(IFile & file)
 
 bool CGame::importJoyStateMap(IFile & file)
 {
-    int32_t version = 0;
+    uint32_t version = 0;
     uint32_t revision = -1;
     char signature[4];
     file.read(signature, 4);
     if (memcmp(signature, SIGNATURE_JOYSTATEMAP, 4)==0) {
         file.read(&version, sizeof(int32_t));
         file.read(&revision, sizeof(uint32_t));
-        if (version == getVersion()) {
+        if (version == getEngineVersion()) {
             file.read(m_joyStateMap, sizeof(m_joyStateMap));
             return true;
         } else {

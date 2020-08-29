@@ -2000,7 +2000,7 @@ int getVersion(lua_State * L)
         lua_pushnumber( L, -1 );
     } else {
 
-        lua_pushnumber( L, CGameFile::getVersion());
+        lua_pushnumber( L, CGameFile::getEngineVersion());
     }
     return 1;
 }

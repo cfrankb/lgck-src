@@ -28,6 +28,7 @@
 #include "../shared/FileWrap.h"
 #include "../shared/Frame.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "../shared/Path.h"
 
 CWizSprite::CWizSprite(QWidget *parent) :
@@ -133,19 +134,7 @@ void CWizSprite::load(const int index)
 
     for (int n=0; n < gf.frames().getSize(); ++n) {
         CFrameSet & frameSet = *gf.frames()[n];
-        uint8_t *png;
-        int size;
-        frameSet[0]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qWarning("failed to load png (%d)\n", n);
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+        QIcon icon = frame2icon(* frameSet[0]);
         ui->cbFrameSet->addItem(icon, frameSet.getName() );
     }
 
@@ -290,20 +279,7 @@ void CWizSprite::load(const int index)
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
         CProto & proto = gf.m_arrProto[i];
         CFrameSet & frameSet = *gf.frames()[proto.m_nFrameSet];
-        uint8_t *png;
-        int size;
-        frameSet[proto.m_nFrameNo]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qWarning("failed to load png $\n");
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
+        QIcon icon = frame2icon(* frameSet[proto.m_nFrameNo]);
         ui->cbChangeTo->addItem(icon, proto.getName());
 
         // from page 2
