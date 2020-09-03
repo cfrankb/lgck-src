@@ -52,7 +52,7 @@ CLevelViewGL::CLevelViewGL(QWidget* parent, CGame *game):
     m_hasFocus = false;
     m_game = game;
     m_triggerFontSize = 16;
-
+    m_mouseEvent.x = m_mouseEvent.y = m_mouseEvent.buttons = -1;
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(this, SIGNAL(versionCheck()),
             parent->parent(), SLOT(checkVersion()));
@@ -93,13 +93,24 @@ void CLevelViewGL::initializeGL()
 void CLevelViewGL::paintGL()
 {
     static bool drawing = false;
-    if (!drawing) {     
+    if (!drawing) {
         drawing = true;
         QOpenGLWidget::paintGL();
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         drawBackground();
         drawing = false;
     }
+    if (m_game && isGameMode()) {
+        m_game->triggerMouseEvent(m_mouseEvent.x, m_mouseEvent.y, m_mouseEvent.buttons);
+    }
+    m_mouseEvent.x = m_mouseEvent.y = m_mouseEvent.buttons = -1;
+}
+
+void CLevelViewGL::mouseClick(int x, int y, Qt::MouseButtons buttons)
+{
+    m_mouseEvent.x = x;
+    m_mouseEvent.y = y;
+    m_mouseEvent.buttons = buttons;
 }
 
 void CLevelViewGL::resizeGL(int w, int h)

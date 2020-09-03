@@ -71,6 +71,12 @@ protected:
     CGame *m_game;
     bool m_hasFocus;
     QTimer m_timer;
+    typedef struct {
+        int x;
+        int y;
+        int buttons;
+    } MouseEvent;
+    MouseEvent m_mouseEvent;
 
     virtual void initializeGL();
     virtual void paintGL();
@@ -99,6 +105,7 @@ protected slots:
     void setTriggerKeyColor(const QString & gridColor);
     void showTriggerKey(bool state);
     void setTriggerFontSize(int size);
+    void mouseClick(int x, int y, Qt::MouseButtons buttons);
     friend class CLevelScroll;
 };
 

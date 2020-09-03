@@ -114,12 +114,13 @@ public:
     } PARAM_LEVEL;
 
     enum {
-        WRAP_NONE               = 0,
-        WRAP_UP                 = 1,
-        WRAP_DOWN               = 2,
-        WRAP_LEFT               = 4,
-        WRAP_RIGHT              = 8,
-        OPENTOP                 = 16
+        WRAP_NONE               = 0x0000,
+        WRAP_UP                 = 0x0001,
+        WRAP_DOWN               = 0x0002,
+        WRAP_LEFT               = 0x0004,
+        WRAP_RIGHT              = 0x0008,
+        OPENTOP                 = 0x0010,
+        NO_LOOK_UP              = 0x0020
     } WRAP;
 
     enum {

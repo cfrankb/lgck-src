@@ -741,7 +741,8 @@ bool CGame::initLevel(int n)
     counter("goalLeft") = m_sFW->countGoals();
     setEndLevel( false );
     setLevelGoal( s->getSettingInt(CLevel::SPARAM_GOAL ) );
-    setLookUp ( (*m_settings)[PARAM_LOOKUP].valueInt > 0 );
+    setLookUp ( (*m_settings)[PARAM_LOOKUP].valueInt > 0
+                && !(s->getSettingInt(CLevel::SPARAM_WRAP ) & CLevel::NO_LOOK_UP));
     counter("closureEvent") = EVENT_NO_EVENT;
     counter("closureTime") = 0;
     counter("closureDelay") = s->getSettingInt("closure");
@@ -1513,8 +1514,8 @@ CInventory *CGame::getInventory(const char *name)
 
 void CGame::triggerMouseEvent(int x, int y, int button)
 {
-    int offsetX;
-    int offsetY;
+    int offsetX = 0;
+    int offsetY = 0;
     graphics()->getOffset(offsetX, offsetY);
     x -= offsetX;
     y -= offsetY;

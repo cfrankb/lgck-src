@@ -86,7 +86,7 @@ CDlgAnimation::CDlgAnimation(QWidget *parent) :
 
     m_iconMax = GROWBY;
     m_iconCount = 0;
-    m_icons = (void **) new uint8_t * [m_iconMax];
+    m_icons = new uint8_t * [m_iconMax];
     m_iconSizes = new int[m_iconMax];
     m_animation = new CAnimation;
 }
@@ -95,7 +95,7 @@ CDlgAnimation::~CDlgAnimation()
 {
     delete ui;
     delete m_animation;
-    delete [] (uint8_t**)m_icons;
+    delete [] m_icons;
     delete [] m_iconSizes;
 }
 
@@ -141,7 +141,7 @@ void CDlgAnimation::addIcon(void *png, int size)
 
         delete [] m_icons;
         delete [] m_iconSizes;
-        m_icons = (void**)t;
+        m_icons = t;
         m_iconSizes = tt;
     }
 }

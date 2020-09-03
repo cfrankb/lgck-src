@@ -76,6 +76,8 @@ CLevelScroll::CLevelScroll(QWidget *parent, CGame *game) :
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(myChanged(int)));
     connect(this, SIGNAL(setMX(int)), horizontalScrollBar(), SLOT(setValue(int)));
     connect(this, SIGNAL(setMY(int)), verticalScrollBar(), SLOT(setValue(int)));
+    connect(this, & CLevelScroll::triggerMouseEvent,
+            widget, & CLevelViewGL::mouseClick);
 }
 
 void CLevelScroll::resizeEvent(QResizeEvent * event)
@@ -178,8 +180,7 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
     const bool validLevel = m_game && m_game->getSize();
     if (this->isGameMode()) {
         if (m_game) {
-            CGame & gf = *m_game;
-            gf.triggerMouseEvent(m_mouse.x, m_mouse.y, event->button());
+            emit triggerMouseEvent(m_mouse.x, m_mouse.y, event->button());
         }
     } else if (validLevel && m_mouse.lButton && m_paintSprite) {
         paintSprite();

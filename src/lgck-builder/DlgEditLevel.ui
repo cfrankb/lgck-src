@@ -63,7 +63,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -554,6 +554,19 @@
      </property>
      <property name="wordWrap">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cNoLookUp">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>244</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>no lookup</string>
      </property>
     </widget>
    </widget>

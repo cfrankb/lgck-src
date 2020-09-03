@@ -146,6 +146,7 @@ void CDlgEditLevel::load(CLevel *s)
     m_ui->cWrapLeft->setChecked( wrap & CLevel::WRAP_LEFT );
     m_ui->cWrapRight->setChecked( wrap & CLevel::WRAP_RIGHT );
     m_ui->cOpenTop->setChecked( wrap & CLevel::OPENTOP );
+    m_ui->cNoLookUp->setChecked( wrap & CLevel::NO_LOOK_UP );
 
     int noGravity = strtol(level.getSetting("no_gravity"), nullptr, 10);
     m_ui->cNoGravity->setChecked( noGravity != 0 );
@@ -230,6 +231,10 @@ void CDlgEditLevel::save(CLevel *s)
 
     if (m_ui->cOpenTop->checkState() == Qt::Checked) {
         wrap += CLevel::OPENTOP;
+    }
+
+    if (m_ui->cNoLookUp->isChecked()) {
+        wrap += CLevel::NO_LOOK_UP;
     }
 
     level.setSetting("wrap", q2c(QString("%1").arg(wrap)));

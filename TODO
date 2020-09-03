@@ -24,10 +24,13 @@ levels
      [ ] honor `opentop` policy inside the code
 [ ] levelStack / levelcache
 [ ] levels
-	[ ] inherit player
-	[ ] continuity
-	[ ] reset hp
-	[ ] force def. sprite ???
+    [ ] inherit player
+    [ ] continuity
+    [ ] reset hp
+    [ ] force def. sprite ???
+    [x] disable lookup
+    [x] make lookup a level property (yes,no, auto)
+
 
 [ ] music repeat
 
@@ -37,7 +40,7 @@ levels
     - none  
 
 [ ] level wiz
-	[ ] setup global speed settings that override level settings (scripting)
+    [ ] setup global speed settings that override level settings (scripting)
 
 
 sprites
@@ -45,7 +48,7 @@ sprites
 
 [ ] death
   [x] waypoints
-  [ ] honor the state_dead flag
+  [x] honor the state_dead flag
   [x] lives bonus (as in extra life)
   [x] coin bonus
   [x] ammo bonus
@@ -73,8 +76,8 @@ player
 ------
 
 [ ] powerup chain
-	bonus1 => bonus2
-	playerobj1 => playerobj2
+    bonus1 => bonus2
+    playerobj1 => playerobj2
 
 [ ] player bullet
   [x] proto
@@ -82,25 +85,25 @@ player
   [x] damage to monsters or enemy bullets
   [ ] ammo left or unlimited
   [ ] powerlevel
-  [ ] automatically managed without scripting
-
-[ ] improved jump code
-[ ] jump grace period
-[ ] control fall?
-[ ] control jump/rebound
-[ ] flex: move left/right while jumping
-[ ] smoother jumps
+  [x] automatically managed without scripting
+  [ ] control fall?
+  
+[ ] jump
+    [ ] improved jump code
+    [ ] jump grace period
+    [ ] control jump/rebound
+    [ ] flex: move left/right while jumping
+    [ ] smoother jumps
 
 [ ] lives: start, max
-[ ] hp: start	max
+[ ] hp: start, max
 [ ] death: reset hp, reset level
     [ ] set by game
     [ ] set by level
     [ ] set by sprite
 [ ] selectPlayer
 [ ] water/oxygen 
-[ ] improved lookup;w/lookup delay
-[ ] make lookup a level property (yes,no, auto)
+[ ] improved lookup; w/lookup delay
 [ ] damage
 
 [ ] death
@@ -199,5 +202,5 @@ Fresh bugs
 [ ] BUG: when restoring to a way point, state of displays not restored
 [ ] BUG: when restoring to a way point, end of level trigger not firing (after being triggered)
 [ ] BUG: inventory not preserved when restoring from waypoint
-[ ] BUG: onleftClick/onRightClick doesn't work anymore
+[x] BUG: onleftClick/onRightClick doesn't work anymore
 

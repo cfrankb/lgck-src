@@ -105,6 +105,7 @@ Q_SIGNALS:
     void viewSizeChanged(int len, int hei);
     void newLevelReq();
     void keyChanged(int, int);
+    void triggerMouseEvent(int x, int y, Qt::MouseButtons buttons);
 
 public slots:
     void changeProtoFrame(int proto, int frameId);

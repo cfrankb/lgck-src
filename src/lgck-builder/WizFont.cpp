@@ -47,9 +47,9 @@ CWizFont::~CWizFont()
 void CWizFont::updateFont(const QString & fontName)
 {
     QImage image;
-    bool bold = false;//ui->cBold->isChecked();
-    bool grid = false;//ui->cGrid->isChecked();
-    bool white = true;//ui->cWhite->isChecked();
+    bool bold = false;
+    bool grid = false;
+    bool white = true;
     createBitmap(image, fontName, bold, grid, white);
     ui->sImage->setPixmap(QPixmap::fromImage(image));
 }

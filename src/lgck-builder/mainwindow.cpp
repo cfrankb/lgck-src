@@ -440,11 +440,13 @@ void MainWindow::focusInEvent ( QFocusEvent * event )
 
 MainWindow::~MainWindow()
 {
+    m_timer.stop();
+    m_timerIndicator.stop();
     delete ui;
     delete (CMusicSDL*) m_doc.music();
-    m_doc.attach((IMusic*)NULL);
+    m_doc.attach(static_cast<IMusic*>(nullptr));
     delete (CSndSDL*) m_doc.sound();
-    m_doc.attach((ISound*)NULL);
+    m_doc.attach(static_cast<ISound*>(nullptr));
     while (m_updater && m_updater->isRunning());
     if (m_updater) {
         delete m_updater;
