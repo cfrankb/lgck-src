@@ -44,6 +44,7 @@
 #include "interfaces/IGraphics.h"
 #include "Const.h"
 #include "fontmanager.h"
+#include "Countdown.h"
 
 #ifdef USE_QFILE
     #include <QMessageBox>
@@ -114,10 +115,9 @@ int playSound(lua_State *L)
 
 int ss_notifyClosure(lua_State *L)
 {
-    const char *fn = "ss_notifyClosure";
     int argc = lua_gettop(L);
     if ( argc != 0)  {
-        CGame::error(fn, 0);
+        CGame::error(__func__, 0);
     }
     CGame::getGame().callGameEvent(CGameEvents::EG_NOTIFYCLOSURE);
     CGame::getGame().callLvEvent(CLevel::EL_NOTIFYCLOSURE);
@@ -127,10 +127,9 @@ int ss_notifyClosure(lua_State *L)
 
 int ss_notifyAll(lua_State *L)
 {
-    const char *fn = "ss_notifyAll";
     int argc = lua_gettop(L);
     if ( argc != 3 && argc != 1)  {
-        CGame::error(fn, 3);
+        CGame::error(__func__, 3);
     }
     if (argc != 1) {
         int gameEventID = static_cast<int>(lua_tonumber(L, 1));
@@ -149,10 +148,9 @@ int ss_notifyAll(lua_State *L)
 
 int countGoals(lua_State *L)
 {
-    const char *fn = "countGoals";
     int argc = lua_gettop(L);
     if ( argc != 0)  {
-        CGame::error(fn, 0);
+        CGame::error(__func__, 0);
     }
     lua_pushnumber(L, CGame::getGame().scene().countGoals());
     return 1;
@@ -160,17 +158,16 @@ int countGoals(lua_State *L)
 
 int cancelEvent(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     return 0;
 }
 
 int callTrigger(lua_State *L)
 {
-    const char *fn = "callTrigger";
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error(fn, 1);
+        CGame::error(__func__, 1);
     } else {
         game.callTrigger( (int) lua_tonumber(L, 1) );
     }
@@ -183,7 +180,7 @@ int sprite_setTriggerKey(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 2)  {
-        CGame::error("sprite_setTriggerKey", 2);
+        CGame::error(__func__, 2);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -199,7 +196,7 @@ int sprite_freeze(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("sprite_freeze", 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene[ (int) lua_tonumber(L, 1) ];
@@ -214,7 +211,7 @@ int sprite_hide(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("sprite_hide", 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -226,11 +223,10 @@ int sprite_hide(lua_State *L)
 int sprite_show(lua_State *L)
 //# showSprite
 {
-    const char *fn = "sprite_show";
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error(fn, 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -242,11 +238,10 @@ int sprite_show(lua_State *L)
 int sprite_unFreeze(lua_State *L)
 //# unFreezeSprite
 {
-    const char *fn = "sprite_unFreeze";
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error(fn, 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -258,11 +253,10 @@ int sprite_unFreeze(lua_State *L)
 int sprite_activate(lua_State *L)
 //# activateSprite
 {
-    const char *fn = "sprite_activate";
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error(fn, 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -277,7 +271,7 @@ int sprite_markAsGoal(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("sprite_markAsGoal", 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -295,12 +289,10 @@ int getTickScale(lua_State *L)
 
 int setTickScale(lua_State *L)
 {
-    const char *fnName = "setTickScale";
     CGame & game = CGame::getGame();
-
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         game.var("TICK_SCALE") = (int) lua_tonumber(L, 1);
     }
@@ -309,12 +301,10 @@ int setTickScale(lua_State *L)
 
 int setSpeed(lua_State *L)
 {
-    const char *fnName = "setSpeed";
     CGame & game = CGame::getGame();
-
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         int rate = (int) lua_tonumber(L, 1);
         if (rate) {
@@ -362,7 +352,7 @@ int sprite_new(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if (argc < 4) {
-        CGame::error("sprite_new", 4);
+        CGame::error(__func__, 4);
         lua_pushnumber(L, 0);
     } else {
         CActor entry;
@@ -389,7 +379,7 @@ int sprite_getVars(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if (argc < 1) {
-        CGame::error("sprite_getVars", 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, 0);
     } else {
         CScene & scene = game.scene();
@@ -414,7 +404,7 @@ int testJoyState(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if (argc < 1) {
-        CGame::debug("-- warning: getJoyState(...) requires 1 args.");
+        CGame::debug("-- warning: testJoyState(...) requires 1 args.");
         lua_pushboolean(L, 0);
     } else {
         int mask = (int) lua_tonumber(L, 1);
@@ -467,7 +457,7 @@ int killPlayer(lua_State *)
     if (player.proto().m_nClass == CLASS_PLAYER_OBJECT) {
         game.killPlayer( player );
     } else {
-        CLuaVM::debugv("kill player against none player object.");
+        CLuaVM::debugv("killPlayer against none player object.");
     }
     return 0;
 }
@@ -478,7 +468,7 @@ int sprite_move(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if (argc < 2) {
-        CGame::error("sprite_move", 2);
+        CGame::error(__func__, 2);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -498,7 +488,7 @@ int sprite_tryAnimation(lua_State *L)
     int argc = lua_gettop(L);
 
     if (argc != 2) {
-        CGame::error("sprite_tryAnimation", 2);
+        CGame::error(__func__, 2);
         lua_pushboolean(L, false);
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -522,7 +512,7 @@ int sprite_moveTo(lua_State *L)
     int argc = lua_gettop(L);
 
     if (argc != 3 ) {
-        CGame::error("sprite_moveTo", 3);
+        CGame::error(__func__, 3);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -538,7 +528,7 @@ int sprite_moveBy(lua_State *L)
     int argc = lua_gettop(L);
 
     if (argc != 3 ) {
-        CGame::error("sprite_moveBy", 3);
+        CGame::error(__func__, 3);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -553,7 +543,7 @@ int sprite_canMove(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 2)  {
-        CGame::error("sprite_canMove", 2);
+        CGame::error(__func__, 2);
         lua_pushboolean(L, 0);
     } else {
         CScene & scene = game.scene();
@@ -569,7 +559,7 @@ int sprite_canFall(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("sprite_canFall", 1);
+        CGame::error(__func__, 1);
         lua_pushboolean(L, 0);
     } else {
         CScene & scene = game.scene();
@@ -581,18 +571,17 @@ int sprite_canFall(lua_State *L)
 
 int testAim(lua_State *L)
 {
-    Q_UNUSED(L);
+    UNUSED(L);
     return 0;
 }
 
 int sprite_map(lua_State *L)
 //# mapSprite
 {
-    const char *fn = "sprite_map";
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc < 1)  {
-        CGame::error(fn, 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         for ( int n = 1; n <= argc; ++ n ) {
@@ -605,11 +594,10 @@ int sprite_map(lua_State *L)
 int sprite_unMap(lua_State *L)
 //#unMapSprite
 {
-    const char *fn = "sprite_unMap";
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc < 1)  {
-        CGame::error(fn, 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         for ( int n=1; n <= argc; ++n ) {
@@ -637,7 +625,7 @@ int OR(lua_State *L)
 {
     int argc = lua_gettop(L);
     if ( argc != 2)  {
-        CGame::error("OR", 2);
+        CGame::error(__func__, 2);
         lua_pushnumber(L, 0);
     } else {
         int a = (int) lua_tonumber(L, 1);
@@ -651,7 +639,7 @@ int AND(lua_State *L)
 {
     int argc = lua_gettop(L);
     if ( argc != 2)  {
-        CGame::error("AND", 2);
+        CGame::error(__func__, 2);
         lua_pushnumber(L, 0);
     } else {
         int a = (int) lua_tonumber(L, 1);
@@ -667,7 +655,7 @@ int sprite_setAim(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 2)  {
-        CGame::error("sprite_setAim", 2);
+        CGame::error(__func__, 2);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -682,7 +670,7 @@ int sprite_isPlayerThere(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 2)  {
-        CGame::error("sprite_isPlayerThere", 2);
+        CGame::error(__func__, 2);
         lua_pushboolean(L, false);
     } else {
         CScene & scene = game.scene();
@@ -698,7 +686,7 @@ int sprite_attackPlayer(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("sprite_attackPlayer", 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & entry = scene [ (int) lua_tonumber(L, 1) ];
@@ -713,7 +701,7 @@ int sprite_isVisible(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("sprite_isVisible", 1);
+        CGame::error(__func__, 1);
         lua_pushboolean(L, false);
     } else {
         CScene & scene = game.scene();
@@ -729,7 +717,7 @@ int sprite_getTriggerKey(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("sprite_getTriggerKey", 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, 0);
     } else {
         CScene & scene = game.scene();
@@ -744,7 +732,7 @@ int addToScore(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("addToScore", 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, game.getScore());
     } else {
         game.addToScore( (int) lua_tonumber(L, 1) );
@@ -774,7 +762,7 @@ int setHP(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("setHP", 1);
+        CGame::error(__func__, 1);
     } else {
         CScene & scene = game.scene();
         CActor & player = scene [ game.svar("playerEntry") ];
@@ -788,7 +776,7 @@ int addToHP(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        CGame::error("addTotHP", 1);
+        CGame::error(__func__, 1);
     } else {
         game.addToHP( (int) lua_tonumber(L, 1) );
     }
@@ -805,7 +793,7 @@ int display_new(lua_State *L)
     CGame & game = CGame::getGame();
     int argc = lua_gettop(L);
     if (argc != 4) {
-        CGame::error("display_new", 4);
+        CGame::error(__func__, 4);
         lua_pushnumber(L, -1);
     } else {
         game.displays()->add(
@@ -823,10 +811,9 @@ int display_new(lua_State *L)
 int display_move(lua_State *L)
 //#displaySetXY
 {
-    const char *fnName = "display_move";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {       
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -834,7 +821,7 @@ int display_move(lua_State *L)
             display.setXY((int) lua_tonumber(L, 2), (int) lua_tonumber(L, 3));
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -844,11 +831,9 @@ int display_move(lua_State *L)
 int display_setType(lua_State *L)
 //# displaySetType
 {
-    const char *fnName = "display_setType";
-
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         IDisplayManager * manager = CGame::getGame().displays();
@@ -857,7 +842,7 @@ int display_setType(lua_State *L)
             display.setType((int) lua_tonumber(L, 2));
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -867,10 +852,9 @@ int display_setType(lua_State *L)
 int display_setColor(lua_State *L)
 //# displaySetColor
 {
-    const char *fnName = "display_setColor";
     int argc = lua_gettop(L);
     if (argc != 5) {
-        CGame::error(fnName, 5);
+        CGame::error(__func__, 5);
     } else {
         int id = (int) lua_tonumber(L, 1);
         IDisplayManager * manager = CGame::getGame().displays();
@@ -884,7 +868,7 @@ int display_setColor(lua_State *L)
             );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -894,10 +878,9 @@ int display_setColor(lua_State *L)
 int display_setExpireTime(lua_State *L)
 //# displaySetExpireTime
 {
-    const char *fnName = "display_setExpireTime";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         IDisplayManager * manager = CGame::getGame().displays();
@@ -906,7 +889,7 @@ int display_setExpireTime(lua_State *L)
             display.setExpireTime((int) lua_tonumber(L, 2) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -916,10 +899,9 @@ int display_setExpireTime(lua_State *L)
 int display_setFontSize(lua_State *L)
 //# displaySetFontSize
 {
-    const char *fnName = "display_setFontSize";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -927,7 +909,7 @@ int display_setFontSize(lua_State *L)
             display.setFontSize((int) lua_tonumber(L, 2) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -937,10 +919,9 @@ int display_setFontSize(lua_State *L)
 int display_setAlpha(lua_State *L)
 //# displaySetAlpha
 {
-    const char *fnName = "display_setAlpha";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -948,7 +929,7 @@ int display_setAlpha(lua_State *L)
             display.setAlpha((int) lua_tonumber(L, 2) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -958,10 +939,9 @@ int display_setAlpha(lua_State *L)
 int display_setVisible(lua_State *L)
 //# displaySetVisible
 {
-    const char *fnName = "display_setVisible";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -969,7 +949,7 @@ int display_setVisible(lua_State *L)
             display.setVisible(lua_toboolean(L, 2) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -979,10 +959,9 @@ int display_setVisible(lua_State *L)
 int display_setText(lua_State *L)
 //# displaySetText
 {
-    const char *fnName = "display_setText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -990,7 +969,7 @@ int display_setText(lua_State *L)
             display.setText(lua_tostring(L, 2) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -1000,10 +979,9 @@ int display_setText(lua_State *L)
 int display_setImage(lua_State *L)
 //# displaySetImage
 {
-    const char *fnName = "display_setImage";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {
         char tmp[1024];
         int id = (int) lua_tonumber(L, 1);
@@ -1018,11 +996,11 @@ int display_setImage(lua_State *L)
             if (imageId != CGame::INVALID) {
                 display.setImage(imageId, lua_tonumber(L, 3));
             } else {
-                sprintf(tmp, "-- frameSet value is not valid for ``%s``", fnName);
+                sprintf(tmp, "-- frameSet value is not valid for ``%s``", __func__);
                 CGame::debug(tmp);
             }
         } else {
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -1032,10 +1010,9 @@ int display_setImage(lua_State *L)
 int display_setShadowOffset(lua_State *L)
 //#displaySetShadowOffset
 {
-    const char *fnName = "display_setShadowOffset";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -1043,7 +1020,7 @@ int display_setShadowOffset(lua_State *L)
             display.setShadowOffset(lua_tonumber(L, 2), lua_tonumber(L, 3) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -1053,11 +1030,10 @@ int display_setShadowOffset(lua_State *L)
 int display_setShadowColor(lua_State *L)
 //# displaySetShadowColor
 {
-    const char *fnName = "display_setShadowColor";
     // r g b a
     int argc = lua_gettop(L);
     if (argc != 5) {
-        CGame::error(fnName, 5);
+        CGame::error(__func__, 5);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -1065,7 +1041,7 @@ int display_setShadowColor(lua_State *L)
             display.setShadowColor(lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4), lua_tonumber(L, 5) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -1075,10 +1051,9 @@ int display_setShadowColor(lua_State *L)
 int display_enableShadows(lua_State *L)
 //# displayEnableShadows
 {
-    const char *fnName = "display_enableShadows";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
@@ -1086,7 +1061,7 @@ int display_enableShadows(lua_State *L)
             display.enableShadow( lua_toboolean(L, 2) );
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -1095,10 +1070,9 @@ int display_enableShadows(lua_State *L)
 
 int findDisplay(lua_State *L)
 {
-    const char *fnName = "findDisplay";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
     } else {
         const char* name = lua_tostring(L, 1);
@@ -1109,10 +1083,9 @@ int findDisplay(lua_State *L)
 
 int setEndLevel(lua_State *L)
 {
-    const char *fnName = "setEndLevel";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         lua_pushnumber(L, -1);
     } else {
         CGame::getGame().setEndLevel( true );
@@ -1142,10 +1115,9 @@ int getWrapFlag(lua_State *L)
 
 int setWrapFlag(lua_State *L)
 {
-    const char *fnName = "setWrapFlag";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         CGame::getGame().var("wrapFlags") = (int) lua_tonumber(L, 1);
     }
@@ -1155,10 +1127,9 @@ int setWrapFlag(lua_State *L)
 int layer_new(lua_State *L)
 //# addLayerC
 {
-    const char *fnName = "layer_new";
     int argc = lua_gettop(L);
     if (argc < 2 || argc > 4) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         const char * name =  lua_tostring(L, 1);
         int type = lua_tonumber(L, 2);
@@ -1185,10 +1156,9 @@ int layer_new(lua_State *L)
 int findLayer(lua_State *L)
 //#getLayerC
 {
-    const char *fnName = "findLayer";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         const char * name =  lua_tostring(L, 1);
         CLevel * layers = CGame::getGame().layers();
@@ -1199,7 +1169,7 @@ int findLayer(lua_State *L)
             }
         }
         char tmp[2048];
-        sprintf(tmp, "%s(...) - can't find fn `%s`", fnName, name);
+        sprintf(tmp, "%s(...) - can't find fn `%s`", __func__, name);
         CGame::debug(tmp);
     }
     lua_pushnumber(L, -1);
@@ -1209,17 +1179,16 @@ int findLayer(lua_State *L)
 int element_new(lua_State *L)
 //#addElement
 {
-    const char *fnName = "element_new";
     int argc = lua_gettop(L);
     if (argc < 5 || argc > 6) {
         lua_pushnumber(L, -1);
-        CGame::error(fnName, 5);
+        CGame::error(__func__, 5);
     } else {
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
             CGame::debug(tmp);
             lua_pushnumber(L, -1);
         } else {
@@ -1241,17 +1210,16 @@ int element_new(lua_State *L)
 
 int layer_clear(lua_State *L)
 {
-    const char *fnName = "layer_clear";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushboolean(L, false);
     } else {
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
             CGame::debug(tmp);
             lua_pushboolean(L, false);
         } else {
@@ -1264,17 +1232,16 @@ int layer_clear(lua_State *L)
 
 int layer_getSize(lua_State *L)
 {
-    const char *fnName = "layer_getSize";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
             CGame::debug(tmp);
             lua_pushnumber(L, -1);
         } else {
@@ -1287,17 +1254,16 @@ int layer_getSize(lua_State *L)
 
 int layer_getElement(lua_State *L)
 {
-    const char *fnName = "layer_getElement";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
           //  lua_pushnumber(L, -1);
             return 0;
@@ -1306,7 +1272,7 @@ int layer_getElement(lua_State *L)
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
                 char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", fnName, id);
+                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
                 CGame::debug(tmp);
                 //  lua_pushnumber(L, -1);
                 return 0;
@@ -1325,10 +1291,9 @@ int layer_getElement(lua_State *L)
 
 int element_setImage(lua_State *L)
 {
-    const char *fnName = "element_setImage";
     int argc = lua_gettop(L);
     if (argc != 4) {
-        CGame::error(fnName, 4);
+        CGame::error(__func__, 4);
         lua_pushboolean(L, false);
         return 1;
     } else {
@@ -1336,7 +1301,7 @@ int element_setImage(lua_State *L)
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
             lua_pushboolean(L, false);
             return 1;
@@ -1345,7 +1310,7 @@ int element_setImage(lua_State *L)
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
                 char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", fnName, id);
+                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
                 CGame::debug(tmp);
                 lua_pushboolean(L, false);
                 return 1;
@@ -1362,10 +1327,9 @@ int element_setImage(lua_State *L)
 
 int element_setVisible(lua_State *L)
 {
-    const char *fnName = "element_setVisible";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
         lua_pushboolean(L, false);
         return 1;
     } else {
@@ -1373,7 +1337,7 @@ int element_setVisible(lua_State *L)
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
             lua_pushboolean(L, false);
             return 1;
@@ -1382,7 +1346,7 @@ int element_setVisible(lua_State *L)
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
                 char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", fnName, id);
+                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
                 CGame::debug(tmp);
                 lua_pushboolean(L, false);
                 return 1;
@@ -1403,10 +1367,9 @@ int element_setVisible(lua_State *L)
 
 int element_moveTo(lua_State *L)
 {
-    const char *fnName = "element_moveTo";
     int argc = lua_gettop(L);
     if (argc != 4) {
-        CGame::error(fnName, 4);
+        CGame::error(__func__, 4);
         lua_pushboolean(L, false);
         return 1;
     } else {
@@ -1414,7 +1377,7 @@ int element_moveTo(lua_State *L)
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
             lua_pushboolean(L, false);
             return 1;
@@ -1423,7 +1386,7 @@ int element_moveTo(lua_State *L)
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
                 char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", fnName, id);
+                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
                 CGame::debug(tmp);
                 lua_pushboolean(L, false);
                 return 1;
@@ -1440,10 +1403,9 @@ int element_moveTo(lua_State *L)
 
 int element_move(lua_State *L)
 {
-    const char *fnName = "element_move";
     int argc = lua_gettop(L);
     if (argc != 4) {
-        CGame::error(fnName, 4);
+        CGame::error(__func__, 4);
         lua_pushboolean(L, false);
         return 1;
     } else {
@@ -1451,7 +1413,7 @@ int element_move(lua_State *L)
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
             lua_pushboolean(L, false);
             return 1;
@@ -1460,7 +1422,7 @@ int element_move(lua_State *L)
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
                 char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", fnName, id);
+                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
                 CGame::debug(tmp);
                 lua_pushboolean(L, false);
                 return 1;
@@ -1486,7 +1448,7 @@ int element_move(lua_State *L)
 
                 default:
                     char tmp[2048];
-                    sprintf(tmp, "%s(...) - aim value `%d` is invalid", fnName, aim);
+                    sprintf(tmp, "%s(...) - aim value `%d` is invalid", __func__, aim);
                     CGame::debug(tmp);
                     lua_pushboolean(L, false);
                     return 1;
@@ -1502,10 +1464,9 @@ int element_move(lua_State *L)
 
 int element_moveBy(lua_State *L)
 {
-    const char *fnName = "element_moveBy";
     int argc = lua_gettop(L);
     if (argc != 4) {
-        CGame::error(fnName, 4);
+        CGame::error(__func__, 4);
         lua_pushboolean(L, false);
         return 1;
     } else {
@@ -1513,7 +1474,7 @@ int element_moveBy(lua_State *L)
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
             lua_pushboolean(L, false);
             return 1;
@@ -1522,7 +1483,7 @@ int element_moveBy(lua_State *L)
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
                 char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", fnName, id);
+                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
                 CGame::debug(tmp);
                 lua_pushboolean(L, false);
                 return 1;
@@ -1539,10 +1500,9 @@ int element_moveBy(lua_State *L)
 
 int setLevelGoal(lua_State *L)
 {
-    const char *fnName = "setLevelGoal";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         int levelGoal =  lua_tonumber(L, 1);
         CGame::getGame().setLevelGoal(levelGoal);
@@ -1591,10 +1551,9 @@ int getBkColor(lua_State *L)
 int setBkColor(lua_State *L)
 //#setBkColorC
 {
-    const char *fnName = "setBkColor";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {
         CGame & game = CGame::getGame();
         int red =  ((int)lua_tonumber(L, 1)) & 0xff;
@@ -1609,10 +1568,9 @@ int setBkColor(lua_State *L)
 int sprite_copy(lua_State *L)
 //#copySpriteC
 {
-    const char *fnName = "sprite_copy";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
         return 1;
     } else {
@@ -1629,10 +1587,9 @@ int sprite_copy(lua_State *L)
 
 int findSprite(lua_State *L)
 {
-    const char *fnName = "findSprite";
     int argc = lua_gettop(L);
     if (argc < 1 && argc > 2) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
         return 1;
     } else {
@@ -1646,7 +1603,7 @@ int findSprite(lua_State *L)
 
         if (origin < 0) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - origin `%d` is out of bound", fnName, origin);
+            sprintf(tmp, "%s(...) - origin `%d` is out of bound", __func__, origin);
             CGame::debug(tmp);
         }
 
@@ -1669,10 +1626,9 @@ int findSprite(lua_State *L)
 int sprite_setState(lua_State *L)
 //#setState
 {
-    const char *fnName = "sprite_setState";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -1689,10 +1645,9 @@ int sprite_setState(lua_State *L)
 
 int getImage(lua_State *L)
 {
-    const char *fnName = "getImage";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
         return 1;
     } else {
@@ -1709,10 +1664,9 @@ int getImage(lua_State *L)
 int sprite_setImage(lua_State *L)
 //#setImage
 {
-    const char *fnName = "sprite_setImage";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
         lua_pushnumber(L, -1);
         return 0;
     } else {
@@ -1734,10 +1688,9 @@ int getLookUp(lua_State *L)
 
 int setLookUp(lua_State *L)
 {
-    const char *fnName = "setLookUp";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {
         CGame & game = CGame::getGame();
         bool lookup = lua_toboolean(L, 1);
@@ -1755,17 +1708,16 @@ int clearDisplay(lua_State *)
 int display_remove(lua_State *L)
 //#removeDisplayById
 {
-    const char *fnName = "display_remove";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
             CGame::getGame().displays()->removeAt( id );
         } else {
             char tmp[2048];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -1780,10 +1732,9 @@ int pause(lua_State *)
 
 int addToInventory(lua_State * L)
 {
-    const char *fnName = "addToInventory";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         int protoId = (int) lua_tonumber(L, 1);
         char tmp[2048];
@@ -1801,10 +1752,9 @@ int addToInventory(lua_State * L)
 
 int sprite_addItem(lua_State * L)
 {
-    const char *fnName = "sprite_addItem";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {
         CGame & game = CGame::getGame();
         int objId = (int) lua_tonumber(L, 1);
@@ -1828,10 +1778,9 @@ int sprite_addItem(lua_State * L)
 
 int hasItem( lua_State * L)
 {
-    const char *fnName = "hasItem";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushboolean(L, false);
     } else {
         int protoId = (int) lua_tonumber(L, 1);
@@ -1843,10 +1792,9 @@ int hasItem( lua_State * L)
 
 int sprite_hasItem( lua_State * L)
 {
-    const char *fnName = "sprite_hasItem";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         lua_pushboolean(L, false);
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -1861,10 +1809,9 @@ int sprite_hasItem( lua_State * L)
 
 int resetInventory(lua_State * L)
 {
-    const char *fnName = "resetInventory";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         lua_pushboolean(L, false);
     } else {
         CInventory *inventory = CGame::getGame().getInventory();
@@ -1877,10 +1824,9 @@ int resetInventory(lua_State * L)
 
 int sprite_resetInventory(lua_State * L)
 {
-    const char *fnName = "sprite_resetInventory";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushboolean(L, false);
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -1896,10 +1842,9 @@ int sprite_resetInventory(lua_State * L)
 
 int removeFromInventory(lua_State * L)
 {
-    const char *fnName = "removeFromInventory";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         int protoId = (int) lua_tonumber(L, 1);
         CInventory *inventory = CGame::getGame().getInventory();
@@ -1912,10 +1857,9 @@ int removeFromInventory(lua_State * L)
 
 int sprite_removeItem(lua_State * L)
 {
-    const char *fnName = "sprite_removeItem";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int objId = (int) lua_tonumber(L, 1);
         CScene & scene = CGame::getGame().scene();
@@ -1938,13 +1882,12 @@ int getSkill(lua_State * L)
 int sprite_getHitTest(lua_State * L)
 //#getHitTestC
 {
-    const char *fnName = "sprite_getHitTest";
     // IN:  int objId
     //      aim
     // OUT: bk, fw, ac, flags, player
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -1993,10 +1936,9 @@ int sprite_getHitTest(lua_State * L)
 
 int getVersion(lua_State * L)
 {
-    const char *fnName = "getVersion";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         lua_pushnumber( L, -1 );
     } else {
 
@@ -2007,10 +1949,9 @@ int getVersion(lua_State * L)
 
 int alert(lua_State * L)
 {
-    const char *fnName = "alert";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
 #ifdef USE_QFILE
         QMessageBox::warning(nullptr, QString(""),
@@ -2024,10 +1965,9 @@ int alert(lua_State * L)
 int sprite_changeTo(lua_State * L)
 //#changeTo
 {
-    const char *fnName = "sprite_changeTo";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         CGame & game = CGame::getGame();
         int id = (int) lua_tonumber(L, 1);
@@ -2041,10 +1981,9 @@ int sprite_changeTo(lua_State * L)
 int sprite_getExtra(lua_State *L)
 //#getExtraC
 {
-    const char *fnName = "sprite_getExtra";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2071,10 +2010,9 @@ int sprite_getExtra(lua_State *L)
 int proto_get(lua_State *L)
 //#getProtoC
 {
-    const char *fnName = "proto_get";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2151,10 +2089,9 @@ int proto_get(lua_State *L)
 int sprite_getUID(lua_State *L)
 //#getExtraUID
 {
-    const char *fnName = "sprite_getUID";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
         return 1;
     } else {
@@ -2170,10 +2107,9 @@ int sprite_getUID(lua_State *L)
 int getPlayerID(lua_State *L)
 //#getPlayerC
 {
-    const char *fnName = "getPlayerID";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         lua_pushnumber(L, -1);
         return 0;
     } else {
@@ -2185,10 +2121,9 @@ int getPlayerID(lua_State *L)
 int sprite_isHidden(lua_State *L)
 //#isHidden
 {
-    const char *fnName = "sprite_isHidden";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2202,10 +2137,9 @@ int sprite_isHidden(lua_State *L)
 int sprite_isDead(lua_State *L)
 //#isDead
 {
-    const char *fnName = "sprite_isDead";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2218,10 +2152,9 @@ int sprite_isDead(lua_State *L)
 int sprite_land(lua_State *L)
 //#land
 {
-    const char *fnName = "sprite_land";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2234,10 +2167,9 @@ int sprite_land(lua_State *L)
 int sprite_triggerHitState(lua_State *L)
 //#triggerHitState
 {
-    const char *fnName = "sprite_triggerHitState";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2250,10 +2182,9 @@ int sprite_triggerHitState(lua_State *L)
 int sprite_tryPath(lua_State *L)
 //#tryPath
 {
-    const char *fnName = "sprite_tryPath";
     int argc = lua_gettop(L);
     if (argc < 2 || argc > 3) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2275,10 +2206,9 @@ int sprite_tryPath(lua_State *L)
 int sprite_stopAnimation(lua_State *L)
 //#stopAnimation
 {
-    const char *fnName = "sprite_stopAnimation";
     int argc = lua_gettop(L);
     if (argc !=1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2291,10 +2221,9 @@ int sprite_stopAnimation(lua_State *L)
 int sprite_isMonster(lua_State *L)
 //#isMonster
 {
-    const char *fnName = "sprite_isMonster";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2308,10 +2237,9 @@ int sprite_isMonster(lua_State *L)
 int sprite_kill(lua_State *L)
 //#killSprite
 {
-    const char *fnName = "sprite_kill";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2324,10 +2252,9 @@ int sprite_kill(lua_State *L)
 int sprite_spawn(lua_State *L)
 //#spawn
 {
-    const char *fnName = "sprite_spawn";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2340,10 +2267,9 @@ int sprite_spawn(lua_State *L)
 int sprite_callEvent(lua_State *L)
 //#callObjEvent
 {
-    const char *fnName = "sprite_callEvent";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2356,21 +2282,19 @@ int sprite_callEvent(lua_State *L)
 
 int triggerPlayerHitState(lua_State *L)
 {
-    const char *fnName = "triggerPlayerHitState";
     CGame::getGame().triggerPlayerHitState();
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
     }
     return 0;
 }
 
 int openStream(lua_State *L)
 {
-    const char *fnName = "openStream";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushboolean(L, false);
     } else {
         CGame & game = CGame::getGame();
@@ -2381,10 +2305,9 @@ int openStream(lua_State *L)
 
 int playStream(lua_State *L)
 {
-    const char *fnName = "playStream";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
     } else {
         CGame::getGame().music()->play();
     }
@@ -2393,10 +2316,9 @@ int playStream(lua_State *L)
 
 int stopStream(lua_State *L)
 {
-    const char *fnName = "stopStream";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
     } else {
         CGame::getGame().music()->stop();
     }
@@ -2406,10 +2328,9 @@ int stopStream(lua_State *L)
 int sprite_clear(lua_State *L)
 //#clearSprite
 {
-    const char *fnName = "sprite_clear";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2426,10 +2347,9 @@ int sprite_clear(lua_State *L)
 
 int getImageSize(lua_State *L)
 {
-    const char *fnName = "getImageSize";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2444,10 +2364,9 @@ int getImageSize(lua_State *L)
 
 int MIN(lua_State *L)
 {
-    const char *fnName = "MIN";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int a = (int) lua_tonumber(L, 1);
@@ -2459,10 +2378,9 @@ int MIN(lua_State *L)
 
 int MAX(lua_State *L)
 {
-    const char *fnName = "MAX";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int a = (int) lua_tonumber(L, 1);
@@ -2474,10 +2392,9 @@ int MAX(lua_State *L)
 
 int testKey(lua_State *L)
 {
-    const char *fnName = "testKey";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2493,10 +2410,9 @@ int testKey(lua_State *L)
 
 int getLastKey(lua_State *L)
 {
-    const char *fnName = "getLastKey";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2511,10 +2427,9 @@ int setKey(lua_State *L)
     // IN: value
     // OUT: void
 
-    const char *fnName = "setKey";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2533,10 +2448,9 @@ int clearKeys(lua_State *L)
     // IN: void
     // OUT: void
 
-    const char *fnName = "clearKeys";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -2567,7 +2481,7 @@ int getClosure(lua_State *L)
 
 int ss_manageTasks(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame & game = CGame::getGame();
     game.manageTasks();
     return 0;
@@ -2575,7 +2489,7 @@ int ss_manageTasks(lua_State *L)
 
 int ss_manageKeyEvents(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     lua_pushnumber(L, CGame::getGame().manageKeyEvents());
     return 1;
 }
@@ -2596,10 +2510,9 @@ int ss_getPause(lua_State *L)
 
 int ss_setNextTick(lua_State *L)
 {
-    const char *fnName = "ss_setNextTick";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         CGame & game = CGame::getGame();
         game.counter("nextTick") = (int) lua_tonumber(L, 1);
@@ -2609,52 +2522,51 @@ int ss_setNextTick(lua_State *L)
 
 int ss_animate(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame::getGame().scene().animate();
     return 0;
 }
 
 int ss_doManage(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame::getGame().scene().doManage();
     return 0;
 }
 
 int ss_managePlayer(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame::getGame().managePlayer();
     return 0;
 }
 
 int ss_manageAuto(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame::getGame().scene().manageAuto();
     return 0;
 }
 
 int ss_pollDevice(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     //CGame::getGame().pollDevice();
     return 0;
 }
 
 int ss_clearKeys(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame::getGame().clearKeys();
     return 0;
 }
 
 int setClosure(lua_State *L)
 {
-    const char *fnName = "setClosure";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         CGame & game = CGame::getGame();
         game.setClosure( (int) lua_tonumber(L, 1));
@@ -2692,10 +2604,9 @@ int getTimeLeft(lua_State *L)
 
 int setNextSecond(lua_State *L)
 {
-    const char *fnName = "setNextSecond";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         CGame & game = CGame::getGame();
         game.setNextSecond( (int) lua_tonumber(L, 1));
@@ -2705,7 +2616,7 @@ int setNextSecond(lua_State *L)
 
 int decTimeLeft(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame & game = CGame::getGame();
     game.decTimeLeft();
     return 0;
@@ -2713,7 +2624,7 @@ int decTimeLeft(lua_State *L)
 
 int nextTick(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame & game = CGame::getGame();
     game.nextTick();
     return 0;
@@ -2721,7 +2632,7 @@ int nextTick(lua_State *L)
 
 int updateHP(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame & game = CGame::getGame();
     game.updateHP();
     return 0;
@@ -2730,10 +2641,9 @@ int updateHP(lua_State *L)
 int callLvEvent(lua_State *L)
 //# callLevelEvent
 {
-    const char *fnName = "callLvEvent";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
     } else {
         CGame & game = CGame::getGame();
         game.callLvEvent( (int) lua_tonumber(L, 1));
@@ -2744,10 +2654,9 @@ int callLvEvent(lua_State *L)
 int sprite_getHeight(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_getHeight";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2761,10 +2670,9 @@ int sprite_getHeight(lua_State *L)
 int sprite_getWidth(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_getWidth";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2778,10 +2686,9 @@ int sprite_getWidth(lua_State *L)
 int sprite_isActive(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_isActive";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2793,7 +2700,7 @@ int sprite_isActive(lua_State *L)
 
 int ss_autoCenter(lua_State *L)
 {
-    Q_UNUSED(L);
+    UNUSED(L);
     CGame & game = CGame::getGame();
     CActor & player = game.getPlayer();
     player.autoCenter();
@@ -2803,10 +2710,9 @@ int ss_autoCenter(lua_State *L)
 int sprite_childCount(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_childCount";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2819,10 +2725,9 @@ int sprite_childCount(lua_State *L)
 int sprite_setOwner(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_setOwner";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2836,10 +2741,9 @@ int sprite_setOwner(lua_State *L)
 int sprite_getString(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_getString";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2854,10 +2758,9 @@ int sprite_getString(lua_State *L)
 int sprite_getHP(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_getHP";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2870,10 +2773,9 @@ int sprite_getHP(lua_State *L)
 int sprite_setHP(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_setHP";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2886,10 +2788,9 @@ int sprite_setHP(lua_State *L)
 int sprite_isFrozen(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_isFrozen";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2902,10 +2803,9 @@ int sprite_isFrozen(lua_State *L)
 int sprite_isGoal(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_isGoal";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2918,10 +2818,9 @@ int sprite_isGoal(lua_State *L)
 int sprite_frameCount(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_frameCount";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int objId = (int) lua_tonumber(L, 1);
@@ -2935,10 +2834,9 @@ int sprite_frameCount(lua_State *L)
 int frameSet_getSize(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "frameSet_getSize";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int frameSet = (int) lua_tonumber(L, 1);
@@ -2952,10 +2850,9 @@ int counter_get(lua_State *L)
 //#counters_get
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "counter_get";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         const char *s = (const char*) lua_tostring(L, 1);
@@ -2969,10 +2866,9 @@ int counter_set(lua_State *L)
 //#counters_set
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "counter_set";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         const char *s = (const char*) lua_tostring(L, 1);
@@ -2985,10 +2881,9 @@ int counter_inc(lua_State *L)
 //#counters_inc
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "counter_inc";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         const char *s = (const char*) lua_tostring(L, 1);
@@ -3002,10 +2897,9 @@ int counter_add(lua_State *L)
 //#counters_add
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "counter_add";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         const char *s = (const char*) lua_tostring(L, 1);
@@ -3022,10 +2916,9 @@ int counter_dec(lua_State *L)
 //#counters_dec
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "counter_dec";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         const char *s = (const char*) lua_tostring(L, 1);
@@ -3040,10 +2933,9 @@ int counter_dec(lua_State *L)
 int ss_paint(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "ss_paint";
     int argc = lua_gettop(L);
     if (argc != 5 && argc != 6) {
-        CGame::error(fnName, 5);
+        CGame::error(__func__, 5);
         return 0;
     } else {
         bool fill = true;
@@ -3063,10 +2955,9 @@ int ss_paint(lua_State *L)
 int ss_paintImage(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "ss_paintImage";
     int argc = lua_gettop(L);
     if (argc != 4) {
-        CGame::error(fnName, 4);
+        CGame::error(__func__, 4);
         return 0;
     } else {
         int x1 = lua_tointeger(L,1);
@@ -3081,10 +2972,9 @@ int ss_paintImage(lua_State *L)
 int display_sizeText(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "display_sizeText";
     int argc = lua_gettop(L);
     if (argc != 1 && argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int id = lua_tointeger(L,1);
@@ -3103,10 +2993,9 @@ int display_sizeText(lua_State *L)
 int getScreenSize(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "getScreenSize";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     } else {
         int len;
@@ -3121,10 +3010,9 @@ int getScreenSize(lua_State *L)
 int ss_drawText(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "ss_drawText";
     int argc = lua_gettop(L);
     if (argc != 6 && argc != 7 && argc != 8) {
-        CGame::error(fnName, 6);
+        CGame::error(__func__, 6);
         return 0;
     } else {
         int x = lua_tointeger(L,1);
@@ -3146,10 +3034,9 @@ int ss_drawText(lua_State *L)
 
 int setBorderColor(lua_State *L)
 {
-    const char *fnName = "setBorderColor";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {
         CGame & game = CGame::getGame();
         int red =  ((int)lua_tonumber(L, 1)) & 0xff;
@@ -3164,10 +3051,9 @@ int setBorderColor(lua_State *L)
 int ss_clear(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "ss_clear";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
         return 0;
     } else {
         int red =  ((int)lua_tonumber(L, 1)) & 0xff;
@@ -3180,7 +3066,7 @@ int ss_clear(lua_State *L)
 
 int updateJoyState(lua_State *L)
 {
-    Q_UNUSED( L );
+    UNUSED( L );
     CGame & game = CGame::getGame();
     game.updateJoyState();
     return 0;
@@ -3189,10 +3075,9 @@ int updateJoyState(lua_State *L)
 int sprite_set(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_set";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
         return 0;
     } else {
         int id = (int) lua_tonumber(L, 1);
@@ -3213,10 +3098,9 @@ int sprite_set(lua_State *L)
 int sprite_get(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_get";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int id = (int) lua_tonumber(L, 1);
@@ -3264,10 +3148,9 @@ int callGameEvent(lua_State *L)
 int var_get(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "var_get";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         const char *s = static_cast<const char*>(lua_tostring(L, 1));
@@ -3280,10 +3163,9 @@ int var_get(lua_State *L)
 int var_del(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "var_del";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         const char *s = static_cast<const char*>(lua_tostring(L, 1));
@@ -3295,10 +3177,9 @@ int var_del(lua_State *L)
 int var_set(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "var_set";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         const char *s = static_cast<const char*>(lua_tostring(L, 1));
@@ -3309,10 +3190,9 @@ int var_set(lua_State *L)
 
 int sprite_isPlayer(lua_State *L)
 {
-    const char *fnName = "sprite_isPlayer";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3326,10 +3206,9 @@ int sprite_isPlayer(lua_State *L)
 int display_count(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "display_count";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     }
     lua_pushnumber(L, game.displays()->getSize());
@@ -3339,10 +3218,9 @@ int display_count(lua_State *L)
 int sprite_togglePathPlayback(lua_State *L)
 {
     CGame & game = CGame::getGame();
-    const char *fnName = "sprite_togglePathPlayback";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         int objId = static_cast<int>(lua_tonumber(L, 1));
@@ -3355,10 +3233,9 @@ int sprite_togglePathPlayback(lua_State *L)
 
 int warpTo(lua_State *L)
 {
-    const char *fnName = "warpTo";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3383,10 +3260,9 @@ int warpTo(lua_State *L)
 
 int saveGame(lua_State *L)
 {
-    const char *fnName = "saveGame";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3409,10 +3285,9 @@ int saveGame(lua_State *L)
 
 int loadGame(lua_State *L)
 {
-    const char *fnName = "loadGame";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3435,10 +3310,9 @@ int loadGame(lua_State *L)
 
 int strv_set(lua_State *L)
 {
-    const char *fnName = "strv_set";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3451,10 +3325,9 @@ int strv_set(lua_State *L)
 
 int strv_get(lua_State *L)
 {
-    const char *fnName = "strv_get";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3466,10 +3339,9 @@ int strv_get(lua_State *L)
 
 int strv_del(lua_State *L)
 {
-    const char *fnName = "strv_del";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3481,10 +3353,9 @@ int strv_del(lua_State *L)
 
 int snapshot_take(lua_State *L)
 {
-    const char *fnName = "snapshot_take";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3495,10 +3366,9 @@ int snapshot_take(lua_State *L)
 
 int snapshot_reload(lua_State *L)
 {
-    const char *fnName = "snapshot_reload";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3510,10 +3380,9 @@ int snapshot_reload(lua_State *L)
 
 int snapshot_clear(lua_State *L)
 {
-    const char *fnName = "snapshot_clear";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3525,10 +3394,9 @@ int snapshot_clear(lua_State *L)
 
 int remap(lua_State *L)
 {
-    const char *fnName = "remap";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3539,17 +3407,16 @@ int remap(lua_State *L)
 
 int layer_getOffsetX(lua_State *L)
 {
-    const char *fnName = "layer_getOffsetX";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
             CGame::debug(tmp);
             lua_pushnumber(L, -1);
         } else {
@@ -3563,17 +3430,16 @@ int layer_getOffsetX(lua_State *L)
 
 int layer_getOffsetY(lua_State *L)
 {
-    const char *fnName = "layer_getOffsetY";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
             CGame::debug(tmp);
             lua_pushnumber(L, -1);
         } else {
@@ -3587,17 +3453,16 @@ int layer_getOffsetY(lua_State *L)
 
 int layer_setOffsetX(lua_State *L)
 {
-    const char *fnName = "layer_setOffsetX";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
             CGame::debug(tmp);
         } else {
             int mx, my;
@@ -3610,17 +3475,16 @@ int layer_setOffsetX(lua_State *L)
 
 int layer_setOffsetY(lua_State *L)
 {
-    const char *fnName = "layer_setOffsetY";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
     } else {
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, id);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
             CGame::debug(tmp);
         } else {
             int mx, my;
@@ -3634,10 +3498,9 @@ int layer_setOffsetY(lua_State *L)
 
 int SHR(lua_State *L)
 {
-    const char *fnName = "SHR";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         lua_pushnumber(L, -1);
         return 0;
     } else {
@@ -3651,10 +3514,9 @@ int SHR(lua_State *L)
 
 int SHL(lua_State *L)
 {
-    const char *fnName = "SHL";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
         lua_pushnumber(L, -1);
         return 0;
     } else {
@@ -3667,10 +3529,9 @@ int SHL(lua_State *L)
 
 int uuid(lua_State *L)
 {
-    const char *fnName = "uuid";
     int argc = lua_gettop(L);
     if (argc != 0) {
-        CGame::error(fnName, 0);
+        CGame::error(__func__, 0);
         lua_pushnumber(L, -1);
         return 0;
     } else {
@@ -3683,17 +3544,16 @@ int uuid(lua_State *L)
 
 int layer_setSpeed(lua_State *L)
 {
-    const char *fnName = "layer_setSpeed";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
         return 0;
     } else {
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
             return 0;
         } else {
@@ -3708,17 +3568,16 @@ int layer_setSpeed(lua_State *L)
 
 int layer_delete(lua_State *L)
 {
-    const char *fnName = "layer_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
             char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", fnName, layerId);
+            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
             CGame::debug(tmp);
             return 0;
         } else {
@@ -3730,10 +3589,9 @@ int layer_delete(lua_State *L)
 
 int display_setFlagXY(lua_State *L)
 {
-    const char *fnName = "display_setFlagXY";
     int argc = lua_gettop(L);
     if (argc != 3) {
-        CGame::error(fnName, 3);
+        CGame::error(__func__, 3);
     } else {
         int id = (int) lua_tonumber(L, 1);
         IDisplayManager * manager = CGame::getGame().displays();
@@ -3742,7 +3600,7 @@ int display_setFlagXY(lua_State *L)
             display.setFlagXY((int) lua_tonumber(L, 2), (int) lua_tonumber(L, 3));
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -3751,10 +3609,9 @@ int display_setFlagXY(lua_State *L)
 
 int display_setFont(lua_State *L)
 {
-    const char *fnName = "display_setFont";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         char tmp[1024];
         int id = -1;
@@ -3763,7 +3620,7 @@ int display_setFont(lua_State *L)
         } else if (lua_isstring(L, 1)) {
             id = CGame::getGame().getFonts()->indexOf((const char*) lua_tostring(L, 1));
         } else {
-            sprintf(tmp, "-- displayId invalid arg type for ``%s``", fnName);
+            sprintf(tmp, "-- displayId invalid arg type for ``%s``", __func__);
             CGame::debug(tmp);
         }
         if (id != -1) {
@@ -3772,7 +3629,7 @@ int display_setFont(lua_State *L)
                 CDisplay & display = manager->getAt(id);
                 display.setFont((int) lua_tonumber(L, 2));
             } else {
-                sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+                sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
                 CGame::debug(tmp);
             }
         }
@@ -3782,10 +3639,9 @@ int display_setFont(lua_State *L)
 
 int display_setTemplate(lua_State *L)
 {
-    const char *fnName = "display_setTemplate";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         IDisplayManager * manager = CGame::getGame().displays();
@@ -3794,7 +3650,7 @@ int display_setTemplate(lua_State *L)
             display.setTemplate(lua_tostring(L, 2));
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
     }
@@ -3803,10 +3659,9 @@ int display_setTemplate(lua_State *L)
 
 int spriteIdFromUuid(lua_State *L)
 {
-    const char *fnName = "spriteIdFromUuid";
     int argc = lua_gettop(L);
     if (argc != 1) {
-        CGame::error(fnName, 1);
+        CGame::error(__func__, 1);
         return 0;
     } else {
         CGame & game = CGame::getGame();
@@ -3819,10 +3674,9 @@ int spriteIdFromUuid(lua_State *L)
 
 int display_setSource(lua_State *L)
 {
-    const char *fnName = "display_setSource";
     int argc = lua_gettop(L);
     if (argc != 2) {
-        CGame::error(fnName, 2);
+        CGame::error(__func__, 2);
     } else {
         int id = (int) lua_tonumber(L, 1);
         IDisplayManager * manager = CGame::getGame().displays();
@@ -3831,9 +3685,46 @@ int display_setSource(lua_State *L)
             display.setSource(lua_tostring(L, 2));
         } else {
             char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, fnName);
+            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
+    }
+    return 0;
+}
+
+int countdown_set(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    if (argc < 1) {
+        CGame::error(__func__, 1);
+    } else {
+        CCountdown * countdown = CGame::getGame().countdowns();
+        if (countdown) {
+            const char *name = static_cast<const char*>(lua_tostring(L, 1));
+            int timeInSeconds = argc > 1 ? static_cast<int>(lua_tonumber(L, 2)) : -1;
+            const char *payload = argc > 2 ? static_cast<const char *>(lua_tostring(L, 3)) : "";
+            countdown->add(name, timeInSeconds, 0, payload).start();
+        }
+    }
+    return 0;
+}
+
+int countdown_cycle(lua_State *L)
+{
+    UNUSED(L);
+    CCountdown * countdown = CGame::getGame().countdowns();
+    if (countdown) {
+        CGame::getGame().countdowns()->cycle();
+    }
+    return 0;
+}
+
+int countdown_clear(lua_State *L)
+{
+    UNUSED(L);
+    CCountdown * countdown = CGame::getGame().countdowns();
+    if (countdown) {
+        CGame::getGame().countdowns()->removeAll();
     }
     return 0;
 }

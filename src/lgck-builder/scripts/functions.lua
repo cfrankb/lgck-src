@@ -1156,6 +1156,10 @@ function unfoldEvents1()
             snapshot_reload();
         end
         
+        if ticks % 8 == 0 then
+            countdown_cycle();
+        end
+
         -- move to the tick
         nextTick();
     end

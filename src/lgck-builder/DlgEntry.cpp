@@ -99,7 +99,7 @@ void CDlgEntry::load(const int entryPos)
 {
     init();
     m_entry = entryPos;
-    CGameFile &gf = *((CGameFile*)m_gameFile);
+    CGameFile &gf = *m_gameFile;
     CLevel & level = m_gameFile->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];
@@ -304,7 +304,7 @@ void CDlgEntry::save(const int entryPos, bool isMulti)
 
 void CDlgEntry::saveNonCombining(const int entryPos)
 {
-    CGameFile &gf = *((CGameFile*)m_gameFile);
+    CGameFile &gf = *m_gameFile;
     CLevel & level = m_gameFile->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];

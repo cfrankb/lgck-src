@@ -20,8 +20,7 @@
 #include "OBL5File.h"
 #include "../shared/Frame.h"
 
-//#define q2c(__qstring__) (const char*) __qstring__.toAscii().constData()
-#define q2c(__qstring__) (const char*) __qstring__.toLatin1().data()
+#define q2c(__qstring__) static_cast<const char *>(__qstring__.toLatin1().data())
 
 COBL5File::COBL5File()
 {

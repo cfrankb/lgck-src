@@ -20,6 +20,7 @@
 #define _STDAFX_H
 
 #include <inttypes.h>
+#include <sys/time.h>
 
 // 
 // Select the target QT or GCC

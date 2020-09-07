@@ -343,9 +343,9 @@ MainWindow::MainWindow(QWidget *parent)
     // reload settings
     reloadSettings();
     CSndSDL *sn = new CSndSDL();
-    m_doc.attach((ISound*)sn);
+    m_doc.attach(static_cast<ISound*>(sn));
     CMusicSDL *mu = new CMusicSDL();
-    m_doc.attach((IMusic*)mu);
+    m_doc.attach(static_cast<IMusic*>(mu));
     m_updater = new CThreadUpdater();
     if (m_bUpdate) {
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
@@ -443,9 +443,9 @@ MainWindow::~MainWindow()
     m_timer.stop();
     m_timerIndicator.stop();
     delete ui;
-    delete (CMusicSDL*) m_doc.music();
+    delete static_cast<CMusicSDL*>(m_doc.music());
     m_doc.attach(static_cast<IMusic*>(nullptr));
-    delete (CSndSDL*) m_doc.sound();
+    delete static_cast<CSndSDL*>(m_doc.sound());
     m_doc.attach(static_cast<ISound*>(nullptr));
     while (m_updater && m_updater->isRunning());
     if (m_updater) {
@@ -454,7 +454,9 @@ MainWindow::~MainWindow()
     if (m_options) {
         delete m_options;
     }
-    delete m_fixer;
+    if (m_fixer) {
+        delete m_fixer;
+    }
 }
 
 bool MainWindow::maybeSave()
@@ -1969,7 +1971,7 @@ void MainWindow::on_actionCustomize_triggered()
 
 void MainWindow::on_actionImages_triggered()
 {
-    CWizFrameSet *wiz = new CWizFrameSet( (QWidget*)parent() );
+    CWizFrameSet *wiz = new CWizFrameSet(static_cast<QWidget*>(parent()));
     wiz->init(m_doc.frames().getSize());
     if (wiz->exec()) {
         CFrameSet *frameSet = new CFrameSet (wiz->getFrameSet());
@@ -1994,7 +1996,7 @@ void MainWindow::showContextMenu(const QPoint& pos)
             CLayer & layer = * level.getCurrentLayer();
             int x = pos.x() & 0xfff8;
             int y = pos.y() & 0xfff8;
-            CGameFile * gf = (CGameFile*) &m_doc;
+            CGameFile * gf = &m_doc;
             int index = gf->whoIs( level, x + level.m_mx, y + level.m_my);
             if (index == -1 || !layer.isInSelection(index)) {
                 layer.selectSingle( index );

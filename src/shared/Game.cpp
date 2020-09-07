@@ -25,7 +25,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <cstring>
-#include <sys/time.h>
 #include "../shared/FileWrap.h"
 #include "../shared/Folders.h"
 #include "../shared/Game.h"
@@ -55,6 +54,7 @@
 #include "../shared/Font.h"
 #include "displayconfig.h"
 #include "fontmanager.h"
+#include "Countdown.h"
 
 constexpr char SIGNATURE_JOYSTATEMAP[] = "JOYS";
 constexpr uint32_t REVISION_JOYSTATEMAP = 0;
@@ -148,6 +148,7 @@ CGame::CGame():CGameFile()
     m_snapshot = new CSnapshot;
     m_tasks = new CTasks;
     copyDefaultJoyStateMap();
+    m_countdowns = new CCountdown;
 }
 
 CGame::~CGame()
@@ -176,6 +177,8 @@ CGame::~CGame()
     delete m_sFW;
     delete m_snapshot;
     delete m_tasks;
+    delete m_countdowns;
+    m_countdowns = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -2018,7 +2021,7 @@ void CGame::setEngineState(unsigned int state)
 
 int CGame::runEngine()
 {
-    unsigned long long now;
+    uint64_t now;
     switch(var("engineState")) {
     case ES_TIMEOUT:
     case ES_INTRO:
@@ -2393,4 +2396,9 @@ bool CGame::importJoyStateMap(IFile & file)
 void CGame::resetAllCounters()
 {
     m_counters.clear();
+}
+
+CCountdown * CGame::countdowns()
+{
+    return m_countdowns;
 }

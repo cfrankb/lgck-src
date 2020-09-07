@@ -27,7 +27,7 @@ CDrone::CDrone(): CMonster()
 
 void CDrone::doManage()
 {
-    CGame & game = * (CGame *) m_game;
+    CGame & game = *m_game;
     CProto & proto = game.toProto(m_nProto);
 
     int nAim = m_nAim;

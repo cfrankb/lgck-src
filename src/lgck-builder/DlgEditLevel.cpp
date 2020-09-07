@@ -272,7 +272,7 @@ void CDlgEditLevel::on_treeEvents_doubleClicked(QModelIndex index)
         return;
     }
 
-    CDlgSource *d = new CDlgSource((QWidget*) parent());
+    CDlgSource *d = new CDlgSource(static_cast<QWidget*>(parent()));
     d->init(m_gameFile);
     QString t = QString(tr("Edit Event ``%1``")).arg(CLevel::getEventName(index.row()));
     d->setWindowTitle(t);

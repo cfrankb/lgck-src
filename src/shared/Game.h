@@ -46,6 +46,7 @@ class ISound;
 class CSnapshot;
 class IFile;
 class CFont;
+class CCountdown;
 
 /////////////////////////////////////////////////////////////////////////////
 // CGame
@@ -334,6 +335,7 @@ public:
     IGraphics * graphics();
     IMusic *music();
     ISound *sound();
+    CCountdown * countdowns();
 
     /////////////////////////////////////////////////////////////////
     // engine
@@ -372,6 +374,7 @@ protected:
     CFrameSet *m_points;
     CLevel *m_layers;
     CInventoryTable *m_inventoryTable;
+    CCountdown * m_countdowns;
 
     //////////////////////////////////////////////////////////////////
     // Game variables

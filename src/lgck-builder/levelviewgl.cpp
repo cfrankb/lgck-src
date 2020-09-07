@@ -60,11 +60,12 @@ CLevelViewGL::CLevelViewGL(QWidget* parent, CGame *game):
 
 CLevelViewGL::~CLevelViewGL()
 {
+    m_timer.stop();
     if (m_game) {
         makeCurrent();
-        m_game->attach((IGraphics*) nullptr);
+        m_game->attach(static_cast<IGraphics*>(nullptr));
         delete m_game->graphics();
-        m_game->attach((IImageManager*) nullptr);
+        m_game->attach(static_cast<IImageManager*>(nullptr));
         delete m_game->cache();
     }
 }
@@ -75,7 +76,7 @@ void CLevelViewGL::initializeGL()
     initializeOpenGLFunctions();
     if (m_game) {
         CGROpenGL * gr = new CGROpenGL(m_game);
-        m_game->attach((IGraphics*)gr);
+        m_game->attach(static_cast<IGraphics*>(gr));
         m_game->attach(gr->cache());
     } else {
         qFatal("Game object not set. Implementors not attached");

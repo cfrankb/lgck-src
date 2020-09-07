@@ -91,9 +91,8 @@ void CDlgFrameSet::init(CFrameSet * frameSet)
     m_frameSet = frameSet;
     m_ui->treeWidget->setFrameSet(frameSet);
 
-    CFrameSet * fs = (CFrameSet *) m_frameSet;
-    m_ui->eName->setText(fs->getName());
-    m_ui->sUUID->setText(QString("UUID: ") + QString(fs->tag("UUID").c_str()));
+    m_ui->eName->setText(m_frameSet->getName());
+    m_ui->sUUID->setText(QString("UUID: ") + QString(m_frameSet->tag("UUID").c_str()));
 
     emit refill();
     updateButtons();
@@ -118,8 +117,7 @@ void CDlgFrameSet::updateButtons()
 
 void CDlgFrameSet::save()
 {
-    CFrameSet * fs = (CFrameSet *) m_frameSet;
-    fs->setName(q2c(m_ui->eName->text().trimmed().mid(0 , 31)));
+    m_frameSet->setName(q2c(m_ui->eName->text().trimmed().mid(0 , 31)));
 }
 
 void CDlgFrameSet::on_treeWidget_itemSelectionChanged()

@@ -160,7 +160,7 @@ void CGRSdl::paintImage(int x1, int y1, int frameSet, int frameNo)
 
 IDisplayManager* CGRSdl::displayManager()
 {
-    return (IDisplayManager*) m_displayManager;
+    return static_cast<IDisplayManager*>(m_displayManager);
 }
 
 void CGRSdl::ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
@@ -178,7 +178,7 @@ void CGRSdl::ss_paintImage(int x1, int y1, int frameSet, int frameNo)
 
 IImageManager *CGRSdl::CGRSdl::cache()
 {
-    return (IImageManager *) m_imageManager;
+    return static_cast<IImageManager *>(m_imageManager);
 }
 
 void CGRSdl::update()

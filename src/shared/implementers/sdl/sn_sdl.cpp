@@ -66,7 +66,7 @@ void CSndSDL::add(unsigned char *data, unsigned int size, unsigned int uid)
     snd->channel = -1;
     snd->chunk = nullptr;
     bool fail = false;
-    SDL_RWops *rw = SDL_RWFromConstMem((void*) data,  size);
+    SDL_RWops *rw = SDL_RWFromConstMem(static_cast<void*>(data),  size);
     if (!rw) {
         fail = true;
         CLuaVM::debugv("SDL_RWFromConstMem Failed: %s", SDL_GetError());
