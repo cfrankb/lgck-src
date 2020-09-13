@@ -141,3 +141,30 @@ void CProto::resetUUID()
 {
     strcpy(m_uuid, getUUID());
 }
+
+bool CProto::isPlayer() const
+{
+    return m_nClass == CLASS_PLAYER_OBJECT;
+}
+
+bool CProto::isMonster() const
+{
+    const int monsterClasses []= {
+        CLASS_GENERIC_COS,
+        CLASS_GENERIC_COS___COMPLEX,
+        CLASS_DRONE_UP_DOWN,
+        CLASS_DRONE_LEFT_RIGHT,
+        CLASS_RANDOM_ATTACKER,
+        CLASS_VAMPIRE_PLANT_SOLID,
+        CLASS_WACKER_UP_DOWN,
+        CLASS_WACKER_LEFT_RIGHT,
+        CLASS_CREATURE_BULLET
+    };
+
+    for (unsigned int i=0; i < sizeof(monsterClasses) / sizeof(int); ++i) {
+        if (m_nClass == monsterClasses[i]) {
+            return true;
+        }
+    }
+    return false;
+}

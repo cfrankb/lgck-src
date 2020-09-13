@@ -608,7 +608,7 @@ void CWizSprite::save(const int index)
                 prefix = "-- ";
             }
 
-            if (proto.m_nClass == CLASS_PLAYER_OBJECT) {
+            if (proto.isPlayer()) {
                 eventCode += QString("%2playSound(\"%1\");\n")
                         .arg(soundName)
                         .arg(prefix);

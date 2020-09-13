@@ -1018,9 +1018,11 @@ function firePlayerBullet(id, ticks)
     local sprite = getSprite( id );
     local proto = sprite:getProto();
     local ammo = Counters:get("ammo")
-    if ((proto.fireRate == 0 ) or (ticks % proto.fireRate == 0))
+    if AND(proto.bulletOptions, BULLET_ENABLED) and
+        ((proto.fireRate == 0 ) or (ticks % proto.fireRate == 0))
         and testJoyState( JOY_FIRE )
-        and ammo > 0 then
+        and (ammo > 0 or AND(proto.bulletOptions, BULLET_UNLIMITED))
+        then
         local x , y, aim = getSpriteVars( id );
         if testJoyState( JOY_LEFT ) then
             aim = LEFT;

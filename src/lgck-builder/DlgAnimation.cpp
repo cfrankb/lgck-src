@@ -23,6 +23,7 @@
 #include "../shared/Object.h"
 #include "../shared/FileWrap.h"
 #include "../shared/qtgui/qthelper.h"
+#include <QMessageBox>
 
 QString CDlgAnimation::m_sequences[] =
 {
@@ -243,16 +244,17 @@ void CDlgAnimation::on_btRemove_clicked()
 void CDlgAnimation::on_btClearAll_clicked()
 {
     // TODO: add warning box
-
-    CAnimation & as = * m_animation;
-
-    int count = ui->treeSequence->model()->rowCount();
-    for (int i = count - 1; i >= 0; --i) {
-        ui->treeSequence->model()->removeRow( i );
+    QMessageBox::StandardButton reply = QMessageBox::warning(this, "", tr("Remove all the frames?"),
+        QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        CAnimation & as = * m_animation;
+        int count = ui->treeSequence->model()->rowCount();
+        for (int i = count - 1; i >= 0; --i) {
+            ui->treeSequence->model()->removeRow( i );
+        }
+        as.forget();
+        updateButtons();
     }
-
-    as.forget();
-    updateButtons();
 }
 
 void CDlgAnimation::load(CAnimation *a, int seqId)

@@ -279,7 +279,7 @@ void CGame::setPause(bool state) {
 
     var("pause") = (int)state;
     int i = displays()->findDisplay("pause");
-    if ( i != -1) {
+    if ( i != INVALID) {
         CDisplay & display = displays()->getAt(i);
         display.setVisible( var("pause") != 0);
     }
@@ -289,7 +289,7 @@ void CGame::flipPause() {
 
     var("pause") ^= 1;
     int i = displays()->findDisplay("pause");
-    if ( i != -1) {
+    if ( i != INVALID ) {
         CDisplay & display = displays()->getAt(i);
         display.setVisible( var("pause") != 0 );
     }
@@ -541,8 +541,8 @@ void CGame::splitLevel(CLevel *level, CScene *sBK, CScene *sFW)
 
 bool CGame::calculateWorldSize(CLevel *s, int &width, int &height)
 {
-    int largerX = -1;
-    int largerY = -1;
+    int largerX = INVALID;
+    int largerY = INVALID;
     CLayer *main = s->getMainLayer();
     if (!main) {
         CLuaVM::debugv("main is null\n");
@@ -690,7 +690,7 @@ bool CGame::initLevel(int n)
     }
 
     // Find the player object
-    if ( (svar("playerEntry") = m_sFW->findPlayerEntry()) == -1) {
+    if ( (svar("playerEntry") = m_sFW->findPlayerEntry()) == INVALID) {
         m_lastError = "Missing player object!";
         return false;
     }
@@ -713,7 +713,7 @@ bool CGame::initLevel(int n)
 
     // Init PlayerObject
     CLuaVM::debugv("init player\n");
-    if (svar("playerEntry") != -1) {
+    if (svar("playerEntry") != INVALID) {
         CActor & player = (*m_sFW)[svar("playerEntry")];
         player.callEvent(CObject::EO_ACTIVATE);
         centerOnPlayer(player);
@@ -771,7 +771,7 @@ void CGame::moveTo(int x, int y)
 bool CGame::managePlayer()
 {
     updateJoyState();
-    if (svar("playerEntry") == -1) {
+    if (svar("playerEntry") == INVALID) {
         return false;
     }
 
@@ -787,7 +787,7 @@ bool CGame::managePlayer()
 
     /////////////////////////////////////////////////////////////////
     // Check if player is falling
-    int bFall = player.canFall() && player.get(lgck::EXTRA_PATHDIR) == -1;
+    int bFall = player.canFall() && player.get(lgck::EXTRA_PATHDIR) == INVALID;
     /*
     if (bFall) {
         qDebug("grace:%d",player.m_fallGrace);
@@ -858,7 +858,7 @@ bool CGame::managePlayer()
 
     /////////////////////////////////////////////////////////////////
     // Manage Player Jumping
-    if (player.get(lgck::EXTRA_PATHDIR) != -1 && gravity()) {
+    if (player.get(lgck::EXTRA_PATHDIR) != INVALID && gravity()) {
         player.managePath();
     }
 
@@ -890,7 +890,7 @@ bool CGame::managePlayer()
 
 bool CGame::playerZKey()
 {
-    if (svar("playerEntry") == -1)
+    if (svar("playerEntry") == INVALID)
         return false;
     CActor & player = getPlayer();
     if (player.m_nY<0)
@@ -1017,13 +1017,13 @@ void CGame::managePlayerJump()
 
         case JM_GIANA:
             if (joyState & JOY_UP) {
-                player.tryPath(CObject::PS_JUMP_UP, -1);
+                player.tryPath(CObject::PS_JUMP_UP, INVALID);
             }
             break;
 
         case JM_MIXED:
             if (joyState & JOY_JUMP) {
-                player.tryPath(CObject::PS_JUMP_UP, -1);
+                player.tryPath(CObject::PS_JUMP_UP, INVALID);
             }
             break;
         }
@@ -1037,7 +1037,7 @@ void CGame::managePlayerMovements(CActor & player)
     // vla3 disallows control of movement during paths and fall
     CProto & proto = m_arrProto[player.m_nProto];
     if (proto.m_nJumpMode == JM_VLA3 &&
-            (player.get(lgck::EXTRA_PATHDIR) != -1 || player.getState(CHitData::STATE_FALL))) {
+            (player.get(lgck::EXTRA_PATHDIR) != INVALID || player.getState(CHitData::STATE_FALL))) {
         return;
     }
     if (joyState){// && player.m_pathDir == INVALID) {
@@ -1076,7 +1076,7 @@ void CGame::managePlayerMovements(CActor & player)
         int & my = m_my;
         CFrame & frame = * m_arrFrames.getFrame( player );
         if (joyState & JOY_UP
-                && player.get(lgck::EXTRA_PATHDIR) == -1) {
+                && player.get(lgck::EXTRA_PATHDIR) == INVALID) {
             CActor t_player;
             t_player.copyFrom(player);
             t_player.move(UP);
@@ -1102,7 +1102,7 @@ void CGame::managePlayerMovements(CActor & player)
         player.setState(CHitData::STATE_LOOKUP, lookup);
 
         if (joyState & JOY_DOWN
-                && player.get(lgck::EXTRA_PATHDIR) == -1) {
+                && player.get(lgck::EXTRA_PATHDIR) == INVALID) {
             if (player.canMove(DOWN, false)) {
                 player.unMap();
                 player.move(DOWN);
@@ -1526,7 +1526,7 @@ void CGame::triggerMouseEvent(int x, int y, int button)
     if (x >= 0 && x <= m_screenLen &&
         y >= 0 && x <= m_screenHei ) {
         int target = scene.whoIs( x + m_mx, y + m_my);
-        if (target != -1) {
+        if (target != INVALID) {
             CActor & entry = scene[target];
             switch( button) {
             case BUTTON_LEFT:
@@ -1845,20 +1845,28 @@ void CGame::callGameEvent(int eventId)
 
 void CGame::callObjEvent(int objId, int eventId)
 {
-    CScene & scene = *(m_sFW);
-    int proto = scene[objId].m_nProto;
+    CActor & actor = m_sFW->get(objId);
+#ifdef TRACKMSG
+    if (eventId != CObject::EO_HANDLER
+            && eventId != CObject::EO_FIRE) {
+        qDebug("callObjEvent() objId: %d event %d [%s]", objId, eventId, CProtoArray::getEventName(eventId));
+        actor.debug();
+    }
+#endif
+    int proto = actor.m_nProto;
     if (proto <= 0) {
-        CLuaVM::debugv("execObjEvent() invalid call rejected: objId: %d, proto: 0x%.4x, event: 0x%x", objId, proto, eventId);
+        CLuaVM::debugv("callObjEvent() invalid call rejected: objId: %d, proto: 0x%.4x, event: 0x%x",
+                       objId,
+                       proto,
+                       eventId);
         return ;
     }
 
-    CObject & object = m_arrProto.getObject(scene[objId].m_nProto);
+    CObject & object = m_arrProto.getObject(actor.m_nProto);
     const char* luaCode = object.getEvent(eventId);
     if (luaCode[0]) {
-        CScene & scene = *(m_sFW);
-        CActor & entry = scene[objId];
         char fnName [255];
-        sprintf(fnName, "event_obj_%d_%s", entry.m_nProto, CProtoArray::getEventName(eventId));
+        sprintf(fnName, "event_obj_%d_%s", actor.m_nProto, CProtoArray::getEventName(eventId));
         callStaticHandler(fnName, objId);
     }
 }

@@ -46,7 +46,7 @@ levels
 sprites
 -------
 
-[ ] death
+[x] death
   [x] waypoints
   [x] honor the state_dead flag
   [x] lives bonus (as in extra life)
@@ -69,6 +69,7 @@ sprites
 
 [ ] rebirth animation seq
 [ ] engine group sprites into sheets
+[ ] optimize texture selection and z-order
 [ ] per sprite color/alpha mod (SDL_SetTextureColorMod)
 [x] trigger flip to death state
 
@@ -83,10 +84,11 @@ player
   [x] proto
   [x] fire rate / freq / max bullets (actives)
   [x] damage to monsters or enemy bullets
-  [ ] ammo left or unlimited
+  [x] ammo left or unlimited
   [ ] powerlevel
   [x] automatically managed without scripting
-  [ ] control fall?
+
+[ ] control fall?
   
 [ ] jump
     [ ] improved jump code
@@ -124,7 +126,7 @@ engine
         [ ] pickup
         [ ] drop
 [x] counters
-    [ ] countdown
+    [x] countdown
 [ ] object action tab ???
 [ ] custom object maps
 [ ] merge Proto, ImageSet and Object into `Sprite`

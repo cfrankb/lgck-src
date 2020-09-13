@@ -38,6 +38,7 @@ public:
     void removeAt(int i);
     void forget();
     CActor & operator [] (int i) const;
+    CActor & get(int i) const;
     virtual CLevelEntry & atIndex (int i) const;
     void setOwner(CGame *game, bool bk);
     virtual int getSize() const;

@@ -165,7 +165,7 @@ void CDlgObject::load(const int index)
                 m_ui->cbClass->setCurrentIndex( j );
                 classFound =  true;
             }
-            j++;
+            ++j;
         }
     }
 
@@ -516,6 +516,7 @@ void CDlgObject::load(const int index)
 
     // bullet options
     m_ui->cBulletEnabled->setChecked(proto.m_bulletOptions & CProto::BULLET_ENABLED);
+    m_ui->cUnlimitedAmmo->setChecked(proto.m_bulletOptions & CProto::BULLET_UNLIMITED);
 }
 
 void CDlgObject::save(const int index)
@@ -585,7 +586,7 @@ void CDlgObject::save(const int index)
 
     // proto buddy
 
-    if (proto.m_nClass==CLASS_PLAYER_OBJECT) {
+    if (proto.isPlayer()) {
         proto.m_nProtoBuddy = m_ui->cbBullet->currentData().toUInt();
     } else {
         proto.m_nProtoBuddy = m_ui->cbBuddy->currentIndex();
@@ -716,8 +717,9 @@ void CDlgObject::save(const int index)
             | m_ui->cSolidRIGHT->isChecked() * CProto::SOLID_RIGHT;
 
     // bullet options
-    proto.m_bulletOptions = m_ui->cBulletEnabled->isChecked() ? CProto::BULLET_ENABLED : 0;
-
+    proto.m_bulletOptions =
+            (m_ui->cBulletEnabled->isChecked() ? CProto::BULLET_ENABLED : 0) |
+            (m_ui->cUnlimitedAmmo->isChecked() ? CProto::BULLET_UNLIMITED : 0);
 }
 
 void CDlgObject::setImage(int frameSet, int frameNo)
@@ -767,6 +769,7 @@ void CDlgObject::on_cbClass_currentIndexChanged(int index)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
     int classId = m_classIndex [ index ];
+
     if (!gf.m_className[ classId ].empty()) {
         m_ui->sClass->setText(gf.m_classInfo[ classId ].c_str());
     } else {
@@ -778,16 +781,15 @@ void CDlgObject::on_cbClass_currentIndexChanged(int index)
         m_ui->tab->removeTab(1);
     }
 
+    bool isPlayer = classId == CLASS_PLAYER_OBJECT;
     if (classId >= 0x10) {
         m_ui->tab->addTab(m_ui->tab_2, QIcon(), tr("Features"));
         m_ui->tab->addTab(m_ui->tab_3, QIcon(), tr("Animation"));
 
-        if (classId == CLASS_PLAYER_OBJECT) {
+        if (isPlayer) {
             m_ui->tab->addTab(m_ui->tab_7, QIcon(), tr("Misc"));
-        } else {
-            if (classId < CLASS_GENERIC_COS) {
-                m_ui->tab->addTab(m_ui->tab_9, QIcon(), tr("Solidity"));
-            }
+        } else if (classId < CLASS_GENERIC_COS) {
+            m_ui->tab->addTab(m_ui->tab_9, QIcon(), tr("Solidity"));
         }
 
         if (classId == CLASS_OPEN_TO_OWNER) {
@@ -797,6 +799,19 @@ void CDlgObject::on_cbClass_currentIndexChanged(int index)
         m_ui->tab->addTab(m_ui->tab_4, QIcon(), tr("Death"));
         m_ui->tab->addTab(m_ui->tab_5, QIcon(), tr("Auto"));
         m_ui->tab->addTab(m_ui->tab_6, QIcon(), tr("Events"));
+    }
+
+    QComboBox *combos[] = {
+        m_ui->cbRebirths,
+        m_ui->cbRebirthDelay,
+        m_ui->cbRebirthLocation,
+        m_ui->cbBonusHP,
+        m_ui->cbCoins,
+        m_ui->cbAmmo,
+        m_ui->cbLives
+    };
+    for (unsigned int i=0; i < sizeof(combos) / sizeof(QComboBox*);++i){
+        combos[i]->setEnabled(!isPlayer);
     }
 }
 

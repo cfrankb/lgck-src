@@ -54,7 +54,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>5</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideNone</enum>
@@ -912,6 +912,19 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>Enabled</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cUnlimitedAmmo">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>40</y>
+       <width>141</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>unlimited ammo</string>
      </property>
     </widget>
    </widget>

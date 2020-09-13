@@ -26,6 +26,7 @@ class IFile;
 class CGame;
 class CLevel;
 class CDisplayConfig;
+class CCountdown;
 
 class CSnapshot
 {
@@ -46,6 +47,7 @@ protected:
     CScene *m_fw;
     CScene *m_bk;
     CLevel *m_layers;
+    CCountdown *m_countdown;
     CDisplayConfig *m_displayConf;
     std::unordered_map<std::string, unsigned long long> m_vars;
 

@@ -70,6 +70,7 @@ public:
     bool isDead();
     bool isFrozen();
     bool isGoal();
+    bool isPickUpTrigger();
     bool isMonster();
     bool isPlayer();
     bool isPlayerThere (int nAim);
@@ -110,6 +111,7 @@ public:
     void togglePathPlayback(bool enable);
     const char *getClassName();
     void copyFrom(const CActor & s);
+    void debug();
 
     enum  {
         TAG_REBORN          = 0x0001,

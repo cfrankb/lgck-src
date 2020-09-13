@@ -454,10 +454,10 @@ int killPlayer(lua_State *)
     CGame & game = CGame::getGame();
     CScene & scene = game.scene();
     CActor & player = scene [ game.svar("playerEntry") ] ;
-    if (player.proto().m_nClass == CLASS_PLAYER_OBJECT) {
+    if (player.proto().isPlayer()) {
         game.killPlayer( player );
     } else {
-        CLuaVM::debugv("killPlayer against none player object.");
+        CLuaVM::debugv("killPlayer against non-player object.");
     }
     return 0;
 }
@@ -878,6 +878,7 @@ int display_setColor(lua_State *L)
 int display_setExpireTime(lua_State *L)
 //# displaySetExpireTime
 {
+    char tmp[1024];
     int argc = lua_gettop(L);
     if (argc != 2) {
         CGame::error(__func__, 2);
@@ -886,9 +887,15 @@ int display_setExpireTime(lua_State *L)
         IDisplayManager * manager = CGame::getGame().displays();
         if (manager->isValidIndex( id )) {
             CDisplay & display = manager->getAt(id);
-            display.setExpireTime((int) lua_tonumber(L, 2) );
+            int timeInSeconds = (int) lua_tonumber(L, 2);
+            CCountdown * countdown = CGame::getGame().countdowns();
+            if (countdown) {
+                sprintf(tmp, "local id = findDisplay(\"%s\"); display_setVisible(id, false);", display.name());
+                char *s = getUUID();
+                CGame::getGame().countdowns()->add(s, timeInSeconds, 0, tmp).start();
+                delete s;
+            }
         } else {
-            char tmp[1024];
             sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
             CGame::debug(tmp);
         }
@@ -3243,16 +3250,21 @@ int warpTo(lua_State *L)
         if (lua_isstring(L, 1)) {
             std::string uuid = static_cast<const char*>(lua_tostring(L, 1));
             id = game.getLevelByUUID(uuid.c_str());
-        }
-        if (lua_isnumber(L, 1)) {
+            if (id == CGame::INVALID) {
+                std::string title = static_cast<const char*>(lua_tostring(L, 1));
+                id = game.getLevelByTitle(title.c_str());
+            }
+        } else if (lua_isnumber(L, 1)) {
             id = static_cast<int>(lua_tonumber(L, 1));
         }
 
         if (id != CGame::INVALID) {
             game.setClosure( CGame::EVENT_LEVEL_COMPLETED );
+            CLuaVM::debugv("Warp to level %d", id + 1);
             game.var("WarpTo") = id;
+        } else {
+            CLuaVM::debugv("warpTo() invalid level ignored.");
         }
-
         lua_pushnumber(L, id);
         return 1;
     }
@@ -3709,12 +3721,42 @@ int countdown_set(lua_State *L)
     return 0;
 }
 
+int countdown_start(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    if (argc != 1) {
+        CGame::error(__func__, 1);
+    } else {
+        CCountdown * countdown = CGame::getGame().countdowns();
+        if (countdown) {
+            const char *name = static_cast<const char*>(lua_tostring(L, 1));
+            countdown->get(name).start();
+        }
+    }
+    return 0;
+}
+
+int countdown_stop(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    if (argc < 1) {
+        CGame::error(__func__, 1);
+    } else {
+        CCountdown * countdown = CGame::getGame().countdowns();
+        if (countdown) {
+            const char *name = static_cast<const char*>(lua_tostring(L, 1));
+            countdown->get(name).stop();
+        }
+    }
+    return 0;
+}
+
 int countdown_cycle(lua_State *L)
 {
     UNUSED(L);
     CCountdown * countdown = CGame::getGame().countdowns();
     if (countdown) {
-        CGame::getGame().countdowns()->cycle();
+        countdown->cycle();
     }
     return 0;
 }
@@ -3724,7 +3766,7 @@ int countdown_clear(lua_State *L)
     UNUSED(L);
     CCountdown * countdown = CGame::getGame().countdowns();
     if (countdown) {
-        CGame::getGame().countdowns()->removeAll();
+        countdown->removeAll();
     }
     return 0;
 }

@@ -97,8 +97,7 @@ public:
     // constants
 
     enum {
-        STATE_VERSION       = 0,
-        INVALID             = -1
+        STATE_VERSION       = 0
     };
 
     enum : uint16_t {
@@ -387,6 +386,7 @@ protected:
     friend class CActor;
     friend class CAttacker;
     friend class IGraphics;
+    friend class CCountdown;
 };
 
 /////////////////////////////////////////////////////////////////////////////

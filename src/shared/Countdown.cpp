@@ -20,6 +20,7 @@
 #include "helper.h"
 #include "Game.h"
 #include "stdafx.h"
+#include <vector>
 
 CCountdown::CCountdown()
 {
@@ -66,7 +67,8 @@ void CCountdown::forget()
 
 void CCountdown::cycle()
 {
-    uint64_t now;
+    std::vector<std::string> d;
+    uint64_t now = 0;
     microtime(&now);
     for(auto kv : m_countdown) {
         std::string key = kv.first;
@@ -77,17 +79,24 @@ void CCountdown::cycle()
                 -- count;
                 entry.setNextSecond(now + 1000);
             } else {
-                // TODO: run payload
                 entry.stop();
-                //m_countdown.erase(key.c_str());
+                if (!entry.m_payload.empty()) {
+                    CGame::luaVM().exec(entry.m_payload.c_str());
+                }
+                // TODO: remove entry
+                d.push_back(key.c_str());
             }
         }
+    }
+    for(std::string i : d) {
+        m_countdown.erase(i);
+        CGame::getGame().m_counters.erase(i);
     }
 }
 
 CCountdownEntry &CCountdown::operator [](const char *name)
 {
-    return m_countdown[name];
+    return get(name);
 }
 
 CCountdownEntry &CCountdown::get(const char *name)

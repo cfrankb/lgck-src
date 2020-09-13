@@ -246,6 +246,8 @@ luaFn ( display_setSource )
 luaFn ( countdown_set )
 luaFn ( countdown_cycle )
 luaFn ( countdown_clear )
+luaFn ( countdown_start )
+luaFn ( countdown_stop )
 
 static FUNCTION exports [] = {
     fn ( addToHP )
@@ -468,6 +470,8 @@ static FUNCTION exports [] = {
     fn ( countdown_set )
     fn ( countdown_cycle )
     fn ( countdown_clear )
+    fn ( countdown_start )
+    fn ( countdown_stop )
     alias ( "activateSprite", sprite_activate )
     alias ( "addDisplayC", display_new )
     alias ( "addElement", element_new )

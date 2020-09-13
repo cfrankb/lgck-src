@@ -51,7 +51,7 @@ void CHitData::addBk(const uint8_t bkC) {
         int i;
         for (i = 0; i < bkCount; ++i) {
             if (bkClass[i] == bkC) {
-                break;
+                return;
             }
         }
 
@@ -80,7 +80,7 @@ void CHitData::addFw(const uint8_t fwC,const uint16_t fwE) {
         int i;
         for (i = 0; i < fwCount; ++i) {
             if (fwEntry[i] == fwE) {
-                break;
+                return;
             }
         }
 
@@ -97,7 +97,7 @@ void CHitData::addAc(const uint8_t acC,const uint16_t acE) {
         int i;
         for (i = 0; i < acCount; ++i) {
             if (acEntry[i] == acE) {
-                break;
+                return;
             }
         }
 

@@ -117,9 +117,14 @@ void CScene::forget()
     m_size = 0;
 }
 
+CActor & CScene::get(int i) const
+{
+    return * m_actors[i];
+}
+
 CActor & CScene::operator [] (int i) const
 {
-    return *(m_actors [ i ]);
+    return get(i);
 }
 
 CLevelEntry & CScene::atIndex (int i) const
@@ -141,7 +146,7 @@ int CScene::getSize() const
 int CScene::findPlayerEntry()
 {
     for (int i = 0; i < m_size; ++i) {
-        if (m_actors [ i ]->proto().m_nClass == CLASS_PLAYER_OBJECT) {
+        if (m_actors [ i ]->proto().isPlayer()) {
             return i;
         }
     }

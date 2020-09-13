@@ -23,6 +23,7 @@
 #include "IFile.h"
 #include "Map.h"
 #include "displayconfig.h"
+#include "Countdown.h"
 
 CSnapshot::CSnapshot()
 {
@@ -30,6 +31,7 @@ CSnapshot::CSnapshot()
     m_fw = nullptr;
     m_layers = nullptr;
     m_displayConf = nullptr;
+    m_countdown = nullptr;
 }
 
 CSnapshot::~CSnapshot()
@@ -56,7 +58,10 @@ void CSnapshot::forget()
         delete m_displayConf;
         m_displayConf = nullptr;
     }
-
+    if (m_countdown) {
+        delete m_countdown;
+        m_countdown = nullptr;
+    }
     m_vars.clear();
 }
 
@@ -70,12 +75,17 @@ void CSnapshot::read(IFile &file)
     char has_data = 0;
     file.read(&has_data, 1);
     if (has_data) {
+        m_fw = new CScene;
         m_fw->read(file);
+        m_bk = new CScene;
         m_bk->read(file);
+        m_layers = new CLevel;
         m_layers->read(file);
+        m_displayConf = new CDisplayConfig;
         m_displayConf->read(file);
+        m_countdown = new CCountdown;
+        m_countdown->read(file);
     }
-
     // TODO: load vars
     //m_vars["__mx"] = game.m_mx;
     //m_vars["__my"] = game.m_my;
@@ -93,6 +103,7 @@ void CSnapshot::write(IFile &file)
         m_bk->write(file);
         m_layers->write(file);
         m_displayConf->write(file);
+        m_countdown->write(file);
     } else {
         file.write(&has_data, 1);
     }
@@ -118,6 +129,8 @@ void CSnapshot::take(CGame & game)
     m_vars["__mx"] = game._mx();
     m_vars["__my"] = game._my();
     m_vars["__levelTriggerCalled"] = game.var("__levelTriggerCalled");
+    m_countdown = new CCountdown;
+    *m_countdown = * game.countdowns();
     game.saveDisplays(m_displayConf);
 }
 
@@ -133,6 +146,7 @@ bool CSnapshot::reload(CGame & game)
         game.restoreDisplays(m_displayConf);
         // reMap collision map
         game.remap();
+        * game.countdowns() = * m_countdown;
         return true;
     } else {
         return false;

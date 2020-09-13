@@ -8,6 +8,7 @@ HISTORY OF LGCK BUILDER
 - ENGINE: overlays can have custom fonts
 - ENGINE: major code clean up
 - ENGINE: abstracted keys and buttons
+- ENGINE: added Countdowns
 - EDITOR: mark/unmark all goals matching a sprite 
 - EDITOR: added debug output window
 - EDITOR: tile paint, eraser modes added
@@ -21,9 +22,11 @@ HISTORY OF LGCK BUILDER
 - EDITOR: new Overlay type Counter
 - EDITOR: added coins, lives and ammo bonuses
 - EDITOR: integrating player fire bullet w/ editSprite
+- TOOLS: migrated to qt 5.15
 - LUA: display_setFlagXY, display_setFont, display_setSource
+- LUA: countdown_set, countdown_start, countdown_stop
 - LUA: spriteIdFromUuid
-
+- BUG FIX: onleftClick/onRightClick doesn't work anymore
 
 *** 0.6.0.8
 

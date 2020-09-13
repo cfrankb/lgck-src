@@ -135,7 +135,8 @@ public:
 
     // classes
     enum {
-        MAX_CLASSES = 256
+        MAX_CLASSES         = 256,
+        INVALID             = -1
     };
 
     std::string m_className [ MAX_CLASSES ];
@@ -159,6 +160,7 @@ public:
     CLevel & getCurrentLevel();
 
     int getLevelByUUID(const char *uuid);
+    int getLevelByTitle(const char *title);
     void insertLevel(int n, CLevel *level);
     void addLevel(CLevel *level);
     void removeLevel (int n);

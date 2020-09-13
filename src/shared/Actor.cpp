@@ -159,8 +159,7 @@ void CActor::spawn()
         const CProto & p = proto();
         m_propi[lgck::EXTRA_HP] = p.m_nHP;
         m_propi[lgck::EXTRA_ANIMSPEED] = p.m_nAniSpeed;
-        if (p.m_nClass != CLASS_PLAYER_OBJECT
-                && !isTagged(TAG_REBORN)) {
+        if (!p.isPlayer() && !isTagged(TAG_REBORN)) {
             m_propi[lgck::EXTRA_LIVES] = p.m_nRebirths;
         }
         setTag(TAG_ACTIVATED, p.getOption(CProto::OPTION_INACTIVE) == 0);
@@ -255,26 +254,22 @@ void CActor::stopAnimation()
 
 void CActor::kill()
 {
-
     if (m_nProto < 0) {
         m_nProto = 0;
         return;
     }
 
     const CProto & p = proto();
-    if (p.m_nClass == CLASS_PLAYER_OBJECT) {
+    if (p.isPlayer()) {
         setState(CHitData::STATE_DEAD, true);
         set(lgck::EXTRA_HP,0);
         return;
     }
 
-    bool is_a_goal = isGoal();
-    bool is_pickup = p.m_nClass == CLASS_PICKUP_TRIGGERS;
-
     const CProto & newproto =  m_game->m_arrProto[p.m_nChProto];
     m_propi[lgck::EXTRA_OWNER] = 0;
     // test if a rebirth is possible
-    if (m_nProto > 0 && p.m_nClass != CLASS_PLAYER_OBJECT
+    if (m_nProto > 0 && !p.isPlayer()
             && m_propi[lgck::EXTRA_LIVES]) {
         --m_propi[lgck::EXTRA_LIVES];
         CTask * task = new CTask;
@@ -309,11 +304,11 @@ void CActor::kill()
     }
 
     if (isGoal()) {
-        m_nTriggerKey -= TRIGGER_GOAL;
+        m_nTriggerKey ^= TRIGGER_GOAL;
     }
 
     if (isFrozen()) {
-        m_nTriggerKey -= TRIGGER_FROZEN;
+        m_nTriggerKey ^= TRIGGER_FROZEN;
     }
 
     if (p.m_nPoints != 0) {
@@ -341,12 +336,12 @@ void CActor::kill()
         m_game->playSound(nChSound);
     }
 
-    if (is_a_goal) {
+    if (isGoal()) {
         m_game->callGameEvent(CGameEvents::EG_GOAL_KILLED);
         m_game->callLvEvent(CLevel::EL_GOAL_KILLED);
     }
 
-    if (is_pickup) {
+    if (isPickUpTrigger()) {
         m_game->callGameEvent(CGameEvents::EG_PICKUP);
     }
 }
@@ -379,27 +374,7 @@ void CActor::setGame(CGame *game)
 
 bool CActor::isMonster()
 {
-    const int monsterClasses []= {
-        CLASS_GENERIC_COS,
-        CLASS_GENERIC_COS___COMPLEX,
-        CLASS_DRONE_UP_DOWN,
-        CLASS_DRONE_LEFT_RIGHT,
-        CLASS_RANDOM_ATTACKER,
-        CLASS_VAMPIRE_PLANT_SOLID,
-        CLASS_WACKER_UP_DOWN,
-        CLASS_WACKER_LEFT_RIGHT,
-        CLASS_CREATURE_BULLET,
-        0
-    };
-
-    const int classId = proto().m_nClass;
-    for (int i=0; monsterClasses[i]; ++i) {
-        if (classId == monsterClasses[i]) {
-            return true;
-        }
-    }
-
-    return false;
+    return proto().isMonster();
 }
 
 bool CActor::isVisible()
@@ -455,7 +430,7 @@ bool CActor::canMove(int nAim, bool bActor)
                     return true;
                 }
             }
-            if (!m_game->gravity() || po.m_nClass != CLASS_PLAYER_OBJECT) {
+            if (!m_game->gravity() || !po.isPlayer()) {
                 return false;
             }
         }
@@ -595,7 +570,7 @@ bool CActor::map()
                 for (int x = 0; x < sx.len; ++x) {
                     CMapEntry & map = m.at(p.x + x, p.y + y);
                     if (po.m_bNoSmartMap || frame.map(x,y)) {
-                        if (po.m_nClass == CLASS_PLAYER_OBJECT) {
+                        if (po.isPlayer()) {
                             map.m_bPlayer = true;
                         } else {
                             if (po.m_nClass < CLASS_GENERIC_COS) {
@@ -1067,9 +1042,10 @@ void CActor::doManage()
                 followPath();
             }
             //TODO: revisit this
-            //if (isMonster() && isPlayerThere(m_nAim)) {
-            //    attackPlayer();
-            //}
+            if (m_playback & CPathBlock::PB_ATTACK_PLAYER &&
+                isPlayerThere(m_nAim) && isMonster()) {
+                attackPlayer();
+            }
             return;
         }
 
@@ -1205,7 +1181,7 @@ void CActor::doManage()
     } else{
         if (getState(CHitData::STATE_DEAD)
             && m_propi[lgck::EXTRA_ANIMSEQ] == CGame::INVALID
-                && po.m_nClass != CLASS_PLAYER_OBJECT) {
+                && !po.isPlayer()) {
             unMap();
             kill();
         }
@@ -1492,7 +1468,7 @@ bool CActor::isSolid(const CMapEntry *pMap, int aim)
     }
     for (int i=0; i < map.m_fwCount; ++i) {
         // enforce solid to monster
-        if (protoActor.m_nClass != CLASS_PLAYER_OBJECT) {
+        if (!protoActor.isPlayer()) {
             // if everything else
             const CActor & entry = scene[map.m_nFwEntry[i]];
             const CProto & protoMap = m_game->m_arrProto[entry.m_nProto];
@@ -1501,8 +1477,7 @@ bool CActor::isSolid(const CMapEntry *pMap, int aim)
             }
         }
         if (map.m_nFwClass[i] == CLASS_OPEN_TO_OWNER) {
-            if (protoActor.m_nClass != CLASS_PLAYER_OBJECT
-                || aim == CGame::FALL) {
+            if (!protoActor.isPlayer() || aim == CGame::FALL) {
                 return true;
             } else {
                 CActor & object = scene[map.m_nFwEntry[i]];
@@ -1590,7 +1565,7 @@ int CActor::checkHit()
     memset(static_cast<void*>(&data), 0, sizeof(CHitData));
     hitTest(CGame::HERE, data);
     for (int i = 0; i < data.fwCount; ++i) {
-        CActor & object = scene[ data.fwEntry[i] ];
+        CActor & object = scene.get(data.fwEntry[i]);
         const CProto & protoObj = m_game->m_arrProto[object.m_nProto];
         int triggerKey = object.m_nTriggerKey & TRIGGER_KEYS;
         if (object.m_nProto > 0) {
@@ -1614,10 +1589,10 @@ int CActor::checkHit()
             /* fall through */
         case CLASS_PICKUP_TRIGGERS:
             object.unMap();
+            object.callEvent(CObject::EO_DEATH);
             if (triggerKey) {
                 object.callTrigger();
             }
-            object.callEvent(CObject::EO_DEATH);
             object.kill();
         }
     }
@@ -1632,6 +1607,11 @@ bool CActor::isFrozen()
 bool CActor::isGoal()
 {
     return (m_nTriggerKey & TRIGGER_GOAL) != 0;
+}
+
+bool CActor::isPickUpTrigger()
+{
+    return proto().m_nClass == CLASS_PICKUP_TRIGGERS;
 }
 
 int CActor::getHP()
@@ -1668,7 +1648,7 @@ void CActor::getExtra(int * &extra, int * &index, int &size)
 const char * CActor::getInventoryName()
 {
     static char name[16];
-    if (proto().m_nClass == CLASS_PLAYER_OBJECT) {
+    if (proto().isPlayer()) {
         strcpy(name, "@player");
     } else {
         sprintf(name, "@%.8x", m_seed);
@@ -1733,7 +1713,7 @@ int & CActor::get(int i)
 
 bool CActor::isPlayer()
 {
-    return proto().m_nClass == CLASS_PLAYER_OBJECT;
+    return proto().isPlayer();
 }
 
 void CActor::togglePathPlayback(bool enable)
@@ -1757,4 +1737,14 @@ void CActor::togglePathPlayback(bool enable)
 const char *CActor::getClassName()
 {
     return m_game->m_className[proto().m_nClass].c_str();
+}
+
+void CActor::debug()
+{
+    qDebug("id: %d [proto %d - %s] class: %d [%s]",
+           this->m_id,
+           this->m_nProto,
+           getProto().getName(),
+           getProto().m_nClass,
+           getClassName());
 }

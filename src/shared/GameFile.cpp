@@ -816,7 +816,18 @@ int CGameFile::getLevelByUUID(const char *uuid)
             return i;
         }
     }
-    return -1;
+    return INVALID;
+}
+
+int CGameFile::getLevelByTitle(const char *title)
+{
+    for (int i=0; i < m_nLevels; ++i) {
+        CLevel *level = m_arrLevels[i];
+        if (std::string(level->getSetting("title")) == title) {
+            return i;
+        }
+    }
+    return INVALID;
 }
 
 CDisplayConfig * CGameFile::getDisplayConfig()
@@ -825,7 +836,7 @@ CDisplayConfig * CGameFile::getDisplayConfig()
 }
 
 int *CGameFile::countFrameSetUses()
-{;
+{
     int count = m_arrFrames.getSize();
     int * countFrameSetUses = new int[count];
     memset(countFrameSetUses, 0, sizeof(int)*count);

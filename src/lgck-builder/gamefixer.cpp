@@ -200,15 +200,34 @@ void CGameFixer::troubleshoot()
                             ""
                         });
         } else {
-            m_errors.push_back(
-                        DesignError{
-                            Warning,
-                            tr("Current Level doesn't contains one goal."),
-                            tr("Not including one goal on this level will lead to "\
-                               "automatically completing the level upon entry."\
-                               "This is likely not the intended result."),
-                            "no_goal_on_current_level.html"
-                        });
+            int goal = m_game->getCurrentLevel().getSettingInt(CLevel::SPARAM_GOAL);
+            QList<int> goals;
+            goals << CLevel::GOAL_UP
+                  << CLevel::GOAL_DOWN
+                  << CLevel::GOAL_LEFT
+                  << CLevel::GOAL_ONLY
+                  << CLevel::GOAL_RIGHT;
+            if (goals.contains(goal)) {
+                m_errors.push_back(
+                    DesignError{
+                        Warning,
+                        tr("Current Level doesn't contains one goal."),
+                        tr("Not including one goal on this level will lead to "\
+                           "automatically completing the level upon entry."\
+                           "This is likely not the intended result."),
+                        "no_goal_on_current_level.html"
+                    });
+            } else {
+                m_errors.push_back(
+                    DesignError{
+                        Warning,
+                        tr("Level goal is set to No Complete and level doesn't contains one goal."),
+                        tr("The goal for this level is assumed to be dynamic and will be defined through scripting. "\
+                           "While this will not result in automatically completing the level upon entry, "\
+                           "it is still possibly wrong and might need to be checked."),
+                        "no_goal_on_current_level.html"
+                    });
+            }
         }
     }
 

@@ -23,7 +23,6 @@
 #define _PROTO_H
 
 class IFile;
-class QString;
 
 #include "stdafx.h"
 
@@ -208,6 +207,8 @@ public:
     bool isBkClass() const;
     bool isFkClass() const;
     bool isAcClass() const;
+    bool isPlayer() const;
+    bool isMonster() const;
 
 };
 
