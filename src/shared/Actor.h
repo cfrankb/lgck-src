@@ -110,6 +110,8 @@ public:
     CProto & getProto();
     void togglePathPlayback(bool enable);
     const char *getClassName();
+    const char *getName();
+    const char *getString();
     void copyFrom(const CActor & s);
     void debug();
 

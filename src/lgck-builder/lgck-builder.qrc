@@ -120,5 +120,6 @@
         <file>images/Light-bulb-wine.png</file>
         <file>res/const.txt</file>
         <file>images/pd/primary-gnome-question.svg</file>
+        <file>images/Light-bulb-blue.png</file>
     </qresource>
 </RCC>

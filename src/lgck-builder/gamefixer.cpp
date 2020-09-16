@@ -173,12 +173,21 @@ void CGameFixer::troubleshoot()
                             tr("This is not intentional. Your level cannot be empty."),
                             "insert_sprite.html"
                         });
-        } else if (layer->countSpriteOfClass(*m_game, CLASS_PLAYER_OBJECT)) {
+        } else if (layer->countSpriteOfClass(*m_game, CLASS_PLAYER_OBJECT) == 1) {
             m_errors.push_back(
                         DesignError{
                             Okay,
-                            tr("Found player on current Level."),
+                            tr("Found one Player Sprite on the current Level."),
                             "",
+                            ""
+                        });
+        } else if (layer->countSpriteOfClass(*m_game, CLASS_PLAYER_OBJECT) > 1){
+            m_errors.push_back(
+                        DesignError{
+                            Info,
+                            tr("Found %1 Player Sprites on current Level.").arg(layer->countSpriteOfClass(*m_game, CLASS_PLAYER_OBJECT)),
+                            tr("This is perfectly valid. However, please keep in mind that only one Player Sprite will be used by the engine. "\
+                            "Any additional sprite instances will be ignored and remain inactive."),
                             ""
                         });
         } else {
@@ -220,7 +229,7 @@ void CGameFixer::troubleshoot()
             } else {
                 m_errors.push_back(
                     DesignError{
-                        Warning,
+                        Info,
                         tr("Level goal is set to No Complete and level doesn't contains one goal."),
                         tr("The goal for this level is assumed to be dynamic and will be defined through scripting. "\
                            "While this will not result in automatically completing the level upon entry, "\
@@ -262,7 +271,7 @@ void CGameFixer::troubleshoot()
     } else if (m_game->protos().countAutoGoals()==0){
         m_errors.push_back(
             DesignError{
-                Warning,
+                Info,
                 tr("No sprite defined as an automatic goal."),
                 tr("While this can be perfectly valid, "\
                    "you may be required to mark every single goal on the level manually. "\
@@ -282,6 +291,8 @@ const char *CGameFixer::getIcon(Severity severity, bool flip)
     switch (severity) {
         case Okay:
             return ":/images/Light-bulb-green.png";
+        case Info:
+            return ":/images/Light-bulb-blue.png";
         case Warning:
             return ":/images/Light-bulb-yellow.png";
         case Error:
@@ -300,18 +311,23 @@ QString CGameFixer::getTooltip()
     QString status;
     int warnings = 0;
     int errors = 0;
+    int info = 0;
 
     for(auto error: m_errors){
         if (error.severity == Warning) {
             ++ warnings;
         } else if (error.severity == Error) {
             ++ errors;
+        } else if (error.severity == Info) {
+            ++ info;
         }
     }
     if (errors) {
-        status = tr("%1 error%2 detected.").arg(errors).arg(errors>1? "s" :"");
+        status = errors > 1 ? tr("%1 errors detected.").arg(errors) : tr("%1 error detected.").arg(errors);
     } else if (warnings) {
-        status = tr("%1 warning%2 detected.").arg(warnings).arg(warnings>1? "s" :"");
+        status = errors > 1 ? tr("%1 warnings detected.").arg(warnings) : tr("%1 warning detected.").arg(warnings);
+    } else if (info) {
+        status = info > 1 ? tr("%1 suggestions.").arg(info) : tr("%1 suggestion.").arg(info);
     } else {
         status = tr("No errors detected");
     }
@@ -344,7 +360,7 @@ QString CGameFixer::getStatus()
 
 QString CGameFixer::getText()
 {
-    QString out;
+    QStringList list;
     for(auto error: m_errors){
         QString sError = tr("Info");
         QString img = tr("<img src='%1' width=%2 height=%2>").arg(getIcon(error.severity, false)).arg(ICON_SIZE);
@@ -354,11 +370,11 @@ QString CGameFixer::getText()
             sError = tr("Error");
         }
         QString link = QString("&nbsp;<a href=\"%1%2\">%3</a>").arg(WEB_PATH).arg(error.url).arg(tr("more info..."));
-        out += tr("<div><b>[%1] %2</b></div><div>%3%4<br><br></div>").arg(
+        list << tr("<div><b>[%1] %2</b></div><div>%3%4<br><br></div>").arg(
                     img,
                     error.message,
                     error.severity != Okay ? error.tip : tr("This requirement is satisfied."),
                     error.severity != Okay && !error.url.isEmpty() ? link : "");
     }
-    return out;
+    return list.join("");
 }

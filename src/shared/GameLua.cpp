@@ -359,7 +359,9 @@ int sprite_new(lua_State *L)
         entry.m_nX = (int) lua_tonumber(L, 1) ;
         entry.m_nY = (int) lua_tonumber(L, 2);
         entry.m_nAim = (int) lua_tonumber(L, 3);
-        entry.m_nProto = (int) lua_tonumber(L, 4);
+        entry.m_nProto = (int) lua_isnumber(L, 4) ?
+                    lua_tonumber(L, 4):
+                    game.m_arrProto.indexOfUUID(lua_tostring(L, 4));
         if (argc >= 6) {
             entry.m_nFrameSet = (int) lua_tonumber(L, 5);
             entry.m_nFrameNo = (int) lua_tonumber(L, 6);
@@ -820,9 +822,7 @@ int display_move(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setXY((int) lua_tonumber(L, 2), (int) lua_tonumber(L, 3));
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -841,9 +841,7 @@ int display_setType(lua_State *L)
             CDisplay & display = manager->getAt(id);
             display.setType((int) lua_tonumber(L, 2));
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -867,9 +865,7 @@ int display_setColor(lua_State *L)
                     (int) lua_tonumber(L, 5)
             );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -878,7 +874,6 @@ int display_setColor(lua_State *L)
 int display_setExpireTime(lua_State *L)
 //# displaySetExpireTime
 {
-    char tmp[1024];
     int argc = lua_gettop(L);
     if (argc != 2) {
         CGame::error(__func__, 2);
@@ -890,14 +885,14 @@ int display_setExpireTime(lua_State *L)
             int timeInSeconds = (int) lua_tonumber(L, 2);
             CCountdown * countdown = CGame::getGame().countdowns();
             if (countdown) {
+                char tmp[1024];
                 sprintf(tmp, "local id = findDisplay(\"%s\"); display_setVisible(id, false);", display.name());
                 char *s = getUUID();
                 CGame::getGame().countdowns()->add(s, timeInSeconds, 0, tmp).start();
                 delete s;
             }
         } else {
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -915,9 +910,7 @@ int display_setFontSize(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setFontSize((int) lua_tonumber(L, 2) );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -935,9 +928,7 @@ int display_setAlpha(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setAlpha((int) lua_tonumber(L, 2) );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -955,9 +946,7 @@ int display_setVisible(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setVisible(lua_toboolean(L, 2) );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -975,9 +964,7 @@ int display_setText(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setText(lua_tostring(L, 2) );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -990,7 +977,6 @@ int display_setImage(lua_State *L)
     if (argc != 3) {
         CGame::error(__func__, 3);
     } else {
-        char tmp[1024];
         int id = (int) lua_tonumber(L, 1);
         if (CGame::getGame().displays()->isValidIndex( id )) {
             CDisplay & display = CGame::getGame().displays()->getAt(id);
@@ -1003,12 +989,10 @@ int display_setImage(lua_State *L)
             if (imageId != CGame::INVALID) {
                 display.setImage(imageId, lua_tonumber(L, 3));
             } else {
-                sprintf(tmp, "-- frameSet value is not valid for ``%s``", __func__);
-                CGame::debug(tmp);
+                CLuaVM::debugv("-- frameSet value is not valid for ``%s``", __func__);
             }
         } else {
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -1026,9 +1010,7 @@ int display_setShadowOffset(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setShadowOffset(lua_tonumber(L, 2), lua_tonumber(L, 3) );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -1047,9 +1029,7 @@ int display_setShadowColor(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.setShadowColor(lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4), lua_tonumber(L, 5) );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -1067,9 +1047,7 @@ int display_enableShadows(lua_State *L)
             CDisplay & display = CGame::getGame().displays()->getAt(id);
             display.enableShadow( lua_toboolean(L, 2) );
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -1175,9 +1153,7 @@ int findLayer(lua_State *L)
                 return 1;
             }
         }
-        char tmp[2048];
-        sprintf(tmp, "%s(...) - can't find fn `%s`", __func__, name);
-        CGame::debug(tmp);
+        CLuaVM::debugv("%s(...) - can't find fn `%s`", __func__, name);
     }
     lua_pushnumber(L, -1);
     return 1;
@@ -1194,9 +1170,7 @@ int element_new(lua_State *L)
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, id);
             lua_pushnumber(L, -1);
         } else {
             int imageSet =  lua_tonumber(L, 2);
@@ -1225,9 +1199,7 @@ int layer_clear(lua_State *L)
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, id);
             lua_pushboolean(L, false);
         } else {
             (*layers)[id].forget();
@@ -1247,9 +1219,7 @@ int layer_getSize(lua_State *L)
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, id);
             lua_pushnumber(L, -1);
         } else {
             lua_pushnumber(L, (*layers)[id].getSize());
@@ -1269,18 +1239,14 @@ int layer_getElement(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
           //  lua_pushnumber(L, -1);
             return 0;
         } else {
             CLayer & layer = (*layers)[layerId];
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
-                char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
-                CGame::debug(tmp);
+                CLuaVM::debugv("%s(...) - elementId `%d` is out of bound", __func__, id);
                 //  lua_pushnumber(L, -1);
                 return 0;
             } else {
@@ -1307,18 +1273,14 @@ int element_setImage(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
             lua_pushboolean(L, false);
             return 1;
         } else {
             CLayer & layer = (*layers)[layerId];
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
-                char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
-                CGame::debug(tmp);
+                CLuaVM::debugv("%s(...) - elementId `%d` is out of bound", __func__, id);
                 lua_pushboolean(L, false);
                 return 1;
             } else {
@@ -1343,18 +1305,14 @@ int element_setVisible(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
             lua_pushboolean(L, false);
             return 1;
         } else {
             CLayer & layer = (*layers)[layerId];
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
-                char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
-                CGame::debug(tmp);
+                CLuaVM::debugv("%s(...) - elementId `%d` is out of bound", __func__, id);
                 lua_pushboolean(L, false);
                 return 1;
             } else {
@@ -1383,18 +1341,14 @@ int element_moveTo(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
             lua_pushboolean(L, false);
             return 1;
         } else {
             CLayer & layer = (*layers)[layerId];
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
-                char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
-                CGame::debug(tmp);
+                CLuaVM::debugv("%s(...) - elementId `%d` is out of bound", __func__, id);
                 lua_pushboolean(L, false);
                 return 1;
             } else {
@@ -1419,18 +1373,14 @@ int element_move(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
             lua_pushboolean(L, false);
             return 1;
         } else {
             CLayer & layer = (*layers)[layerId];
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
-                char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
-                CGame::debug(tmp);
+                CLuaVM::debugv("%s(...) - elementId `%d` is out of bound", __func__, id);
                 lua_pushboolean(L, false);
                 return 1;
             } else {
@@ -1454,9 +1404,7 @@ int element_move(lua_State *L)
                     break;
 
                 default:
-                    char tmp[2048];
-                    sprintf(tmp, "%s(...) - aim value `%d` is invalid", __func__, aim);
-                    CGame::debug(tmp);
+                    CLuaVM::debugv("%s(...) - aim value `%d` is invalid", __func__, aim);
                     lua_pushboolean(L, false);
                     return 1;
                     break;
@@ -1480,18 +1428,14 @@ int element_moveBy(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
             lua_pushboolean(L, false);
             return 1;
         } else {
             CLayer & layer = (*layers)[layerId];
             int id =  lua_tonumber(L, 2);
             if (id < 0 || id >= layer.getSize()) {
-                char tmp[2048];
-                sprintf(tmp, "%s(...) - elementId `%d` is out of bound", __func__, id);
-                CGame::debug(tmp);
+                CLuaVM::debugv("%s(...) - elementId `%d` is out of bound", __func__, id);
                 lua_pushboolean(L, false);
                 return 1;
             } else {
@@ -1609,9 +1553,7 @@ int findSprite(lua_State *L)
         }
 
         if (origin < 0) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - origin `%d` is out of bound", __func__, origin);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - origin `%d` is out of bound", __func__, origin);
         }
 
         CScene & scene = game.scene();
@@ -1723,9 +1665,7 @@ int display_remove(lua_State *L)
         if (CGame::getGame().displays()->isValidIndex( id )) {
             CGame::getGame().displays()->removeAt( id );
         } else {
-            char tmp[2048];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s", id, __func__);
         }
     }
     return 0;
@@ -1744,9 +1684,7 @@ int addToInventory(lua_State * L)
         CGame::error(__func__, 1);
     } else {
         int protoId = (int) lua_tonumber(L, 1);
-        char tmp[2048];
-        sprintf(tmp,"-- adding type ``%d to inventory" , protoId);
-        CGame::debug(tmp);
+        CLuaVM::debugv("-- adding type ``%d to inventory" , protoId);
         CInventory *inventory = CGame::getGame().getInventory();
         if (inventory){
             inventory->addItem(protoId);
@@ -1769,15 +1707,12 @@ int sprite_addItem(lua_State * L)
         CActor & src = scene[objId];
         int protoId = (int) lua_tonumber(L, 2);
         int count = (int) lua_tonumber(L, 3);
-        char tmp[2048];
-        sprintf(tmp,"-- adding type ``%d to inventory" , protoId);
-        CGame::debug(tmp);
+        CLuaVM::debugv("-- adding type ``%d to inventory" , protoId);
         CInventory *inventory = src.getInventory();
         if (inventory){
             inventory->addItem(protoId,count);
         } else {
-            sprintf(tmp,"can't find inventory for sprite %d", objId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("can't find inventory for sprite %d", objId);
         }
     }
     return 0;
@@ -1978,7 +1913,9 @@ int sprite_changeTo(lua_State * L)
     } else {
         CGame & game = CGame::getGame();
         int id = (int) lua_tonumber(L, 1);
-        int protoId = (int) lua_tonumber(L, 2);
+        int protoId = (int) lua_isnumber(L, 2) ?
+                    lua_tonumber(L, 2):
+                    game.m_arrProto.indexOfUUID(lua_tostring(L, 2));
         game.scene()[id].changeTo(protoId);
     }
 
@@ -2755,9 +2692,7 @@ int sprite_getString(lua_State *L)
     } else {
         int objId = (int) lua_tonumber(L, 1);
         CActor & sprite = game.scene()[objId];
-        CStringTable * table = game.getStringTable();
-        const char * s = table->get(sprite.m_string);
-        lua_pushstring(L, s);
+        lua_pushstring(L, sprite.getString());
         return 1;
     }
 }
@@ -3256,6 +3191,9 @@ int warpTo(lua_State *L)
             }
         } else if (lua_isnumber(L, 1)) {
             id = static_cast<int>(lua_tonumber(L, 1));
+            if (id < 0 || id >= game.getSize()) {
+                id = CGame::INVALID;
+            }
         }
 
         if (id != CGame::INVALID) {
@@ -3427,9 +3365,7 @@ int layer_getOffsetX(lua_State *L)
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, id);
             lua_pushnumber(L, -1);
         } else {
             int mx, my;
@@ -3450,9 +3386,7 @@ int layer_getOffsetY(lua_State *L)
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, id);
             lua_pushnumber(L, -1);
         } else {
             int mx, my;
@@ -3473,9 +3407,7 @@ int layer_setOffsetX(lua_State *L)
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, id);
         } else {
             int mx, my;
             (*layers)[id].getOffset(mx, my);
@@ -3495,9 +3427,7 @@ int layer_setOffsetY(lua_State *L)
         int id =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((id < 0) || (id >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, id);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, id);
         } else {
             int mx, my;
             (*layers)[id].getOffset(mx, my);
@@ -3564,9 +3494,7 @@ int layer_setSpeed(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
             return 0;
         } else {
             CLayer & layer = (*layers)[layerId];
@@ -3588,9 +3516,7 @@ int layer_delete(lua_State *L)
         int layerId =  lua_tonumber(L, 1);
         CLevel * layers = CGame::getGame().layers();
         if ((layerId < 0) || (layerId >= layers->getSize())) {
-            char tmp[2048];
-            sprintf(tmp, "%s(...) - layerId `%d` is out of bound", __func__, layerId);
-            CGame::debug(tmp);
+            CLuaVM::debugv("%s(...) - layerId `%d` is out of bound", __func__, layerId);
             return 0;
         } else {
             layers->removeLayerById(layerId);
@@ -3611,9 +3537,7 @@ int display_setFlagXY(lua_State *L)
             CDisplay & display = manager->getAt(id);
             display.setFlagXY((int) lua_tonumber(L, 2), (int) lua_tonumber(L, 3));
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -3625,15 +3549,13 @@ int display_setFont(lua_State *L)
     if (argc != 2) {
         CGame::error(__func__, 2);
     } else {
-        char tmp[1024];
         int id = -1;
         if (lua_isnumber(L, 1)) {
             id = (int) lua_tonumber(L, 1);
         } else if (lua_isstring(L, 1)) {
             id = CGame::getGame().getFonts()->indexOf((const char*) lua_tostring(L, 1));
         } else {
-            sprintf(tmp, "-- displayId invalid arg type for ``%s``", __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId invalid arg type for ``%s``", __func__);
         }
         if (id != -1) {
             IDisplayManager * manager = CGame::getGame().displays();
@@ -3641,8 +3563,7 @@ int display_setFont(lua_State *L)
                 CDisplay & display = manager->getAt(id);
                 display.setFont((int) lua_tonumber(L, 2));
             } else {
-                sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-                CGame::debug(tmp);
+                CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
             }
         }
     }
@@ -3661,9 +3582,7 @@ int display_setTemplate(lua_State *L)
             CDisplay & display = manager->getAt(id);
             display.setTemplate(lua_tostring(L, 2));
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;
@@ -3696,9 +3615,7 @@ int display_setSource(lua_State *L)
             CDisplay & display = manager->getAt(id);
             display.setSource(lua_tostring(L, 2));
         } else {
-            char tmp[1024];
-            sprintf(tmp, "-- displayId ``%d`` not valid for ``%s``", id, __func__);
-            CGame::debug(tmp);
+            CLuaVM::debugv("-- displayId ``%d`` not valid for ``%s``", id, __func__);
         }
     }
     return 0;

@@ -54,7 +54,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideNone</enum>
@@ -87,8 +87,8 @@
       <rect>
        <x>10</x>
        <y>17</y>
-       <width>52</width>
-       <height>15</height>
+       <width>81</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -151,7 +151,7 @@
       <rect>
        <x>10</x>
        <y>45</y>
-       <width>71</width>
+       <width>81</width>
        <height>16</height>
       </rect>
      </property>
@@ -978,7 +978,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="text">
-      <string>Select an object to act as a key to unlock this door. If `destroy on use` is enabled this sprite will disappear automatically.</string>
+      <string>Select an sprite to act as a key to unlock this door. If `destroy on use` is enabled this sprite will disappear automatically.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -1426,7 +1426,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="text">
-      <string>overide default behavior</string>
+      <string>override default behavior</string>
      </property>
     </widget>
     <widget class="QGroupBox" name="gSolid">

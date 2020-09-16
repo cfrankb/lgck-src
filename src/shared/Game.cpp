@@ -1205,6 +1205,7 @@ void CGame::callTrigger (const int nKey)
                 entry.callEvent(CObject::EO_TRIGGER);
                 if (entry.m_nActionMask & TRIGGER_DEATH_FLIP) {
                     entry.m_nActionMask ^= TRIGGER_DEATH_FLIP;
+                    entry.callEvent(CObject::EO_DEATH);
                     entry.kill();
                 }
                 entry.map();

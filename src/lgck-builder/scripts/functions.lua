@@ -663,6 +663,10 @@ function Sprite:use(...)
     return getSprite(unpack(arg));
 end
 
+function Sprite:find(...)
+    return getSprite(unpack(arg));
+end
+
 function addSprite(...)
   local arg = {...}
   local id = addSpriteC(unpack(arg));
@@ -1018,32 +1022,37 @@ function firePlayerBullet(id, ticks)
     local sprite = getSprite( id );
     local proto = sprite:getProto();
     local ammo = Counters:get("ammo")
-    if AND(proto.bulletOptions, BULLET_ENABLED) and
+    if AND(proto.bulletOptions, BULLET_ENABLED) > 0 and
         ((proto.fireRate == 0 ) or (ticks % proto.fireRate == 0))
         and testJoyState( JOY_FIRE )
-        and (ammo > 0 or AND(proto.bulletOptions, BULLET_UNLIMITED))
+        and ((ammo > 0) or AND(proto.bulletOptions, BULLET_UNLIMITED) > 0)
         then
         local x , y, aim = getSpriteVars( id );
         if testJoyState( JOY_LEFT ) then
             aim = LEFT;
-            x = x - 8;
-            y = y + 16;
         elseif testJoyState( JOY_RIGHT ) then
             aim = RIGHT;
-            x = x + sprite:width();
-            y = y + 16;
         elseif testJoyState( JOY_UP ) then
             aim = UP;
-            x = x + 8;
-            y = y - 8;
         elseif testJoyState( JOY_DOWN ) then
             aim = DOWN;
-            x = x + 8;
+        end
+
+        if aim == LEFT then
+            y = y + AND(sprite:height()/2, 0xfff8);
+        elseif aim == RIGHT then
+            x = x + sprite:width();
+            y = y + AND(sprite:height()/2, 0xfff8);
+        elseif aim == UP then
+            x = x + AND(sprite:width()/2, 0xfff8);
+        elseif aim == DOWN then
+            x = x + AND(sprite:width()/2, 0xfff8);
             y = y + sprite:height();
         end
+
         local activeBullets = sprite:childCount();
-        Counters:dec("ammo");
-        if aim ~= HERE  and activeBullets < proto.maxBullets then
+        if aim ~= HERE and proto.buddy ~= 0 and activeBullets < proto.maxBullets then
+            Counters:dec("ammo");
             local bullet = addSprite (
                 x,
                 y,
@@ -1051,6 +1060,12 @@ function firePlayerBullet(id, ticks)
                 proto.buddy
                 --spriteIdFromUuid("2b611fd2-0696-2065-2980-706e3f9539a3")
             );
+            if aim == LEFT then
+                bullet:moveBy(- bullet:width(), 0)
+            elseif aim == UP then
+                bullet:moveBy(0, - bullet:height())
+            end
+            bullet:map();
             bullet:setOwner( sprite );
             if proto.bulletSound > 0 then
                 playSound(proto.bulletSound);

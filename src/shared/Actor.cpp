@@ -40,6 +40,7 @@
 #include "GameEvents.h"
 #include "Extra.h"
 #include "IFile.h"
+#include "StringTable.h"
 
 CGame *CActor::m_game = nullptr;
 
@@ -1213,10 +1214,8 @@ void CActor::doManage_PlayerBullet()
         for (int i=0; i < hitData.acCount; ++i) {
             CActor & tE = scene [ hitData.acEntry[i] ];
             if (tE.isMonster()) {
+                callEvent(CObject::EO_ATTACK);
                 attack(tE);
-                unMap();
-                callEvent(CObject::EO_DEATH);
-                kill();
                 hasHit = true;
                 break;
             }
@@ -1721,10 +1720,8 @@ void CActor::togglePathPlayback(bool enable)
     if (enable) {
         m_playback |= CPathBlock::PB_PLAYBACK;
     } else {
-
         m_playback &= (-1 ^ CPathBlock::PB_PLAYBACK);
     }
-
     if (m_path && (m_playback & CPathBlock::PB_PLAYBACK)
             && tryPath(CObject::PS_SPRITE_CUSTOM)) {
         m_propi[lgck::EXTRA_PATHDIR] = CObject::PS_SPRITE_CUSTOM;
@@ -1737,6 +1734,16 @@ void CActor::togglePathPlayback(bool enable)
 const char *CActor::getClassName()
 {
     return m_game->m_className[proto().m_nClass].c_str();
+}
+
+const char *CActor::getName()
+{
+    return getProto().getName();
+}
+
+const char *CActor::getString()
+{
+    return m_game->getStringTable()->get(m_string);
 }
 
 void CActor::debug()

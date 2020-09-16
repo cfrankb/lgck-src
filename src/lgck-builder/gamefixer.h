@@ -24,6 +24,7 @@ class CGame;
 
 enum Severity:uint8_t{
     Okay,
+    Info,
     Warning,
     Error,
    // Fatal
