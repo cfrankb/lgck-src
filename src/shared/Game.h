@@ -97,40 +97,40 @@ public:
     // constants
 
     enum {
-        STATE_VERSION       = 0
+        STATE_VERSION           = 0
     };
 
     enum : uint16_t {
-        MAX_HP              = 255,
-        PROTO_SPECIAL_MASK  = 0x8000,
-        PROTO_POINTS        = 0xffff,
-        PROTO_DEAD_PLAYER   = 0xfffe,
-        PROTO_DEAD_WOOD     = 0xfffd,
-        DEFAULT_TICK_RATE   = 90
+        MAX_HP                  = 255,
+        PROTO_SPECIAL_MASK      = 0x8000,
+        PROTO_POINTS            = 0xffff,
+        PROTO_DEAD_PLAYER       = 0xfffe,
+        PROTO_DEAD_WOOD         = 0xfffd,
+        DEFAULT_TICK_RATE       = 90
     };
 
     enum JoyState{
-        JOY_UP              = 0x0001,
-        JOY_DOWN            = 0x0002,
-        JOY_LEFT            = 0x0004,
-        JOY_RIGHT           = 0x0008,
-        JOY_JUMP            = 0x0010,
-        JOY_FIRE            = 0x0020,
-        JOY_ZKEY            = 0x0040,
-        JOY_SPECIAL1        = 0x0080,
-        JOY_SPECIAL2        = 0x0100
+        JOY_UP                  = 0x0001,
+        JOY_DOWN                = 0x0002,
+        JOY_LEFT                = 0x0004,
+        JOY_RIGHT               = 0x0008,
+        JOY_JUMP                = 0x0010,
+        JOY_FIRE                = 0x0020,
+        JOY_ZKEY                = 0x0040,
+        JOY_SPECIAL1            = 0x0080,
+        JOY_SPECIAL2            = 0x0100
     };
 
     enum {
-        DI_NONE             = 0,
-        DI_ANIMATION        = 1,
-        DI_REMOVAL          = 2
+        DI_NONE                 = 0,
+        DI_ANIMATION            = 1,
+        DI_REMOVAL              = 2
     };
 
     enum {
-        BUTTON_LEFT         = 1,
-        BUTTON_RIGHT        = 2,
-        BUTTON_MIDDLE       = 3
+        BUTTON_LEFT             = 1,
+        BUTTON_RIGHT            = 2,
+        BUTTON_MIDDLE           = 3
     };
 
     enum {

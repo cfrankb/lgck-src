@@ -267,6 +267,10 @@ void CActor::kill()
         return;
     }
 
+    // do not remove
+    const bool isPickUp = isPickUpTrigger();
+    const bool isGoalObj = isGoal();
+
     const CProto & newproto =  m_game->m_arrProto[p.m_nChProto];
     m_propi[lgck::EXTRA_OWNER] = 0;
     // test if a rebirth is possible
@@ -337,13 +341,13 @@ void CActor::kill()
         m_game->playSound(nChSound);
     }
 
-    if (isGoal()) {
-        m_game->callGameEvent(CGameEvents::EG_GOAL_KILLED);
-        m_game->callLvEvent(CLevel::EL_GOAL_KILLED);
+    if (isPickUp) {
+        m_game->callGameEvent(CGameEvents::EG_PICKUP);
     }
 
-    if (isPickUpTrigger()) {
-        m_game->callGameEvent(CGameEvents::EG_PICKUP);
+    if (isGoalObj) {
+        m_game->callGameEvent(CGameEvents::EG_GOAL_KILLED);
+        m_game->callLvEvent(CLevel::EL_GOAL_KILLED);
     }
 }
 

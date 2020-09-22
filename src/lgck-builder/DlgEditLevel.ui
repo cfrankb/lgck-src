@@ -63,7 +63,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -73,7 +73,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>154</y>
+       <y>131</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -86,7 +86,7 @@
      <property name="geometry">
       <rect>
        <x>159</x>
-       <y>153</y>
+       <y>130</y>
        <width>241</width>
        <height>101</height>
       </rect>
@@ -125,7 +125,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>280</y>
+       <y>255</y>
        <width>57</width>
        <height>15</height>
       </rect>
@@ -138,7 +138,7 @@
      <property name="geometry">
       <rect>
        <x>160</x>
-       <y>274</y>
+       <y>249</y>
        <width>221</width>
        <height>25</height>
       </rect>
@@ -157,7 +157,7 @@
      <property name="geometry">
       <rect>
        <x>382</x>
-       <y>275</y>
+       <y>250</y>
        <width>21</width>
        <height>23</height>
       </rect>
@@ -196,7 +196,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>100</y>
+       <y>90</y>
        <width>91</width>
        <height>17</height>
       </rect>
@@ -209,10 +209,52 @@
      <property name="geometry">
       <rect>
        <x>160</x>
-       <y>100</y>
+       <y>90</y>
        <width>241</width>
        <height>25</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cNoLookUp">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>290</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>no lookup</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cNoGravity">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>320</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Disable gravity on this level.</string>
+     </property>
+     <property name="text">
+      <string>no gravity</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cOpenTop">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>350</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>open top</string>
      </property>
     </widget>
    </widget>
@@ -223,8 +265,8 @@
     <widget class="CWBtnColor" name="btnColorMod">
      <property name="geometry">
       <rect>
-       <x>272</x>
-       <y>100</y>
+       <x>282</x>
+       <y>110</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -236,8 +278,8 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>40</y>
+       <x>30</x>
+       <y>50</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -249,8 +291,8 @@
     <widget class="QLabel" name="label_17">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>270</y>
+       <x>20</x>
+       <y>280</y>
        <width>111</width>
        <height>17</height>
       </rect>
@@ -262,8 +304,8 @@
     <widget class="CWBtnColor" name="btnColor">
      <property name="geometry">
       <rect>
-       <x>272</x>
-       <y>40</y>
+       <x>282</x>
+       <y>50</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -275,8 +317,8 @@
     <widget class="CWBtnColor" name="btnITextColor">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>330</y>
+       <x>280</x>
+       <y>340</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -288,7 +330,7 @@
     <widget class="QLabel" name="label_16">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>10</y>
        <width>62</width>
        <height>17</height>
@@ -304,8 +346,8 @@
     <widget class="QLineEdit" name="eIBkColor">
      <property name="geometry">
       <rect>
-       <x>148</x>
-       <y>300</y>
+       <x>158</x>
+       <y>310</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -320,8 +362,8 @@
     <widget class="QLineEdit" name="eBorderColor">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>70</y>
+       <x>160</x>
+       <y>80</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -336,8 +378,8 @@
     <widget class="QLabel" name="label_21">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>100</y>
+       <x>30</x>
+       <y>110</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -349,8 +391,8 @@
     <widget class="CWBtnColor" name="btnBorderColor">
      <property name="geometry">
       <rect>
-       <x>272</x>
-       <y>70</y>
+       <x>282</x>
+       <y>80</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -362,8 +404,8 @@
     <widget class="CWBtnColor" name="btnIBkColor">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>300</y>
+       <x>280</x>
+       <y>310</y>
        <width>81</width>
        <height>24</height>
       </rect>
@@ -375,8 +417,8 @@
     <widget class="QLabel" name="label_15">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>330</y>
+       <x>30</x>
+       <y>340</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -388,8 +430,8 @@
     <widget class="QLineEdit" name="eColorMod">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>100</y>
+       <x>160</x>
+       <y>110</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -404,8 +446,8 @@
     <widget class="QLabel" name="label_13">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>70</y>
+       <x>30</x>
+       <y>80</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -417,8 +459,8 @@
     <widget class="QLineEdit" name="eITextColor">
      <property name="geometry">
       <rect>
-       <x>148</x>
-       <y>330</y>
+       <x>158</x>
+       <y>340</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -433,8 +475,8 @@
     <widget class="QLabel" name="label_14">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>300</y>
+       <x>30</x>
+       <y>310</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -446,8 +488,8 @@
     <widget class="QLineEdit" name="bkColor">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>40</y>
+       <x>160</x>
+       <y>50</y>
        <width>121</width>
        <height>25</height>
       </rect>
@@ -462,9 +504,9 @@
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>217</y>
-       <width>91</width>
+       <x>30</x>
+       <y>227</y>
+       <width>121</width>
        <height>16</height>
       </rect>
      </property>
@@ -472,24 +514,11 @@
       <string>Wrap arround</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cOpenTop">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>217</y>
-       <width>81</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>open top</string>
-     </property>
-    </widget>
     <widget class="QCheckBox" name="cWrapUp">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>217</y>
+       <x>160</x>
+       <y>227</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -501,8 +530,8 @@
     <widget class="QCheckBox" name="cWrapDown">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>217</y>
+       <x>250</x>
+       <y>227</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -514,8 +543,8 @@
     <widget class="QCheckBox" name="cWrapLeft">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>243</y>
+       <x>160</x>
+       <y>253</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -527,8 +556,8 @@
     <widget class="QCheckBox" name="cWrapRight">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>243</y>
+       <x>250</x>
+       <y>253</y>
        <width>82</width>
        <height>23</height>
       </rect>
@@ -540,9 +569,9 @@
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>140</y>
-       <width>401</width>
+       <x>30</x>
+       <y>150</y>
+       <width>391</width>
        <height>71</height>
       </rect>
      </property>
@@ -556,19 +585,6 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cNoLookUp">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>244</y>
-       <width>101</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>no lookup</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -578,7 +594,7 @@
      <property name="geometry">
       <rect>
        <x>32</x>
-       <y>42</y>
+       <y>51</y>
        <width>52</width>
        <height>14</height>
       </rect>
@@ -591,7 +607,7 @@
      <property name="geometry">
       <rect>
        <x>132</x>
-       <y>32</y>
+       <y>45</y>
        <width>221</width>
        <height>25</height>
       </rect>
@@ -604,7 +620,7 @@
      <property name="geometry">
       <rect>
        <x>132</x>
-       <y>76</y>
+       <y>89</y>
        <width>91</width>
        <height>25</height>
       </rect>
@@ -620,7 +636,7 @@
      <property name="geometry">
       <rect>
        <x>32</x>
-       <y>82</y>
+       <y>95</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -633,7 +649,7 @@
      <property name="geometry">
       <rect>
        <x>302</x>
-       <y>76</y>
+       <y>89</y>
        <width>91</width>
        <height>25</height>
       </rect>
@@ -649,7 +665,7 @@
      <property name="geometry">
       <rect>
        <x>242</x>
-       <y>82</y>
+       <y>95</y>
        <width>52</width>
        <height>15</height>
       </rect>
@@ -662,7 +678,7 @@
      <property name="geometry">
       <rect>
        <x>132</x>
-       <y>116</y>
+       <y>129</y>
        <width>91</width>
        <height>25</height>
       </rect>
@@ -681,7 +697,7 @@
      <property name="geometry">
       <rect>
        <x>32</x>
-       <y>122</y>
+       <y>135</y>
        <width>91</width>
        <height>16</height>
       </rect>
@@ -694,7 +710,7 @@
      <property name="geometry">
       <rect>
        <x>132</x>
-       <y>160</y>
+       <y>173</y>
        <width>91</width>
        <height>25</height>
       </rect>
@@ -713,7 +729,7 @@
      <property name="geometry">
       <rect>
        <x>32</x>
-       <y>166</y>
+       <y>179</y>
        <width>101</width>
        <height>16</height>
       </rect>
@@ -726,7 +742,7 @@
      <property name="geometry">
       <rect>
        <x>360</x>
-       <y>32</y>
+       <y>45</y>
        <width>31</width>
        <height>25</height>
       </rect>
@@ -739,7 +755,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>243</y>
+       <y>256</y>
        <width>81</width>
        <height>16</height>
       </rect>
@@ -748,27 +764,11 @@
       <string>End Level</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cNoGravity">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>284</y>
-       <width>101</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Disable gravity on this level.</string>
-     </property>
-     <property name="text">
-      <string>no gravity</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>286</y>
+       <y>299</y>
        <width>81</width>
        <height>16</height>
       </rect>
@@ -781,7 +781,7 @@
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>237</y>
+       <y>250</y>
        <width>281</width>
        <height>25</height>
       </rect>
@@ -791,7 +791,7 @@
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>282</y>
+       <y>295</y>
        <width>91</width>
        <height>25</height>
       </rect>
@@ -801,7 +801,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>210</y>
+       <y>223</y>
        <width>71</width>
        <height>17</height>
       </rect>

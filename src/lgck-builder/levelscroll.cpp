@@ -122,7 +122,8 @@ void CLevelScroll::insideTile(int x1, int y1, int x2, int y2, CSelection & selec
     for (int i=0; i < layer.getSize(); ++i) {
         CLevelEntry & entry = layer[i];
         if ((entry.m_nX >= x1 && entry.m_nX < x2)
-                && (entry.m_nY >= y1 && entry.m_nY < y2)) {
+                && (entry.m_nY >= y1 && entry.m_nY < y2)
+                && (entry.m_nActionMask & m_skillFilters)) {
             selection.addEntry(entry, i);
         }
     }
@@ -190,7 +191,7 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
         CLayer & layer = * level.getCurrentLayer();
         int oldCurrEntry = layer.getSelectionIndex(0);
         int selCount = layer.getSelectionSize();
-        int index = gf.whoIs(level, m_mouse.x + level.m_mx, m_mouse.y + level.m_my);
+        int index = gf.whoIs(level, m_mouse.x + level.m_mx, m_mouse.y + level.m_my, m_skillFilters);
         if (index != -1) {
             if (layer.isInSelection(index)) {
                 if (m_game->testKey(lgck::Key::LControl)) {
@@ -839,7 +840,8 @@ void CLevelScroll::select(int x1, int y1, int x2, int y2, CSelection & selection
     for (int i=0; i < layer.getSize(); ++i) {
         CLevelEntry & entry = layer[i];
         CFrame & frame = m_game->toFrame(entry);
-        if ( ((entry.m_nX >= x1 && entry.m_nX <= x2)
+        if ( (entry.m_nActionMask & m_skillFilters)
+             && ((entry.m_nX >= x1 && entry.m_nX <= x2)
               || (entry.m_nX <= x1 && entry.m_nX + frame.m_nLen >= x1)
               || (entry.m_nX <= x2 && entry.m_nX + frame.m_nLen >= x2))
                 &&
@@ -987,4 +989,9 @@ void CLevelScroll::setCursor()
     } else {
         viewport()->setCursor(Qt::ArrowCursor);
     }
+}
+
+void CLevelScroll::setSkillFilters(int flags)
+{
+    m_skillFilters = flags;
 }

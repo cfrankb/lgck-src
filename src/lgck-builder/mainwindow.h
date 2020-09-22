@@ -167,6 +167,8 @@ private:
 #endif
     void readButtonConfig(QSettings & settings);
     void writeButtonConfig(QSettings & settings);
+    void updateSkillFiltersCheckbox(int skillval);
+    void updateSkillFlag(int flag, bool bit);
 
 protected:
     void initializeGL();
@@ -285,6 +287,11 @@ private slots:
     void indicatorTriggered();
     void on_actionJoyState_Mapping_triggered();
     void toggleProtoFrame();
+    void on_actionHell_toggled(bool arg1);
+    void on_actionNormal_toggled(bool arg1);
+    void on_actionNightmare_toggled(bool arg1);
+    void on_actionInsane_toggled(bool arg1);
+    void on_actionAll_Skills_triggered();
 
 signals:
     void levelDeleted(int index);
@@ -322,6 +329,7 @@ signals:
     void triggerKeyFontSizeChanged(int size);
     void joyEventOccured(lgck::Button::JoyButton button, char value);
     void currentFrameChanged(int protoId, int frameId);
+    void skillFilterChanged(int);
 };
 
 #endif // MAINWINDOW_H

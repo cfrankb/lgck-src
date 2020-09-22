@@ -77,6 +77,7 @@ protected:
         int buttons;
     } MouseEvent;
     MouseEvent m_mouseEvent;
+    int m_skillFilters;
 
     virtual void initializeGL();
     virtual void paintGL();
@@ -97,6 +98,9 @@ Q_SIGNALS:
     void scrollStatusResync(int &, int &);
     void gameModeStateResync(bool &);
     void versionCheck();
+
+public slots:
+    void setSkillFilters(int flags);
 
 protected slots:
     void showGrid(bool show);

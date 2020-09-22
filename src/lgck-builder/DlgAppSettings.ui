@@ -63,93 +63,12 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
      <string>Editor</string>
     </attribute>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>127</y>
-       <width>52</width>
-       <height>15</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Color</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="eGridColor">
-     <property name="geometry">
-      <rect>
-       <x>141</x>
-       <y>120</y>
-       <width>113</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="inputMask">
-      <string>hhhhhh</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="maxLength">
-      <number>6</number>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cShowGrid">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>47</y>
-       <width>101</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>show grid</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>89</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Grid Size</string>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="cbGridSize">
-     <property name="geometry">
-      <rect>
-       <x>141</x>
-       <y>83</y>
-       <width>63</width>
-       <height>25</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="CWBtnColor" name="btnGridColor">
-     <property name="geometry">
-      <rect>
-       <x>254</x>
-       <y>120</y>
-       <width>71</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_13">
      <property name="geometry">
       <rect>
@@ -166,92 +85,11 @@
       <enum>Qt::RichText</enum>
      </property>
     </widget>
-    <widget class="QLineEdit" name="eTriggerKeyColor">
-     <property name="geometry">
-      <rect>
-       <x>141</x>
-       <y>200</y>
-       <width>113</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="inputMask">
-      <string>hhhhhh</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="maxLength">
-      <number>6</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_11">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>203</y>
-       <width>62</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Color    </string>
-     </property>
-    </widget>
-    <widget class="CWBtnColor" name="btnTriggerKeyColor">
-     <property name="geometry">
-      <rect>
-       <x>254</x>
-       <y>200</y>
-       <width>71</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cbShowTriggerKey">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>160</y>
-       <width>161</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>show trigger keys</string>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="cbTriggerKeyFontSize">
-     <property name="geometry">
-      <rect>
-       <x>141</x>
-       <y>236</y>
-       <width>85</width>
-       <height>27</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_17">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>243</y>
-       <width>62</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Font size</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_19">
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>282</y>
+       <y>333</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -264,7 +102,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>279</y>
+       <y>330</y>
        <width>86</width>
        <height>25</height>
       </rect>
@@ -274,7 +112,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>329</y>
+       <y>380</y>
        <width>101</width>
        <height>17</height>
       </rect>
@@ -287,7 +125,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>325</y>
+       <y>376</y>
        <width>86</width>
        <height>25</height>
       </rect>
@@ -297,7 +135,7 @@
      <property name="geometry">
       <rect>
        <x>260</x>
-       <y>280</y>
+       <y>331</y>
        <width>191</width>
        <height>23</height>
       </rect>
@@ -305,6 +143,197 @@
      <property name="text">
       <string>Remember last folder</string>
      </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>331</width>
+       <height>131</height>
+      </rect>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Level Grid</string>
+     </property>
+     <widget class="CWBtnColor" name="btnGridColor">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>90</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="cShowGrid">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>27</y>
+        <width>101</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>show grid</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbGridSize">
+      <property name="geometry">
+       <rect>
+        <x>117</x>
+        <y>60</y>
+        <width>63</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>97</y>
+        <width>52</width>
+        <height>15</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Color</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>66</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Grid Size</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="eGridColor">
+      <property name="geometry">
+       <rect>
+        <x>117</x>
+        <y>90</y>
+        <width>113</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="inputMask">
+       <string>hhhhhh</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="maxLength">
+       <number>6</number>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>180</y>
+       <width>331</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Trigger Keys</string>
+     </property>
+     <widget class="CWBtnColor" name="btnTriggerKeyColor">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>67</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="eTriggerKeyColor">
+      <property name="geometry">
+       <rect>
+        <x>117</x>
+        <y>67</y>
+        <width>113</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="inputMask">
+       <string>hhhhhh</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="maxLength">
+       <number>6</number>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="cbShowTriggerKey">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>30</y>
+        <width>161</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>show trigger keys</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbTriggerKeyFontSize">
+      <property name="geometry">
+       <rect>
+        <x>117</x>
+        <y>103</y>
+        <width>85</width>
+        <height>27</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>70</y>
+        <width>62</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Color    </string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>110</y>
+        <width>62</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Font size</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab">

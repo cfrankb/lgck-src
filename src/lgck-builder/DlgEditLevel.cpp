@@ -43,6 +43,7 @@ CDlgEditLevel::CDlgEditLevel(QWidget *parent) :
     m_ui->btnIBkColor->setBuddy(m_ui->eIBkColor);
     m_ui->btnITextColor->setBuddy(m_ui->eITextColor);
     m_bNewLevel = false;
+    m_ui->btnMusic->hide();
 }
 
 CDlgEditLevel::~CDlgEditLevel()
@@ -130,11 +131,7 @@ void CDlgEditLevel::load(CLevel *s)
     m_ui->cbEndLevel->setCurrentIndex( goal );
 
     for (int i=0; i < 32; ++i) {
-        if (i != 0) {
-            m_ui->cbTrigger->addItem(QString("%1").arg(i));
-        } else {
-            m_ui->cbTrigger->addItem(QString(tr("(none)")));
-        }
+        m_ui->cbTrigger->addItem(i != 0 ? QVariant(i).toString() : tr("(none)"));
     }
 
     int trigger = strtol(level.getSetting("trigger"), nullptr, 10);

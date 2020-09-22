@@ -72,6 +72,7 @@ sprites
 [ ] optimize texture selection and z-order
 [ ] per sprite color/alpha mod (SDL_SetTextureColorMod)
 [x] trigger flip to death state
+[ ] clip texture
 
 player
 ------
@@ -80,12 +81,12 @@ player
     bonus1 => bonus2
     playerobj1 => playerobj2
 
-[ ] player bullet
+[x] player bullet
   [x] proto
   [x] fire rate / freq / max bullets (actives)
   [x] damage to monsters or enemy bullets
   [x] ammo left or unlimited
-  [ ] powerlevel
+  [x] powerlevel
   [x] automatically managed without scripting
 
 [ ] control fall?

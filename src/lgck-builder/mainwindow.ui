@@ -132,9 +132,21 @@
      <addaction name="actionLayer_ToolBar"/>
      <addaction name="actionLevelToolbar"/>
     </widget>
+    <widget class="QMenu" name="menuFilter">
+     <property name="title">
+      <string>Skill Filters</string>
+     </property>
+     <addaction name="actionNormal"/>
+     <addaction name="actionNightmare"/>
+     <addaction name="actionHell"/>
+     <addaction name="actionInsane"/>
+     <addaction name="separator"/>
+     <addaction name="actionAll_Skills"/>
+    </widget>
     <addaction name="action_ShowToolbox"/>
     <addaction name="actionStatus_bar"/>
     <addaction name="menuToolBar"/>
+    <addaction name="menuFilter"/>
     <addaction name="separator"/>
     <addaction name="action_ShowGrid"/>
     <addaction name="actionDebugOutput"/>
@@ -1113,6 +1125,58 @@
   <action name="actionJoyState_Mapping">
    <property name="text">
     <string>JoyState Mapping</string>
+   </property>
+  </action>
+  <action name="actionHell">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hell</string>
+   </property>
+   <property name="statusTip">
+    <string>Filter sprites to display Sprites available in Hell difficulty.</string>
+   </property>
+  </action>
+  <action name="actionNormal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Normal</string>
+   </property>
+   <property name="statusTip">
+    <string>Filter sprites to display Sprites available in Normal difficulty.</string>
+   </property>
+  </action>
+  <action name="actionNightmare">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Nightmare</string>
+   </property>
+   <property name="statusTip">
+    <string>Filter sprites to display Sprites available in Nightmare difficulty.</string>
+   </property>
+  </action>
+  <action name="actionInsane">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Insane</string>
+   </property>
+   <property name="statusTip">
+    <string>Filter sprites to display Sprites available in Insane difficulty.</string>
+   </property>
+  </action>
+  <action name="actionAll_Skills">
+   <property name="text">
+    <string>All Skills</string>
+   </property>
+   <property name="statusTip">
+    <string>Show all sprites</string>
    </property>
   </action>
  </widget>

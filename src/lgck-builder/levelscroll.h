@@ -85,6 +85,7 @@ protected:
     CLevelEntry m_entry;
     int m_gridSize;
     bool m_bErase;
+    int m_skillFilters;
 
     void scrollFastMargin(int & mx, int & my);
     void scrollFastByKeys(int & mx, int & my);
@@ -109,6 +110,7 @@ Q_SIGNALS:
 
 public slots:
     void changeProtoFrame(int proto, int frameId);
+    void setSkillFilters(int flags);
 
 protected slots:
     void setGameMode(bool gm);

@@ -308,7 +308,7 @@ void CLevelViewGL::drawScreen()
         if (!( (x + frame.m_nLen <= 0) ||
             (x >= w) ||
             (y + frame.m_nHei <= 0) ||
-            (y >= h)) ) {
+            (y >= h)) && (entry.m_nActionMask & m_skillFilters)) {
             unsigned int texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo);
             if (entry.m_nTriggerKey & TRIGGER_HIDDEN){
                 if (!im->hasInverse( entry.m_nFrameSet )) {
@@ -443,4 +443,9 @@ void CLevelViewGL::showTriggerKey(bool state)
 void CLevelViewGL::setTriggerFontSize(int size)
 {
     m_triggerFontSize = size;
+}
+
+void CLevelViewGL::setSkillFilters(int flags)
+{
+    m_skillFilters = flags;
 }

@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
             CWizGame *wiz;
             switch(dlg->getState()) {
             case CDlgSelect::OPEN:
-                fileName = QFileDialog::getOpenFileName(&w, QObject::tr("Open"), "", QObject::tr("LGCK games (*.lgckdb)"));
+                fileName = QFileDialog::getOpenFileName(&w, QObject::tr("Open"), "", QObject::tr("LGCK Projects (*.lgckdb)"));
                 if (!fileName.isEmpty()) {
                     done = true;
                 }

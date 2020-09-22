@@ -95,6 +95,8 @@ const QString MainWindow::m_appTitle = MainWindow::tr("LGCK builder IDE");
 
 constexpr const char WEB_PATH[] = "https://cfrankb.com/lgck/";
 constexpr const char UPDATER_URL[] = "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s";
+
+/* do not translate */
 constexpr const char EDITOR[] = "Editor";
 constexpr int MIN_FONT_SIZE = 10;
 constexpr int MAX_FONT_SIZE = 50;
@@ -126,6 +128,7 @@ constexpr char LAST_FOLDER[] = "rememberLastFolder";
 constexpr char FOLDERS[] = "Folders";
 constexpr char FOLDER_LGCKDB[] = "lgckdb";
 constexpr char INPUTS [] = "Inputs";
+constexpr char SKILL_FILTER[] = "skill_filter";
 
 #define O_STR(s,k) (*m_options)[s].get(k).toString()
 #define O_INT(s,k) (*m_options)[s].get(k).toInt()
@@ -314,6 +317,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, &MainWindow::currentFrameChanged,
             m_scroll, &CLevelScroll::changeProtoFrame);
+    connect(this, &MainWindow::skillFilterChanged,
+            m_lview, &CLevelViewGL::setSkillFilters);
+    connect(this, &MainWindow::skillFilterChanged,
+            m_scroll, &CLevelScroll::setSkillFilters);
 
     connect(this, SIGNAL(eraserStateChanged(bool)),
             m_scroll, SLOT(setEraserState(bool)));
@@ -480,7 +487,7 @@ void MainWindow::open(QString fileName)
     commitAll();
     if (maybeSave()) {
         if (fileName.isEmpty()) {
-            fileName = QFileDialog::getOpenFileName(nullptr, tr("Open"), fileName, tr("LGCK games (*.lgckdb)"));
+            fileName = QFileDialog::getOpenFileName(nullptr, tr("Open"), fileName, tr("LGCK Projects (*.lgckdb)"));
         }
         loadFileName(fileName);
     }
@@ -550,7 +557,7 @@ bool MainWindow::saveAs()
                 this,
                 tr("Save As"),
                 m_doc.getFileName(),
-                tr("LGCK games (*.lgckdb)")
+                tr("LGCK Projects (*.lgckdb)")
             );
     if (fileName.isEmpty())
         return false;
@@ -838,7 +845,12 @@ void MainWindow::updateMenus()
             ui->actionSearch,
             ui->actionDelete,
             ui->actionEdit_Path,
-            ui->actionView_Code
+            ui->actionView_Code,
+            ui->actionNormal,
+            ui->actionHell,
+            ui->actionNightmare,
+            ui->actionInsane,
+            ui->actionAll_Skills
         };
         for (uint32_t i=0; i < sizeof(actionsEditor)/sizeof(QAction*); ++i) {
             actionsEditor[i]->setEnabled(false);
@@ -897,7 +909,6 @@ void MainWindow::updateMenus()
         } else {
             ui->actionCreateSprite->setEnabled( true ) ;
         }
-
         ui->actionCut->setEnabled( enableMulti );
         ui->actionCopy->setEnabled( enableMulti );
         ui->actionDelete->setEnabled( enableMulti );
@@ -942,8 +953,12 @@ void MainWindow::updateMenus()
         } else {
             m_comboEvents->setCurrentIndex(0);
         }
+        ui->actionNormal->setEnabled(true);
+        ui->actionHell->setEnabled(true);
+        ui->actionNightmare->setEnabled(true);
+        ui->actionInsane->setEnabled(true);
+        ui->actionAll_Skills->setEnabled(true);
     }
-
     ui->actionScriptWizard->setEnabled(m_viewMode == VM_SPRITE_EVENTS);
 }
 
@@ -1997,7 +2012,7 @@ void MainWindow::showContextMenu(const QPoint& pos)
             int x = pos.x() & 0xfff8;
             int y = pos.y() & 0xfff8;
             CGameFile * gf = &m_doc;
-            int index = gf->whoIs( level, x + level.m_mx, y + level.m_my);
+            int index = gf->whoIs( level, x + level.m_mx, y + level.m_my, O_INT(GENERAL, SKILL_FILTER));
             if (index == -1 || !layer.isInSelection(index)) {
                 layer.selectSingle( index );
             }
@@ -2580,6 +2595,7 @@ void MainWindow::saveSettings()
 
 void MainWindow::initSettings()
 {
+    // add default values
     qDebug("initSettings");
     m_options = new COptions;
     COptionGroup & editor = (*m_options)[EDITOR];
@@ -2600,7 +2616,8 @@ void MainWindow::initSettings()
             .set(GRIDSIZE, 32)
             .set(LAST_PROJECTS, 4)
             .set(XTICK_MAX_RATE, 100)
-            .set(LAST_FOLDER, true);
+            .set(LAST_FOLDER, true)
+            .set(SKILL_FILTER, CGame::SKILL_FLAG_ALL);
 
     COptionGroup & testLevel = (*m_options)[TESTLEVEL];
     testLevel.set(SKILL, 0)
@@ -2699,6 +2716,7 @@ void MainWindow::reloadSettings()
     ui->actionSprite_Paint->setChecked(settings.value("paintTool", false).toBool());
     settings.endGroup();
 
+    updateSkillFiltersCheckbox(O_INT(GENERAL, SKILL_FILTER));
     // Inputs
     readButtonConfig(settings);
 }
@@ -3202,7 +3220,7 @@ void MainWindow::indicatorTriggered()
 {
     if (m_fixer->ready()){
         CDlgIndicator dlg;
-        dlg.setWindowTitle(tr("Project Fixer"));
+        dlg.setWindowTitle(tr("Project Assistant"));
         dlg.setText(m_fixer->getText());
         dlg.exec();
     }
@@ -3332,5 +3350,52 @@ void MainWindow::on_actionJoyState_Mapping_triggered()
             // write error
             warningMessage( QString(tr("can't write to %1")).arg(fileName) );
         }
+    }
+}
+
+void MainWindow::updateSkillFlag(int flag, bool bit)
+{
+    int curr = O_INT(GENERAL, SKILL_FILTER);
+    curr = bit ? curr | flag : curr & (CGame::SKILL_FLAG_ALL ^ flag);
+    O_SET(GENERAL, SKILL_FILTER, curr);
+    emit skillFilterChanged(curr);
+}
+
+void MainWindow::on_actionHell_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_HELL, arg1);
+}
+
+void MainWindow::on_actionNormal_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_NORMAL, arg1);
+}
+
+void MainWindow::on_actionNightmare_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_NIGHTMARE, arg1);
+}
+
+void MainWindow::on_actionInsane_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_INSANE, arg1);
+}
+
+void MainWindow::on_actionAll_Skills_triggered()
+{
+    updateSkillFiltersCheckbox(CGame::SKILL_FLAG_ALL);
+}
+
+void MainWindow::updateSkillFiltersCheckbox(int skillval)
+{
+    QAction *skills [] = {
+        ui->actionNormal,
+        ui->actionNightmare,
+        ui->actionHell,
+        ui->actionInsane
+    };
+    for (unsigned int i=0; i < sizeof(skills) / sizeof(QAction*); ++i) {
+        int flag = 1 << i;
+        skills[i]->setChecked(skillval & flag);
     }
 }

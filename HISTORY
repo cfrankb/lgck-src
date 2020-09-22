@@ -13,7 +13,7 @@ HISTORY OF LGCK BUILDER
 - EDITOR: added debug output window
 - EDITOR: tile paint, eraser modes added
 - EDITOR: show TriggerKeys in editor
-- EDITOR: added GameFixer that report and help fix common design errors
+- EDITOR: added Project Assistant that report and help fix common design errors
 - EDITOR: added sample sprite to New Games
 - EDITOR: replaced QScintilla with a native Qt solution
 - EDITOR: added GamePad support
@@ -22,6 +22,7 @@ HISTORY OF LGCK BUILDER
 - EDITOR: new Overlay type Counter
 - EDITOR: added coins, lives and ammo bonuses
 - EDITOR: integrating player fire bullet w/ editSprite
+- EDITOR: added skill filter
 - TOOLS: migrated to qt 5.15
 - LUA: display_setFlagXY, display_setFont, display_setSource
 - LUA: countdown_set, countdown_start, countdown_stop

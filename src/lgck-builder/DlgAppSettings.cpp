@@ -79,30 +79,28 @@ CDlgAppSettings::CDlgAppSettings(QWidget *parent) :
 
     m_ui->cbSkill->setFocus();
     for (int i=1; i< 255; ++i) {
-        QString s = QString("%1").arg(i);
-        m_ui->cbLives->addItem(s);
+        m_ui->cbLives->addItem(QVariant(i).toString());
     }
 
     m_ui->tabWidget->setCurrentIndex(0);
 
     // editor
     for (int i=10; i< 50; ++i) {
-        QString s = QString("%1").arg(i);
-        m_ui->cbFontSize->addItem(s);
+        m_ui->cbFontSize->addItem(QVariant(i).toString());
     }
     m_ui->cbFontSize->setCurrentIndex(0);
 
     for (unsigned int i=0; i< sizeof(triggerFontSizes)/sizeof(int); ++i) {
         m_ui->cbTriggerKeyFontSize->addItem(
-                    QString("%1").arg(triggerFontSizes[i]));
+                    QVariant(triggerFontSizes[i]).toString(), triggerFontSizes[i]);
     }
 
     for (unsigned int i=0; i< sizeof(lastProjectCount)/sizeof(int); ++i) {
-        m_ui->cbProjects->addItem(QString("%1").arg(lastProjectCount[i]));
+        m_ui->cbProjects->addItem(QVariant(lastProjectCount[i]).toString(), lastProjectCount[i]);
     }
 
     for (unsigned int i=0; i< sizeof(tickMaxRateOptions)/sizeof(int); ++i) {
-        m_ui->cbTickMaxRate->addItem(QString("%1").arg(tickMaxRateOptions[i]));
+        m_ui->cbTickMaxRate->addItem(QVariant(tickMaxRateOptions[i]).toString(), tickMaxRateOptions[i]);
     }
 
     m_ui->sArgsHelp->setText(tr("%1 lgckdb filename\n" \

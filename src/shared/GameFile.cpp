@@ -78,6 +78,7 @@ CSettings::SETTING CGameFile::m_gameDefaults[] =
     { "hp", "32", 32},
     { "lives_max", "99", 99},
     { "hp_max", "255", 255},
+    { "skill_filter", "15", SKILL_FLAG_ALL},
     { "", "", 0}
 };
 
@@ -354,7 +355,7 @@ CLevel * CGameFile::getLevel(int n)
     return m_arrLevels[n];
 }
 
-int CGameFile::whoIs(CLevel & level, int x, int y)
+int CGameFile::whoIs(CLevel & level, int x, int y, int skillFilters)
 {
     int nTarget = -1;
 
@@ -368,7 +369,8 @@ int CGameFile::whoIs(CLevel & level, int x, int y)
             CFrame * pFrame = frameSet[entry.m_nFrameNo];
             if ((entry.m_nX<= x) && (entry.m_nY<= y) &&
                 (entry.m_nX+ pFrame->m_nLen) > x &&
-                (entry.m_nY+ pFrame->m_nHei) > y )
+                (entry.m_nY+ pFrame->m_nHei) > y &&
+                (entry.m_nActionMask & skillFilters))
                 nTarget = n;
         }
     }
@@ -602,7 +604,7 @@ bool CGameFile::read(const char *filepath)
             m_fontManager->reset();
         }
 
-        CLuaVM::debugv("FS[0] %s", m_arrFrames[0]->tag("UUID").c_str());
+      //  CLuaVM::debugv("FS[0] %s", m_arrFrames[0]->tag("UUID").c_str());
         CLuaVM::debugv("read done ;) \n");
         return true;
     }

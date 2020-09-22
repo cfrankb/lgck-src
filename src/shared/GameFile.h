@@ -109,8 +109,17 @@ public:
         PARAM_LIVES             = 28,
         PARAM_HP                = 29,
         PARAM_LIVES_MAX         = 30,
-        PARAM_HP_MAX            = 31
+        PARAM_HP_MAX            = 31,
+        PARAM_SKILL_FILTER      = 32
     } PARAM_GAME;
+
+    enum {
+        SKILL_NORMAL            = 0,
+        SKILL_NIGHTMARE         = 1,
+        SKILL_HELL              = 2,
+        SKILL_INSANE            = 3,
+        SKILL_FLAG_ALL          = 0xf
+    };
 
     /////////////////////////////////////////////////////////////////
     // variables
@@ -148,7 +157,7 @@ public:
     bool isUntitled ();
     bool isDirty() const;
     void setDirty(const bool dirty);
-    int whoIs(CLevel & script, int x, int y);
+    int whoIs(CLevel & script, int x, int y, int skillFilters=0xf);
     const char * getFileName();
     void setFileName(const char * fileName);
     int getSize();
