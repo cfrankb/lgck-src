@@ -21,7 +21,8 @@ if unpack == nil then
     -- to keep lua 5.2 happy
     unpack = table.unpack;
 end
-        CWBtnColor = {};
+
+CWBtnColor = {};
 CWBtnColor.__index = CWBtnColor;
 
 function CWBtnColor:color()

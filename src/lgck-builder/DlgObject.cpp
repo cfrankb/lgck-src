@@ -1049,7 +1049,8 @@ void CDlgObject::on_cOverideSolid_clicked(bool checked)
 void CDlgObject::on_eName_textChanged(const QString &arg1)
 {
     QPushButton *button=m_ui->buttonBox->button(QDialogButtonBox::Save);
-    button->setEnabled(!arg1.trimmed().isEmpty());
+    const QString name = arg1.trimmed();
+    button->setEnabled(!name.isEmpty() && (name[0].isLetter() || (name[0]=='_')));
 }
 
 void CDlgObject::on_treePaths_customContextMenuRequested(const QPoint &pos){

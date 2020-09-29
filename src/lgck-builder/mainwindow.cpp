@@ -344,7 +344,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_infoDock, SIGNAL(visibilityChanged(bool)),
                      ui->actionDebugOutput, SLOT(setChecked(bool)));
 
-    CLuaVM::setCallback(newDebugString);
+    CLuaVM::setCallback(CLuaVM::Debug, newDebugString);
     emit debugText(tr("LuaVM ready.\n"));
 
     // reload settings
@@ -624,8 +624,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
     } else {
         event->ignore();
     }
+    leaveGameMode();
     saveSettings();
-    CLuaVM::setCallback(nullptr);
+    CLuaVM::setCallback(CLuaVM::Debug, nullptr);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -1396,7 +1397,7 @@ void MainWindow::handleGameEvents()
             m_doc.m_nCurrLevel = m_start_level;
             emit levelSelected(m_start_level);
             emit focusGL();
-            m_doc.removePointsOBL();
+            leaveGameMode();
         }
     }
 }
@@ -1890,7 +1891,7 @@ void MainWindow::on_actionPause_triggered()
     }
 }
 
-void MainWindow::on_actionQuit_Game_triggered()
+void MainWindow::leaveGameMode()
 {
     if (m_viewMode == VM_GAME) {
         setViewMode(VM_EDITOR);
@@ -1899,6 +1900,11 @@ void MainWindow::on_actionQuit_Game_triggered()
         m_doc.stopMusic();
         emit scrollbarShown(true);
     }
+}
+
+void MainWindow::on_actionQuit_Game_triggered()
+{
+    leaveGameMode();
 }
 
 void MainWindow::on_actionDebug_triggered()
@@ -3138,6 +3144,11 @@ void MainWindow::on_actionUnmark_All_as_Goals_triggered()
 }
 
 void MainWindow::newDebugString(const char *s)
+{
+    emit me->debugText(QString(s));
+}
+
+void MainWindow::newErrorString(const char *s)
 {
     emit me->debugText(QString(s));
 }

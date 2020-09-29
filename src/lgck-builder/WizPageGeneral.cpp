@@ -30,10 +30,10 @@ CWizPageGeneral::~CWizPageGeneral()
 
 bool CWizPageGeneral::isComplete () const
 {
-    return field("name").toString().trimmed() != "";
+    const QString name = field("name").toString().trimmed();
+    return name != "" && (name[0].isLetter() || name[0] == '_');
 }
 
 void CWizPageGeneral::initializePage()
 {
 }
-

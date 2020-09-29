@@ -24,7 +24,7 @@
 #include "LuaVM.h"
 #include "FileWrap.h"
 
-std::function<void(const char *)> CLuaVM::m_callback = nullptr;
+std::unordered_map<int, CLuaVM::CallbackFct> CLuaVM::m_callback;
 
 void CLuaVM::registerInt(const char *name, int value)
 {
@@ -53,7 +53,7 @@ void CLuaVM::reportErrors(int status, const char *fnName)
         if (asprintf(&t, fmt, status, s, fnName) == -1) {
             qDebug("allocation error with asprintf().");
         } else {
-            debug(t);
+            error(t);
             free(t);
         }
         qDebug(fmt, status, s, fnName);
@@ -63,8 +63,15 @@ void CLuaVM::reportErrors(int status, const char *fnName)
 
 void CLuaVM::debug(const char *s)
 {
-    if (s && m_callback) {
-        m_callback(s);
+    if (s && m_callback[Debug]) {
+        m_callback[Debug](s);
+    }
+}
+
+void CLuaVM::error(const char *s)
+{
+    if (s && m_callback[Error]) {
+        m_callback[Error](s);
     }
 }
 
@@ -90,8 +97,8 @@ int CLuaVM::debug(lua_State *L)
     int argc = lua_gettop(L);
     for (int n=1; n <= argc; ++n) {
         const char *s = lua_tostring(L, n);
-        if (s && m_callback) {
-            m_callback(s);
+        if (s && m_callback[Debug]) {
+            m_callback[Debug](s);
         }
     }
     return 0;
@@ -119,8 +126,6 @@ CLuaVM::~CLuaVM() {
     }
 }
 
-// lua interface
-
 lua_State * CLuaVM::getState()
 {
     return m_luaState;
@@ -138,7 +143,7 @@ void CLuaVM::registerFn(const char * fnName, lua_CFunction fn)
     lua_register(m_luaState, fnName, fn);
 }
 
-void CLuaVM::setCallback(std::function<void(const char *)> callback)
+void CLuaVM::setCallback(int callbackID, std::function<void(const char *)> callback)
 {
-    m_callback = callback;
+    m_callback[callbackID] = callback;
 }

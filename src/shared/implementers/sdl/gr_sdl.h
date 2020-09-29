@@ -19,7 +19,7 @@
 #ifndef GR_SDL_H
 #define GR_SDL_H
 
-#include <cstring>
+#include <string>
 #include <SDL2/SDL.h>
 #include "../shared/interfaces/IGraphics.h"
 

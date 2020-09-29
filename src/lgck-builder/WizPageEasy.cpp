@@ -27,7 +27,8 @@ CWizPageEasy::CWizPageEasy(QWidget *parent) :
 
 bool CWizPageEasy::isComplete () const
 {
-    return field("name2").toString().trimmed() != "";
+    const QString name = field("name2").toString().trimmed();
+    return name != "" && (name[0].isLetter() || name[0] == '_');
 }
 
 void CWizPageEasy::initializePage()

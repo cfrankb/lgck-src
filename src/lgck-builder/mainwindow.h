@@ -161,14 +161,13 @@ private:
     void loadFileName(const QString &fileName);
     void markAsGoal(bool isGoal);
     static void newDebugString(const char *s);
+    static void newErrorString(const char *s);
     void memorizeFilePath();
-#ifdef LGCK_GAMEPAD
-    void initGamePad();
-#endif
     void readButtonConfig(QSettings & settings);
     void writeButtonConfig(QSettings & settings);
     void updateSkillFiltersCheckbox(int skillval);
     void updateSkillFlag(int flag, bool bit);
+    void leaveGameMode();
 
 protected:
     void initializeGL();
@@ -179,6 +178,7 @@ protected:
     QOpenGLContext *m_context;
 #ifdef LGCK_GAMEPAD
     QGamepad *m_gamepad;
+    void initGamePad();
 #endif
 
 public slots:

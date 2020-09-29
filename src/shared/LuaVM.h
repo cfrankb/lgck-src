@@ -28,6 +28,8 @@ extern "C" {
 #include <lua5.2/lualib.h>
 }
 
+#include <unordered_map>
+
 class CLuaVM
 {
 public:
@@ -45,13 +47,20 @@ public:
     void reportErrors( int status, const char *fnName = nullptr);
 
     // lua interface
-    static void setCallback(std::function<void(const char *)> callback);
+    enum Callback {
+        Debug,
+        Error
+    };
+
+    typedef std::function<void(const char *)> CallbackFct;
+    static void setCallback(int callbackID, CallbackFct callback);
     static int debug(lua_State *L);
     static void debug(const char *s);
+    static void error(const char *s);
     static void debugv(const char *fmt, ...);
 
 protected:
-    static std::function<void(const char *)> m_callback;
+    static std::unordered_map<int, CallbackFct> m_callback;
     lua_State *m_luaState;
 };
 

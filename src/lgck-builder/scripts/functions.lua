@@ -660,11 +660,13 @@ function getSprite (...)
 end
 
 function Sprite:use(...)
+    local arg = {...}
     return getSprite(unpack(arg));
 end
 
 function Sprite:find(...)
-    return getSprite(unpack(arg));
+  local arg = {...}
+  return getSprite(unpack(arg));
 end
 
 function addSprite(...)

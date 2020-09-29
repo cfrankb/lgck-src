@@ -30,8 +30,6 @@ levels
     [ ] force def. sprite ???
     [x] disable lookup
     [x] make lookup a level property (yes,no, auto)
-
-
 [ ] music repeat
 
 [ ] Scroll Mode 
@@ -143,7 +141,8 @@ engine
     [x] for rebirths
     [ ] and removing displays (expire/timeout)
     [ ] and other script events
-  
+[ ] better handling/reporting of lua errors
+
 editor
 [x] add new Sprite wizard 
     (we're part of the way there)

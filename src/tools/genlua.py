@@ -42,7 +42,7 @@ if unpack == nil then
     -- to keep lua 5.2 happy
     unpack = table.unpack;
 end
-        ''')
+\n''')
         cpp_file = self.data['output']['cpp']
         print("OUT CPP: {}".format(self.data['output']['cpp']))
         src = ''
@@ -55,7 +55,6 @@ end
         if src and len(src)>1:
             tf_cpp.write(src[0])
         else:
-            #write_GPL(tf_cpp, '/*', '*/')
             tf_cpp.write(license_cpp)
         tf_cpp.write('// auto-generated\n')
         cl_dict = {}
@@ -100,13 +99,12 @@ end
                         argc_max = argc_max +1
                 fcta = []
                 tf_cpp.write('int %s_%s(lua_State *L)\n{\n' % (cl.lower(), fct))
-                tf_cpp.write('    const char *fn = "%s_%s";\n' % (cl.lower(),fct))
                 tf_cpp.write('    int argc = lua_gettop(L);\n')
                 if argc == argc_max:
                     tf_cpp.write('    if (argc != %d) {\n' % argc)
                 else:
                     tf_cpp.write('    if (argc < %d and argc > %d) {\n' % (argc, argc_max))
-                tf_cpp.write('       error(fn, %d);\n' % argc)
+                tf_cpp.write('       error(__func__, %d);\n' % argc)
                 tf_cpp.write('    } else {\n')
                 if fct != 'new':
                     tf_cpp.write('        int id = lua_tointeger(L, 1);\n')
@@ -131,10 +129,11 @@ end
                         suff = ''
                         if defv != '':
                             itype = atypes[atype]
+                            argcn = i+1+start
                             tf_cpp.write('        %s arg%d = (argc >= %d) ? lua_to%s(L, %d) : %s;\n'
-                                % (itype, i, i+1+start,
-                                ltype, i+1+start,
-                                defv))
+                                % (itype, i, argcn,
+                                ltype, argcn,
+                                f'static_cast<{atype}>({defv})' if (atype and cast) else defv))
                         else:
                             tf_cpp.write('        %s arg%d = lua_to%s(L, %d);\n' % (atypes[atype], i, ltype, i+1+start))
                         if cast:

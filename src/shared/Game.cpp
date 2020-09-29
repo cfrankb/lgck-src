@@ -1883,7 +1883,7 @@ void CGame::callStaticHandler(const char *fnName, int objId)
     // do the call (2 arguments, 1 result)
     int status = lua_pcall(m_lua.getState(), 2, 0, 0);
     if ( status != 0) {
-        m_lua.reportErrors(status);
+        m_lua.reportErrors(status, fnName);
     }
 }
 
@@ -1893,7 +1893,7 @@ int CGame::call(const char *fnName)
     lua_getglobal(L, fnName);
     int status = lua_pcall(L, 0, 1, 0);
     if ( status != 0) {
-        m_lua.reportErrors(status);
+        m_lua.reportErrors(status, fnName);
         lua_pop(L, 1);
         return EVENT_ERROR;
     } else {

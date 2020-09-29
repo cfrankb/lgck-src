@@ -153,11 +153,24 @@
        <height>131</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+       <kerning>true</kerning>
+      </font>
+     </property>
      <property name="autoFillBackground">
       <bool>false</bool>
      </property>
      <property name="title">
       <string>Level Grid</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
      </property>
      <widget class="CWBtnColor" name="btnGridColor">
       <property name="geometry">
@@ -249,6 +262,11 @@
        <width>331</width>
        <height>141</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
      </property>
      <property name="title">
       <string>Trigger Keys</string>
