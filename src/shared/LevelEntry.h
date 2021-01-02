@@ -31,17 +31,17 @@ class CProto;
 // CLevelEntry 
 
 constexpr uint8_t TRIGGER_KEYS    = 0x1f;
+constexpr uint8_t TRIGGER_DEATH_FLIP = 0x10;
 constexpr uint8_t TRIGGER_GOAL    = 0x20;
 constexpr uint8_t TRIGGER_FROZEN  = 0x40;
 constexpr uint8_t TRIGGER_HIDDEN  = 0x80;
-constexpr uint8_t TRIGGER_MASK    = 0xe0;
-
-constexpr uint8_t TRIGGER_DEATH_FLIP = 0x10;
+constexpr uint8_t TRIGGER_MASK    = 0xe0; // flipmask
 
 constexpr uint8_t DIFFICULTY_NORMAL = 0x01;
 constexpr uint8_t DIFFICULTY_NIGHTMARE = 0x02;
 constexpr uint8_t DIFFICULTY_HELL   = 0x04;
 constexpr uint8_t DIFFICULTY_INSANE = 0x08;
+constexpr uint8_t DIFFICULTY_ALL = 0xf;
 
 class CLevelEntry 
 {

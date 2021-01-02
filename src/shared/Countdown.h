@@ -81,8 +81,10 @@ public:
     CCountdownEntry & operator [](const char *name);
     int count();
     void removeAll() { forget(); }
+    void reset() { m_toClear = true; }
 
 protected:
     std::unordered_map <std::string, CCountdownEntry> m_countdown;
+    bool m_toClear;
 };
 #endif

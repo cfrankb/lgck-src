@@ -24,7 +24,7 @@
 
 CCountdown::CCountdown()
 {
-
+    m_toClear = false;
 }
 
 CCountdown::~CCountdown()
@@ -67,11 +67,16 @@ void CCountdown::forget()
 
 void CCountdown::cycle()
 {
+    if (m_toClear) {
+        forget();
+        m_toClear = false;
+    }
     std::vector<std::string> d;
     uint64_t now = 0;
     microtime(&now);
     for(auto kv : m_countdown) {
         std::string key = kv.first;
+        CLuaVM::debugv("countdown key: %s", key.c_str());
         CCountdownEntry & entry = kv.second;
         if (entry.isRunning() && now > entry.nextSecond()) {
             int & count = CGame::getGame().counter(key.c_str());
@@ -85,12 +90,14 @@ void CCountdown::cycle()
                 }
                 // TODO: remove entry
                 d.push_back(key.c_str());
+                CLuaVM::debugv("countdown key to be deleted: %s", key.c_str());
             }
         }
     }
     for(std::string i : d) {
         m_countdown.erase(i);
         CGame::getGame().m_counters.erase(i);
+        CLuaVM::debugv("countdown deleted: %s", i.c_str());
     }
 }
 

@@ -1492,6 +1492,9 @@ void CGame::postInitLevel()
 {
     CLuaVM::debugv("postInitLevel\n");
 
+    // clear countdowns
+    m_countdowns->removeAll();
+
     // invoke onCreate event
     callLvEvent(CLevel::EL_CREATE);
 

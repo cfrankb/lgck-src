@@ -52,6 +52,7 @@
 #include "../shared/Frame.h"
 #include "../shared/inputs/qt/kt_qt.h"
 #include "../shared/qtgui/qthelper.h"
+#include "../shared/Countdown.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "DlgEditLevel.h"
@@ -1236,6 +1237,7 @@ void MainWindow::on_actionTest_Level_triggered()
 {
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
         m_doc.initFonts();
+        m_doc.countdowns()->removeAll();
         CDlgTestLevel *dlg = new CDlgTestLevel(this);
         dlg->setSkill(O_INT(TESTLEVEL, SKILL));
         dlg->setHP(O_INT(TESTLEVEL, START_HP));

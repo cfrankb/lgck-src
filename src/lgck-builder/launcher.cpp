@@ -51,6 +51,7 @@ bool getCmd(const QString & appName, Path & outPath)
             return true;
         }
     }
+    qDebug() << QString("giving up on %1").arg(appName);
     return false;
 }
 

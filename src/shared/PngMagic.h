@@ -18,10 +18,12 @@
 #ifndef PNGMAGIC_H
 #define PNGMAGIC_H
 
+#include "stdafx.h"
+
 class CFrame;
 class CFrameSet;
 class IFile;
-typedef struct CFrame png_IHDR;
+//typedef struct CFrame png_IHDR;
 
 class CPngMagic
 {

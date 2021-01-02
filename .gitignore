@@ -52,4 +52,5 @@ src/build/linux/linuxdeployqt/lgck/usr/share/qt.conf
 src/build/linux/linuxdeployqt/lgck/usr/translations/*
 src/tools/buildcount.dat
 src/build/linux/snap/
+src/__temp/
 

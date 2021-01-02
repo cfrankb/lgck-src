@@ -156,7 +156,7 @@ public:
         EO_LEFTCLICK,
         EO_RIGHTCLICK,
         EO_NOTIFYCLOSURE
-    } EVENT_OBJECT;
+    } EventObject;
 
     void debug();
 private:

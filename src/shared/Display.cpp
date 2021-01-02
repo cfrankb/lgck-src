@@ -140,7 +140,7 @@ void CDisplay::setExpireTime(int time)
 
 void CDisplay::setVisible(bool visible)
 {
-    set(DI_VISIBLE, visible ? 1 : 0);
+    set(DI_VISIBLE, visible);
 }
 
 void CDisplay::show()

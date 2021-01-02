@@ -199,7 +199,7 @@ function Display:expire(time)
   displaySetExpireTime(self.id, time);
 end
 
-function Display:show(visible)
+function Display:show()
   displaySetVisible(self.id, true);
 end
 

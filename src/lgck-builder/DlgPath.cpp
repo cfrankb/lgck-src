@@ -183,7 +183,6 @@ void CDlgPath::updateIcon(QTreeWidgetItem *item, int aim)
 
 void CDlgPath::on_btnRaw_clicked()
 {
-    QString tmp;
     CPath & path = *m_path;
     QString s = path.toHex().c_str();
     bool ok = false;

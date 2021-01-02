@@ -58,23 +58,6 @@
 #include <cctype>
 #include <locale>
 
-// trim from start
-static inline std::string &ltrim(std::string &s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-        return s;
-}
-
-// trim from end
-static inline std::string &rtrim(std::string &s) {
-        s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-        return s;
-}
-
-// trim from both ends
-static inline std::string &trim(std::string &s) {
-        return ltrim(rtrim(s));
-}
-
 CGame * CGame::m_game;
 CLuaVM CGame::m_lua;
 
@@ -83,7 +66,7 @@ CLuaVM CGame::m_lua;
 
 void CGame::initLua()
 {
-    CLuaVM::debugv("initLua");
+    CLuaVM::debugv(__func__);
     // registers functions
     for (int i = 0; exports[i].fnName; ++i) {
         m_lua.registerFn(exports[i].fnName, exports[i].fnAddr);
@@ -95,18 +78,19 @@ void CGame::initLua()
 
 int playSound(lua_State *L)
 {
-    const char *fn = "playSound";
     int argc = lua_gettop(L);
     if ( argc < 1)  {
-        CGame::error(fn, 1);
+        CGame::error(__func__, 1);
     } else {
         for ( int n=1; n <= argc; ++n ) {
             if (lua_isnumber(L, n)) {
                 int i = lua_tointeger(L, n);
                 CGame::getGame().playSound(i);
-            } else {
+            } else if (lua_isstring(L, n)) {
                 const char* name = lua_tostring(L, n);
                 CGame::getGame().playSound(name);
+            } else {
+                CLuaVM::debugv("%s invalid arg %d", __func__, n);
             }
         }
     }
@@ -3182,17 +3166,17 @@ int warpTo(lua_State *L)
     } else {
         CGame & game = CGame::getGame();
         int id = CGame::INVALID;
-        if (lua_isstring(L, 1)) {
+        if (lua_isnumber(L, 1)) {
+            id = static_cast<int>(lua_tonumber(L, 1));
+            if (id < 0 || id >= game.getSize()) {
+                id = CGame::INVALID;
+            }
+        } else if (lua_isstring(L, 1)) {
             std::string uuid = static_cast<const char*>(lua_tostring(L, 1));
             id = game.getLevelByUUID(uuid.c_str());
             if (id == CGame::INVALID) {
                 std::string title = static_cast<const char*>(lua_tostring(L, 1));
                 id = game.getLevelByTitle(title.c_str());
-            }
-        } else if (lua_isnumber(L, 1)) {
-            id = static_cast<int>(lua_tonumber(L, 1));
-            if (id < 0 || id >= game.getSize()) {
-                id = CGame::INVALID;
             }
         }
 

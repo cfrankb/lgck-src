@@ -487,13 +487,13 @@ void CLevelScroll::entryFromProto(const int protoId, CLevelEntry &entry)
     entry.m_nFrameSet = proto.m_nFrameSet;
 
     if (proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP)) {
-        entry.m_nActionMask = 0xf;
+        entry.m_nActionMask = DIFFICULTY_ALL;
     } else {
-        entry.m_nActionMask = 0x8f;
+        entry.m_nActionMask = DIFFICULTY_ALL | TRIGGER_HIDDEN ;
     }
 
     if (proto.getOption(CProto::OPTION_AUTO_GOAL)) {
-        entry.m_nTriggerKey += 0x20;
+        entry.m_nTriggerKey = TRIGGER_GOAL;
     }
 }
 
