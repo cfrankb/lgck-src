@@ -50,6 +50,10 @@ sprites
   [x] lives bonus (as in extra life)
   [x] coin bonus
   [x] ammo bonus
+  [ ] freeze/unfreeze all sprites
+     [ ] freeze by class
+     [ ] freeze by objtype
+     [ ] freeze duration (in seconds)
 
 [ ] idle time counter for objects
 
@@ -71,6 +75,7 @@ sprites
 [ ] per sprite color/alpha mod (SDL_SetTextureColorMod)
 [x] trigger flip to death state
 [ ] clip texture
+
 
 player
 ------

@@ -124,6 +124,7 @@ private slots:
     void on_btnDeleteFont_clicked();
     void editFont();
     void docked(Qt::DockWidgetArea area);
+    void on_eSearchSprite_textChanged(const QString &arg1);
 
 signals:
     void levelSelection(int index);

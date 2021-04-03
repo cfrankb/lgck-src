@@ -3671,3 +3671,29 @@ int countdown_clear(lua_State *L)
     }
     return 0;
 }
+
+int sprite_freezeAll(lua_State *L)
+{
+    CGame & game = CGame::getGame();
+    int argc = lua_gettop(L);
+    if ( argc < 1)  {
+        CGame::error(__func__, 1);
+    } else {
+        CScene & scene = game.scene();
+        scene.freezeAll(lua_tonumber(L, 1), argc > 1 ? lua_tonumber(L, 2) : 0);
+    }
+    return 0;
+}
+
+int sprite_unfreezeAll(lua_State *L)
+{
+    CGame & game = CGame::getGame();
+    int argc = lua_gettop(L);
+    if ( argc < 1)  {
+        CGame::error(__func__, 1);
+    } else {
+        CScene & scene = game.scene();
+        scene.unfreezeAll(lua_tonumber(L, 1), argc > 1 ? lua_tonumber(L, 2) : 0);
+    }
+    return 0;
+}

@@ -90,7 +90,7 @@ public:
         int getIndexSize();
         int indexOfUUID(const char *uuid);
 
-        CProtoIndex * createIndex(int pattern = 0);
+        CProtoIndex * createIndex(int pattern = 0, const char *search=nullptr);
 
 // Implementation
 public:

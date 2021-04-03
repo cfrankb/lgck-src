@@ -23,10 +23,11 @@ HISTORY OF LGCK BUILDER
 - EDITOR: added coins, lives and ammo bonuses
 - EDITOR: integrating player fire bullet w/ editSprite
 - EDITOR: added skill filter
+- EDITOR: added sprite search to Toolbox
 - TOOLS: migrated to qt 5.15
 - LUA: display_setFlagXY, display_setFont, display_setSource
 - LUA: countdown_set, countdown_start, countdown_stop
-- LUA: spriteIdFromUuid
+- LUA: spriteIdFromUuid, sprite_freezeAll, sprite_unfreezeAll
 - BUG FIX: onleftClick/onRightClick doesn't work anymore
 
 *** 0.6.0.8

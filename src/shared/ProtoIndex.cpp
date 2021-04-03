@@ -55,6 +55,7 @@ CProtoIndex::CProtoIndex(CProtoArray *parent, int custom)
     m_index = nullptr;
     m_size = 0;
     m_custom = custom;
+    m_search = "";
 }
 
 void CProtoIndex::forget()
@@ -97,7 +98,6 @@ bool CProtoIndex::isAccepted(int protoId)
                 || pClass == CLASS_CREATURE_BULLET;
     }
 
-
     return false;
 }
 
@@ -106,7 +106,7 @@ void CProtoIndex::init()
     forget();
     m_index = new int [ m_protoArray->getSize() ] ;
     for (int j = 0; j < m_protoArray->getSize(); ++j) {
-        if (isAccepted(j)) {
+        if (isAccepted(j) && matchString(j)) {
             insert(j);
         }
     }
@@ -200,6 +200,23 @@ int CProtoIndex::getSize()
 int CProtoIndex::operator [] (int i)
 {
     return m_index[i];
+}
+
+void CProtoIndex::setTextFilter(const char *search)
+{
+    std::string tmp = search;
+    transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+    m_search = tmp;
+}
+
+bool CProtoIndex::matchString(int protoId) {
+    if (m_search.length() != 0) {
+        CProto & proto = (*m_protoArray) [protoId];
+        std::string tmp = proto.m_szName;
+        transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+        return tmp.find(m_search) != std::string::npos;
+    }
+    return true;
 }
 
 void CProtoIndex::debug()

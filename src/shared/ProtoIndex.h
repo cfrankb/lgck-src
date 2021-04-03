@@ -53,11 +53,14 @@ public:
     int operator [] (int i);
     static const char* getFilterName(int i);
     static int getFilterCount();
+    void setTextFilter(const char *search);
 
 protected:
 
     bool isAccepted(int protoId);
+    bool matchString(int protoId);
 
+    std::string m_search;
     int *m_index;
     int m_size;
     int m_custom;

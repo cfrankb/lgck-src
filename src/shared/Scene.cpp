@@ -426,3 +426,42 @@ const CScene &CScene::operator =(const CScene &s)
     m_seed = s.m_seed;
     return *this;
 }
+
+bool CScene::isTarget(CActor * actor, int targetGroup, int typeId)
+{
+    switch (targetGroup) {
+    case GROUP_CLASS:
+        return actor->proto().m_nClass == typeId;
+        break;
+    case GROUP_ALL_MONSTERS:
+        return actor->isMonster();
+        break;
+    case GROUP_PROTOTYPE:
+        return actor->m_nProto == typeId;
+        break;
+    case GROUP_ALL:
+        return true;
+    default:
+        return false;
+    }
+}
+
+void CScene::freezeAll(int targetGroup, int typeId)
+{
+    for (int i=1; i < m_size; ++i) {
+        CActor * actor = m_actors[i];
+        if (isTarget(actor, targetGroup, typeId)) {
+            actor->freeze();
+        }
+    }
+}
+
+void CScene::unfreezeAll(int targetGroup, int typeId)
+{
+    for (int i=1; i < m_size; ++i) {
+        CActor * actor = m_actors[i];
+        if (isTarget(actor, targetGroup, typeId)) {
+            actor->freeze();
+        }
+    }
+}

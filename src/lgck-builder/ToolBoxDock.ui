@@ -58,6 +58,13 @@
          <widget class="QComboBox" name="cbFilterSprites"/>
         </item>
         <item>
+         <widget class="QLineEdit" name="eSearchSprite">
+          <property name="placeholderText">
+           <string>search</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="CWSpriteList" name="treeObjects">
           <property name="toolTip">
            <string>This is a list of all the sprites contained in your game. 

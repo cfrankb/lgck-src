@@ -57,6 +57,9 @@ public:
     const CScene & operator = (const CScene & s);
     void notifyClosure();
     void notifyAll(int eventId);
+    void freezeAll(int targetGroup, int typeId=0);
+    void unfreezeAll(int targetGroup, int typeId);
+    bool isTarget(CActor *actor, int targetGroup, int typeId);
 
 protected:
     CActor **m_actors;
@@ -68,6 +71,14 @@ protected:
     enum {
         GROWBY = 32,
         VERSION = 0x0002
+    };
+
+    enum {
+        GROUP_NOTHING,
+        GROUP_ALL_MONSTERS,
+        GROUP_CLASS,
+        GROUP_PROTOTYPE,
+        GROUP_ALL
     };
 
     unsigned int m_seed;

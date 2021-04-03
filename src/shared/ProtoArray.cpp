@@ -712,9 +712,12 @@ int CProtoArray::getIndexSize()
     return m_indexSize;
 }
 
-CProtoIndex * CProtoArray::createIndex(int pattern)
+CProtoIndex * CProtoArray::createIndex(int pattern, const char *search)
 {
     CProtoIndex *index = new CProtoIndex(this, pattern);
+    if (search) {
+        index->setTextFilter(search);
+    }
     index->init();
     return index;
 }

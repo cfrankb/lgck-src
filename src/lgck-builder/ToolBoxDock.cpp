@@ -480,7 +480,7 @@ void CToolBoxDock::reloadSprites()
 
     CGameFile & gf = *m_gameFile;
     int filter = m_ui->cbFilterSprites->currentIndex();
-    m_index = gf.m_arrProto.createIndex(filter);
+    m_index = gf.m_arrProto.createIndex(filter, q2c(m_ui->eSearchSprite->text().trimmed()));
     CProtoIndex *index = (CProtoIndex*) m_index;
 
     clearSprites();
@@ -1657,4 +1657,10 @@ void CToolBoxDock::editFont()
         item->setText(0, text);
         m_gameFile->setDirty(true);
     }
+}
+
+void CToolBoxDock::on_eSearchSprite_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    reloadSprites();
 }
