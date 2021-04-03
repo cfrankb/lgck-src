@@ -511,7 +511,7 @@ void CFrameSet::bitmap2rgb(char *bitmap, uint32_t *rgb, int len, int hei, int er
 
 bool CFrameSet::extract(IFile &file, char *out_format)
 {
-    char format[5] = "NaN";
+    std::string format = "NaN";
     bool isUnknown = true;
 
     m_lastError = "";
@@ -608,7 +608,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
     int size = 0;
     if (memcmp(id, "OBL3", 4) == 0) {
         isUnknown = false;
-        strcpy(format, "OBL3");
+        format = "OBL3";
         file.seek( 0 );
         USER_OBL3HEADER oblHead;
         file.read(&oblHead, sizeof(USER_OBL3HEADER));
@@ -631,7 +631,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
 
     if (memcmp(id, "OBL4", 4) == 0) {
         isUnknown = false;
-        strcpy(format, "OBL4");
+        format = "OBL4";
         file.seek( 4 );
         int mode;
         file >> size;
@@ -681,7 +681,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
                 // TODO: add map if this is ever implemented
             }
             frameSet.removeAll();
-            strcpy(format, "OBL5");
+            format = "OBL5";
         } else{
             size = 0;
             m_lastError = "unsupported OBL5 version";
@@ -691,7 +691,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
 
     if (memcmp(id, "GE96", 4) == 0) {
         isUnknown = false;
-        strcpy(format, "GE96");
+        format = "GE96";
         file.seek( 0 );
         USER_MCXHEADER mcxHead;
         file.read(&mcxHead, sizeof(USER_MCXHEADER));
@@ -714,7 +714,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
 
     if (memcmp(id, "IMC1", 4) == 0) {
         isUnknown = false;
-        strcpy(format, "IMC1");
+        format = "IMC1";
         size = 1;
         USER_IMC1HEADER imc1Head;
         file.seek( 0 );
@@ -757,14 +757,13 @@ bool CFrameSet::extract(IFile &file, char *out_format)
 
     uint8_t pngSig [] = { 137, 80, 78, 71, 13, 10, 26, 10 };
     if (memcmp(id, pngSig, 8) == 0) {
-        isUnknown = false;
-        strcpy(format, "PNG");
+        format = "PNG";
         CPngMagic png;
         return png.parsePNG(*this, file);
     }
 
     if (!size && isUnknown) {
-        strcpy(format, "IMA");
+        format = "IMA";
         int fileSize = file.getSize();
         USER_IMAHEADER imaHead;
         file.seek(  0 );
@@ -774,7 +773,6 @@ bool CFrameSet::extract(IFile &file, char *out_format)
             m_lastError = "this is not a valid .ima file";
             return false;
         }
-        strcpy(format, "IMA");
         size = 1;
         CFrame * frame = new CFrame ();
         char * pIMA = new char [ dataSize ];
@@ -791,7 +789,7 @@ bool CFrameSet::extract(IFile &file, char *out_format)
     }
 
     if (out_format) {
-        strcpy(out_format, format);
+        strncpy(out_format, format.c_str(), 4);
     }
 
     return size != 0;

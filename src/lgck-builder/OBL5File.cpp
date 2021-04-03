@@ -33,7 +33,7 @@ COBL5File::~COBL5File()
 
 void COBL5File::init()
 {
-    strcpy(m_format, "OBL5");
+    m_format = "OBL5";
     m_dirty = false;
     m_currImage = -1;
 }
@@ -61,7 +61,7 @@ bool COBL5File::read()
             }
             m_currImage = 0;
             if (CFrameSet::isFriendFormat(format)) {
-                strcpy(format, "OBL5");
+                strncpy(format, "OBL5", 5);
             }
             setFormat(format);
         } else {
@@ -83,7 +83,7 @@ bool COBL5File::write()
     CFileWrap file;
     if (file.open(q2c(m_fileName), "wb")) {
         result = true;        
-        if (strcmp(m_format, "OBL5")==0) {
+        if (strcmp(m_format.c_str(), "OBL5")==0) {
             m_filter.write(file);
         } else {
             unsigned char *data;
@@ -171,10 +171,10 @@ int COBL5File::getCurrentIndex()
 
 const char *COBL5File::getFormat()
 {
-    return m_format;
+    return m_format.c_str();
 }
 
 void COBL5File::setFormat(const char *format)
 {
-    strcpy(m_format, format);
+    m_format = format;
 }

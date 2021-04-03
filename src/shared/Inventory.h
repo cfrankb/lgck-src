@@ -20,6 +20,7 @@
 #define INVENTORY_H
 
 #include <inttypes.h>
+#include <string>
 class IFile;
 
 class CInventory
@@ -53,7 +54,7 @@ protected:
         uint16_t count;
     } ITEM;
 
-    char m_name [ MAX_NAME ];
+    std::string m_name;
     ITEM m_items [ MAX_ITEMS ];
     int m_options;
 };

@@ -131,7 +131,7 @@ void CGameFixer::addSampleSprites()
             proto.m_nAutoBullet = 0;
             proto.m_nProtoBuddy = 0;
             proto.m_bulletSound = 0;
-            strcpy(proto.m_szName, item.name);
+            strncpy(proto.m_szName, item.name, sizeof(proto.m_szName) - 1);
             int id = m_game->m_arrProto.getSize();
             sprites[item.name] = Sprite {proto.m_uuid, id};
             m_game->m_arrProto += t;
@@ -296,7 +296,7 @@ const char *CGameFixer::getIcon(Severity severity, bool flip)
         case Warning:
             return ":/images/Light-bulb-yellow.png";
         case Error:
-            return m_flip & flip ? ":/images/Light-bulb-wine.png" : ":/images/Light-bulb-red.png";
+            return (m_flip & flip) ? ":/images/Light-bulb-wine.png" : ":/images/Light-bulb-red.png";
     }
     return "";
 }

@@ -342,10 +342,13 @@ MainWindow::MainWindow(QWidget *parent)
     this->addDockWidget(Qt::BottomDockWidgetArea, m_infoDock);
     connect(this, SIGNAL(debugText(QString)),
             m_infoDock, SLOT(appendText(QString)));
+    connect(this, SIGNAL(errorText(QString)),
+            m_infoDock, SLOT(appendError(QString)));
     connect(m_infoDock, SIGNAL(visibilityChanged(bool)),
                      ui->actionDebugOutput, SLOT(setChecked(bool)));
 
     CLuaVM::setCallback(CLuaVM::Debug, newDebugString);
+    CLuaVM::setCallback(CLuaVM::Error, newErrorString);
     emit debugText(tr("LuaVM ready.\n"));
 
     // reload settings
@@ -628,6 +631,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     leaveGameMode();
     saveSettings();
     CLuaVM::setCallback(CLuaVM::Debug, nullptr);
+    CLuaVM::setCallback(CLuaVM::Error, nullptr);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -1998,9 +2002,8 @@ void MainWindow::on_actionImages_triggered()
     wiz->init(m_doc.frames().getSize());
     if (wiz->exec()) {
         CFrameSet *frameSet = new CFrameSet (wiz->getFrameSet());
-        char name[32];
-        strcpy(name, wiz->getName());
-        frameSet->setName(name);
+        std::string name = wiz->getName();
+        frameSet->setName(name.c_str());
         m_doc.frames().add(frameSet);
         // add this new imageSet to the cache
         m_doc.cache()->add(frameSet);
@@ -3152,7 +3155,7 @@ void MainWindow::newDebugString(const char *s)
 
 void MainWindow::newErrorString(const char *s)
 {
-    emit me->debugText(QString(s));
+    emit me->errorText(QString(s));
 }
 
 void MainWindow::on_actionDebugOutput_toggled(bool arg1)

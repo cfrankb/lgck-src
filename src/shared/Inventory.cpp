@@ -80,12 +80,12 @@ int CInventory::operator[] (int i) const
 
 void CInventory::setName(const char *s)
 {
-    memccpy(m_name, s, 0, MAX_NAME - 1);
+    m_name = s;
 }
 
 const char* CInventory::getName() const
 {
-    return m_name;
+    return m_name.c_str();
 }
 
 void CInventory::setOptions(int options)
@@ -111,8 +111,7 @@ void CInventory::read(IFile & file)
 {
     reset();
     std::string name;
-    file >> name;
-    strcpy(m_name, name.c_str());
+    file >> m_name;
     file.read(&m_options, sizeof(m_options));
     int size = 0;
     file.read(&size, sizeof(size));

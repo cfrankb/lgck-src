@@ -489,9 +489,7 @@ void CDlgGame::on_btnAddFrameSet_clicked()
     wiz->init(i);
     if (wiz->exec()) {
         CFrameSet *frameSet = new CFrameSet (wiz->getFrameSet());
-        char name[32];
-        strcpy(name, wiz->getName());
-        frameSet->setName(name);
+        frameSet->setName(wiz->getName());
         // add new FrameSet
         gf.frames().add(frameSet);
         // add this new imageSet to the cache

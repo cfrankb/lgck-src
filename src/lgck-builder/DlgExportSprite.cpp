@@ -113,7 +113,7 @@ void CDlgExportSprite::on_btnExport_clicked()
          QFileDialog::ShowDirsOnly
          | QFileDialog::DontResolveSymlinks);
     QString suffix;
-    char outFormat[5];
+    std::string outFormat;
     if (!dir.isEmpty()) {
         outDir = dir;
         typedef struct {
@@ -130,7 +130,7 @@ void CDlgExportSprite::on_btnExport_clicked()
 
         int formatId = ui->cbFormat->currentIndex();
         suffix = formats[formatId].suffix;
-        strcpy(outFormat, formats[formatId].format);
+        outFormat = formats[formatId].format;
 
         QList<QTreeWidgetItem *> itemList;
         itemList = ui->treeObjects->selectedItems();
@@ -142,7 +142,7 @@ void CDlgExportSprite::on_btnExport_clicked()
            if (formats[formatId].isObl) {
                CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
                COBL5File oblDoc;
-               oblDoc.setFormat(outFormat);
+               oblDoc.setFormat(outFormat.c_str());
                oblDoc.getImageSet() = frameSet;
                oblDoc.setFileName(fileName);
                oblDoc.write();

@@ -1265,22 +1265,22 @@ void CToolBoxDock::exportSprite()
         }
     }
 
-    char outFormat[5];
+    std::string outFormat;
     if (!fileName.isEmpty()) {
         selected = dlg->selectedNameFilter();
         bool isObl = true;
         if (selected == oblFilter) {
-            strcpy(outFormat, "OBL5");
+            outFormat = "OBL5";
         } else if(selected == pngFilter) {
-            strcpy(outFormat, "PNG");
+            outFormat = "PNG";
         } else if(selected == metaFilter) {
-            strcpy(outFormat, "PRTO");
+            outFormat = "PRTO";
             isObl = false;
         }
         bool result = false;
         if (isObl) {
             COBL5File oblDoc;
-            oblDoc.setFormat(outFormat);
+            oblDoc.setFormat(outFormat.c_str());
             oblDoc.getImageSet() = *frameSet;
             oblDoc.setFileName(fileName);
             result = oblDoc.write();

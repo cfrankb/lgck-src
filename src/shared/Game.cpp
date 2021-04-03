@@ -640,10 +640,9 @@ bool CGame::initLevel(int n)
     // start music
     const char* music = s->getSetting("music");
     if (music[0]) {
-        char filePath[strlen(music)+m_path.length()+1];
-        strcpy(filePath, m_path.c_str());
-        strcat(filePath, music);
-        if (m_music && m_music->open(filePath)) {
+        std::string filePath;
+        filePath = m_path.c_str() + std::string(music);
+        if (m_music && m_music->open(filePath.c_str())) {
             m_music->play();
         } else {
             CLuaVM::debugv("failed to music");
@@ -1607,29 +1606,17 @@ void CGame::generateRuntimeLua(std::string & s)
     char tmp[512];
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         CProto & proto = m_arrProto[n];
-        char name[strlen(proto.m_szName)+1];
-        strcpy(name, proto.m_szName);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
-        sprintf(tmp, "OBJECT_%-40s = %d;\n", name, n);
+        std::string name = proto.m_szName;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
+        sprintf(tmp, "OBJECT_%-40s = %d;\n", name.c_str(), n);
         s += std::string(tmp);
     }
 
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         CProto & proto = m_arrProto[n];
-        char name[strlen(proto.m_szName)+1];
-        strcpy(name, proto.m_szName);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
-        sprintf(tmp, "SPRITE_%-40s = %d;\n", name, n);
+        std::string name = proto.m_szName;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
+        sprintf(tmp, "SPRITE_%-40s = %d;\n", name.c_str(), n);
         s += std::string(tmp);
     }
 
@@ -1637,17 +1624,9 @@ void CGame::generateRuntimeLua(std::string & s)
 
     for (int n = 0; n < CGame::MAX_CLASSES; ++n) {
         if (!m_className[n].empty()) {
-            const char *r = m_className[n].c_str();
-            char name[strlen(r)+1];
-            strcpy(name, r);
-            toUpper(name);
-            for (unsigned int i = 0; i < strlen(name); ++i) {
-                if (!isalnum(name[i])) {
-                    name[i] = '_';
-                }
-            }
-
-            sprintf(tmp, "CLASS_%-40s = 0x%.2x;\n",  name, n);
+            std::string name = m_className[n];
+            transform(name.begin(), name.end(), name.begin(), upperClean);
+            sprintf(tmp, "CLASS_%-40s = 0x%.2x;\n",  name.c_str(), n);
             s += std::string(tmp);
         }
     }
@@ -1655,18 +1634,9 @@ void CGame::generateRuntimeLua(std::string & s)
     s += "\n-- IMAGE SETS\n\n" ;
 
     for (int n=0; n < m_arrFrames.getSize(); ++n) {
-
-        const char *r = m_arrFrames[n]->getName();
-        char name[strlen(r)+1];
-        strcpy(name, r);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
-
-        sprintf(tmp, "IMAGES_%-40s = 0x%.2x;\n",  name, n);
+        std::string name = m_arrFrames[n]->getName();
+        transform(name.begin(), name.end(), name.begin(), upperClean);
+        sprintf(tmp, "IMAGES_%-40s = 0x%.2x;\n",  name.c_str(), n);
         s += std::string(tmp);
     }
 
@@ -1914,7 +1884,7 @@ void CGame::error(const char *fnName, int argc)
     char tmp[256];
     sprintf(tmp, "-- error: %s(...) requires %d args.",
             fnName, argc);
-    m_lua.debug(tmp);
+    m_lua.error(tmp);
 }
 
 CGame &CGame::getGame()
@@ -2068,7 +2038,7 @@ void CGame::updateScreen()
             sprintf(text, "Warp to Level %.2d", getLevel() + 1);
         }
         if (var("engineState") == ES_TIMEOUT) {
-            strcpy(text, "Ran out of time");
+            strncpy(text, "Ran out of time", sizeof(text));
         }
         displays()->drawText(-1,-1,text, 0, 15,
                              CGame::bgr2rgb(strtol(level->getSetting("introTextColor"), nullptr, 16)));
@@ -2103,8 +2073,6 @@ void CGame::saveGame(IFile & file)
     for(auto kv : m_counters) {
         std::string key = kv.first;
         int val = kv.second;
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
         file << key;
         file.write(&val, sizeof(int));
     }
@@ -2117,8 +2085,6 @@ void CGame::saveGame(IFile & file)
     for(auto kv : m_vars) {
         const std::string key = kv.first;
         unsigned long long val = kv.second;
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
         file << key;
         file.write(&val, sizeof(unsigned long long));
     }
@@ -2184,9 +2150,7 @@ void CGame::loadGame(IFile &file)
         file >> key;
         int val = 0;
         file.read(&val, sizeof(val));
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
-        counter(tmp) = val;
+        counter(key.c_str()) = val;
     }
 
     // Read Variables
@@ -2198,9 +2162,7 @@ void CGame::loadGame(IFile &file)
         file >> key;
         unsigned long long val = 0;
         file.read(&val, sizeof(val));
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
-        var(tmp) = val;
+        var(key.c_str()) = val;
     }
 
     // Read inventory table
@@ -2241,9 +2203,7 @@ void CGame::loadGame(IFile &file)
         file >> key;
         std::string val;
         file >> val;
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
-        strv(tmp) = val.c_str();
+        strv(key.c_str()) = val.c_str();
     }
 
     // load snapshot

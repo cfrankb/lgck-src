@@ -34,6 +34,7 @@ public:
 
 public slots:
     void appendText(const QString & text);
+    void appendError(const QString & text);
 
 protected:
     void closeEvent(QCloseEvent *event) override;

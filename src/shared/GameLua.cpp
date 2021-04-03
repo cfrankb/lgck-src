@@ -1523,7 +1523,7 @@ int sprite_copy(lua_State *L)
 int findSprite(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 1 && argc > 2) {
+    if (argc < 1 || argc > 2) {
         CGame::error(__func__, 1);
         lua_pushnumber(L, -1);
         return 1;
@@ -1883,6 +1883,8 @@ int alert(lua_State * L)
         QMessageBox::warning(nullptr, QString(""),
                      QString(lua_tostring(L, 1)),
                      QMessageBox::Ok );
+#else
+        // TODO add code here
 #endif
     }
     return 0;
@@ -3204,9 +3206,7 @@ int saveGame(lua_State *L)
         if (lua_isstring(L, 1)) {
             std::string filename = static_cast<const char*>(lua_tostring(L, 1));
             CFileWrap file;
-            char fname[filename.length()+1];
-            strcpy(fname, filename.c_str());
-            if (file.open(fname, "wb")) {
+            if (file.open(filename.c_str(), "wb")) {
                 game.saveGame(file);
                 file.close();
                 result = true;
@@ -3229,9 +3229,7 @@ int loadGame(lua_State *L)
         if (lua_isstring(L, 1)) {
             std::string filename = static_cast<const char*>(lua_tostring(L, 1));
             CFileWrap file;
-            char fname[filename.length()+1];
-            strcpy(fname, filename.c_str());
-            if (file.open(fname, "rb")) {
+            if (file.open(filename.c_str(), "rb")) {
                 game.loadGame(file);
                 file.close();
                 result = true;

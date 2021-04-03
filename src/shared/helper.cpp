@@ -34,6 +34,10 @@ const char *toUpper(char *s)
     return s;
 }
 
+int upperClean(int c) {
+    return isalnum(c) ? ::toupper(c) : '_';
+}
+
 char *getUUID()
 {
     char *uuid = new char[40];

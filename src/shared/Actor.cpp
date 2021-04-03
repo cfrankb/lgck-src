@@ -1652,7 +1652,7 @@ const char * CActor::getInventoryName()
 {
     static char name[16];
     if (proto().isPlayer()) {
-        strcpy(name, "@player");
+        strncpy(name, "@player", sizeof(name));
     } else {
         sprintf(name, "@%.8x", m_seed);
     }

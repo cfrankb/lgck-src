@@ -322,6 +322,7 @@ signals:
     void frameSetChanged(int fs);
     void spriteUpdated(int protoId);
     void debugText(const QString & text);
+    void errorText(const QString & text);
     void spritePaintStateChanged(bool state);
     void eraserStateChanged(bool state);
     void triggerKeyColorChanged(const QString & color);

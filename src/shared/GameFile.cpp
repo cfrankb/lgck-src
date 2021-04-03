@@ -737,16 +737,10 @@ CONST_DATA * CGameFile::getSpriteList()
     CONST_DATA * data = new CONST_DATA[m_arrProto.getSize()+1];
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         const CProto & proto = m_arrProto[n];
-        char name[strlen(proto.m_szName)+1];
-        strcpy(name, proto.m_szName);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
+        std::string name = proto.m_szName;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
         data[n].name = proto.m_szName;
-        data[n].value = "SPRITE_" + std::string(name);
+        data[n].value = "SPRITE_" + name;
     }
     return data;
 }
@@ -764,16 +758,10 @@ CONST_DATA * CGameFile::getClassList()
     for (int n = 0, i =0; n < CGameFile::MAX_CLASSES; ++n) {
         if (!m_className[n].empty()) {
             const char *r = m_className[n].c_str();
-            char name[strlen(r)+1];
-            strcpy(name, r);
-            toUpper(name);
-            for (unsigned int i = 0; i < strlen(name); ++i) {
-                if (!isalnum(name[i])) {
-                    name[i] = '_';
-                }
-            }
+            std::string name = r;
+            transform(name.begin(), name.end(), name.begin(), upperClean);
             data[i].name = r;
-            data[i].value = "CLASS_" + std::string(name);
+            data[i].value = "CLASS_" + name;
             ++i;
         }
     }
@@ -785,16 +773,10 @@ CONST_DATA * CGameFile::getImageList()
     CONST_DATA * data = new CONST_DATA[m_arrFrames.getSize()+1];
     for (int n=0; n < m_arrFrames.getSize(); ++n) {
         const char *r = m_arrFrames[n]->getName();
-        char name[strlen(r)+1];
-        strcpy(name, r);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
+        std::string name = r;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
         data[n].name = r;
-        data[n].value = "IMAGES_" + std::string(name);
+        data[n].value = "IMAGES_" + name;
     }
     return data;
 }

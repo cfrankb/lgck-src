@@ -76,7 +76,7 @@ void CCountdown::cycle()
     microtime(&now);
     for(auto kv : m_countdown) {
         std::string key = kv.first;
-        CLuaVM::debugv("countdown key: %s", key.c_str());
+        //CLuaVM::debugv("countdown key: %s", key.c_str());
         CCountdownEntry & entry = kv.second;
         if (entry.isRunning() && now > entry.nextSecond()) {
             int & count = CGame::getGame().counter(key.c_str());
@@ -90,7 +90,7 @@ void CCountdown::cycle()
                 }
                 // TODO: remove entry
                 d.push_back(key.c_str());
-                CLuaVM::debugv("countdown key to be deleted: %s", key.c_str());
+                //CLuaVM::debugv("countdown key to be deleted: %s", key.c_str());
             }
         }
     }

@@ -471,3 +471,13 @@
     KEY_UP               = 0x125;
     KEY_DOWN             = 0x126;
     KEY_PAUSE            = 0x140;
+
+---------------------------------------------------------------------
+-- SECTION: Groups
+
+    GROUP_NOTHING        = 0;
+    GROUP_ALL_MONSTERS   = 1;
+    GROUP_CLASS          = 2;
+    GROUP_PROTOTYPE      = 3;
+    GROUP_ALL            = 4;
+

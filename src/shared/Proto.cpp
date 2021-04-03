@@ -63,7 +63,7 @@ CProto::CProto (const CProto & proto)
 CProto::CProto (const char* s)
 {
     memset(static_cast<void*>(this), 0, sizeof(CProto));
-    strcpy (m_szName, s);
+    strncpy (m_szName, s, sizeof(m_szName) - 1);
     resetUUID();
 }
 
@@ -139,7 +139,9 @@ bool CProto::isAcClass() const
 
 void CProto::resetUUID()
 {
-    strcpy(m_uuid, getUUID());
+    char *uuid = getUUID();
+    strncpy(m_uuid, uuid, sizeof(m_uuid) - 1);
+    delete [] uuid;
 }
 
 bool CProto::isPlayer() const

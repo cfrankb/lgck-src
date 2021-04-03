@@ -36,6 +36,12 @@ void CInfoDock::appendText(const QString & text)
     ui->plainTextEdit->appendPlainText(text);
 }
 
+void CInfoDock::appendError(const QString & text)
+{
+    QString error = "<font color=red>" + text + "</font>";
+    ui->plainTextEdit->appendHtml(error);
+}
+
 void CInfoDock::closeEvent(QCloseEvent *event)
 {
     event->ignore();
