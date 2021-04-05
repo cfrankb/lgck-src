@@ -112,13 +112,7 @@ void CHitData::addAc(const uint8_t acC,const uint16_t acE) {
 /////////////////////////////////////////////////////////////////////
 // CMap()
 
-CMap::CMap():
-    m_len(0),
-    m_hei(0)
-{
-}
-
-CMap::CMap(const int sx=0, const int sy=0):
+CMap::CMap(const int sx, const int sy):
     m_len(sx),
     m_hei(sy)
 {

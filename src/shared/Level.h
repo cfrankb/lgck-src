@@ -81,7 +81,6 @@ public:
     int getSettingInt (const int index);
     void setSetting(const char * param, const char * value, int mask=0xffffffff);
     CSettings & getSettings();
-    void debug();
     ~CLevel();
     bool read(IFile & file);
     bool write(IFile & file);

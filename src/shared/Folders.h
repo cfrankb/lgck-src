@@ -22,8 +22,8 @@
 #include "stdafx.h"
 #include <string>
 
-class CFileWrap;
 class ISerial;
+class IFile;
 
 class CFolder
 {
@@ -40,38 +40,9 @@ public:
         int getSize() { return m_size; }
 
     protected:
-        bool writeFileIndex (CFileWrap &file)
-        {
-            char t [MAX_FILENAME + 1];
-            memset(t, 0, MAX_FILENAME + 1);
-            memccpy(t, m_name.c_str(), 0, MAX_FILENAME);
-
-            file.write(t, MAX_FILENAME);
-            file << m_offset;
-            file << m_size;
-
-            return true;
-        }
-
-        bool readFileIndex (CFileWrap &file)
-        {
-            char t [MAX_FILENAME + 1];
-            memset(t, 0, MAX_FILENAME + 1);
-
-            file.read(t, MAX_FILENAME);
-            m_name = t;
-            file >> m_offset;
-            file >> m_size;
-
-            return true;
-        }
-
-        CFileEntry & operator = (CFileEntry & s) {
-            m_name = s.getName();
-            m_offset = s.getOffset();
-            m_size = s.getSize();
-            return *this;
-        }
+        bool writeFileIndex (IFile &file);
+        bool readFileIndex (IFile &file);
+        CFileEntry & operator = (CFileEntry & s) ;
 
     protected:
 
@@ -107,10 +78,10 @@ protected:
     int m_max;
     CFileEntry *m_files ;
 
-    bool writeFolderIndex(CFileWrap & file);
-    bool readFolderIndex(CFileWrap & file);
-    bool writeFileIndex(CFileWrap & file);
-    bool readFileIndex(CFileWrap & file);
+    bool writeFolderIndex(IFile &file);
+    bool readFolderIndex(IFile &file);
+    bool writeFileIndex(IFile & file);
+    bool readFileIndex(IFile & file);
     int getOffset() { return m_offset; }
     void setOffset(int offset) { m_offset = offset;}
 
@@ -124,12 +95,12 @@ public:
     CFolders();
     ~CFolders();
 
-    CFileWrap & getFile() { return m_file; }
+    IFile & getFile() { return *m_file; }
     int getSize() { return m_fileSize; }
 
     CFolder * operator [] (const char* name);
     int operator += (const int size) { m_fileSize += size; return m_fileSize; }
-    bool open(const char * fileName, bool create=false);
+    bool open(IFile *file, bool create=false);
 
     CFolder & addFolder(const char* name, int offset = -1);
     void addFile(CFolder & folder, const char * srcfileName, const char * fileName);
@@ -140,19 +111,13 @@ public:
     bool readFolderIndex();
     bool writeFileIndex();
     bool readFileIndex();
-    bool writeFile(CFileWrap & file, ISerial & serial, CFolder &folder, const char *name);
-
-    typedef struct {
-        CFileWrap file;
-        int size;
-        bool internal;
-    } FileInfo;
+    bool writeFile(IFile &file, ISerial & serial, CFolder &folder, const char *name);
 
     CFolder::CFileEntry * checkOut(const char *filePath);
 
 protected:
 
-    CFileWrap m_file;
+    IFile *m_file;
 
     int m_version;
     int m_fileSize;

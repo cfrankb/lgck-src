@@ -15,5 +15,5 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define q2c(__qstring__) (const char*) __qstring__.toLatin1().data()
+#define q2c(__qstring__) __qstring__.toStdString().c_str()
  

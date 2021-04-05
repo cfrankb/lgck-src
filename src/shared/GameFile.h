@@ -200,7 +200,9 @@ public:
     // i/o
 
     bool read(const char *filepath=nullptr);
+    bool read(IFile & file);
     bool write(const char *filepath=nullptr);
+    bool write(IFile & file);
 
     /////////////////////////////////////////////////////////////////
     // settings

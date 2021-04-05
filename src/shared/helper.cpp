@@ -22,7 +22,14 @@
 #include <string>
 #include <list>
 #include <zlib.h>
-#include "FileWrap.h"
+//#include "FileWrap.h"
+#ifdef USE_QFILE
+    #define FILEWRAP QFileWrap
+    #include "../shared/qtgui/qfilewrap.h"
+#else
+    #define FILEWRAP CFileWrap
+    #include "../shared/FileWrap.h"
+#endif
 
 const char *toUpper(char *s)
 {
@@ -57,8 +64,8 @@ char *getUUID()
 bool copyFile(const std::string in, const std::string out, std::string & errMsg)
 {
     bool result = true;
-    CFileWrap sfile;
-    CFileWrap tfile;
+    FILEWRAP sfile;
+    FILEWRAP tfile;
     if (sfile.open(in.c_str())) {
         int size = sfile.getSize();
         char *buf = new char[size];
@@ -85,11 +92,11 @@ bool copyFile(const std::string in, const std::string out, std::string & errMsg)
 
 bool concat(const std::list<std::string> files, std::string out, std::string & msg)
 {
-    CFileWrap tfile;
+    FILEWRAP tfile;
     bool result = true;
     if (tfile.open(out.c_str(), "wb")) {
         for (std::list<std::string>::const_iterator iterator = files.begin(), end = files.end(); iterator != end; ++iterator) {
-            CFileWrap sfile;
+            FILEWRAP sfile;
             std::string in = *iterator;
             if (sfile.open(in.c_str())) {
                 int size = sfile.getSize();

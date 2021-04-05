@@ -462,15 +462,6 @@ void CFrame::updateMap()
     }
 }
 
-void CFrame::outputDebug(const char *s)
-{
-    CFileWrap file;
-    if (file.open("../debug/frame", "ab" )) {
-        file.write(s, strlen(s));
-        file.close();
-    }
-}
-
 bool CFrame::hasTransparency() const
 {
     for (int i=0; i < m_nLen * m_nHei; ++i) {
@@ -506,29 +497,6 @@ CFrameSet *CFrame::split(int pxSize, bool whole)
         }
     }
     return frameSet;
-}
-
-void CFrame::debug()
-{
-    char s[1024];
-    sprintf(s,"[frame]%d x %d\n\n", m_map.height(), m_map.length());
-    outputDebug(s);
-
-    for (int y = 0; y < m_map.height() ; ++y) {
-        memset(s, 0, 1024);
-
-        for (int x = 0; x < m_map.length(); ++x) {
-            if (m_map.at(x,y)) {
-                s[x] = 'X';
-            } else {
-                s[x] = '.';
-            }
-        }
-
-        strcat(s, "\n");
-        outputDebug(s);
-    }
-    outputDebug("\n");
 }
 
 const uint32_t* CFrame::dosPal()

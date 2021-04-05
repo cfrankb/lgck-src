@@ -697,16 +697,6 @@ void CProtoArray::debugIndex()
     }
 }
 
-void CProtoArray::debugIndex(CFileWrap & file)
-{
-    for (int k = 0 ; k < m_indexSize; ++k) {
-        const char *format = "index %-3d\t%d \t%s\n";
-        char *buf = new char[strlen(format) + 64];
-        sprintf(buf, format, k, m_index[k], m_objects[ m_index[k] ].proto().getName());
-        file += buf;
-    }
-}
-
 int CProtoArray::getIndexSize()
 {
     return m_indexSize;

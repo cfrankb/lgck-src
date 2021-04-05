@@ -148,6 +148,8 @@ private:
     };
     QLabel *m_labels[3];
     QAction *m_recentFileActs[16];
+    QString m_fileName;
+
     virtual void closeEvent(QCloseEvent *event);
     virtual void setVisible ( bool visible );
     virtual void resizeEvent (QResizeEvent *event);

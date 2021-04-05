@@ -202,8 +202,6 @@ public:
         // CRC  : size 4
     } png_OBL5;
 
-    void debug();
-
 protected:    
     enum {
         MODE_NORMAL ,
@@ -217,7 +215,6 @@ protected:
     CFrame **m_undoFrames;
     int m_undoPtr;
     int m_undoSize;
-    void outputDebug(const char *s);
     void init();
 };
 

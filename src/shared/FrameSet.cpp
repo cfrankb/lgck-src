@@ -800,14 +800,6 @@ const char * CFrameSet::getLastError() const
     return m_lastError.c_str();
 }
 
-void CFrameSet::debug()
-{
-    for (int i=0; i < m_size; ++i)
-    {
-        m_arrFrames[i]->debug();
-    }
-}
-
 bool CFrameSet::isFriendFormat(const char *format)
 {
     const char * friends[] = {

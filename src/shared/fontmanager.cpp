@@ -18,9 +18,15 @@
 #include "fontmanager.h"
 #include "string.h"
 #include "../shared/Font.h"
-#include "../shared/FileWrap.h"
 #include "../shared/LuaVM.h"
 #include "stdafx.h"
+#ifdef USE_QFILE
+    #define FILEWRAP QFileWrap
+    #include "../shared/qtgui/qfilewrap.h"
+#else
+    #define FILEWRAP CFileWrap
+    #include "../shared/FileWrap.h"
+#endif
 
 CFontManager::CFontManager()
 {
@@ -125,7 +131,7 @@ void CFontManager::reset()
     forget();
 
     const char *fontName = ":/res/Tuffy_bold.fnt";
-    CFileWrap file;
+    FILEWRAP file;
     if (file.open(fontName)){
         CFont font;
         font.read(file);

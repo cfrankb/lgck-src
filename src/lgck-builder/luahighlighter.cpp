@@ -67,6 +67,8 @@
 
 #include "luahighlighter.h"
 #include "FileWrap.h"
+#include "../shared/qtgui/qfilewrap.h"
+
 
 const QBrush orange = QBrush(QColor(255,165,0));
 const QBrush darkOrange = QBrush(QColor(0xa3,0x5a,0x00));
@@ -164,7 +166,7 @@ void CLuaHighlighter::highlightBlock(const QString &text)
 QStringList CLuaHighlighter::fromFile(const char *fileName)
 {
     QString fct;
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(fileName)) {
         int size = file.getSize();
         char tmp[ size + 1];

@@ -501,20 +501,6 @@ void CLevel::copyEvents(CLevel & src)
     }
 }
 
-void CLevel::debug()
-{
-    /*
-    for (int i=0; i < m_settings.getSize(); ++i) {
-        qDebug("%d> %s %s %d\n",
-               i,
-               q2c(m_settings[i].param),
-               q2c(m_settings[i].value),
-                m_settings[i].valueInt
-        );
-    }
-    */
-}
-
 int CLevel::getVersion()
 {
     return 0x00000004;

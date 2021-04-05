@@ -49,7 +49,6 @@ public:
     void resizeIndex(int newSize);
     int getSize();
     void forget();
-    void debug();
     int operator [] (int i);
     static const char* getFilterName(int i);
     static int getFilterCount();

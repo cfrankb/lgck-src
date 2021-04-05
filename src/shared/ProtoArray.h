@@ -31,7 +31,6 @@
 // CProtoArray 
 
 class CProtoIndex;
-class CFileWrap;
 class IFile;
 
 class CProtoArray: public ISerial
@@ -86,7 +85,6 @@ public:
         bool isIndexed();
         void resizeIndex(int newSize);
         void debugIndex();
-        void debugIndex(CFileWrap & file);
         int getIndexSize();
         int indexOfUUID(const char *uuid);
 

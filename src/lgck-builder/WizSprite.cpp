@@ -29,6 +29,7 @@
 #include "../shared/Frame.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "../shared/Path.h"
 
 CWizSprite::CWizSprite(QWidget *parent) :
@@ -675,7 +676,7 @@ void CWizSprite::save(const int index)
         } else if (getClass() >= CLASS_GENERIC_COS) {
             event = CObject::EO_DEATH;
         }
-        CFileWrap file;
+        QFileWrap file;
         if (file.open(":/scripts/templates/waypoint.lua")) {
             int size=file.getSize();
             char *buf = new char[size+1];

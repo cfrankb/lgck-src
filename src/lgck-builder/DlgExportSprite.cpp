@@ -22,6 +22,7 @@
 #include "../shared/Frame.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "OBL5File.h"
 #include <QFileDialog>
 
@@ -147,8 +148,8 @@ void CDlgExportSprite::on_btnExport_clicked()
                oblDoc.setFileName(fileName);
                oblDoc.write();
            } else {
-               CFileWrap file;
-               if (file.open(q2c(fileName), "wb")) {
+               QFileWrap file;
+               if (file.open(fileName, "wb")) {
                    m_gameFile->protos().exportMeta(file, data->protoId);
                    file.close();
                }

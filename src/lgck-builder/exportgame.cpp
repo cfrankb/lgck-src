@@ -29,6 +29,7 @@
 #include "helper.h"
 #include "DlgDistributeGame.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "../shared/GameFile.h"
 #include "FileWrap.h"
 #include "Level.h"
@@ -102,8 +103,8 @@ bool CExportGame::copyRuntime(QString & runtimeSource, QStringList & depList, QS
         qDebug() << QString("base:") << base;
         QString deps = base + ".depends";
         if (fileExists(deps)) {
-            CFileWrap file;
-            if (file.open(q2c(deps), "r")) {
+            QFileWrap file;
+            if (file.open(deps, "r")) {
                 long size = file.getSize() ;
                 char *buf = new char[size+1];
                 buf[size] = 0;

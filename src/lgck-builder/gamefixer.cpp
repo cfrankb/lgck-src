@@ -23,6 +23,7 @@
 #include "Layer.h"
 #include <vector>
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 constexpr int ICON_SIZE = 24;
 constexpr char WEB_PATH[] = "https://cfrankb.com/lgck/";
@@ -51,58 +52,70 @@ void CGameFixer::addSampleSprites()
 
     std::unordered_map<std::string, Sprite> sprites;
     typedef struct {
-        const char * name;
-        const char * chToProto;
+        const char * name; // internal - do not translate
+        const char * chToProto; // internal - do not translate
+        QString trName;
     } metaItem;
 
     metaItem items[] = {
         {
             "annie",
-            nullptr
+            nullptr,
+            tr("annie")
         },
         {
             "little_star (dead)",
-            nullptr
+            nullptr,
+            tr("little_star (dead)")
         },
         {
             "little_star (player bullet)",
-            "little_star (dead)"
+            "little_star (dead)",
+            tr("little_star (player bullet)")
         },
         {
             "sparkle",
-            nullptr
+            nullptr,
+            tr("sparkle")
         },
         {
             "diamond",
-            "sparkle"
+            "sparkle",
+            tr("diamond")
         },
         {
             "wallbrick",
-            nullptr
+            nullptr,
+            tr("wallbrick")
         },
         {
             "drago",
-            "sparkle"
+            "sparkle",
+            tr("drago")
         },
         {
             "deico",
-            "sparkle"
+            "sparkle",
+            tr("deico")
         },
         {
             "switch94",
-            nullptr
+            nullptr,
+            tr("switch94")
         },
         {
             "forcef94",
-            nullptr
+            nullptr,
+            tr("forcef94")
         },
         {
             "snake",
-            "sparkle"
+            "sparkle",
+            tr("snake")
         },
     };
 
-    CFileWrap file;
+    QFileWrap file;
     for (unsigned int i=0; i < sizeof(items)/sizeof(metaItem); ++i) {
         CFrameSet *frameSet = new CFrameSet;
         int frameSetId = 0;
@@ -123,6 +136,7 @@ void CGameFixer::addSampleSprites()
             CProtoArray t;
             t.importMeta(file);
             CProto & proto = t[0];
+            strncpy(proto.m_szName, q2c(item.trName), sizeof(proto.m_szName) - 1);
             proto.m_nFrameSet = frameSetId;
             proto.m_nChProto = item.chToProto ? sprites[item.chToProto].id : 0;
             proto.m_nChSound = 0;

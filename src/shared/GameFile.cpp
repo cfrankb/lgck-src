@@ -25,7 +25,6 @@
 #include <string.h>
 #include <libgen.h>
 #include <ctype.h>
-#include "FileWrap.h"
 #include "Folders.h"
 #include "ss_version.h"
 #include "GameFile.h"
@@ -43,6 +42,14 @@
 #include "displayconfig.h"
 #include "fontmanager.h"
 #include "LuaVM.h"
+
+#ifdef USE_QFILE
+    #define FILEWRAP QFileWrap
+    #include "../shared/qtgui/qfilewrap.h"
+#else
+    #define FILEWRAP CFileWrap
+    #include "../shared/FileWrap.h"
+#endif
 
 CSettings::SETTING CGameFile::m_gameDefaults[] =
 {
@@ -223,7 +230,7 @@ void CGameFile::initDefaultSounds()
             char tmp[len];
             sprintf(tmp, ":/res/%s", m_defaultSounds[i].src.c_str());
 
-            CFileWrap file;
+            FILEWRAP file;
             if (file.open(tmp)) {
                 char *data = new char[file.getSize()];
                 int size = file.getSize();
@@ -246,11 +253,11 @@ void CGameFile::forget ()
     m_arrFrames.forget();
     m_arrProto.forget();
 
-    if (m_nLevels) {
-        while (m_nLevels) {
-            delete m_arrLevels[0];
-            removeLevel (0);
+    if (m_arrLevels) {
+        for (int i = 0; i < m_nLevels; ++i) {
+            delete m_arrLevels[i];
         }
+        m_nLevels = 0;
         delete [] m_arrLevels;
     }
 
@@ -428,10 +435,23 @@ int CGameFile::addFrameSet(CFrameSet *pFrameSet)
 bool CGameFile::read(const char *filepath)
 {
     CLuaVM::debugv("reading ...\n");
+    FILEWRAP gameFile;
+    if (!gameFile.open(filepath ? filepath : m_fileName.c_str(), "rb")) {
+        CLuaVM::debugv("Failed to read: %s", filepath);
+        CLuaVM::error("Read gamefile failed");
+        return false;
+    }
+
+    return read(gameFile);
+}
+
+bool CGameFile::read(IFile & file)
+{
     CFolders fs;
-    if (fs.open(filepath ? filepath:m_fileName.c_str(), false)) {
+
+    if (fs.open(&file, false)) {
         forget();
-        CFileWrap & file = fs.getFile();
+        IFile & file = fs.getFile();
 
         // version.dat
 
@@ -620,9 +640,20 @@ bool CGameFile::read(const char *filepath)
 bool CGameFile::write(const char *filepath)
 {
     //qDebug("Writing to `%s`\n", q2c(m_fileName));
+    FILEWRAP gameFile;
+    if (!gameFile.open(filepath ? filepath:m_fileName.c_str(), "rb+")){
+        CLuaVM::debugv("Failed to write: %s", filepath);
+        CLuaVM::error("Write gamefile failed");
+        return false;
+    }
+    return write(gameFile);
+}
+
+bool CGameFile::write(IFile & file)
+{
     CFolders fs;
-    if (fs.open(filepath ? filepath: m_fileName.c_str(), true)) {
-        CFileWrap & file = fs.getFile();
+    if (fs.open(&file, true)) {
+        IFile & file = fs.getFile();
         CFolder & root = fs.addFolder("");
         int aSize, bSize;
 

@@ -25,7 +25,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <cstring>
-#include "../shared/FileWrap.h"
 #include "../shared/Folders.h"
 #include "../shared/Game.h"
 #include "../shared/vlamits3.h"
@@ -55,6 +54,14 @@
 #include "displayconfig.h"
 #include "fontmanager.h"
 #include "Countdown.h"
+
+#ifdef USE_QFILE
+    #define FILEWRAP QFileWrap
+    #include "../shared/qtgui/qfilewrap.h"
+#else
+    #define FILEWRAP CFileWrap
+    #include "../shared/FileWrap.h"
+#endif
 
 constexpr char SIGNATURE_JOYSTATEMAP[] = "JOYS";
 constexpr uint32_t REVISION_JOYSTATEMAP = 0;
@@ -1321,7 +1328,7 @@ bool CGame::initSettings()
 
     if (settings[PARAM_POINTS].value[0] == ':') {
         CLuaVM::debugv("points internal");
-        CFileWrap file;
+        FILEWRAP file;
         if (file.open(settings[PARAM_POINTS].value.c_str() )) {
             m_points = new CFrameSet;
             m_points->setName("points.obl5");
@@ -1720,7 +1727,7 @@ bool CGame::loadScript( const char *scriptName )
     char path[strlen(fmt) + strlen(scriptName) +1];
     sprintf(path, fmt, scriptName);
 
-    CFileWrap file;
+    FILEWRAP file;
     bool result = file.open(path);
     if (!result) {
         CLuaVM::debugv("-- loading internal:%s\n", scriptName);
@@ -1753,7 +1760,7 @@ bool CGame::readScript( const char *scriptName, std::string &out )
     char path[strlen(fmt) + strlen(scriptName) +1];
     sprintf(path, fmt, scriptName);
 
-    CFileWrap file;
+    FILEWRAP file;
     bool result = file.open(path);
     if (!result) {
         CLuaVM::debugv("-- loading internal:%s\n", scriptName);

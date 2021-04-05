@@ -88,8 +88,6 @@ public:
         GROWBY      = 16
     };
 
-    void debug();
-
 protected:
 
     void write0x501(IFile &file);

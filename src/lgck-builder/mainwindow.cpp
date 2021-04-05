@@ -86,6 +86,8 @@
 #include "dlgindicator.h"
 #include "launcher.h"
 #include "options.h"
+#include "../shared/qtgui/qfilewrap.h"
+
 #ifdef LGCK_GAMEPAD
 #include <QtGamepad/QGamepad>
 #endif
@@ -502,14 +504,17 @@ void MainWindow::open(QString fileName)
 void MainWindow::loadFileName(const QString & fileName)
 {
     if (!fileName.isEmpty()) {
-        QString oldFileName = m_doc.getFileName();
+        QString oldFileName = m_fileName;
         QApplication::setOverrideCursor(Qt::WaitCursor);
         m_doc.setFileName(fileName.toStdString().c_str());
-        if (!m_doc.read())  {
+        m_fileName = fileName;
+        QFileWrap file;
+        if (!file.open(fileName) || !m_doc.read(file))  {
             warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
             m_doc.forget();
             m_doc.init();
             m_doc.setFileName(q2c(oldFileName));
+            m_fileName = oldFileName;
             // update fileList
             QSettings settings;
             QStringList files = settings.value("recentFileList").toStringList();
@@ -536,15 +541,17 @@ void MainWindow::loadFileName(const QString & fileName)
 bool MainWindow::save()
 {
     commitAll();
-    QString oldFileName = m_doc.getFileName();
+    QString oldFileName = m_fileName;
     if (m_doc.isUntitled()) {
         if (!saveAs())
             return false;
     }
 
-    if (!m_doc.write() || !updateTitle())  {
+    QFileWrap file;
+    if (!file.open(m_fileName, "wb") || !m_doc.write(file) || !updateTitle()) {
         warningMessage(tr("Can't write file"));
         m_doc.setFileName(q2c(oldFileName));
+        m_fileName = oldFileName;
         return false;
     }
     m_doc.setDirty(false);
@@ -569,6 +576,7 @@ bool MainWindow::saveAs()
         fileName.append(".lgckdb");
     }
     m_doc.setFileName(q2c(fileName));
+    m_fileName = fileName;
     memorizeFilePath();
     return true;
 }
@@ -1722,8 +1730,8 @@ void MainWindow::on_actionC_declarations_triggered()
         if (!fileName.toLower().endsWith(".h")) {
             fileName.append(".h");
         }
-        CFileWrap file;
-        if (file.open(q2c(fileName), "wb")) {
+        QFileWrap file;
+        if (file.open(fileName, "wb")) {
             file += "// Constants declarations for C/C++\r\n" \
                     "// ====================================\r\n\r\n" \
                     "// *** OBJECT TYPES\r\n\r\n" ;
@@ -1766,8 +1774,8 @@ void MainWindow::on_actionRuntime_Lua_triggered()
         if (!fileName.toLower().endsWith(".lua")) {
             fileName.append(".lua");
         }
-        CFileWrap file;
-        if (file.open(q2c(fileName), "wb")) {
+        QFileWrap file;
+        if (file.open(fileName, "wb")) {
             std::string lua;
             m_doc.generateRuntimeLua(lua);
             file += lua.c_str();
@@ -3358,8 +3366,8 @@ void MainWindow::on_actionJoyState_Mapping_triggered()
         if (!fileName.toLower().endsWith(".bin")) {
             fileName.append(".bin");
         }
-        CFileWrap file;
-        if (file.open(q2c(fileName), "wb")) {
+        QFileWrap file;
+        if (file.open(fileName, "wb")) {
             m_doc.exportJoyStateMap(file);
             file.close();
         }  else {

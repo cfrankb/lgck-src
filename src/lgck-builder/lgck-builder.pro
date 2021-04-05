@@ -102,6 +102,7 @@ SOURCES += \
     ../shared/Proto.cpp \
     ../shared/ProtoArray.cpp \
     ../shared/ProtoIndex.cpp \
+    ../shared/qtgui/qfilewrap.cpp \
     ../shared/qtgui/qthelper.cpp \
     ../shared/qtgui/qtlua.cpp \
     ../shared/Scene.cpp \
@@ -109,7 +110,6 @@ SOURCES += \
     ../shared/Settings.cpp \
     ../shared/Snapshot.cpp \
     ../shared/SndArray.cpp \
-    ../shared/ss_build.cpp \
     ../shared/StringTable.cpp \
     ../shared/Tasks.cpp \
     DlgAbout.cpp \
@@ -225,6 +225,7 @@ HEADERS += \
     ../shared/Proto.h \
     ../shared/ProtoArray.h \
     ../shared/ProtoIndex.h \
+    ../shared/qtgui/qfilewrap.h \
     ../shared/qtgui/qthelper.h \
     ../shared/qtgui/qtlua.h \
     ../shared/Scene.h \
@@ -233,7 +234,6 @@ HEADERS += \
     ../shared/Snapshot.h \
     ../shared/Snd.h \
     ../shared/SndArray.h \
-    ../shared/ss_build.h \
     ../shared/ss_version.h \
     ../shared/StringTable.h \
     ../shared/Tasks.h \

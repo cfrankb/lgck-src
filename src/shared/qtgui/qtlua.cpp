@@ -35,6 +35,7 @@
 #include <QSlider>
 #include "wbtncolor.h"
 #include "WizScript.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CLuaVM g_lua;
 std::unordered_map<unsigned int, void *> g_controls;
@@ -98,7 +99,7 @@ void qtLua_init()
         g_lua.registerFn(exports[i].fnName, exports[i].fnAddr);
     }
 
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(":/scripts/qtlua.lua", "r")) {
         int size = file.getSize();
         char *buf = new char[size+1];

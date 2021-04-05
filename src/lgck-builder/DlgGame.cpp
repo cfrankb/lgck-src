@@ -41,6 +41,7 @@
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"
 #include "../shared/Game.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CDlgGame::CDlgGame(QWidget *parent) :
     QDialog(parent),
@@ -318,8 +319,8 @@ void CDlgGame::on_treeSounds_doubleClicked(QModelIndex index)
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
 
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);
@@ -375,8 +376,8 @@ void CDlgGame::on_btnAddSound_clicked()
         } else {
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);

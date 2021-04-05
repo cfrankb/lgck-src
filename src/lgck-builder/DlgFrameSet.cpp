@@ -29,6 +29,7 @@
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
 #include "launcher.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CDlgFrameSet::CDlgFrameSet(QWidget *parent) :
     QDialog(parent),
@@ -154,8 +155,8 @@ void CDlgFrameSet::on_btnEdit_clicked()
         qDebug() << QString("temp file:") + fileName;
 
         // same image set to temp file
-        CFileWrap file;
-        if (file.open(q2c(tmp.fileName()),"wb")) {
+        QFileWrap file;
+        if (file.open(tmp.fileName(),"wb")) {
             m_frameSet->write(file);
             file.close();
         }

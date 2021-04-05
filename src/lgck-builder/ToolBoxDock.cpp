@@ -52,6 +52,7 @@
 #include "fontmanager.h"
 #include "Font.h"
 #include "WizFont.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CToolBoxDock::CToolBoxDock(QWidget *parent) :
     QDockWidget(parent),
@@ -246,7 +247,6 @@ void CToolBoxDock::createSprite()
             qDebug("new frameSet created");
             int frameSet = gf.frames().getSize();
             gf.frames().add(wiz->getFrameSet());
-            wiz->getFrameSet()->debug();
             char name[256];
             sprintf(name,"img%d",frameSet);
             gf.frames()[frameSet]->setName(name);
@@ -778,8 +778,8 @@ void CToolBoxDock::on_btnAddSound_clicked()
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
 
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);
@@ -1091,8 +1091,8 @@ void CToolBoxDock::editSound()
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
 
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);
@@ -1285,8 +1285,8 @@ void CToolBoxDock::exportSprite()
             oblDoc.setFileName(fileName);
             result = oblDoc.write();
         } else {
-            CFileWrap file;
-            if (file.open(q2c(fileName), "wb")) {
+            QFileWrap file;
+            if (file.open(fileName, "wb")) {
                 result = m_gameFile->m_arrProto.exportMeta(file, protoId);
                 file.close();
             }

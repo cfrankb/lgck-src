@@ -78,6 +78,7 @@
 #include "../shared/stdafx.h"
 #include "../shared/FileWrap.h"
 #include "optiongroup.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 const QColor highlightColor = QColor(Qt::yellow);
 const QColor indentationBackgroundColor = QColor(Qt::lightGray);
@@ -152,7 +153,7 @@ void CWEdit::enableWordWrap(bool state)
 QStringList CWEdit::fromFile(const char *fileName)
 {
     QString fct;
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(fileName)) {
         int size = file.getSize();
         char tmp[ size + 1];

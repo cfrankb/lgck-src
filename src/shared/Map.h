@@ -123,8 +123,7 @@ public:
 class CMap
 {
 public:
-    CMap();
-    CMap(const int sx, const int sy);
+    CMap(const int sx=0, const int sy=0);
     ~CMap();
 
     enum {

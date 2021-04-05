@@ -219,17 +219,4 @@ bool CProtoIndex::matchString(int protoId) {
     return true;
 }
 
-void CProtoIndex::debug()
-{
-    CFileWrap file;
-    file.open("../debug/protoIndex.txt", "a");
-    char s[1024];
-    for (int k = 0 ; k < m_size; ++k) {
-        CLuaVM::debugv("index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
-        sprintf(s, "index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
-        file.write(s, strlen(s));
-    }
 
-    file += "\n--------------------------------------\n";
-    file.close();
-}

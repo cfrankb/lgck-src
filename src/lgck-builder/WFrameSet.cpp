@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QFileDialog>
+#include "../shared/qtgui/qfilewrap.h"
 
 CWFrameSet::CWFrameSet(QWidget *parent)
     : QTreeWidget(parent)
@@ -187,8 +188,8 @@ void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
 
 void CWFrameSet::addFile( QString fileName )
 {
-    CFileWrap file;
-    if (file.open( q2c(fileName) )) {
+    QFileWrap file;
+    if (file.open(fileName)) {
         CFrameSet images;
         char format[5];
         if (images.extract(file, format)) {
