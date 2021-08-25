@@ -25,14 +25,14 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={autopf32}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=D:\files\build\src\lgck-src\src\build\files\licenses\license.txt
-InfoAfterFile=D:\files\build\src\lgck-src\src\build\files\readme.txt
-OutputDir=D:\files\build\src\lgck-src\src\build\setup
+LicenseFile=C:\files\lgck-src\src\build\win32\files\licenses\license.txt
+InfoAfterFile=C:\files\lgck-src\src\build\win32\files\readme.txt
+OutputDir=C:\files\lgck-src\src\build\win32\setup
 OutputBaseFilename=lgck-setup
-SetupIconFile=D:\files\build\src\lgck-src\src\build\resources\system_installer_7Ou_icon.ico
-Compression=lzma
+SetupIconFile=C:\files\lgck-src\src\build\win32\files\resources\system-installer.ico
+Compression=lzma2
 SolidCompression=yes
 PrivilegesRequired=admin
 
@@ -44,8 +44,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "D:\files\build\src\lgck-src\src\build\files\lgck-builder.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\files\build\src\lgck-src\src\build\files\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\files\lgck-src\src\build\win32\files\lgck-builder.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\files\lgck-src\src\build\win32\files\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
