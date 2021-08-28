@@ -151,6 +151,19 @@ constexpr char actionNames[][16] = {
     "Special2"
 };
 
+/* do not translate */
+constexpr char actionKeys[][16] = {
+    "Up", "Down", "Left", "Right",
+    "Space", "Shift", "Z", "", ""
+};
+
+/* do not translate */
+constexpr char actionButtons[][16] = {
+    "Up", "Down", "Left", "Right",
+    "A", "B", "X", "", ""
+};
+
+
 MainWindow *me = nullptr;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -3336,6 +3349,12 @@ void MainWindow::readButtonConfig(QSettings & settings)
         CGame::JoyStateEntry & entry = m_doc.joyStateEntry(i);
         QString buttonText = settings.value(QString("button_%1").arg(actionName), "").toString();
         QString qtKeyText = settings.value(QString("key_%1").arg(actionName), "").toString();
+        if (buttonText.isEmpty()) {
+            buttonText = actionButtons[i];
+        }
+        if (qtKeyText.isEmpty()) {
+            qtKeyText = actionKeys[i];
+        }
         entry.keyCode = static_cast<lgck::Key::Code>(CKeyTranslator::translateText2Lgck(qtKeyText));
         entry.button = static_cast<lgck::Button::JoyButton>(m_doc.findButtonText(q2c(buttonText)));
     }
@@ -3363,7 +3382,7 @@ void MainWindow::on_actionJoyState_Mapping_triggered()
     QString fileFilter = tr("JoyState Dump (*.bin)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        if (!fileName.toLower().endsWith(".bin")) {
+        if (!fileName.endsWith(".bin", Qt::CaseInsensitive)) {
             fileName.append(".bin");
         }
         QFileWrap file;
