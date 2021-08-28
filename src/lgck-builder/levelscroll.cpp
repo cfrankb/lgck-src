@@ -153,7 +153,7 @@ void CLevelScroll::paintSprite()
 void CLevelScroll::mousePressEvent(QMouseEvent * event)
 {
     setCursor();
-    if (!m_game | !m_game->getSize()) {
+    if (!m_game || !m_game->getSize()) {
         return;
     }
 
@@ -232,7 +232,7 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
 
 void CLevelScroll::mouseReleaseEvent(QMouseEvent * event)
 {
-    if (!m_game | !m_game->getSize()) {
+    if (!m_game || !m_game->getSize()) {
         return;
     }
 
@@ -288,7 +288,7 @@ void CLevelScroll::mouseReleaseEvent(QMouseEvent * event)
 void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
 {
     setCursor();
-    if (!m_game | !m_game->getSize()) {
+    if (!m_game || !m_game->getSize()) {
         return;
     }
     //qDebug("mouseMoveEvent");
@@ -918,7 +918,7 @@ void CLevelScroll::getGameMode(bool & gm)
 
 void CLevelScroll::keyReflector(const QKeyEvent *event, bool pressed)
 {
-    emit(keyChanged(CKeyTranslator::translate(event->key()), (int) pressed));
+    emit keyChanged(CKeyTranslator::translate(event->key()), (int) pressed);
 }
 
 void CLevelScroll::keyPressEvent ( QKeyEvent * event )

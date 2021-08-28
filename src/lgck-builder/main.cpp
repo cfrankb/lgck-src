@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 
     w.show();
     if (!fileName.isEmpty()) {
-        if (fileName.toLower().endsWith(".lgckdb")) {
+        if (fileName.endsWith(".lgckdb", Qt::CaseInsensitive)) {
             w.open(fileName);
         } else {
             QString errMsg = QObject::tr("Invalid file: %1").arg(fileName);

@@ -585,7 +585,7 @@ bool MainWindow::saveAs()
             );
     if (fileName.isEmpty())
         return false;
-    if (!fileName.toLower().endsWith(".lgckdb")) {
+    if (!fileName.endsWith(".lgckdb", Qt::CaseInsensitive)) {
         fileName.append(".lgckdb");
     }
     m_doc.setFileName(q2c(fileName));
@@ -1740,7 +1740,7 @@ void MainWindow::on_actionC_declarations_triggered()
     QString fileFilter = tr("Header files (*.h)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        if (!fileName.toLower().endsWith(".h")) {
+        if (!fileName.endsWith(".h", Qt::CaseInsensitive)) {
             fileName.append(".h");
         }
         QFileWrap file;
@@ -1784,7 +1784,7 @@ void MainWindow::on_actionRuntime_Lua_triggered()
     QString fileFilter = tr("Lua script (*.lua)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        if (!fileName.toLower().endsWith(".lua")) {
+        if (!fileName.endsWith(".lua", Qt::CaseInsensitive)) {
             fileName.append(".lua");
         }
         QFileWrap file;
