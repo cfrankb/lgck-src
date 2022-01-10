@@ -607,7 +607,7 @@ bool MainWindow::updateTitle()
     } else {
         file = QFileInfo(m_doc.getFileName()).fileName();
     }
-    setWindowTitle(tr("%1[*] - %2").arg(file).arg(m_appTitle));
+    setWindowTitle(tr("%1[*] - %2").arg(file, m_appTitle));
     return true;
 }
 
@@ -810,7 +810,6 @@ void MainWindow::paintEvent(QPaintEvent * event) {
 
 void MainWindow::updateMenus()
 {
-    bool result = !(m_viewMode == VM_GAME);
     QAction * actionsGame[] = {
         ui->actionDebug,
         ui->actionQuit_Game,
@@ -885,7 +884,7 @@ void MainWindow::updateMenus()
         m_comboEvents->setEnabled(false);
         m_comboLayers->setEnabled(false);
     } else {
-        result = m_doc.getSize() != 0;
+        bool result = m_doc.getSize() != 0;
         ui->actionNew_file->setEnabled(true);
         ui->actionOpen->setEnabled(true);
         ui->actionSave->setEnabled(true);
@@ -1368,6 +1367,7 @@ void MainWindow::handleGameEvents()
                 if (m_doc.m_nCurrLevel < m_doc.getSize() - 1) {
                     ++m_doc.m_nCurrLevel;
                 } else {
+                    qDebug(">>>> images: %d", m_doc.frames().getSize());
                     QMessageBox::information(this, tr(m_appName),
                                              tr("You have sucessfully completed this level."));
                     break;
@@ -1920,13 +1920,17 @@ void MainWindow::on_actionPause_triggered()
 
 void MainWindow::leaveGameMode()
 {
+    qDebug("IN leaveGameMode: frames %d", m_doc.frames().getSize());
+    qDebug("IN pointsOBL_texture: %llu", m_doc.var("pointsOBL_texture"));
     if (m_viewMode == VM_GAME) {
         setViewMode(VM_EDITOR);
-        m_doc.removePointsOBL();
         updateMenus();
         m_doc.stopMusic();
         emit scrollbarShown(true);
     }
+    m_doc.removePointsOBL();
+    qDebug("OUT leaveGameMode: frames %d", m_doc.frames().getSize());
+    qDebug("OUT pointsOBL_texture: %llu", m_doc.var("pointsOBL_texture"));
 }
 
 void MainWindow::on_actionQuit_Game_triggered()
@@ -2266,7 +2270,7 @@ void MainWindow::deleteSprite(int sprite)
 {
     updateMenus();
     emit spriteDeleted(sprite);
-    emit changeProtoIcon(CGame::INVALID);
+    changeProtoIcon(CGame::INVALID);
 }
 
 void MainWindow::changeSprite(int sprite)
@@ -2314,13 +2318,13 @@ void MainWindow::on_actionCreateSprite_triggered()
 
 void MainWindow::on_actionDocumentation_triggered()
 {
-    QString url = QString("%1manual.htm?v=%2").arg(WEB_PATH).arg(formatVersion(true));
+    QString url = QString("%1manual.htm?v=%2").arg(WEB_PATH, formatVersion(true));
     QDesktopServices::openUrl(url);
 }
 
 void MainWindow::on_actionTutorials_triggered()
 {
-    QString url = QString("%1tutorial.htm?v=%2").arg(WEB_PATH).arg(formatVersion(true));
+    QString url = QString("%1tutorial.htm?v=%2").arg(WEB_PATH, formatVersion(true));
     QDesktopServices::openUrl(url);
 }
 
@@ -2662,6 +2666,7 @@ void MainWindow::initSettings()
     folders.set(FOLDER_LGCKDB, "");
 
     QSettings settings(m_author, m_appName);
+    qDebug("read settings");
     m_options->read(settings);
 }
 
@@ -3041,10 +3046,8 @@ void MainWindow::on_actionSprite_Editor_triggered()
 
 void MainWindow::exportGame()
 {
-    if (QSysInfo::kernelType()=="linux") {
-        QMessageBox::warning(this, m_appTitle, tr("Export game is unavailable on linux at this time."));
-        return;
-    }
+    QMessageBox::warning(this, m_appTitle, tr("Export game is unavailable at this time."));
+    return;
 
     if (m_doc.isDirty() || m_doc.m_path.empty()) {
         if (!saveAs()) {
@@ -3343,17 +3346,21 @@ void MainWindow::initGamePad()
 
 void MainWindow::readButtonConfig(QSettings & settings)
 {
+    QStringList buttonUsed;
+    QStringList keyUsed;
     settings.beginGroup(INPUTS);
     for (int i=0; i < lgck::Input::Count; ++i) {
         const char *actionName = actionNames[i];
         CGame::JoyStateEntry & entry = m_doc.joyStateEntry(i);
         QString buttonText = settings.value(QString("button_%1").arg(actionName), "").toString();
         QString qtKeyText = settings.value(QString("key_%1").arg(actionName), "").toString();
-        if (buttonText.isEmpty()) {
+        if (buttonText.isEmpty() && !buttonUsed.contains(actionButtons[i])) {
             buttonText = actionButtons[i];
+            buttonUsed.append(buttonText);
         }
-        if (qtKeyText.isEmpty()) {
+        if (qtKeyText.isEmpty() && !keyUsed.contains(actionKeys[i])) {
             qtKeyText = actionKeys[i];
+            keyUsed.append(qtKeyText);
         }
         entry.keyCode = static_cast<lgck::Key::Code>(CKeyTranslator::translateText2Lgck(qtKeyText));
         entry.button = static_cast<lgck::Button::JoyButton>(m_doc.findButtonText(q2c(buttonText)));
