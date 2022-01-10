@@ -29,7 +29,7 @@ COptionGroup::~COptionGroup()
 
 void COptionGroup::setName(const char *name)
 {
-    Q_ASSERT(name && name[0]);
+    Q_ASSERT(name);
     m_group = name;
 }
 
