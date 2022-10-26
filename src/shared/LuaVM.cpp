@@ -77,6 +77,7 @@ void CLuaVM::error(const char *s)
 
 void CLuaVM::debugv(const char *fmt, ...)
 {
+    ASSERT(fmt);
     char *s = nullptr;
     va_list args;
     va_start(args, fmt);

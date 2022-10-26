@@ -611,14 +611,12 @@ void CWizSprite::save(const int index)
 
             if (proto.isPlayer()) {
                 eventCode += QString("%2playSound(\"%1\");\n")
-                        .arg(soundName)
-                        .arg(prefix);
+                        .arg(soundName, prefix);
             } else {
                 eventCode += QString("%2if isVisible(self) then\n"\
                                     "%2   playSound(\"%1\");\n" \
                                     "%2end\n")
-                        .arg(soundName)
-                        .arg(prefix);
+                        .arg(soundName, prefix);
             }
 
             object.setEvent(sounds[i].event, q2c(eventCode));

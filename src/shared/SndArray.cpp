@@ -105,8 +105,9 @@ CSnd * CSndArray::operator [](int n)
 CSnd * CSndArray::operator [](const char *name)
 {
     for (int n = 0; n < m_nSize; ++n) {
-        if (!strcmp(name,m_arrSnds[n]->getName())) {
-            return m_arrSnds[n];
+        CSnd * snd = m_arrSnds[n];
+        if (!strcmp(name,snd->getName())) {
+            return snd;
         }
     }
     return nullptr;

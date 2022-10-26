@@ -1723,7 +1723,7 @@ void MainWindow::on_actionAppend_image_triggered()
         m_lastWidth = dlg->getWidth();
         m_lastHeight = dlg->getHeight();
         set.add(frame);
-        emit frameChanged(m_doc.getCurrent());
+        emit frameChanged(frame);
         m_doc.setDirty(true);
         m_doc.setCurrentIndex(m_doc.getSize()-1);
         updateStatus();

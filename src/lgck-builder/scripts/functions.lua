@@ -1083,7 +1083,6 @@ function unfoldEvents1()
     if player_id == INVALID then
         return EVENT_NO_PLAYER;
     end
-
     -- if we got a closureEvent and time is elapsed
     -- return to caller    
     local closureEvent, closureTime = getClosure();
@@ -1174,7 +1173,7 @@ function unfoldEvents1()
             var_set("reloadSnapshot", 0)
             snapshot_reload();
         end
-        
+
         if ticks % 8 == 0 then
             countdown_cycle();
         end

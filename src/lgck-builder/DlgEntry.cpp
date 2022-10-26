@@ -235,6 +235,7 @@ void CDlgEntry::enableCheckboxes()
    m_ui->cF20->setEnabled( result ) ;
    m_ui->cF40->setEnabled( result ) ;
    m_ui->cF80->setEnabled( result ) ;
+   m_ui->cDeathFlip->setEnabled( result ) ;
 }
 
 void CDlgEntry::save(const int entryPos, bool isMulti)
@@ -314,12 +315,10 @@ void CDlgEntry::saveNonCombining(const int entryPos)
     QString str = m_ui->eHint->toPlainText();
     str = str.trimmed();
     if (entry.m_string) {
-        const char* s = q2c(str);
-        entry.m_string = table->set(entry.m_string, s);
+        entry.m_string = table->set(entry.m_string, q2c(str));
     } else {
         if (!str.isEmpty()) {
-            const char* s = q2c(str);
-            entry.m_string = table->add(s);
+            entry.m_string = table->add(q2c(str));
         }
     }
 
@@ -421,7 +420,7 @@ void CDlgEntry::on_btnRawPath_clicked()
             s += " ";
         }
         QString tmp = QString::asprintf("%2.2x", path[i]);
-        s += tmp.mid(0,2);
+        s += tmp.midRef(0,2);
     }
 
     bool ok = false;

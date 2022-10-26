@@ -93,6 +93,7 @@ CFrameSet * CWizFrameSet::getFrameSet()
 
 const char *CWizFrameSet::getName()
 {
-    qDebug("%s", q2c(ui->eName->text()));
-    return q2c(ui->eName->text());
+    static std::string s;
+    s = q2c(ui->eName->text());
+    return s.c_str();
 }
