@@ -473,7 +473,7 @@ int cwizscript_setField(lua_State *L)
 int cwizscript_setOption(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
+    if (argc < 2 || argc > 3) {
        error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
@@ -873,7 +873,7 @@ int qcheckbox_isTristate(lua_State *L)
 int qcheckbox_new(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
+    if (argc < 0 || argc > 1) {
        error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
@@ -937,7 +937,7 @@ int qcheckbox_setText(lua_State *L)
 int qcheckbox_setTristate(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 1 and argc > 2) {
+    if (argc < 1 || argc > 2) {
        error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
@@ -1263,7 +1263,7 @@ int qcombobox_setFrame(lua_State *L)
 int qgridlayout_addWidget(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 4 and argc > 6) {
+    if (argc < 4 || argc > 6) {
        error(__func__, 4);
     } else {
         int id = lua_tointeger(L, 1);
@@ -1404,7 +1404,7 @@ int qlabel_margin(lua_State *L)
 int qlabel_new(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
+    if (argc < 0 || argc > 1) {
        error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
@@ -1708,7 +1708,7 @@ int qlineedit_copy(lua_State *L)
 int qlineedit_cursorBackward(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
+    if (argc < 2 || argc > 3) {
        error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
@@ -1724,7 +1724,7 @@ int qlineedit_cursorBackward(lua_State *L)
 int qlineedit_cursorForward(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
+    if (argc < 2 || argc > 3) {
        error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
@@ -1956,7 +1956,7 @@ int qlineedit_maxLength(lua_State *L)
 int qlineedit_new(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
+    if (argc < 0 || argc > 1) {
        error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
@@ -2386,7 +2386,7 @@ int qradiobutton_isChecked(lua_State *L)
 int qradiobutton_new(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
+    if (argc < 0 || argc > 1) {
        error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
@@ -2561,7 +2561,7 @@ int qslider_minimum(lua_State *L)
 int qslider_new(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
+    if (argc < 0 || argc > 1) {
        error(__func__, 0);
     } else {
         int arg0 = (argc >= 1) ? lua_tointeger(L, 1) : static_cast<int>(Qt::Vertical);
@@ -3303,7 +3303,7 @@ int qwizard_setField(lua_State *L)
 int qwizard_setOption(lua_State *L)
 {
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
+    if (argc < 2 || argc > 3) {
        error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);

@@ -103,7 +103,7 @@ end
                 if argc == argc_max:
                     tf_cpp.write('    if (argc != %d) {\n' % argc)
                 else:
-                    tf_cpp.write('    if (argc < %d and argc > %d) {\n' % (argc, argc_max))
+                    tf_cpp.write('    if (argc < %d || argc > %d) {\n' % (argc, argc_max))
                 tf_cpp.write('       error(__func__, %d);\n' % argc)
                 tf_cpp.write('    } else {\n')
                 if fct != 'new':
