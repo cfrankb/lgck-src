@@ -1,8 +1,28 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "DlgExportSprite.h"
 #include "ui_DlgExportSprite.h"
 #include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/Frame.h"
+#include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "OBL5File.h"
 #include <QFileDialog>
 
@@ -31,7 +51,7 @@ void CDlgExportSprite::reloadSprites()
     ui->treeObjects->geometry().getRect(&x, &y, &w, &h);
     ui->treeObjects->setColumnWidth(0, 32);
     ui->treeObjects->setColumnWidth(1, 96);
-    ui->treeObjects->setEditTriggers(0);
+    ui->treeObjects->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->treeObjects->setWordWrap(true);
     ui->treeObjects->setRootIsDecorated(false);
     ui->treeObjects->setIconSize(QSize(32,32));
@@ -42,7 +62,7 @@ void CDlgExportSprite::reloadSprites()
     ui->treeObjects->setAlternatingRowColors(true);
     ui->treeObjects->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->treeObjects->enableDrag(false);
-    for (int i = 1; i < gf.m_arrFrames.getSize(); ++i) {
+    for (int i = 1; i < gf.frames().getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIcon(item, i );
         ui->treeObjects->addTopLevelItem(item);
@@ -53,6 +73,7 @@ void CDlgExportSprite::reloadSprites()
             SLOT(updateBtnExport()));
     ui->cbFormat->addItem("PNG");
     ui->cbFormat->addItem("OBL5");
+    ui->cbFormat->addItem("META");
 }
 
 void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
@@ -71,22 +92,9 @@ void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
     item->setData(0, Qt::UserRole, v);
 
     CGameFile & gf = *m_gameFile;
-    CProto & proto = gf.m_arrProto[ protoId ];
+    CProto & proto = gf.toProto(protoId);
 
-    CFrameSet & filter = *gf.m_arrFrames[proto.m_nFrameSet];
-    UINT8 *png;
-    int size;
-    filter[proto.m_nFrameNo]->toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    QIcon icon = frame2icon(gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo));
     icon.actualSize(QSize(32,32));
     QString className;
     if (gf.m_className[proto.m_nClass].empty()) {
@@ -106,31 +114,46 @@ void CDlgExportSprite::on_btnExport_clicked()
          QFileDialog::ShowDirsOnly
          | QFileDialog::DontResolveSymlinks);
     QString suffix;
-    char outFormat[5];
+    std::string outFormat;
     if (!dir.isEmpty()) {
         outDir = dir;
-        if (ui->cbFormat->currentIndex()==0) {
-            strcpy(outFormat, "PNG");
-            suffix = "png";
-        } else {
-            strcpy(outFormat, "OBL5");
-            suffix = "obl";
-        }
+        typedef struct {
+            char format[5];
+            char suffix[6];
+            bool isObl;
+        } Format;
+
+        Format formats[] = {
+            {"PNG", "png", true},
+            {"OBL5", "obl", true},
+            {"META", "proto", false}
+        };
+
+        int formatId = ui->cbFormat->currentIndex();
+        suffix = formats[formatId].suffix;
+        outFormat = formats[formatId].format;
+
         QList<QTreeWidgetItem *> itemList;
         itemList = ui->treeObjects->selectedItems();
-        COBL5File oblDoc;
         foreach(QTreeWidgetItem *item, itemList) {
-           ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
-           //qDebug("selected Sprite (proto): %d", data->protoId);
            CGameFile & gf = *m_gameFile;
-           CProto & proto = gf.m_arrProto[ data->protoId ];
-           CFrameSet * frameSet = gf.m_arrFrames[proto.m_nFrameSet];
+           ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
+           CProto & proto = gf.toProto(data->protoId);
            QString fileName = QDir(dir).filePath(QString(proto.m_szName) + "." + suffix);
-           //qDebug("path: %s", fileName.toLatin1().constData());
-           oblDoc.setFormat(outFormat);
-           oblDoc.getImageSet() = *frameSet;
-           oblDoc.setFileName(fileName);
-           oblDoc.write();
+           if (formats[formatId].isObl) {
+               CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
+               COBL5File oblDoc;
+               oblDoc.setFormat(outFormat.c_str());
+               oblDoc.getImageSet() = frameSet;
+               oblDoc.setFileName(fileName);
+               oblDoc.write();
+           } else {
+               QFileWrap file;
+               if (file.open(fileName, "wb")) {
+                   m_gameFile->protos().exportMeta(file, data->protoId);
+                   file.close();
+               }
+           }
         }
     }
 }

@@ -1,8 +1,26 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "displayconfig.h"
 #include <string.h>
 #include "stdafx.h"
 #include "Display.h"
 #include "IFile.h"
+#include "LuaVM.h"
 
 CDisplayConfig::CDisplayConfig()
 {
@@ -33,7 +51,7 @@ CDisplay * CDisplayConfig::find(const char *name)
     if (i != NOT_FOUND) {
         return m_displays[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -93,7 +111,7 @@ void CDisplayConfig::forget()
 {
     for (int i=0; i < m_size; ++i) {
         delete m_displays[i];
-        m_displays[i] = NULL;
+        m_displays[i] = nullptr;
     }
     m_size = 0;
 }
@@ -140,6 +158,12 @@ void CDisplayConfig::reset()
     display5.setVisible(false);
     display5.setProtected(true);
     display5.setFlagXY(CDisplay::FLAG_X_ALIGN_CENTER, CDisplay::FLAG_Y_ALIGN_TOP);
+
+    CDisplay & display6 = add("healthbar", -1, 0, CDisplay::DISPLAY_HEALTH_BAR);
+    display6.setColor(0, 0xff, 0x40, 0xff);
+    display6.setVisible(true);
+    display6.setProtected(true);
+    display6.setFlagXY(CDisplay::FLAG_X_ALIGN_LEFT, CDisplay::FLAG_Y_ALIGN_BOTTOM);
 }
 
 bool CDisplayConfig::read(IFile & file)
@@ -148,7 +172,7 @@ bool CDisplayConfig::read(IFile & file)
     unsigned int file_version = 0;
     file.read(&file_version, sizeof(file_version));
     if(file_version != VERSION) {
-        qDebug("incorrect version CDisplayConfig");
+        CLuaVM::debugv("incorrect version CDisplayConfig");
         return false;
     }
     int size;
@@ -177,7 +201,7 @@ CDisplay *CDisplayConfig::operator[](int i)
     if (i >= 0 && i < m_size) {
         return m_displays[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -198,3 +222,16 @@ void CDisplayConfig::killFrameSet(int frameSet)
         }
     }
 }
+
+ void CDisplayConfig::killFont(int fontID)
+ {
+     for (int i=0; i < m_size; ++i) {
+         CDisplay * d = m_displays[i];
+         int fontX = d->font();
+         if (fontX == fontID) {
+             d->setFont(0);
+         } else if (fontX > fontID){
+             d->setFont(--fontX);
+         }
+     }
+ }

@@ -24,16 +24,24 @@ class QLabel;
 class CWEditEvents;
 class QAction;
 class CLevelScroll;
-//class CLevelView;
 class CLevelViewGL;
 class CToolBoxDock;
 class CThreadUpdater;
 class QScrollArea;
 class CDlgDistributeGame;
 class QFileSystemWatcher;
+class CInfoDock;
+class QLabel;
+class CGameFixer;
+class QToolButton;
+class QFont;
+class COptions;
+class COptionGroup;
+class QGamepad;
+class QSettings;
 
 #include <QTimer>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QMainWindow>
 #include <QGLFunctions>
 #include "../shared/stdafx.h"
@@ -51,49 +59,43 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    QTime & getTime();
+    QElapsedTimer &getTime();
     void open(QString fileName);
     void initToolBox();
     CGame *getGame();
     void createEventEditor();
     void makeCurrent();
+    static const char m_appName[];
+    static const char m_author[];
+    static const QString m_appTitle;
+    void setReady(bool ready);
 
 private:
-    static char m_fileFilter[];
-    static char m_appName[];
-    static char m_appTitle[];
-    static char m_author[];
     Ui::MainWindow *ui;
     QComboBox *m_comboEvents;
     QComboBox *m_comboLayers;
-    //QScrollArea *m_scroll
     CLevelScroll *m_scroll;
     CLevelViewGL *m_lview;
     CToolBoxDock *m_toolBox;
+    CInfoDock *m_infoDock;
     CWEditEvents *m_editEvents;
     QToolBar *m_levelToolbar;
     QToolBar *m_layerToolbar;
     CGame m_doc;
     QTimer m_timer;
-    QTime m_time;
+    QTimer m_timerIndicator;
+    QElapsedTimer m_time;
     int m_nextTick;
-    bool m_bShowGrid;
-    char m_gridColor[8];
-    int m_gridSize;
-    int m_skill;
-    int m_lives;
-    int m_start_hp;
-    int m_score;
     int m_start_level;
-    bool m_bContinue;
     bool m_bShowToolBox;
+    bool m_bDebugOutput;
     int m_viewMode;
     int m_proto;
     int m_event;    
     int m_pathOrgX;
     int m_pathOrgY;
     int m_pathEntry;
-    int m_fontSize;
+    COptions *m_options;
     bool m_bUpdate;
     QString m_updateURL;
     CThreadUpdater *m_updater;
@@ -104,7 +106,6 @@ private:
     int m_rezW;
     int m_rezH;
     bool m_runtimeExternal;
-    bool m_skipSplash;
     bool maybeSave();
     bool save();
     bool saveAs();
@@ -116,30 +117,39 @@ private:
     void initFileMenu();
     void reloadRecentFileActions();
     void updateRecentFileActions();
+    void initSettings();
     void reloadSettings();
     void hideView(bool hide);
     void showLayerName();
     void adjustViewPort();
     void commitAll();
     void exportGame();
-    QAction** actionShortcuts();
+    void changeTickMaxRate();
+    QFont currentFont();
+    QAction **actionShortcuts();
+    QAction *m_actionEraser;
     QStringList & defaultShortcuts();
+    QToolButton *m_protoIcon;
+    CGameFixer * m_fixer;
+    QToolButton *m_btnIndicator;
+    bool m_ready;
+    QByteArray m_state;
     void saveSettings();
     enum {
-        MaxRecentFiles      = 4,
-        TICK_MAX_RATE       = 200,
+        MAX_PROJECTS        = 16,
         TICK_SCALE          = 1000 / 35,
-        TOOLBAR_WIDTH       = 250,
         LABEL0_SIZE         = 500,
         VM_EDITOR           = 0,
         VM_GAME             = 1,
         VM_SPRITE_EVENTS    = 2,
         VM_EDIT_PATH        = 3,
-        UI_VERSION          = 0
+        UI_VERSION          = 0,
+        TOOLBAR_ICON_SIZE   = 16
     };
     QLabel *m_labels[3];
-    QAction *m_recentFileActs[MaxRecentFiles];
-    QFileSystemWatcher * m_watcher;
+    QAction *m_recentFileActs[16];
+    QString m_fileName;
+
     virtual void closeEvent(QCloseEvent *event);
     virtual void setVisible ( bool visible );
     virtual void resizeEvent (QResizeEvent *event);
@@ -150,8 +160,16 @@ private:
     void goExternalRuntime();
     bool checkExecutible(const QString exec, QString & errMsg);
     void showAppSettings(int tab);
-    void formatVersion(QString &ver);
     void loadFileName(const QString &fileName);
+    void markAsGoal(bool isGoal);
+    static void newDebugString(const char *s);
+    static void newErrorString(const char *s);
+    void memorizeFilePath();
+    void readButtonConfig(QSettings & settings);
+    void writeButtonConfig(QSettings & settings);
+    void updateSkillFiltersCheckbox(int skillval);
+    void updateSkillFlag(int flag, bool bit);
+    void leaveGameMode();
 
 protected:
     void initializeGL();
@@ -160,6 +178,13 @@ protected:
     virtual void changeEvent(QEvent* e);
 
     QOpenGLContext *m_context;
+#ifdef LGCK_GAMEPAD
+    QGamepad *m_gamepad;
+    void initGamePad();
+#endif
+
+public slots:
+    void addLevel();
 
 private slots:
     void on_actionRestart_triggered();
@@ -180,7 +205,7 @@ private slots:
     void on_actionTest_Level_triggered();
     void on_actionAbout_triggered();
     void on_actionNew_file_triggered();
-    void on_actionBrint_to_front_triggered();
+    void on_actionBring_to_front_triggered();
     void on_actionSend_to_back_triggered();
     void on_actionDelete_Object_triggered();
     void on_actionMove_Level_triggered();
@@ -230,8 +255,8 @@ private slots:
     void selectLevel(int index);
     void editLevel(int index);
     void deleteLevel(int index);
-    void addLevel();
     void notifyKeyEvent(int keyCode, int state);
+    void notifyJoyEvent(lgck::Button::JoyButton button, char value);
     void updateMenus();
     void setStatus(int i, const QString message);
     void setViewMode(int viewMode);
@@ -250,11 +275,25 @@ private slots:
     void on_actionDecrease_Font_Size_triggered();
     void on_actionReset_Font_Size_triggered();
     void on_actionEdit_Images_triggered();
-    void on_actionImport_Font_triggered();
     void on_actionSprite_Editor_triggered();
     void on_actionExport_Game_triggered();
     void on_actionDistribution_Package_triggered();
     void updateFrameSet(const QString & fileName);
+    void on_actionMark_All_as_Goals_triggered();
+    void on_actionUnmark_All_as_Goals_triggered();
+    void on_actionDebugOutput_toggled(bool arg1);
+    void on_actionSprite_Paint_toggled(bool checked);
+    void eraserToggled(bool checked);
+    void changeProtoIcon(int protoId);
+    void updateIndicator();
+    void indicatorTriggered();
+    void on_actionJoyState_Mapping_triggered();
+    void toggleProtoFrame();
+    void on_actionHell_toggled(bool arg1);
+    void on_actionNormal_toggled(bool arg1);
+    void on_actionNightmare_toggled(bool arg1);
+    void on_actionInsane_toggled(bool arg1);
+    void on_actionAll_Skills_triggered();
 
 signals:
     void levelDeleted(int index);
@@ -280,8 +319,20 @@ signals:
     void scrollbarShown(bool);
     void focusGL();
     void textInserted(const char *text);
-    void fontSizeChanged(int);
+    void fontChanged(const QFont &);
+    void editorOptionChanged(COptionGroup & options);
     void frameSetChanged(int fs);
+    void spriteUpdated(int protoId);
+    void debugText(const QString & text);
+    void errorText(const QString & text);
+    void spritePaintStateChanged(bool state);
+    void eraserStateChanged(bool state);
+    void triggerKeyColorChanged(const QString & color);
+    void triggerKeyShow(bool state);
+    void triggerKeyFontSizeChanged(int size);
+    void joyEventOccured(lgck::Button::JoyButton button, char value);
+    void currentFrameChanged(int protoId, int frameId);
+    void skillFilterChanged(int);
 };
 
 #endif // MAINWINDOW_H

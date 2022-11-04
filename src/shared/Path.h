@@ -19,6 +19,8 @@
 #ifndef PATH_H
 #define PATH_H
 
+#include <string>
+
 class IFile;
 
 class CPath
@@ -27,8 +29,8 @@ public:
     CPath();
     ~CPath();
 
-    void add(char aim);
-    void insertAt(int i, char aim);
+    void add(uint8_t aim);
+    void insertAt(int i, uint8_t aim);
     void removeAt(int i);
     void read(IFile &file);
     void write(IFile & file);
@@ -37,13 +39,15 @@ public:
     void setOptions(int option);
     void forget();
     void debug();
+    std::string toHex();
+    uint8_t *raw();
 
-    char & operator[] (int i) const;
+    uint8_t & operator[] (int i) const;
     CPath & operator = (const CPath & src);
     bool operator == (const CPath & src);
     bool operator != (const CPath & src);
 
-    static bool isValidAim(char aim);
+    static bool isValidAim(uint8_t aim);
 
     enum {
         PO_NONE = 0,
@@ -59,6 +63,6 @@ protected:
     int m_size;
     int m_max;
     int m_options;
-    char *m_path;
+    uint8_t *m_path;
 };
 #endif // PATH_H

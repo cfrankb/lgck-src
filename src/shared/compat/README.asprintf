@@ -1,0 +1,1 @@
+An implementation of vasprintf and asprintf for the Microsoft Windows platform. This implementation takes advantage of the security enhancements provided by the Microsoft CRT. Works with all Visual C++ versions starting from Visual C++ 2008.

@@ -21,6 +21,8 @@
 
 #include "Settings.h"
 #include <string>
+#include "ISerial.h"
+
 class IFile;
 class CLayer;
 
@@ -30,7 +32,7 @@ class CLayer;
 /////////////////////////////////////////////////////////////////////////////
 // CLevel
 
-class CLevel
+class CLevel: public ISerial
 {
 public:
     CLevel();
@@ -79,10 +81,9 @@ public:
     int getSettingInt (const int index);
     void setSetting(const char * param, const char * value, int mask=0xffffffff);
     CSettings & getSettings();
-    void debug();
     ~CLevel();
     bool read(IFile & file);
-    bool write(IFile & file, bool compr=true);
+    bool write(IFile & file);
     int m_currLayer;
     int m_mx;
     int m_my;
@@ -100,16 +101,25 @@ public:
         SPARAM_TICK_RATE        = 8,
         SPARAM_MUSIC            = 9,
         SPARAM_CLOSURE          = 10,
-        SPARAM_UUID             = 11
+        SPARAM_UUID             = 11,
+        SPARAM_BORDERCOLOR      = 12,
+        SPARAM_INTROBKCOLOR     = 13,
+        SPARAM_INTROTEXTCOLOR   = 14,
+        SPARAM_INTROTIME        = 15,
+        SPARAM_WIDTH            = 16,
+        SPARAM_HEIGHT           = 17,
+        SPARAM_COLORMOD         = 18,
+        SPARAM_AUTHOR           = 19
     } PARAM_LEVEL;
 
     enum {
-        WRAP_NONE               = 0,
-        WRAP_UP                 = 1,
-        WRAP_DOWN               = 2,
-        WRAP_LEFT               = 4,
-        WRAP_RIGHT              = 8,
-        OPENTOP                 = 16
+        WRAP_NONE               = 0x0000,
+        WRAP_UP                 = 0x0001,
+        WRAP_DOWN               = 0x0002,
+        WRAP_LEFT               = 0x0004,
+        WRAP_RIGHT              = 0x0008,
+        OPENTOP                 = 0x0010,
+        NO_LOOK_UP              = 0x0020
     } WRAP;
 
     enum {
@@ -152,7 +162,7 @@ protected:
     int m_size;
     int m_max;
     CLayer **m_layers;
-    UINT64 m_guid;
+    uint64_t m_guid;
     int getVersion();
     enum {
         GROWBY = 1,

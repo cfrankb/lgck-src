@@ -48,7 +48,7 @@ protected:
 
 private:
     Ui::CDlgAnimation *ui;
-    void **m_icons;
+    uint8_t **m_icons;
     int *m_iconSizes;
     int m_iconMax;
     int m_iconCount;

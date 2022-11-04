@@ -1,8 +1,27 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "FileWrap.h"
 #include "Display.h"
 #include <cstdlib>
+#include <cstring>
 #include "stdafx.h"
 #include "FileWrap.h"
+#include "LuaVM.h"
 
 /////////////////////////////////////////////////////////////////////
 // CDisplay
@@ -91,6 +110,7 @@ void CDisplay::setType(int type, bool resetTemplate)
             case DISPLAY_SCORE:
                 set(DI_TEMPLATE, "%.8d");
             break;
+            case DISPLAY_COUNTER:
             case DISPLAY_LIVES:
                 set(DI_TEMPLATE, "%.2d");
             break;
@@ -120,7 +140,7 @@ void CDisplay::setExpireTime(int time)
 
 void CDisplay::setVisible(bool visible)
 {
-    set(DI_VISIBLE, visible ? 1 : 0);
+    set(DI_VISIBLE, visible);
 }
 
 void CDisplay::show()
@@ -136,6 +156,7 @@ void CDisplay::hide()
 void CDisplay::setText(const char *content, int type)
 {
     set(DI_CONTENT, content);
+    splitString(content);
     if (type != DISPLAY_SAME) {
         set(DI_TYPE, DISPLAY_MESSAGE);
     }
@@ -232,14 +253,16 @@ bool CDisplay::write(IFile & file)
         DI_IMAGENO,
         DI_PROTECTED,
         DI_FLAG_X,
-        DI_FLAG_Y
+        DI_FLAG_Y,
+        DI_FONT
     };
 
     int stringList [] = {
         // strings
-        DI_NAME    ,
-        DI_CONTENT  ,
-        DI_TEMPLATE
+        DI_NAME,
+        DI_CONTENT,
+        DI_TEMPLATE,
+        DI_SOURCE
     };
 
     unsigned int count = sizeof(intList) / sizeof(int);
@@ -278,7 +301,7 @@ bool CDisplay::read(IFile &file)
     unsigned int file_version = 0;
     file.read(&file_version, sizeof(file_version));
     if (file_version != VERSION) {
-        qDebug("incorrect version");
+        CLuaVM::debugv("incorrect version");
         return false;
     }
     int count = 0;
@@ -299,6 +322,8 @@ bool CDisplay::read(IFile &file)
         file >> v;
         m_attrs[k] = v;
     }
+
+    splitString(m_attrs[DI_CONTENT].c_str());
     return true;
 }
 
@@ -388,6 +413,16 @@ int CDisplay::flagY()
     return geti(DI_FLAG_Y);
 }
 
+int CDisplay::font()
+{
+    return geti(DI_FONT);
+}
+
+void CDisplay::setFont(int fontID)
+{
+    set(DI_FONT, fontID);
+}
+
 int CDisplay::geti(unsigned i)
 {
     return m_attri[i];
@@ -406,4 +441,53 @@ void CDisplay::set(int i, int v)
 void CDisplay::set(int i, const char * v)
 {
     m_attrs[i] = v;
+}
+
+void CDisplay::splitString(const char *inData)
+{
+    m_lines.clear();
+    int len = strlen(inData);
+    char *tmp = new char[len + 1];
+    strcpy(tmp, inData);
+    char *s = tmp;
+    char *p = s;
+    for (; *s; ++s) {
+        if (s[0] == '\r' && s[1] == '\n') {
+            s[0] = 0;
+            continue;
+        } else if (s[0] == '\r' || s[0] == '\n') {
+            // we have found a new line
+            s[0] = 0;
+            m_lines.push_back(p);
+            p = s + 1;
+        } else if (s[0] == '\t') {
+            s[0] = ' ';
+        }
+    }
+    if (p[0]) {
+        m_lines.push_back(p);
+    }
+    delete [] tmp;
+}
+
+std::list<std::string> & CDisplay::lines()
+{
+    return m_lines;
+}
+
+int CDisplay::rgb()
+{
+     return (geti(DI_R) & 0xff)
+             + ((geti(DI_G) & 0xff) << 8)
+             + ((geti(DI_B) & 0xff) << 16);
+}
+
+const char *CDisplay::source()
+{
+    return gets(DI_SOURCE);
+}
+
+void CDisplay::setSource(const char * s)
+{
+    set(DI_SOURCE, s);
 }

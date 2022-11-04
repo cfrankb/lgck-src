@@ -34,8 +34,8 @@ public:
     explicit CDlgPathDir(QWidget *parent = 0);
     ~CDlgPathDir();
 
-    void load(const char aim);
-    void save(char & aim);
+    void load(const uint8_t aim);
+    void save(uint8_t &aim);
 
 protected:
     void changeEvent(QEvent *e);
@@ -43,12 +43,9 @@ protected:
     enum {
         MAX_ICONS = 5
     };
-   // QIcon m_icons[MAX_ICONS];
     static QString m_iconNames[];
     static QString m_iconText[];
     static int m_iconValues[];
-
-    //bool loadIcon(int i);
 
 private:
     Ui::CDlgPathDir *ui;

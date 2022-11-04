@@ -20,8 +20,9 @@
 #define _SND_H
 
 #include <string>
+#include "ISerial.h"
 
-class CSnd
+class CSnd: public ISerial
 {
 public:
     CSnd();
@@ -39,6 +40,8 @@ public:
     bool operator != (const CSnd & src);
     CSnd & operator = (const CSnd & src);
     void debug();
+    virtual bool read(IFile & file);
+    virtual bool write(IFile & file);
 
 protected:
     void init();

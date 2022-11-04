@@ -30,11 +30,6 @@
 #include "Level.h"
 #include "Font.h"
 
-// http://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Text_Rendering_01
-// http://www.opengl.org/archives/resources/features/fontsurvey/
-// http://students.cs.byu.edu/~bfish/glfontdl.php
-// http://stackoverflow.com/questions/8847899/opengl-how-to-draw-text-using-only-opengl-methods
-
 CGRSfml::CGRSfml()
 {
     m_game = NULL;
@@ -77,201 +72,6 @@ void CGRSfml::getScreenSize(int & len, int & hei)
     hei = m_screenHeight;
 }
 
-void CGRSfml::drawLayer(CLayer * layer, int mx, int my)
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX = 0;
-    int offsetY = 0;
-    int maxX  = m_game->BUFFERLEN;
-    if (maxX < screenLen)  {
-        offsetX = (screenLen - maxX) / 2;
-    }
-    int maxY  = m_game->BUFFERHEI;
-    if (maxY < screenHei)  {
-        offsetY = (screenHei - maxY) / 2;
-    }
-    CFrame *pFrame;
-    CLayer & l = (*layer);
-    int entries = l.getSize();
-    for (int i=0; i< entries; ++i) {
-        CLevelEntry & entry = l[i] ;
-        if ((entry.m_nProto & m_game->PROTO_POINTS) == m_game->PROTO_POINTS ) {
-            pFrame = (* m_game->m_points ) [entry.m_nFrameNo];
-        } else {
-            pFrame = (* m_game->m_arrFrames[entry.m_nFrameSet])[entry.m_nFrameNo];
-        }
-        int x = entry.m_nX - mx;
-        int y = entry.m_nY - my;
-        if (!((entry.m_nTriggerKey & m_game->TRIGGER_HIDDEN) ||
-            (x + pFrame->m_nLen <= 0) ||
-            (x >= screenLen) ||
-            (y + pFrame->m_nHei <= 0) ||
-            (y >= screenHei) ||
-            (entry.m_nFrameNo & 0x8000))) {
-            x += offsetX;
-            y += offsetY;
-            paintImage(x, screenHei - y, entry.m_nFrameSet, entry.m_nFrameNo);
-        }
-    }
-}
-
-void CGRSfml::drawScene(CScene * layer)
-{
-    int mx = m_game->m_mx;
-    int my = m_game->m_my;
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-
-    int offsetX = 0;
-    int offsetY = 0;
-    int maxX  = m_game->BUFFERLEN;
-    if (maxX < screenLen)  {
-        offsetX = (screenLen - maxX) / 2;
-    }
-
-    int maxY  = m_game->BUFFERHEI;
-    if (maxY < screenHei)  {
-        offsetY = (screenHei - maxY) / 2;
-    }
-
-    CScene & scene = *layer;
-    int entries = scene.getSize();
-    CFrame *pFrame;
-    int frameSet;
-    for (int i=0; i< entries; ++i) {
-        CActor & entry = scene[i] ;
-        if ((entry.m_nProto & m_game->PROTO_POINTS) == m_game->PROTO_POINTS ) {
-            pFrame = (* m_game->m_points ) [entry.m_nFrameNo];
-            frameSet = m_game->var("pointsOBL");
-        } else {
-            pFrame = (* m_game->m_arrFrames[entry.m_nFrameSet])[entry.m_nFrameNo];
-            frameSet = entry.m_nFrameSet;
-        }
-        int x = entry.m_nX - mx;
-        int y = entry.m_nY - my;
-        if (!((entry.m_nTriggerKey & m_game->TRIGGER_HIDDEN) ||
-            (x + pFrame->m_nLen <= 0) ||
-            (x >= screenLen) ||
-            (y + pFrame->m_nHei <= 0) ||
-            (y >= screenHei) ||
-            (entry.m_nFrameNo & 0x8000))) {
-            x += offsetX;
-            y += offsetY;
-            paintImage(x, screenHei - y, pFrame, frameSet, entry.m_nFrameNo);
-        }
-    }
-}
-
-void CGRSfml::drawHP()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    CActor & player = m_game->getPlayer();
-    int x1 = 1;
-    int x2 = x1 + player.getHP() * 2;
-    int y1 = screenHei - 24;
-    int y2 = screenHei - 8;
-    UINT8 a = m_game->getDisplayAlpha();
-    if (a && player.getHP()) {
-        paint(x1, y1, x2, y2, 0x40ff00 | (a << 24));
-        paint(x1, y1, x2, y2, 0xffffff | (a << 24), false);
-    }
-}
-
-void CGRSfml::getOffset(int & offsetX, int & offsetY)
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    offsetX = 0;
-    offsetY = 0;
-    int maxX  = m_game->BUFFERLEN;
-    if (maxX < screenLen)  {
-        offsetX = (screenLen - maxX) / 2;
-    }
-
-    int maxY  = m_game->BUFFERHEI;
-    if (maxY < screenHei)  {
-        offsetY = (screenHei - maxY) / 2;
-    }
-}
-
-void CGRSfml::drawScreen()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX;
-    int offsetY;
-    getOffset(offsetX, offsetY);    
-    clear(m_game->var("borderColor"));
-    paint(offsetX,
-          offsetY,
-          screenLen - offsetX,
-          screenHei - offsetY,
-          m_game->var("bkColor") | 0xff000000);
-    int colorMod = m_game->var("colorMod") | 0xff000000;
-    m_colorMod.blue = (colorMod & 0xff);// << 16;
-    m_colorMod.green = (colorMod & 0xff00) >> 8;
-    m_colorMod.red = (colorMod >> 16) & 0xff;
-
-    for (int i = 0; i < m_game->m_layers->getSize(); ++i) {
-        int speeds[] = {0, 1, 2, 4, 8, 16, 32, 64, 128};
-        CLayer & layer = (*(m_game->m_layers))[i];
-        if (layer.getType() != CLayer::LAYER_MAIN) {
-            // draw background and foreground layers
-            int mx = 0, my = 0;
-            int h, v;                      
-            layer.getSpeed(h, v);
-            if (h == CLayer::SPEED_CUSTOM) {
-                layer.getOffset(mx, my);
-            } else {
-                if (h) {
-                    mx = m_game->m_mx / speeds[h];
-                }
-                if (v) {
-                    my = m_game->m_my / speeds[v];
-                }
-            }
-            drawLayer(&layer, mx, my);
-        } else {
-            // draw main layer
-            drawScene(m_game->m_sBK);
-            drawScene(m_game->m_sFW);
-        }
-    }
-    drawHP();
-    drawInventory();
-    m_displayManager->draw();
-}
-
-void CGRSfml::drawInventory()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    const CInventory *inventory = m_game->getInventory();
-    int i = 0;
-    for (int j=0; inventory && (j < inventory->getSize()); ++j) {
-        if ((*inventory)[j] != 0) {
-            CProto proto = m_game->m_arrProto[(*inventory)[j]];
-            if (!proto.getOption(CProto::OPTION_INVENTORY_HIDDEN)) {
-                int imageSet = proto.m_nFrameSet;
-                int imageNo = proto.m_nFrameNo;
-                CFrame *frame = (*( m_game->m_arrFrames[imageSet]))[imageNo];
-                int x = screenLen - frame->m_nLen - 4;
-                int y = 32 * (i + 1) + 4;
-                paintImage(x, screenHei - y, imageSet, imageNo);
-                ++i;
-            }
-        }
-    }
-}
-
 void CGRSfml::clear(unsigned int red, unsigned int green, unsigned int blue)
 {
     // Set Color
@@ -288,10 +88,10 @@ void CGRSfml::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
-    unsigned int red = rgba & 0xff;
-    unsigned int green = (rgba >> 8) & 0xff;
-    unsigned int blue = (rgba >> 16) & 0xff;
-    unsigned int alpha = (rgba >> 24) & 0xff;
+    uint32_t red = rgba & 0xff;
+    uint32_t green = (rgba >> 8) & 0xff;
+    uint32_t blue = (rgba >> 16) & 0xff;
+    uint32_t alpha = (rgba >> 24) & 0xff;
     int w = x2 - x1;
     int h = y2 - y1;
     sf::RectangleShape rect(sf::Vector2f(w, h));
@@ -306,23 +106,16 @@ void CGRSfml::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill
     rect.setPosition(x1,y1);
     m_window->draw(rect);
 }
-
 void CGRSfml::paintImage(int x1, int y1, int frameSet, int frameNo)
-{
-    CFrame *frame = (*( m_game->m_arrFrames[frameSet]))[frameNo];
-    paintImage(x1,y1, frame, frameSet, frameNo);
-}
-
-void CGRSfml::paintImage(int x1, int y1, CFrame *frame, int frameSet, int frameNo)
 {
     unsigned int id_texture = m_imageManager->getImage(frameSet, frameNo);
     sf::Sprite sprite;
     sprite.setTexture(*m_imageManager->texture(id_texture));
     sprite.setOrigin(0,0);
     sprite.setColor(sf::Color(
-                        m_colorMod.red,
-                        m_colorMod.green,
-                        m_colorMod.blue,
+                        255,//m_colorMod.red,
+                        255,//m_colorMod.green,
+                        255,//m_colorMod.blue,
                         0xff));
     int screenLen;
     int screenHei;
@@ -338,7 +131,10 @@ IDisplayManager* CGRSfml::displayManager()
 
 void CGRSfml::ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
 {
-    paint(x1, y1, x2, y2, rgba, fill);
+    int screenLen;
+    int screenHei;
+    getScreenSize(screenLen, screenHei);
+    paint(x1, screenHei - y1, x2, screenHei - y2, rgba, fill);
 }
 
 void CGRSfml::ss_paintImage(int x1, int y1, int frameSet, int frameNo)
@@ -346,7 +142,7 @@ void CGRSfml::ss_paintImage(int x1, int y1, int frameSet, int frameNo)
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
-    paintImage(x1, y1, frameSet, frameNo);
+    paintImage(x1,screenHei - y1, frameSet, frameNo);
 }
 
 IImageManager *CGRSfml::CGRSfml::cache()

@@ -30,7 +30,7 @@
 
 CObject::CObject()
 {
-    m_events = NULL;
+    m_events = nullptr;
     m_eventCount = 0;
 
     m_animations = new CAnimation[ getAnimationCount()];
@@ -54,7 +54,6 @@ CObject::~CObject()
 
 CObject & CObject::operator = (CObject & s)
 {
-    //qDebug("CObject::operator =\n");
     m_proto = s.proto();
 
     resizeEventList( s.getEventCount() );
@@ -63,11 +62,18 @@ CObject & CObject::operator = (CObject & s)
         m_events[i] = s.getEvent(i);
     }
 
-    // TODO: copy the animation sequences too
+    // copy the animation sequences
 
     int count = getAnimationCount();
     for (int i = 0; i < count; ++i) {
         m_animations[i] = s.getAnimation(i);
+    }
+
+    // copy paths
+
+    count = getPathCount();
+    for (int i=0; i < count; ++i) {
+        m_paths[i] = s.getPath(i);
     }
 
     return *this;
@@ -189,14 +195,14 @@ void CObject::setAnimation (int i, const CAnimation & s)
     m_animations[i] = s;
 }
 
-
 void CObject::readAnimations(IFile & file)
 {
     int count = getAnimationCount();
     int j = 0;
 
     // count of initiated animation sequences
-    file.read(&j, sizeof(UINT8));
+    file.read(&j, sizeof(uint8_t));
+    //qDebug(">>> animations: %d", j);
 
     for (int i=0; i < j; ++i) {
         m_animations[i].read(file);
@@ -220,7 +226,7 @@ void CObject::writeAnimations(IFile &file)
     }
 
     // count of active animation sequences
-    file.write(&j, sizeof(UINT8));
+    file.write(&j, sizeof(uint8_t));
 
     for (int i=0; i < j; ++i) {
         m_animations[i].write(file);
@@ -295,7 +301,7 @@ void CObject::readPaths(IFile &file)
     int j = 0;
 
     // count of initiated path sequences
-    file.read(&j, sizeof(UINT8));
+    file.read(&j, sizeof(uint8_t));
 
     for (int i=0; i < j; ++i) {
         m_paths[i].read(file);
@@ -319,9 +325,18 @@ void CObject::writePaths(IFile &file)
     }
 
     // count of active paths
-    file.write(&j, sizeof(UINT8));
+    file.write(&j, sizeof(uint8_t));
 
     for (int i=0; i < j; ++i) {
         m_paths[i].write(file);
+    }
+}
+
+void CObject::debug()
+{
+    CObject & obj = *this;
+    for (int j=0; j < obj.getPathCount(); ++j) {
+        CPath & path = obj.getPath(j);
+        qDebug("Path %d %s [size: %d] %s", j, obj.getPathName(j), path.getSize(), path.toHex().c_str());
     }
 }

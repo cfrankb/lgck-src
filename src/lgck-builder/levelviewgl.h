@@ -23,6 +23,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_2_0>
 #include <QTimer>
+#include "Color.h"
 
 class CGame;
 
@@ -45,7 +46,7 @@ public:
         PATH_SCROLL = 8,
         MOUSE_POS_MASK = 0xfffffff8,
         TICK_SCALE   = 1000 / 35,
-        TICK_MAX_RATE       = 200
+        TICK_MAX_RATE = 30 // 200
     };
 
 protected:
@@ -63,11 +64,20 @@ protected:
 
     bool m_showGrid;
     int m_gridSize;
-    unsigned int m_gridColor;
+    int m_triggerFontSize;
+    uint32_t m_gridColor;
+    uint32_t m_triggerKeyColor;
+    bool m_showTriggerKey;
     CGame *m_game;
     bool m_hasFocus;
-    bool m_refresh;
     QTimer m_timer;
+    typedef struct {
+        int x;
+        int y;
+        int buttons;
+    } MouseEvent;
+    MouseEvent m_mouseEvent;
+    int m_skillFilters;
 
     virtual void initializeGL();
     virtual void paintGL();
@@ -79,6 +89,8 @@ protected:
     void drawCheckers();
     void drawBackground();
     void drawItemRect();
+    void uint2color(uint32_t rgba, Color &out);
+    void uint2rgba(uint32_t rgba, float &red, float &green, float &blue, float &alpha);
 
 Q_SIGNALS:
     void focused(bool);
@@ -87,12 +99,17 @@ Q_SIGNALS:
     void gameModeStateResync(bool &);
     void versionCheck();
 
+public slots:
+    void setSkillFilters(int flags);
+
 protected slots:
-    void needRefresh();
     void showGrid(bool show);
     void setGridSize(int size);
     void setGridColor(const QString & gridColor);
-    void sceneUpdated();
+    void setTriggerKeyColor(const QString & gridColor);
+    void showTriggerKey(bool state);
+    void setTriggerFontSize(int size);
+    void mouseClick(int x, int y, Qt::MouseButtons buttons);
     friend class CLevelScroll;
 };
 

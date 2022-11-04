@@ -20,6 +20,7 @@
 #define _DISPLAY_H
 #include <unordered_map>
 #include <string>
+#include <list>
 
 class IFile;
 
@@ -42,8 +43,10 @@ public:
     void setExpireTime(int time);
     void setVisible(bool visible);
     void setTemplate(const char *s);
+    void setSource(const char *s);
     void setProtected(bool b);
     void setFlagXY(int flagX, int flagY);
+    void setFont(int fontID);
     void show();
     void hide();
     void setText(const char* content, int displayType=DISPLAY_MESSAGE);
@@ -72,11 +75,15 @@ public:
     int flagX();
     int flagY();
     void flip();
+    int font();
+    int rgb();
+    const char *source();
 
     int geti(unsigned i);
     const char* gets(int i);
     void set(int i, int v);
     void set(int i, const char *v);
+    std::list<std::string> & lines();
 
     enum {
         DISPLAY_TIME_LEFT       = 0,
@@ -86,6 +93,8 @@ public:
         DISPLAY_HP              = 4,
         DISPLAY_DEBUGX          = 5,
         DISPLAY_IMAGE		    = 6,
+        DISPLAY_HEALTH_BAR      = 7,
+        DISPLAY_COUNTER         = 8,
         DISPLAY_SAME            = -1
     } DISPLAY_TYPE;    
     bool write(IFile &file );
@@ -105,10 +114,12 @@ public:
         FLAG_Y_ALIGN_CENTER
     };
 
-protected:
+private:
 
     std::unordered_map <int, std::string> m_attrs;
     std::unordered_map <int, int> m_attri;
+    std::list<std::string> m_lines;
+    void splitString(const char *inData);
 
     enum {
         // numbers
@@ -135,14 +146,16 @@ protected:
         DI_IMAGENO,
         DI_PROTECTED,
         DI_FLAG_X,
-        DI_FLAG_Y
+        DI_FLAG_Y,
+        DI_FONT
     };
 
     enum {
         // strings
         DI_NAME     = 50,
         DI_CONTENT  = 51,
-        DI_TEMPLATE = 52
+        DI_TEMPLATE = 52,
+        DI_SOURCE   = 53
     };
 
     enum {

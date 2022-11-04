@@ -67,10 +67,10 @@ void CWPalette::updateView()
 {
     // draw the palette
     CFrame *frame = new CFrame(16 * GRID_SIZE, ROW_SIZE * GRID_SIZE);
-    const UINT32 *pal = m_palette;//frame->dosPal();
+    const uint32_t *pal = m_palette;//frame->dosPal();
     for (int y=0; y < 16; ++y) {
         for (int x=0; x < ROW_SIZE; ++x) {
-            const UINT32 color = pal[y * 16 + x];
+            const uint32_t color = pal[y * 16 + x];
             for (int i=0; i < GRID_SIZE-1; ++i) {
                 for (int j=0; j < GRID_SIZE-1; ++j) {
                     frame->at(x * GRID_SIZE + j,y * GRID_SIZE + i) = color;
@@ -79,7 +79,7 @@ void CWPalette::updateView()
         }
     }
 
-    UINT8 *png;
+    uint8_t *png;
     int size;
     frame->toPng(png, size);
 
@@ -119,7 +119,7 @@ void CWPalette::mousePressEvent ( QMouseEvent * event )
             && x < ROW_SIZE
             && y < ROW_SIZE) {
         int iColor = x + ROW_SIZE * y;
-        UINT32 color = m_palette[iColor];//CFrame::dosPal()[iColor];
+        uint32_t color = m_palette[iColor];//CFrame::dosPal()[iColor];
         emit colorPicked( color );
         qDebug("color picked");
         QColor qcolor = QColor(
@@ -132,7 +132,7 @@ void CWPalette::mousePressEvent ( QMouseEvent * event )
 
     if (m_mouse.rButton) {
         int iColor = x + ROW_SIZE * y;
-        UINT32 color = m_palette[iColor];//CFrame::dosPal()[iColor];
+        uint32_t color = m_palette[iColor];//CFrame::dosPal()[iColor];
         emit bkColorPicked( color );
         qDebug("bkcolor picked");
     }
@@ -190,7 +190,7 @@ void CWPalette::mouseMoveEvent ( QMouseEvent * event )
             && x < ROW_SIZE
             && y < ROW_SIZE) {
         int iColor = x + ROW_SIZE * y;
-        UINT32 color = m_palette[iColor];//CFrame::dosPal()[iColor];
+        uint32_t color = m_palette[iColor];//CFrame::dosPal()[iColor];
         emit colorPicked( color );
        // qDebug("color picked");
         QColor qcolor = QColor(
@@ -203,7 +203,7 @@ void CWPalette::mouseMoveEvent ( QMouseEvent * event )
 
     if (m_mouse.rButton) {
         int iColor = x + ROW_SIZE * y;
-        UINT32 color = m_palette[iColor];//CFrame::dosPal()[iColor];
+        uint32_t color = m_palette[iColor];//CFrame::dosPal()[iColor];
         emit bkColorPicked( color );
      //   qDebug("bkcolor picked");
     }

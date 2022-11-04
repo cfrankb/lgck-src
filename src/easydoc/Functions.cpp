@@ -173,8 +173,7 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
             break;
         }
 
-        QString hdr;
-        hdr.sprintf("%c %s%s()\n", states[fn.state], q2c(prefix), q2c(fn.name));
+        QString hdr = QString::asprintf("%c %s%s()\n", states[fn.state], q2c(prefix), q2c(fn.name));
         QString paramsIn = "";
         QString paramsInAll = "";
         QString expIn;
@@ -211,8 +210,7 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
                         paramsIn += "       ";
                     }
                     paramsIn += QString ("<span class=\"typeany\">%1</span> %2%3\n").arg(param.type).arg(param.name).arg(o);
-                    QString s;
-                    s.sprintf("   %-16s%s\n", q2c(param.name), q2c(param.desc));
+                    QString s = QString::asprintf("   %-16s%s\n", q2c(param.name), q2c(param.desc));
                     expIn += s;
                     if (!param.desc.isEmpty()) {
                         hasExpIn = true;
@@ -241,8 +239,7 @@ void CFunctions::dump(CFileWrap & file, QString prefix)
                     paramsOut += "       ";
                 }
                 paramsOut += QString ("<span class=\"typeany\">%1</span> %2\n").arg(param.type).arg(param.name);
-                QString s;
-                s.sprintf("   %-16s%s\n", q2c(param.type), q2c(param.desc));
+                QString s = QString::asprintf("   %-16s%s\n", q2c(param.type), q2c(param.desc));
                 expOut += s;
                 if (!param.desc.isEmpty()) {
                     hasExpOut = true;
@@ -368,7 +365,7 @@ void CFunctions::exportWiki(CFileWrap & file, QString prefix)
             paramsOut = "  * __out__ ** void **\\\\\n";
         }
 
-        hdr.sprintf("===== %s%s =====\n", q2c(prefix), q2c(fn.name));
+        hdr = QString::asprintf("===== %s%s =====\n", q2c(prefix), q2c(fn.name));
         file += hdr;
         file += paramsIn;
         file += paramsOut;
@@ -443,9 +440,9 @@ void CFunctions::exportListWiki(CFileWrap & file, QString prefix)
             break;
         }
         QString state = QString(states[fn.state]);
-        QString hdr;
-        hdr.sprintf("  * [[Lua_Functions#%s%s|%s%s", q2c(prefix), q2c(fn.name),
+        QString hdr = QString::asprintf("  * [[Lua_Functions#%s%s|%s%s", q2c(prefix), q2c(fn.name),
                     q2c(prefix), q2c(fn.name));
+
         if (state != "finished") {
             if (fn.lang) {
                 hdr += " (" + langs[fn.lang] + "/" + state + ")";

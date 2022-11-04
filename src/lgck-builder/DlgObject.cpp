@@ -31,8 +31,11 @@
 #include "../shared/Snd.h"
 #include "../shared/interfaces/IImageManager.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "../shared/Frame.h"
 #include "../shared/Path.h"
+
+#define VALUES(x) x, sizeof(x)
 
 CDlgObject::CDlgObject(QWidget *parent) :
     QDialog(parent),
@@ -41,8 +44,8 @@ CDlgObject::CDlgObject(QWidget *parent) :
     m_ui->setupUi(this);
     m_classIndex = 0;
     m_animations = (void*) new CAnimation [ CObject::getAnimationCount() ];
-    m_imgPng = NULL;
-    m_imgSize = NULL;
+    m_imgPng = nullptr;
+    m_imgSize = nullptr;
     m_imgCount = 0;
     m_events = new QString [ CProtoArray::getEventCount() ];
     m_paths = new CPath [ CObject::getPathCount() ];
@@ -53,15 +56,15 @@ void CDlgObject::freeImageSet()
 {
     if (m_imgPng) {
         for (int i=0; i< m_imgCount; ++i) {
-            delete [] ((UINT8**) m_imgPng) [i];
+            delete [] ((uint8_t**) m_imgPng) [i];
         }
-        delete [] (UINT8**) m_imgPng;
-        m_imgPng = NULL;
+        delete [] (uint8_t**) m_imgPng;
+        m_imgPng = nullptr;
     }
 
     if (m_imgSize) {
         delete [] m_imgSize;
-        m_imgSize = NULL;
+        m_imgSize = nullptr;
     }
 }
 
@@ -90,6 +93,24 @@ void CDlgObject::changeEvent(QEvent *e)
     }
 }
 
+void CDlgObject::populateCombo(uint8_t *values, uint valueCount, uint8_t selected, QComboBox *combo, const QString & zero, const QString & format)
+{
+    bool first = true;
+    for (uint32_t i=0; i < valueCount; ++i) {
+        uint8_t c = values[i];
+        if (selected < c && first) {
+            combo->addItem(format.arg(selected));
+            combo->setCurrentIndex(combo->count() - 1);
+            first = false;
+        }
+        combo->addItem(c ? format.arg(c) : zero, c);
+        if (c == selected) {
+            combo->setCurrentIndex(combo->count() - 1);
+            first = false;
+        }
+    }
+}
+
 void CDlgObject::load(const int index)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
@@ -103,7 +124,7 @@ void CDlgObject::load(const int index)
     m_objectIndex = index;
     CProto & proto = gf.m_arrProto[index];
     CObject & object = gf.m_arrProto.getObject( index );
-    QString title = QString(tr("Properties for \"%1\"")).arg(proto.m_szName);
+    QString title = QString(tr("Properties for \"%1\" [%2]")).arg(proto.m_szName).arg(proto.m_uuid);
     setWindowTitle(title);
 
     // name
@@ -116,21 +137,9 @@ void CDlgObject::load(const int index)
 
     // frame set
 
-    for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
-        CFrameSet & frameSet = *gf.m_arrFrames[n];
-        UINT8 *png;
-        int size;
-        frameSet[0]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png (%d)\n", n);
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    for (int n=0; n < gf.frames().getSize(); ++n) {
+        CFrameSet & frameSet = gf.toFrameSet(n);
+        QIcon icon = frame2icon(gf.toFrame(n, 0));
         m_ui->cbFrameSet->addItem(icon, frameSet.getName() );
     }
 
@@ -156,7 +165,7 @@ void CDlgObject::load(const int index)
                 m_ui->cbClass->setCurrentIndex( j );
                 classFound =  true;
             }
-            j++;
+            ++j;
         }
     }
 
@@ -180,16 +189,10 @@ void CDlgObject::load(const int index)
     // speeds
 
     for (int n = 0; n < 16; ++n) {
-        if (n != 0) {
-            QString s = QString(tr("Speed %1")).arg(n);
-            m_ui->cbAnimateSpeed->addItem(s);
-            m_ui->cbMoveSpeed->addItem(s);
-            m_ui->cbFallSpeed->addItem(s);
-        } else {
-            m_ui->cbAnimateSpeed->addItem(tr("(fast)"));
-            m_ui->cbMoveSpeed->addItem(tr("(fast)"));
-            m_ui->cbFallSpeed->addItem(tr("(fast)"));
-        }
+        QString s = n ? tr("Speed %1").arg(n) : tr("(fast)");
+        m_ui->cbAnimateSpeed->addItem(s);
+        m_ui->cbMoveSpeed->addItem(s);
+        m_ui->cbFallSpeed->addItem(s);
     }
 
     for (int n = 0; n < 256; ++n) {
@@ -215,55 +218,39 @@ void CDlgObject::load(const int index)
     QString aims[] = {
         tr("UP"), tr("DOWN"), tr("LEFT"), tr("RIGHT")
     };
-
     for (int i = 0; i < 4; ++i) {
-        m_ui->cbDefaultAim->addItem(aims[i]);
+        m_ui->cbDefaultAim->addItem(aims[i], i);
     }
-
     m_ui->cbDefaultAim->setCurrentIndex(proto.m_nDefaultAim);
 
     // damages
-
-    for (int n = 0; n < 255; ++n) {
-        if (n != 0) {
-            m_ui->cbDamages->addItem(QString(tr("%1 pts")).arg(n));
-        } else {
-            m_ui->cbDamages->addItem(tr("(none)"));
-        }
-    }
-
-    m_ui->cbDamages->setCurrentIndex(proto.m_nDamages);
+    uint8_t damageOptions[] = {0,1,2,3,4,5,10,12,15,20,25,30,35,40,50,75,100,125,150,200,240,250,255};
+    populateCombo(VALUES(damageOptions),proto.m_nDamages, m_ui->cbDamages, tr("(none)"), tr("%1 pts"));
 
     // BonusHP (hit points)
+    uint8_t hpOptions[] = {0,1,2,3,4,5,10,12,15,20,25,30,35,40,50,75,100,125,150,200,240,250,255};
+    populateCombo(VALUES(hpOptions),proto.m_nBonusHP, m_ui->cbBonusHP, "", tr("+%1 pts"));
+    populateCombo(VALUES(hpOptions),proto.m_nHP, m_ui->cbHP, tr("(none)"), tr("%1 pts"));
 
-    for (int n = 0; n < 255; ++n) {
-        if (n != 0) {
-            m_ui->cbBonusHP->addItem(QString(tr("%1 pts")).arg(n));
-            m_ui->cbHP->addItem(QString(tr("%1 pts")).arg(n));
-        }
-        else {
-            m_ui->cbBonusHP->addItem(tr("(none)"));
-            m_ui->cbHP->addItem(tr("(none)"));
-        }
-    }
-
-    m_ui->cbBonusHP->setCurrentIndex(proto.m_nBonusHP);
-    m_ui->cbHP->setCurrentIndex(proto.m_nHP);
+    // bonus coins, lives and ammo
+    uint8_t coinsOptions[] = {0, 1, 2, 3, 4, 5, 10, 20, 25, 50, 100, 200, 250};
+    uint8_t livesOptions[] = {0, 1, 2, 3, 4, 5, 10, 20, 25, 50};
+    uint8_t ammoOptions[] = {0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 40, 50, 100, 150, 200, 250, 255};
+    populateCombo(VALUES(coinsOptions), proto.m_coinsBonus, m_ui->cbCoins, "", QString("+%1"));
+    populateCombo(VALUES(livesOptions), proto.m_livesBonus, m_ui->cbLives, "", QString("+%1"));
+    populateCombo(VALUES(ammoOptions), proto.m_ammoBonus, m_ui->cbAmmo, "", QString("+%1"));
 
     // power level
-
     for (int n = 0; n < 255; ++n) {
         if (n != 0) {
-            m_ui->cbPowerLevel->addItem(QString(tr("Level %1")).arg(n));
+            m_ui->cbPowerLevel->addItem(tr("Level %1").arg(n));
         } else {
             m_ui->cbPowerLevel->addItem(tr("(ignored)"));
         }
     }
-
     m_ui->cbPowerLevel->setCurrentIndex(proto.m_nPowerLevel);
 
     // max bullets
-
     for (int n = 0; n <= 255; ++n) {
         if (n != 0) {
             m_ui->cbMaxBullets->addItem(QString("%1").arg(n));
@@ -334,39 +321,30 @@ void CDlgObject::load(const int index)
         m_ui->cbPlaySound->addItem(gf.m_arrSounds[i]->getName());
         // page 4
         m_ui->cbAutoSound->addItem(gf.m_arrSounds[i]->getName());
+        m_ui->cbSound_bullet->addItem(gf.m_arrSounds[i]->getName());
     }
 
     m_ui->cbPlaySound->setCurrentIndex(proto.m_nChSound);
-
+    m_ui->cbSound_bullet->setCurrentIndex(proto.m_bulletSound);
     // proto (changeto)
 
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
-        CProto & proto = gf.m_arrProto[i];
-        CFrameSet & frameSet = *gf.m_arrFrames[proto.m_nFrameSet];
-        UINT8 *png;
-        int size;
-        frameSet[proto.m_nFrameNo]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png $\n");
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
-        m_ui->cbChangeTo->addItem(icon, proto.getName());
+        CProto & protoSpr = gf.m_arrProto[i];
+        QIcon icon = frame2icon(gf.toFrame(protoSpr.m_nFrameSet, protoSpr.m_nFrameNo));
+        m_ui->cbChangeTo->addItem(icon, protoSpr.getName());
 
         // from page 2
-        m_ui->cbBuddy->addItem(icon, proto.getName());
-        m_ui->cbBullet->addItem(icon, proto.getName());
+        m_ui->cbBuddy->addItem(icon, protoSpr.getName(), i);
+        if (i == 0 || protoSpr.m_nClass == CLASS_PLAYER_BULLET) {
+            m_ui->cbBullet->addItem(icon, protoSpr.getName(), i);
+            if (proto.m_nProtoBuddy == i) {
+                m_ui->cbBullet->setCurrentIndex(m_ui->cbBullet->count() - 1);
+            }
+        }
 
         // from page 4
-
-        m_ui->cbAutoBullet->addItem(icon, proto.getName());
-        m_ui->cbAutoChangeTo->addItem(icon, proto.getName());
+        m_ui->cbAutoBullet->addItem(icon, protoSpr.getName());
+        m_ui->cbAutoChangeTo->addItem(icon, protoSpr.getName());
     }
 
     m_ui->cNoChangeAtDeath->setChecked( proto.getOption(CProto::OPTION_NO_SHIFT_AT_DEATH) );
@@ -380,17 +358,16 @@ void CDlgObject::load(const int index)
     m_ui->cbChangeTo->setCurrentIndex( proto.m_nChProto );
     // from page 2
     m_ui->cbBuddy->setCurrentIndex(proto.m_nProtoBuddy);
-    m_ui->cbBullet->setCurrentIndex(proto.m_nProtoBuddy);
 
     // nbr of rebirth
 
     for (int n = 0; n < 255; ++ n) {
         if (n == 1) {
-            m_ui->cbRebirths->addItem(QString("%1 time").arg(n));
+            m_ui->cbRebirths->addItem(tr("%1 time").arg(n));
         } else if (n > 1) {
-            m_ui->cbRebirths->addItem(QString("%1 times").arg(n));
+            m_ui->cbRebirths->addItem(tr("%1 times").arg(n));
         } else {
-            m_ui->cbRebirths->addItem(QString(tr("(none)")));
+            m_ui->cbRebirths->addItem(tr("(none)"));
         }
     }
 
@@ -400,14 +377,13 @@ void CDlgObject::load(const int index)
 
     for (int n = 0; n < 255; ++n) {
         if (n != 0) {
-            m_ui->cbRebirthDelay->addItem(QString(tr("Speed %1")).arg(n));
+            m_ui->cbRebirthDelay->addItem(tr("Speed %1").arg(n));
         } else {
-            m_ui->cbRebirthDelay->addItem(QString(tr("(fast)")));
+            m_ui->cbRebirthDelay->addItem(tr("(fast)"));
         }
     }
 
     m_ui->cbRebirthDelay->setCurrentIndex( proto.m_nRbDelay );
-
 
     // rebirth location
     const QString locations[] = {
@@ -450,12 +426,7 @@ void CDlgObject::load(const int index)
     // timers
 
     for (int n = 0; n < 256; ++n) {
-        QString s = QString(tr("Speed %1").arg(n));
-
-        if (n == 0) {
-            s = tr("(never)");
-        }
-
+        QString s = n ? tr("Speed %1").arg(n) : tr("(never)");
         m_ui->cbAutoSoundDelay->addItem(s);
         m_ui->cbAutoBulletDelay->addItem(s);
         m_ui->cbAutoChangeToDelay->addItem(s);
@@ -471,16 +442,15 @@ void CDlgObject::load(const int index)
     m_ui->cAutoTrigger->setChecked(proto.m_bAutoTrigger != 0);
 
     // trigger
-
-//    m_ui->cTrigger->setChecked( proto.m_bNoTrigger != 0 );
-    m_ui->cTrigger->setChecked( proto.getOption(CProto::OPTION_NO_TRIGGER) );
+    m_ui->cTrigger->setChecked(proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP));
+    m_ui->cTriggerCall->setChecked(proto.getOption(CProto::OPTION_NO_TRIGGER_CALL));
 
     // page 5 ****************************************************************
 
     m_ui->treeEvents->setColumnCount(2);
     m_ui->treeEvents->setColumnWidth(0, 128);
     m_ui->treeEvents->setColumnWidth(1, 128);
-    m_ui->treeEvents->setEditTriggers(0);
+    m_ui->treeEvents->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeEvents->setWordWrap(false);
     m_ui->treeEvents->setRootIsDecorated(false);
     m_ui->treeEvents->setAlternatingRowColors(true);
@@ -503,7 +473,7 @@ void CDlgObject::load(const int index)
     for (int i = 1; i < MAX_DISPLAY_ICONS + 2; ++i) {
         m_ui->treeAnimations->setColumnWidth(i, 16);
     }
-    m_ui->treeAnimations->setEditTriggers(0);
+    m_ui->treeAnimations->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeAnimations->setWordWrap(false);
     m_ui->treeAnimations->setRootIsDecorated(false);
     m_ui->treeAnimations->setAlternatingRowColors(true);
@@ -543,6 +513,10 @@ void CDlgObject::load(const int index)
 
     // connect slots
     m_ui->treeAnimations->connectSlots(this);
+
+    // bullet options
+    m_ui->cBulletEnabled->setChecked(proto.m_bulletOptions & CProto::BULLET_ENABLED);
+    m_ui->cUnlimitedAmmo->setChecked(proto.m_bulletOptions & CProto::BULLET_UNLIMITED);
 }
 
 void CDlgObject::save(const int index)
@@ -594,12 +568,17 @@ void CDlgObject::save(const int index)
 
     // damages
 
-    proto.m_nDamages = m_ui->cbDamages->currentIndex();
+    proto.m_nDamages = m_ui->cbDamages->currentData().toUInt();
 
     // hit points
 
-    proto.m_nBonusHP = m_ui->cbBonusHP->currentIndex();
-    proto.m_nHP = m_ui->cbHP->currentIndex();
+    proto.m_nBonusHP = m_ui->cbBonusHP->currentData().toUInt();
+    proto.m_nHP = m_ui->cbHP->currentData().toUInt();
+
+    // coins, lives and ammo
+    proto.m_coinsBonus = m_ui->cbCoins->currentData().toUInt();
+    proto.m_livesBonus = m_ui->cbLives->currentData().toUInt();
+    proto.m_ammoBonus = m_ui->cbAmmo->currentData().toUInt();
 
     // power level
 
@@ -607,11 +586,12 @@ void CDlgObject::save(const int index)
 
     // proto buddy
 
-    if (proto.m_nClass==CLASS_PLAYER_OBJECT) {
-        proto.m_nProtoBuddy = m_ui->cbBullet->currentIndex();
+    if (proto.isPlayer()) {
+        proto.m_nProtoBuddy = m_ui->cbBullet->currentData().toUInt();
     } else {
         proto.m_nProtoBuddy = m_ui->cbBuddy->currentIndex();
     }
+    proto.m_bulletSound = m_ui->cbSound_bullet->currentIndex();
 
     // page 3 ****************************************************************
 
@@ -700,13 +680,8 @@ void CDlgObject::save(const int index)
     }
 
     // trigger
-
-//    if (m_ui->cTrigger->checkState () == Qt::Checked) {
-  //      proto.m_bNoTrigger = 1;
-   // } else {
-   //     proto.m_bNoTrigger = 0;
-   // }
-    proto.setOption(CProto::OPTION_NO_TRIGGER, m_ui->cTrigger->checkState () == Qt::Checked);
+    proto.setOption(CProto::OPTION_NO_TRIGGER_FLIP, m_ui->cTrigger->checkState () == Qt::Checked);
+    proto.setOption(CProto::OPTION_NO_TRIGGER_CALL, m_ui->cTriggerCall->checkState () == Qt::Checked);
 
     // set autoGoal
     proto.setOption(CProto::OPTION_AUTO_GOAL, m_ui->cAutomaticGoal->checkState () == Qt::Checked);
@@ -731,7 +706,6 @@ void CDlgObject::save(const int index)
     CPath *paths = (CPath *) m_paths;
     for (int i=0; i < CObject::getPathCount(); ++i) {
         object.getPath(i) = paths [ i ];
-        //qDebug("saving path %d; size = %d", i, object.getPath(i).getSize());
     }
 
     // solidity ***************************************************************
@@ -742,43 +716,32 @@ void CDlgObject::save(const int index)
             | m_ui->cSolidLEFT->isChecked() * CProto::SOLID_LEFT
             | m_ui->cSolidRIGHT->isChecked() * CProto::SOLID_RIGHT;
 
+    // bullet options
+    proto.m_bulletOptions =
+            (m_ui->cBulletEnabled->isChecked() ? CProto::BULLET_ENABLED : 0) |
+            (m_ui->cUnlimitedAmmo->isChecked() ? CProto::BULLET_UNLIMITED : 0);
 }
 
 void CDlgObject::setImage(int frameSet, int frameNo)
 {
-    CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
-
-    UINT8 *png;
-    int size;
-    fs[frameNo]->toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png $$\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-
-    m_ui->sImage->setPixmap(pm);
+    m_ui->sImage->setPixmap(frame2pixmap(m_gameFile->toFrame(frameSet, frameNo)));
 }
 
 void CDlgObject::fillFrameCombo(int frameSet)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
+    CFrameSet & fs = gf.toFrameSet(frameSet);
 
     m_ui->cbBaseFrame->clear();
 
     freeImageSet();
 
     m_imgCount = fs.getSize();
-    m_imgPng = (void**)new  UINT8 ** [m_imgCount];
+    m_imgPng = (void**)new  uint8_t ** [m_imgCount];
     m_imgSize = new int [m_imgCount];
 
     for (int i=0; i < m_imgCount; ++i) {
-        fs[i]->toPng( ((UINT8**)m_imgPng)[i], m_imgSize[i]);
+        fs[i]->toPng( ((uint8_t**)m_imgPng)[i], m_imgSize[i]);
         QIcon icon = makeIcon(m_imgPng[i], m_imgSize[i]);
         m_ui->cbBaseFrame->addItem(icon, QString("%1").arg(i + 1));
     }
@@ -806,6 +769,7 @@ void CDlgObject::on_cbClass_currentIndexChanged(int index)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
     int classId = m_classIndex [ index ];
+
     if (!gf.m_className[ classId ].empty()) {
         m_ui->sClass->setText(gf.m_classInfo[ classId ].c_str());
     } else {
@@ -817,16 +781,15 @@ void CDlgObject::on_cbClass_currentIndexChanged(int index)
         m_ui->tab->removeTab(1);
     }
 
+    bool isPlayer = classId == CLASS_PLAYER_OBJECT;
     if (classId >= 0x10) {
         m_ui->tab->addTab(m_ui->tab_2, QIcon(), tr("Features"));
         m_ui->tab->addTab(m_ui->tab_3, QIcon(), tr("Animation"));
 
-        if (classId == CLASS_PLAYER_OBJECT) {
+        if (isPlayer) {
             m_ui->tab->addTab(m_ui->tab_7, QIcon(), tr("Misc"));
-        } else {
-            if (classId < CLASS_GENERIC_COS) {
-                m_ui->tab->addTab(m_ui->tab_9, QIcon(), tr("Solidity"));
-            }
+        } else if (classId < CLASS_GENERIC_COS) {
+            m_ui->tab->addTab(m_ui->tab_9, QIcon(), tr("Solidity"));
         }
 
         if (classId == CLASS_OPEN_TO_OWNER) {
@@ -837,6 +800,19 @@ void CDlgObject::on_cbClass_currentIndexChanged(int index)
         m_ui->tab->addTab(m_ui->tab_5, QIcon(), tr("Auto"));
         m_ui->tab->addTab(m_ui->tab_6, QIcon(), tr("Events"));
     }
+
+    QComboBox *combos[] = {
+        m_ui->cbRebirths,
+        m_ui->cbRebirthDelay,
+        m_ui->cbRebirthLocation,
+        m_ui->cbBonusHP,
+        m_ui->cbCoins,
+        m_ui->cbAmmo,
+        m_ui->cbLives
+    };
+    for (unsigned int i=0; i < sizeof(combos) / sizeof(QComboBox*);++i){
+        combos[i]->setEnabled(!isPlayer);
+    }
 }
 
 void CDlgObject::on_treeEvents_doubleClicked(QModelIndex index)
@@ -844,13 +820,9 @@ void CDlgObject::on_treeEvents_doubleClicked(QModelIndex index)
     CDlgSource *d = new CDlgSource ( (QWidget*) parent());
     d->init(m_gameFile);
     d->setWindowTitle(tr("Edit Event `%1`").arg(CProtoArray::getEventName(index.row())));
-
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    //CObject & object = gf.m_arrProto.getObject(m_objectIndex);
-//    d->setText(object.getEvent(index.row()));
     d->setText(m_events[index.row()]);
     if (d->exec()) {
-        //object.setEvent(index.row(), d->getText());
         m_events[ index.row() ] = d->getText();
         QTreeWidgetItem * item = m_ui->treeEvents->topLevelItem( index.row() );
         if (d->getText().isEmpty()) {
@@ -860,7 +832,6 @@ void CDlgObject::on_treeEvents_doubleClicked(QModelIndex index)
         }
         gf.setDirty( true );
     }
-
     delete d;
 }
 
@@ -872,7 +843,6 @@ void CDlgObject::on_btnClearAll_clicked()
                              QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok) {
 
         CGameFile & gf = *((CGameFile*)m_gameFile);
-
         for (int i=0; i < CProtoArray::getEventCount(); ++i) {
             if (m_events[i] != "") {
                 m_events[i] = "";
@@ -902,10 +872,9 @@ void CDlgObject::editAnimation(int idx)
         int frameSet = m_ui->cbFrameSet->currentIndex();
 
         CGameFile & gf = *((CGameFile*)m_gameFile);
-        CFrameSet & fs = *gf.m_arrFrames[frameSet];
+        CFrameSet & fs = gf.toFrameSet(frameSet);
 
         int count = fs.getSize();
-
         for (int i=0; i < count; ++i) {
             dlg->addIcon((void*)m_imgPng[i], m_imgSize[i]);
         }
@@ -967,8 +936,8 @@ void CDlgObject::updateAnimation(QTreeWidgetItem * item, int animationId)
 QIcon CDlgObject::makeIcon(void *png, int size)
 {
     QImage img;
-    if (!img.loadFromData( (UINT8*)png, size )) {
-        qDebug("failed to load png");
+    if (!img.loadFromData( (uint8_t*)png, size )) {
+        qWarning("failed to load png");
     }
 
     QPixmap pm = QPixmap::fromImage(img);
@@ -1012,7 +981,6 @@ void CDlgObject::on_cNoChangeAtDeath_clicked()
 void CDlgObject::on_btnAddObject_clicked()
 {
     CDlgFrameSet * d = new CDlgFrameSet (this);
-    //d->setGameDB( m_gameFile );
     d->setWindowTitle ( tr("New Image Set") );
     CFrameSet fs;
     d->init(& fs);
@@ -1021,29 +989,16 @@ void CDlgObject::on_btnAddObject_clicked()
         qDebug("on_btnAddFrameSet_clicked() -> save\n");
 
         // add new FrameSet
-        CGameFile & gf = *((CGameFile*)m_gameFile);
+        CGameFile & gf = *m_gameFile;
 
-        int frameSet = gf.m_arrFrames.getSize();
-        gf.m_arrFrames.add(new CFrameSet (&fs));
+        int frameSet = gf.frames().getSize();
+        gf.frames().add(new CFrameSet (&fs));
 
         // add this new imageSet to the cache
         gf.cache()->add( &fs);
 
         // add new ImageSet UI
-
-        UINT8 *png;
-        int size;
-        fs[0]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png");
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+        QIcon icon = frame2icon(* fs[0]);
         m_ui->cbFrameSet->addItem(icon, fs.getName() );
         m_ui->cbFrameSet->setCurrentIndex(frameSet);
 
@@ -1094,7 +1049,8 @@ void CDlgObject::on_cOverideSolid_clicked(bool checked)
 void CDlgObject::on_eName_textChanged(const QString &arg1)
 {
     QPushButton *button=m_ui->buttonBox->button(QDialogButtonBox::Save);
-    button->setEnabled(!arg1.trimmed().isEmpty());
+    const QString name = arg1.trimmed();
+    button->setEnabled(!name.isEmpty() && (name[0].isLetter() || (name[0]=='_')));
 }
 
 void CDlgObject::on_treePaths_customContextMenuRequested(const QPoint &pos){
@@ -1160,7 +1116,7 @@ void CDlgObject::restoreDefaultPaths()
 
             // decode the string
             for (unsigned int k=0; k < strlen(js.path);k +=3) {
-                char aim = strtol(q2c(sq.mid(k, 2)), NULL, 16);
+                char aim = strtol(q2c(sq.mid(k, 2)), nullptr, 16);
                 m_paths[js.id_seq].add(aim);
             }
         }
@@ -1175,7 +1131,7 @@ void CDlgObject::reloadPaths()
     m_ui->treePaths->setColumnCount( 2);
     m_ui->treePaths->setColumnWidth(0, 100);
     m_ui->treePaths->setColumnWidth(1, 70);
-    m_ui->treePaths->setEditTriggers(0);
+    m_ui->treePaths->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treePaths->setWordWrap(false);
     m_ui->treePaths->setRootIsDecorated(false);
     m_ui->treePaths->setAlternatingRowColors(true);
@@ -1196,4 +1152,21 @@ void CDlgObject::reloadPaths()
 void CDlgObject::on_cInactive_clicked(bool checked)
 {
     m_ui->cbInactive->setEnabled(checked);
+}
+
+void CDlgObject::on_btnUuid_clicked()
+{
+    CProto & proto = m_gameFile->m_arrProto[m_objectIndex];
+    QClipboard *clip = QApplication::clipboard();
+    clip->setText(proto.m_uuid);
+}
+
+void CDlgObject::on_cAutoTrigger_toggled(bool checked)
+{
+    m_ui->cTriggerCall->setChecked(!checked);
+}
+
+void CDlgObject::on_cTriggerCall_toggled(bool checked)
+{
+    m_ui->cAutoTrigger->setChecked(!checked);
 }

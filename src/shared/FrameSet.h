@@ -21,6 +21,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "ISerial.h"
 
 class CFrame;
 class IFile;
@@ -31,7 +32,7 @@ class IFile;
 /////////////////////////////////////////////////////////////////////////////
 // CFrameSet
 
-class CFrameSet
+class CFrameSet: public ISerial
 {
     // Construction
 public:
@@ -58,11 +59,11 @@ public:
     void insertAt(int n, CFrame *pFrame);
     void forget();
     void removeAll ();
-    bool extract (IFile & file, char *format=NULL);
+    bool extract (IFile & file, char *format=nullptr);
     bool extractPNG(IFile & file);
 
     static char *ima2bitmap(char *ImaData, int len, int hei);
-    static void bitmap2rgb(char *bitmap, UINT32 *rgb, int len, int hei, int err);
+    static void bitmap2rgb(char *bitmap, uint32_t *rgb, int len, int hei, int err);
     static bool isFriendFormat(const char *format);
     void move(int s, int t);
 
@@ -70,20 +71,22 @@ public:
     void setLastError(const char *error);
     void toPng(unsigned char * &data, int &size);
     std::string & tag(const char *tag);
+    void setTag(const char *tag, const char *v);
+    void copyTags(CFrameSet & src);
+    void assignNewUUID();
+    void toSubset(CFrameSet & dest, int start, int end=-1);
 
     // Implementation
 public:
     ~CFrameSet();
-    bool write(IFile &file, int version=0x501);
-    bool read(IFile &file);
+    virtual bool write(IFile &file);
+    virtual bool read(IFile &file);
     int m_nCurrFrame;
 
     enum {
         OBL_VERSION = 0x501,
         GROWBY      = 16
     };
-
-    void debug();
 
 protected:
 

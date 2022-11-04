@@ -199,7 +199,7 @@ function Display:expire(time)
   displaySetExpireTime(self.id, time);
 end
 
-function Display:show(visible)
+function Display:show()
   displaySetVisible(self.id, true);
 end
 
@@ -242,6 +242,38 @@ end
 function Display:sizeText(...)
     local arg = {...}
     return display_sizeText(self.id, unpack(arg));
+end
+
+function Display:setFlagXY(flagX, flagY)
+    return display_setFlagXY(self.id, flagX, flagY);
+end
+
+function Display:setFont(fontID)
+    return display_setFont(self.id, fontID);
+end
+
+function Display:setTemplate(s)
+    return display_setTemplate(self.id, s);
+end
+
+function Display:new(name, x, y, displayType)
+    local display = {};
+    setmetatable(display, Display);
+    display.id = display_new(name, x, y, displayType);
+    display.name = name;
+    return display;
+end
+
+function Display:setImage(imageSet, imageNo)
+    displaySetImage(self.id, imageSet, imageNo );
+end
+
+function Display:setSource(source)
+    display_setSource(self.id, source);
+end
+
+function Display:find(name)
+    return getDisplayById(findDisplay(name));
 end
 
 --[[
@@ -365,6 +397,18 @@ end
 
 function Layer:delete()
   layer_delete( self.id);
+end
+
+function Layer:new(name, layerType, hSpeed, vSpeed)
+  local layer = {};
+  setmetatable(layer, Layer);
+  layer.id = layer_new(name, layerType, hSpeed, vSpeed);
+  layer.name = name;
+  return layer;
+end
+
+function Layer:find(name)
+    return getLayer(name);
 end
 
 --[[
@@ -494,6 +538,8 @@ function HitTest:hasSprite(spriteID)
 end
 
 
+
+
 --[[
 
     Inventory ---------------------------------------------------------
@@ -565,7 +611,10 @@ function getProto(objType)
     proto.extra1 = items[PPARAM_EXTRA1];
     proto.extra1 = items[PPARAM_EXTRA2];
     proto.bulletSound = items[PPARAM_B_SOUND];
-           
+    proto.coinBonus = items[PPARAM_COINS_BONUS];
+    proto.livesBonus = items[PPARAM_LIVES_BONUS];
+    proto.ammoBonus = items[PPARAM_AMMO_BONUS];
+    proto.bulletOptions = items[PPARAM_BULLET_OPTIONS];
     return proto;
 end
 
@@ -611,7 +660,13 @@ function getSprite (...)
 end
 
 function Sprite:use(...)
+    local arg = {...}
     return getSprite(unpack(arg));
+end
+
+function Sprite:find(...)
+  local arg = {...}
+  return getSprite(unpack(arg));
 end
 
 function addSprite(...)
@@ -965,6 +1020,62 @@ function isPaused()
     return ss_getPause();
 end
 
+function firePlayerBullet(id, ticks)
+    local sprite = getSprite( id );
+    local proto = sprite:getProto();
+    local ammo = Counters:get("ammo")
+    if AND(proto.bulletOptions, BULLET_ENABLED) > 0 and
+        ((proto.fireRate == 0 ) or (ticks % proto.fireRate == 0))
+        and testJoyState( JOY_FIRE )
+        and ((ammo > 0) or AND(proto.bulletOptions, BULLET_UNLIMITED) > 0)
+        then
+        local x , y, aim = getSpriteVars( id );
+        if testJoyState( JOY_LEFT ) then
+            aim = LEFT;
+        elseif testJoyState( JOY_RIGHT ) then
+            aim = RIGHT;
+        elseif testJoyState( JOY_UP ) then
+            aim = UP;
+        elseif testJoyState( JOY_DOWN ) then
+            aim = DOWN;
+        end
+
+        if aim == LEFT then
+            y = y + AND(sprite:height()/2, 0xfff8);
+        elseif aim == RIGHT then
+            x = x + sprite:width();
+            y = y + AND(sprite:height()/2, 0xfff8);
+        elseif aim == UP then
+            x = x + AND(sprite:width()/2, 0xfff8);
+        elseif aim == DOWN then
+            x = x + AND(sprite:width()/2, 0xfff8);
+            y = y + sprite:height();
+        end
+
+        local activeBullets = sprite:childCount();
+        if aim ~= HERE and proto.buddy ~= 0 and activeBullets < proto.maxBullets then
+            Counters:dec("ammo");
+            local bullet = addSprite (
+                x,
+                y,
+                aim,
+                proto.buddy
+                --spriteIdFromUuid("2b611fd2-0696-2065-2980-706e3f9539a3")
+            );
+            if aim == LEFT then
+                bullet:moveBy(- bullet:width(), 0)
+            elseif aim == UP then
+                bullet:moveBy(0, - bullet:height())
+            end
+            bullet:map();
+            bullet:setOwner( sprite );
+            if proto.bulletSound > 0 then
+                playSound(proto.bulletSound);
+            end
+        end
+    end
+end
+
 function unfoldEvents1()
     -- first check if there is a player object
     local ticks = getTicks();   
@@ -972,7 +1083,6 @@ function unfoldEvents1()
     if player_id == INVALID then
         return EVENT_NO_PLAYER;
     end
-
     -- if we got a closureEvent and time is elapsed
     -- return to caller    
     local closureEvent, closureTime = getClosure();
@@ -1063,7 +1173,11 @@ function unfoldEvents1()
             var_set("reloadSnapshot", 0)
             snapshot_reload();
         end
-        
+
+        if ticks % 8 == 0 then
+            countdown_cycle();
+        end
+
         -- move to the tick
         nextTick();
     end

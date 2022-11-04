@@ -32,9 +32,9 @@
   <widget class="QComboBox" name="cbSkill">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>150</x>
      <y>10</y>
-     <width>251</width>
+     <width>231</width>
      <height>25</height>
     </rect>
    </property>
@@ -44,7 +44,7 @@
     <rect>
      <x>20</x>
      <y>17</y>
-     <width>101</width>
+     <width>121</width>
      <height>16</height>
     </rect>
    </property>

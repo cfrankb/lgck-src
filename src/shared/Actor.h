@@ -21,6 +21,7 @@
 
 #include "LevelEntry.h"
 #include <unordered_map>
+#include <string>
 
 class CGame;
 class CHitData;
@@ -69,6 +70,7 @@ public:
     bool isDead();
     bool isFrozen();
     bool isGoal();
+    bool isPickUpTrigger();
     bool isMonster();
     bool isPlayer();
     bool isPlayerThere (int nAim);
@@ -108,6 +110,10 @@ public:
     CProto & getProto();
     void togglePathPlayback(bool enable);
     const char *getClassName();
+    const char *getName();
+    const char *getString();
+    void copyFrom(const CActor & s);
+    void debug();
 
     enum  {
         TAG_REBORN          = 0x0001,

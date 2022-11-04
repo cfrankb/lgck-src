@@ -21,6 +21,7 @@
 #include "../shared/interfaces/ISound.h"
 #include "sn_sfml.h"
 #include <SFML/Audio.hpp>
+#include <cstring>
 
 #define MAX_CHANNELS 32
 sf::Sound m_channels[MAX_CHANNELS];

@@ -19,7 +19,6 @@
 #include "DlgFrameSet.h"
 #include "ui_DlgFrameSet.h"
 #include <QMessageBox>
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QPushButton>
 #include <QStringList>
@@ -29,13 +28,16 @@
 #include "../shared/FrameSet.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
+#include "launcher.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CDlgFrameSet::CDlgFrameSet(QWidget *parent) :
     QDialog(parent),
     m_ui(new Ui::CDlgFrameSet)
 {
     m_ui->setupUi(this);
-    m_frameSet = NULL;
+    m_frameSet = nullptr;
+    m_ui->sUUID->setText("UUID: -");
 }
 
 CDlgFrameSet::~CDlgFrameSet()
@@ -90,16 +92,18 @@ void CDlgFrameSet::init(CFrameSet * frameSet)
     m_frameSet = frameSet;
     m_ui->treeWidget->setFrameSet(frameSet);
 
-    CFrameSet * fs = (CFrameSet *) m_frameSet;
-    m_ui->eName->setText(fs->getName());
+    m_ui->eName->setText(m_frameSet->getName());
+    m_ui->sUUID->setText(QString("UUID: ") + QString(m_frameSet->tag("UUID").c_str()));
 
     emit refill();
     updateButtons();
 
     // disable button if sprite editor not found
     QString appDir = QCoreApplication::applicationDirPath();
-    QString path = appDir + "/obl5edit.exe";
-    m_ui->btnEdit->setDisabled(!fileExists(path));
+
+    Path outPath;
+    bool found = getCmd(SPRITE_EDITOR, outPath);
+    m_ui->btnEdit->setDisabled(!found);
 }
 
 void CDlgFrameSet::updateButtons()
@@ -114,8 +118,7 @@ void CDlgFrameSet::updateButtons()
 
 void CDlgFrameSet::save()
 {
-    CFrameSet * fs = (CFrameSet *) m_frameSet;
-    fs->setName(q2c(m_ui->eName->text().trimmed().mid(0 , 31)));
+    m_frameSet->setName(q2c(m_ui->eName->text().trimmed().mid(0 , 31)));
 }
 
 void CDlgFrameSet::on_treeWidget_itemSelectionChanged()
@@ -152,39 +155,41 @@ void CDlgFrameSet::on_btnEdit_clicked()
         qDebug() << QString("temp file:") + fileName;
 
         // same image set to temp file
-        CFileWrap file;
-        if (file.open(q2c(tmp.fileName()),"w")) {
+        QFileWrap file;
+        if (file.open(tmp.fileName(),"wb")) {
             m_frameSet->write(file);
             file.close();
         }
 
         // lauch the editor
-        QString path = appDir + "/obl5edit.exe";
+        Path outPath;
+        getCmd(SPRITE_EDITOR, outPath); // we assume that it was found
+
+        QStringList list = QStringList{fileName};
         QProcess proc;
-        proc.setWorkingDirectory(appDir);
-        QStringList list;
-        list << fileName;
-        proc.start(path, list);
+        proc.setWorkingDirectory(outPath.path);
+        proc.start(outPath.cmd, list);
         proc.waitForFinished(-1);
 
         // check the exitCode
         int result = proc.exitCode();
         if (result) {
+            QStringList cmd = QStringList {outPath.path, outPath.cmd};
             QString outMsg = QString(tr("An error occured: %1\nCode: %2"))
-                           .arg(path + " " + list.join(" ")).arg(result);
+                           .arg(cmd.join("/") + " " + list.join(" ")).arg(result);
             qDebug() << outMsg;
-            QMessageBox msgBox(QMessageBox::Critical, "", outMsg, 0, this);
-            msgBox.exec();
+            QMessageBox::critical(this, "", outMsg);
         } else {
             // reload the changes
-            if (file.open(q2c(tmp.fileName()),"r")) {
-               m_frameSet->read(file);
+            if (file.open(q2c(tmp.fileName()),"rb")) {
+                std::string uuid = m_frameSet->tag("UUID");
+                m_frameSet->read(file);
+                m_frameSet->setTag("UUID", uuid.c_str());
                 file.close();
                 emit refill();
             } else {
                 QString outMsg = QString("Failed to read %1").arg(tmp.fileName());
-                QMessageBox msgBox(QMessageBox::Critical, "", outMsg, 0, this);
-                msgBox.exec();
+                QMessageBox::critical(this, "", outMsg);
             }
         }
         tmp.setAutoRemove(true);

@@ -6,12 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>374</height>
+    <width>390</width>
+    <height>375</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>390</width>
+    <height>375</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>390</width>
+    <height>375</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="lgck-builder.qrc">
+    <normaloff>:/images/lgckbuilder64ronnie2.png</normaloff>:/images/lgckbuilder64ronnie2.png</iconset>
   </property>
   <property name="toolTip">
    <string>Overlay properties</string>
@@ -40,12 +56,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>361</width>
-     <height>301</height>
+     <width>360</width>
+     <height>300</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tabGeneral">
     <attribute name="title">
@@ -169,8 +185,8 @@
       <rect>
        <x>10</x>
        <y>90</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -366,8 +382,8 @@
       <rect>
        <x>10</x>
        <y>150</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -405,8 +421,8 @@
       <rect>
        <x>10</x>
        <y>110</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -545,25 +561,6 @@
     <attribute name="title">
      <string>Content</string>
     </attribute>
-    <widget class="QLineEdit" name="eText">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>20</y>
-       <width>241</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Text to be displayed on that overlay.</string>
-     </property>
-     <property name="whatsThis">
-      <string>Text to be displayed on that overlay.</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_12">
      <property name="geometry">
       <rect>
@@ -581,8 +578,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>47</y>
-       <width>47</width>
+       <y>197</y>
+       <width>71</width>
        <height>20</height>
       </rect>
      </property>
@@ -594,7 +591,72 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>50</y>
+       <y>200</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
+     <property name="whatsThis">
+      <string>Automatic content template for overlays such as TimeLeft, Score and Lives.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPlainTextEdit" name="eText">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>20</y>
+       <width>271</width>
+       <height>121</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbFont">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>160</y>
+       <width>271</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Font</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>237</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Source</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="eSource">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>240</y>
        <width>113</width>
        <height>20</height>
       </rect>
@@ -630,7 +692,7 @@
     <widget class="QComboBox" name="cbFrameSet">
      <property name="geometry">
       <rect>
-       <x>89</x>
+       <x>120</x>
        <y>15</y>
        <width>161</width>
        <height>25</height>
@@ -661,7 +723,7 @@
     <widget class="QComboBox" name="cbBaseFrame">
      <property name="geometry">
       <rect>
-       <x>89</x>
+       <x>120</x>
        <y>45</y>
        <width>63</width>
        <height>25</height>
@@ -742,7 +804,6 @@
   <tabstop>eShadowColor</tabstop>
   <tabstop>cbFrameSet</tabstop>
   <tabstop>cbBaseFrame</tabstop>
-  <tabstop>eText</tabstop>
   <tabstop>eTemplate</tabstop>
   <tabstop>eY</tabstop>
   <tabstop>cbFlagY</tabstop>
@@ -753,7 +814,9 @@
   <tabstop>tabWidget</tabstop>
   <tabstop>btnShadowColor</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="lgck-builder.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

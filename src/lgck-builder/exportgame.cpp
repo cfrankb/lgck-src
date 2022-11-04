@@ -1,3 +1,20 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "exportgame.h"
 
 #include <QTemporaryDir>
@@ -12,6 +29,7 @@
 #include "helper.h"
 #include "DlgDistributeGame.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "../shared/GameFile.h"
 #include "FileWrap.h"
 #include "Level.h"
@@ -85,8 +103,8 @@ bool CExportGame::copyRuntime(QString & runtimeSource, QStringList & depList, QS
         qDebug() << QString("base:") << base;
         QString deps = base + ".depends";
         if (fileExists(deps)) {
-            CFileWrap file;
-            if (file.open(q2c(deps), "r")) {
+            QFileWrap file;
+            if (file.open(deps, "r")) {
                 long size = file.getSize() ;
                 char *buf = new char[size+1];
                 buf[size] = 0;
@@ -95,13 +113,13 @@ bool CExportGame::copyRuntime(QString & runtimeSource, QStringList & depList, QS
                 QString data = buf;
                 data.replace("\r\n", "\n");
                 delete [] buf;
-                depList = data.split("\n", QString::SkipEmptyParts);
+                depList = data.split("\n", Qt::SkipEmptyParts);
                 return copyList(depList, appDir, outMsg);
             } else {
-                qDebug() << QString("cannot read: %1").arg(deps);
+                qWarning() << QString("cannot read: %1").arg(deps);
             }
         } else {
-            qDebug() << QString("cannot find: %1").arg(deps);
+            qWarning() << QString("cannot find: %1").arg(deps);
         }
     }
     return true;
@@ -130,7 +148,7 @@ bool CExportGame::copyList(QStringList & list, const QString srcDir, QString & o
 bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString & outMsg)
 {
     QWidget *parent = dynamic_cast<QWidget*>(dlg.parent());
-    const char *appName = "LGCK builder";
+    const QString appName = tr("LGCK builder");
     QString appDir = QCoreApplication::applicationDirPath();
     if (m_tmpDir.isValid()) {
         qDebug() << m_tmpPath;
@@ -186,8 +204,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
                 listMusic.append(QString(music));
             } else {
                 QString msgText = dlg.tr("File path not supported %1.").arg(music);
-                QMessageBox msgBox(QMessageBox::Warning, QString(appName), msgText, 0, parent);
-                msgBox.exec();
+                QMessageBox::warning(parent, appName, msgText);
             }
 
         }
@@ -205,7 +222,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
 
     QString gameOut = m_tmpPath + "/" + outName;
     QString finalOut = gameOut;
-    QStringList list = args.split(" ", QString::SkipEmptyParts);
+    QStringList list = args.split(" ", Qt::SkipEmptyParts);
     replace(list, "%game%", gameFile);
     replace(list, "%stub%", m_stub);
     replace(list, "%out%", gameOut);
@@ -241,7 +258,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
     }
 
     QApplication::restoreOverrideCursor();
-    QString fileName = QFileDialog::getSaveFileName(parent, dlg.tr("Export Distribution..."), outName, dlg.tr(q2c(fileFilter)));
+    QString fileName = QFileDialog::getSaveFileName(parent, dlg.tr("Export Distribution..."), outName, fileFilter);
     if (!fileName.isEmpty()) {
         std::string in = q2c(finalOut);
         std::string out = q2c(fileName);
@@ -250,8 +267,7 @@ bool CExportGame::exportCore(CDlgDistributeGame & dlg, CGameFile & gf, QString &
             return false;
         }
         QString msgText = dlg.tr("Export successful.");
-        QMessageBox msgBox(QMessageBox::Information, QString(appName), msgText, 0, parent);
-        msgBox.exec();
+        QMessageBox::information(parent, appName, msgText);
     }
     return true;
 }

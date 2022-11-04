@@ -25,6 +25,7 @@
 #include <unordered_map>
 #include "../shared/GameFile.h"
 #include "../shared/LuaVM.h"
+#include "../shared/Const.h"
 
 class CGame;
 class CSelection;
@@ -45,9 +46,11 @@ class ISound;
 class CSnapshot;
 class IFile;
 class CFont;
+class CCountdown;
 
 /////////////////////////////////////////////////////////////////////////////
 // CGame
+
 
 class CGame : public CGameFile
 {
@@ -58,20 +61,21 @@ public:
     ~CGame();
 
     int getTicks();
-    CLevel * getLayers();
     CActor & getPlayer();
     CScene & scene();
+    CLevel *layers();
     CMap & map();
     void removePointsOBL();
     void cacheImages();
-    static int getVersion();
     int testKey(int keyCode);
     void setKey(int keyCode, char value);
+    void setJoyButton(lgck::Button::JoyButton button, char value);
     void stopMusic();
     void setLastKey(int keyCode);
     void callObjEvent(int objId, int eventId);
     void callLvEvent(int eventId);
     void callGameEvent(int eventId);
+    void callStaticHandler(const char *fnName, int objId);
     void clearKeys();
     int call(const char *fnName);
     int unfoldEvents();
@@ -93,39 +97,40 @@ public:
     // constants
 
     enum {
-        STATE_VERSION      = 0
+        STATE_VERSION           = 0
+    };
+
+    enum : uint16_t {
+        MAX_HP                  = 255,
+        PROTO_SPECIAL_MASK      = 0x8000,
+        PROTO_POINTS            = 0xffff,
+        PROTO_DEAD_PLAYER       = 0xfffe,
+        PROTO_DEAD_WOOD         = 0xfffd,
+        DEFAULT_TICK_RATE       = 90
+    };
+
+    enum JoyState{
+        JOY_UP                  = 0x0001,
+        JOY_DOWN                = 0x0002,
+        JOY_LEFT                = 0x0004,
+        JOY_RIGHT               = 0x0008,
+        JOY_JUMP                = 0x0010,
+        JOY_FIRE                = 0x0020,
+        JOY_ZKEY                = 0x0040,
+        JOY_SPECIAL1            = 0x0080,
+        JOY_SPECIAL2            = 0x0100
     };
 
     enum {
-        MAX_HP              = 255,
-        PROTO_SPECIAL_MASK  = 0x8000,
-        PROTO_POINTS        = 0xffff,
-        PROTO_DEAD_PLAYER   = 0xfffe,
-        PROTO_DEAD_WOOD     = 0xfffd,
-        DEFAULT_TICK_RATE   = 90,
-        INVALID             = -1
+        DI_NONE                 = 0,
+        DI_ANIMATION            = 1,
+        DI_REMOVAL              = 2
     };
 
     enum {
-        JOY_UP          = 1,
-        JOY_DOWN		= 2,
-        JOY_LEFT		= 4,
-        JOY_RIGHT		= 8,
-        JOY_JUMP		= 16,
-        JOY_FIRE		= 32,
-        JOY_ZKEY		= 64
-    };
-
-    enum {
-        DI_NONE             = 0,
-        DI_ANIMATION        = 1,
-        DI_REMOVAL          = 2
-    };
-
-    enum {
-        BUTTON_LEFT         = 1,
-        BUTTON_RIGHT        = 2,
-        BUTTON_MIDDLE       = 3
+        BUTTON_LEFT             = 1,
+        BUTTON_RIGHT            = 2,
+        BUTTON_MIDDLE           = 3
     };
 
     enum {
@@ -133,6 +138,12 @@ public:
         ES_PLAYLEVEL,
         ES_TIMEOUT
     };
+
+    typedef struct
+    {
+        lgck::Key::Code keyCode;
+        lgck::Button::JoyButton button;
+    } JoyStateEntry;
 
     /////////////////////////////////////////////////////////////////
     // Settings
@@ -160,6 +171,8 @@ public:
     bool isLevelEnded();
     int & _mx();
     int & _my();
+    CScene *_fw();
+    CScene *_bk();
     CSnapshot & snapshot();
 
     /////////////////////////////////////////////////////////////////
@@ -177,6 +190,7 @@ public:
     void resetTicks();
     int getTickCount();
     void nextTick();
+    uint64_t startTime();
 
     /////////////////////////////////////////////////////////////////
     // timeLeft
@@ -197,7 +211,6 @@ public:
 
     bool initFonts();
     bool initSounds();
-    char *m_keys;
     void attach(IImageManager *im);
     void attach(IGraphics *gr);
     void attach(IMusic *mu);
@@ -215,7 +228,7 @@ public:
     void managePlayerMovements (CActor & player);
     void managePlyTimerOutCounter (CActor & player);
     bool managePlayerFiring (CActor & player);
-    void autoCenter (CActor & player, UINT32 nAim);
+    void autoCenter (CActor & player, uint32_t nAim);
     bool centerOnPlayer (CActor & player);
     bool playerZKey();
     int manageKeyEvents();
@@ -234,8 +247,8 @@ public:
     void getVitals(int & hp, int & lives, int & score);
 
     // background color
-    UINT32 getBkColor();
-    void setBkColor(UINT32 bkColor);
+    uint32_t getBkColor();
+    void setBkColor(uint32_t bkColor);
 
     // lookup
     void setLookUp(bool set);
@@ -262,8 +275,17 @@ public:
 
     bool keyPressed();
     void updateJoyState();
-    UINT32 getJoyState();
+    uint32_t getJoyState();
     int whoIs(int x, int y);
+    const char *keys();
+    JoyStateEntry & joyStateEntry(int i);
+    const char * buttonText(int i);
+    int findButtonText(const char *text);
+    bool isJoyActionOn(int action);
+    void clearActionKey(int action);
+
+    bool exportJoyStateMap(IFile & file);
+    bool importJoyStateMap(IFile & file);
 
     /////////////////////////////////////////////////////////////////
     // displayManager
@@ -274,6 +296,8 @@ public:
     void setDisplayAlpha(int alpha);
     void updateGeometry(int screenLen, int screenHei);
     void clearDisplay();   
+    void restoreDisplays(CDisplayConfig *config);
+    void saveDisplays(CDisplayConfig *config);
 
     /////////////////////////////////////////////////////////////////
     // luaBind
@@ -282,7 +306,7 @@ public:
     bool loadScript(const char *scriptName);
     void exec(const char* luaCode);
     void generateRuntimeLua(std::string & str);
-    CInventory *getInventory(const char *name=NULL);
+    CInventory *getInventory(const char *name=nullptr);
     int & counter(const char *s);
     unsigned long long & var(const char *s);
     long long & svar(const char *s);
@@ -293,34 +317,13 @@ public:
     bool playSound(const char *name);
     bool playSound(int index);
 
-    //////////////////////////////////////////////////////////////////
-    // Game variables
-    int m_screenLen;
-    int m_screenHei;
-    int BUFFERLEN;
-    int BUFFERHEI;
-    unsigned long long m_startTime;
-    CScene *m_sFW;
-    CScene *m_sBK;
-    CMap *m_map;
-    CFrameSet *m_points;
-    CLevel *m_layers;
-    int m_mx;
-    int m_my;
-    CInventoryTable *m_inventoryTable;
-
     /////////////////////////////////////////////////////////////////
     // static
-    static CGame *m_game;
-    static CLuaVM m_lua;
-    static int m_arrPoints[];
     static CGame & getGame();
+    static CLuaVM & luaVM();
     static void error(const char *fnName, int argc);
     static void debug(const char *s);
-    static unsigned int bgr2rgb(unsigned int bgr, int alpha=0xff);
-    friend class CScene;
-    friend class CActor;
-    friend class CDisplayManager;
+    static unsigned int bgr2rgb(uint32_t bgr, int alpha=0xff);
 
     /////////////////////////////////////////////////////////////////
     // classes
@@ -331,6 +334,7 @@ public:
     IGraphics * graphics();
     IMusic *music();
     ISound *sound();
+    CCountdown * countdowns();
 
     /////////////////////////////////////////////////////////////////
     // engine
@@ -340,6 +344,7 @@ public:
     void saveGame(IFile &file);
     void loadGame(IFile & file);
     void remap();
+    void resetAllCounters();
 
 protected:
     std::unordered_map<std::string, int> m_counters;
@@ -350,7 +355,38 @@ protected:
     ISound *m_sound;
     CSnapshot *m_snapshot;
     CTasks *m_tasks;
-    CFont *m_font;
+
+    char *m_keys;
+    char m_buttons[lgck::Button::Count];
+    static const JoyStateEntry m_defaultJoyStateMap[lgck::Input::Count];
+    JoyStateEntry m_joyStateMap[lgck::Input::Count];
+    static const int m_arrPoints[];
+    void copyDefaultJoyStateMap();
+
+    int m_mx;
+    int m_my;
+    int m_screenLen;
+    int m_screenHei;
+    int BUFFERLEN;
+    int BUFFERHEI;
+    CMap *m_map;
+    CFrameSet *m_points;
+    CLevel *m_layers;
+    CInventoryTable *m_inventoryTable;
+    CCountdown * m_countdowns;
+
+    //////////////////////////////////////////////////////////////////
+    // Game variables
+    CScene *m_sFW;
+    CScene *m_sBK;
+    uint64_t m_startTime;
+    static CLuaVM m_lua;
+    static CGame *m_game;
+
+    friend class CActor;
+    friend class CAttacker;
+    friend class IGraphics;
+    friend class CCountdown;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -77,7 +77,7 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     // team
     m_ui->treeTeam->setColumnCount(2);
     m_ui->treeTeam->setColumnWidth(0, 128);
-    m_ui->treeTeam->setEditTriggers(0);
+    m_ui->treeTeam->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeTeam->setWordWrap(false);
     m_ui->treeTeam->setRootIsDecorated(false);
     m_ui->treeTeam->setAlternatingRowColors(true);

@@ -27,6 +27,7 @@
 
 class CGameFile;
 class CProtoIndex;
+class QTreeWidgetItem;
 
 namespace Ui {
     class CToolBoxDock;
@@ -51,7 +52,8 @@ protected:
     CGameFile *m_gameFile;
     int *m_indexSettings;
 
-    void updateIcon(void * item, int protoId);
+    void updateIcon(QTreeWidgetItem *item, int protoId);
+    void initTree(QTreeWidget *tree);
     void updateIconFrameSet(void * item, int fs);
     void updateObjects (int OldframeSet, int newFrameSet);
     void updateButtons();
@@ -61,9 +63,14 @@ protected:
     void reloadLevels();
     void reloadEvents();
     void reloadDisplays();
+    void reloadFonts();
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
     void checkFrameSetUses(int frameSet);
+
+    enum {
+        TOOLBAR_WIDTH = 250
+    };
 
 private slots:
     void on_btnDeleteSprite_clicked();
@@ -109,6 +116,15 @@ private slots:
     void editDisplay();
     void editEvent();
     void on_treeEvents_customContextMenuRequested(const QPoint &pos);
+    void updateIcon(int protoId);
+    void on_treeFonts_doubleClicked(const QModelIndex &index);
+    void on_treeFonts_clicked(const QModelIndex &index);
+    void on_treeFonts_customContextMenuRequested(const QPoint &pos);
+    void on_btnAddFont_clicked();
+    void on_btnDeleteFont_clicked();
+    void editFont();
+    void docked(Qt::DockWidgetArea area);
+    void on_eSearchSprite_textChanged(const QString &arg1);
 
 signals:
     void levelSelection(int index);
@@ -118,6 +134,7 @@ signals:
     void menuSeekingItems(QMenu *, int);
     void spriteDeleted(int sprite);
     void spriteChanged(int sprite);
+    void currentProtoChanged(int protoId);
 };
 
 #endif // TOOLBARDOCK_H

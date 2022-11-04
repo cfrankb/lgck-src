@@ -20,6 +20,7 @@
 #define ANIMATION_H
 
 class IFile;
+#include "stdafx.h"
 
 class CAnimation
 {
@@ -34,15 +35,15 @@ public:
     void insertAt (int i, int imageId);
     void add (int imageId);
     void set(int i, int imageId);
-    INT16 operator [] (int i) const ;
+    int16_t operator [] (int i) const ;
     CAnimation & operator = (const CAnimation & s);
     bool operator == (CAnimation & s);
     bool operator != (CAnimation & s);
     int getSize() const;
     int getSpeed() const;
-    UINT16 getOptions() const;
+    uint16_t getOptions() const;
     void setSpeed(int speed);
-    void setOptions(UINT16 options);
+    void setOptions(uint16_t options);
 
     void forget();
 
@@ -53,10 +54,10 @@ protected:
         DEFAULT_SPEED = -1
     };
 
-    INT16 m_size;
-    INT16 m_speed;
-    UINT16 m_options;
-    INT16 m_imageIds [ MAX_IMAGES ];
+    int16_t m_size;
+    int16_t m_speed;
+    uint16_t m_options;
+    int16_t m_imageIds [ MAX_IMAGES ];
 
 };
 

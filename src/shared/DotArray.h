@@ -19,16 +19,18 @@
 #ifndef X__DOTARRAY__
 #define X__DOTARRAY__
 
+#include "../shared/stdafx.h"
+
 class Dot {
 
 public:
-    Dot(int sx=0, int sy=0, UINT32 sColor =0) {
+    Dot(int sx=0, int sy=0, uint32_t sColor =0) {
         x = sx;
         y = sy;
         color = sColor;
     }
 
-    UINT32 color;
+    uint32_t color;
     int x;
     int y;
 };
@@ -40,13 +42,13 @@ public:
     CDotArray();
     ~CDotArray();
 
-    void add(UINT32 color, int x, int y);
+    void add(uint32_t color, int x, int y);
     void add(const Dot & dot);
     bool isEmpty();
     void flush();
     int getSize();
-    int lineTab(const UINT32 color, const Dot dot1, const Dot dot2, bool clear=true);
-    int circle(const UINT32 color, const Dot dot1, const Dot dot2, bool clear=true);
+    int lineTab(const uint32_t color, const Dot dot1, const Dot dot2, bool clear=true);
+    int circle(const uint32_t color, const Dot dot1, const Dot dot2, bool clear=true);
     Dot & operator[] (int i);
     void setLimit(int maxX, int maxY);
 

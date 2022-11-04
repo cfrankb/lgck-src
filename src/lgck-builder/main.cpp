@@ -19,25 +19,42 @@
 #include <QApplication>
 #include "../shared/stdafx.h"
 #include "../shared/Credits.h"
+#include "../shared/qtgui/qthelper.h"
 #include "mainwindow.h"
 #include "DlgSelect.h"
 #include <QFileDialog>
 #include <QGLWidget>
 #include <QSettings>
 #include "WizGame.h"
-#include "ss_version.h"
 #include <ctime>
 #include <QMessageBox>
+#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QSurfaceFormat>
+#include <QLockFile>
 
-static char appName[] = "LGCK builder";
-static char author[] = "cfrankb";
+constexpr char appUuid[] = "e139b7fd-2d73-4eba-84ac-339fca583e89";
 
 int main(int argc, char *argv[])
 {
-    //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL, false);
-    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
-    srand( time( NULL ) );
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setMajorVersion( 2 );
+    format.setMinorVersion( 0 );
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
+
+    srand( time( nullptr ) );
     QApplication app(argc, argv);
+    QString tmpDir = QDir::tempPath();
+    QLockFile lockFile(tmpDir + QString("/%1.lock").arg(appUuid));
+    if(!lockFile.tryLock(100)){
+        QMessageBox::warning(nullptr, "", QObject::tr("You cannot run more than one instance of this application."));
+        return 1;
+    }
+
     QFileInfo fi(app.applicationDirPath());
     QString portable = QApplication::applicationDirPath() + "/portable.txt";
     if(fi.isDir() && fi.isWritable() && QFileInfo::exists(portable)) {
@@ -45,13 +62,12 @@ int main(int argc, char *argv[])
         QSettings::setDefaultFormat(QSettings::IniFormat);
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, app.applicationDirPath());
     }
-
     MainWindow w;
     w.createEventEditor();
 
     QString fileName = "";
     bool done = false;
-    QSettings settings(author, appName);
+    QSettings settings(MainWindow::m_author, MainWindow::m_appName);
     settings.beginGroup("Editor");
     bool skipSplash = settings.value("skipSplash", false).toBool();
     settings.endGroup();
@@ -60,24 +76,23 @@ int main(int argc, char *argv[])
         fileName = argv[1];
     }
 
+    bool newProject = false;
     if (!skipSplash && fileName.isEmpty()) {
         do {
-            int version = SS_LGCK_VERSION;
-            int vv[4]={0,0,0,0};
-            for (int i=3; i >= 0; --i) {
-                vv[i] = version & 0xff;
-                version /= 256;
-            }
-            QString ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+            QString ver = formatVersion(true);
             CDlgSelect * dlg = new CDlgSelect(&w);
-            dlg->setWindowTitle(QObject::tr("LGCK builder IDE") + " " + ver);
+            dlg->setWindowTitle(MainWindow::m_appTitle + " " + ver);
             dlg->raise();
-            dlg->setWindowState(Qt::WindowActive) ;
+            dlg->setWindowState(Qt::WindowActive);
+            QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+            int x = (screenGeometry.width() - dlg->width()) / 2;
+            int y = (screenGeometry.height() - dlg->height()) / 2;
+            dlg->move(x, y);
             dlg->exec();
             CWizGame *wiz;
             switch(dlg->getState()) {
             case CDlgSelect::OPEN:
-                fileName = QFileDialog::getOpenFileName(&w, QObject::tr("Open"), "", QObject::tr("LGCK games (*.lgckdb)"));
+                fileName = QFileDialog::getOpenFileName(&w, QObject::tr("Open"), "", QObject::tr("LGCK Projects (*.lgckdb)"));
                 if (!fileName.isEmpty()) {
                     done = true;
                 }
@@ -91,6 +106,7 @@ int main(int argc, char *argv[])
                     w.initToolBox();
                     done = true;
                     w.getGame()->setDirty(true);
+                    newProject = true;
                 }
                 break;
 
@@ -99,6 +115,8 @@ int main(int argc, char *argv[])
 
             case CDlgSelect::NO_SHOW:
                 skipSplash = true;
+                done = true;
+                break;
 
             case CDlgSelect::SKIP:
                 done = true;
@@ -114,13 +132,18 @@ int main(int argc, char *argv[])
 
     w.show();
     if (!fileName.isEmpty()) {
-        if (fileName.toLower().endsWith(".lgckdb")) {
+        if (fileName.endsWith(".lgckdb", Qt::CaseInsensitive)) {
             w.open(fileName);
         } else {
             QString errMsg = QObject::tr("Invalid file: %1").arg(fileName);
-            QMessageBox msgBox(QMessageBox::Critical, QString(appName), errMsg, 0, &w);
-            msgBox.exec();
+            QMessageBox::warning(&w, QString(MainWindow::m_appName), errMsg);
         }
     }
+
+    if (newProject) {
+        w.addLevel();
+    }
+
+    w.setReady(true);
     return app.exec();
 }

@@ -19,6 +19,8 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
+#include <inttypes.h>
+#include <string>
 class IFile;
 
 class CInventory
@@ -48,11 +50,11 @@ protected:
         MAX_NAME           = 32
     };
     typedef struct {
-        UINT16 itemProto;
-        UINT16 count;
+        uint16_t itemProto;
+        uint16_t count;
     } ITEM;
 
-    char m_name [ MAX_NAME ];
+    std::string m_name;
     ITEM m_items [ MAX_ITEMS ];
     int m_options;
 };

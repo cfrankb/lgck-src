@@ -20,10 +20,13 @@
 #define DLGAPPSETTINGS_H
 
 #include <QDialog>
+#include "Game.h"
 class QStringList;
 class QSignalMapper;
 class QTableWidgetItem;
 class CWHotKey;
+class CWGetKey;
+class QComboBox;
 
 namespace Ui {
     class CDlgAppSettings;
@@ -35,13 +38,18 @@ public:
     CDlgAppSettings(QWidget *parent = 0);
     ~CDlgAppSettings();
 
-    void init();    
+    void init();
     void load(QStringList & listActions, QStringList & listShortcuts, QStringList & listDefaults);
     void save(QStringList & listShortcuts);
     int getGridSize();
     QString getGridColor();
+    QString getTriggerKeyColor();
+    bool getShowTriggerKey();
     void setGridSize(int gridSize);
-    void setGridColor(QString gridColor);
+    void setGridColor(const QString & color);
+    void setTriggerKeyColor(const QString & color);
+    void setShowTriggerKey(bool show);
+    void setTriggerFontSize(int size);
     bool isShowGrid();
     void showGrid(bool show);
     void setSkill(int skill);
@@ -58,49 +66,72 @@ public:
     void getRuntime(QString & path, QString & args);
     void setRuntime(const QString path, const QString args);
     int getFontSize();
+    void setFont(const QString & font);
+    QString getFont();
+    int getTriggerFontSize();
     bool getSkipSplashScreen();
     void setSkipSplashScreen(bool state);
     void setCurrentTab(int i);
+    void enableWhiteSpace(bool state);
+    void enableHighlight(bool state);
+    void enableAutocomplete(bool state);
+    void enableWordWrap(bool state);
+    bool whiteSpace();
+    bool highlight();
+    bool autocomplete();
+    bool wordWrap();
+    void setLastProjects(int count);
+    int lastProjects();
+    void setTickMaxRate(int rate);
+    int tickMaxRate();
+    void setLastFolder(bool set);
+    bool lastFolder();
     static const char *defaultRuntimeArgs();
+    bool getContinue();
+    void setContinue(bool);
+    void setJoyButtons(const CGame::JoyStateEntry *map);
+    void getJoyButtons(CGame::JoyStateEntry *map);
 
     enum {
-        TAB_GRID,
-        TAB_SHORTCUTS,
-        TAB_TEST,
-        TAB_UPDATER,
         TAB_EDITOR,
-        TAB_RUNTIME,
+        TAB_CODEVIEW,
+        TAB_UPDATER,
+        TAB_TESTLEVEL,
+        TAB_SHORTCUTS,
         TAB_DEFAULT=0
     };
 
 protected:
     void changeEvent(QEvent *e);
-    static int m_gridSizes [];
-
-    QString m_gridColor;
+    static const int m_gridSizes[];
     int m_gridSize;
-    bool m_showGrid;
+    void enableGridOptions();
+    void enableTriggerKeyOptions();
+    void initButtonTable();
+
+    CGame::JoyStateEntry m_joyStates[lgck::Input::Count];
 
 private:
     Ui::CDlgAppSettings *m_ui;
     QSignalMapper *m_signalMapper;
     CWHotKey **m_hotkeys;
+    CWGetKey **m_keys;
+    QComboBox **m_cbButtons;
     QStringList *m_defaultShortcuts;
     int m_count;
-    void setBtnColor(const QString & str);
 
 signals:
     void versionCheck();
 
 private slots:
     void on_cShowGrid_clicked();
-    void on_btnGridColor_clicked();
-    void buttonPushed();
-    void on_eGridColor_textChanged(const QString &arg1);
+    void clearHotkey();
+    void clearKey();
     void on_cCheckUpdate_clicked(bool checked);
     void on_btnCheckUpdate_clicked();
     void on_btnRuntime_clicked();
     void on_btnRestore_clicked();
+    void on_cbShowTriggerKey_toggled(bool checked);
 };
 
 #endif // DLGAPPSETTINGS_H

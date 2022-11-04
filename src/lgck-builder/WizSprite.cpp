@@ -18,7 +18,6 @@
 
 #include "WizSprite.h"
 #include <QMessageBox>
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QTreeWidgetItem>
 #include "ui_WizSprite.h"
@@ -29,6 +28,8 @@
 #include "../shared/FileWrap.h"
 #include "../shared/Frame.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "../shared/Path.h"
 
 CWizSprite::CWizSprite(QWidget *parent) :
@@ -36,7 +37,7 @@ CWizSprite::CWizSprite(QWidget *parent) :
     ui(new Ui::CWizSprite)
 {
     ui->setupUi(this);
-    m_classIndex = NULL;
+    m_classIndex = nullptr;
     m_frameSet = new CFrameSet();
 }
 
@@ -132,21 +133,9 @@ void CWizSprite::load(const int index)
     // imageSet
     // frame set
 
-    for (int n=0; n < gf.m_arrFrames.getSize(); ++n) {
-        CFrameSet & frameSet = *gf.m_arrFrames[n];
-        UINT8 *png;
-        int size;
-        frameSet[0]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png (%d)\n", n);
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    for (int n=0; n < gf.frames().getSize(); ++n) {
+        CFrameSet & frameSet = *gf.frames()[n];
+        QIcon icon = frame2icon(* frameSet[0]);
         ui->cbFrameSet->addItem(icon, frameSet.getName() );
     }
 
@@ -290,21 +279,8 @@ void CWizSprite::load(const int index)
 
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i){
         CProto & proto = gf.m_arrProto[i];
-        CFrameSet & frameSet = *gf.m_arrFrames[proto.m_nFrameSet];
-        UINT8 *png;
-        int size;
-        frameSet[proto.m_nFrameNo]->toPng(png, size);
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png $\n");
-        }
-        delete [] png;
-
-        QPixmap pm = QPixmap::fromImage(img);
-        QIcon icon;
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
+        CFrameSet & frameSet = *gf.frames()[proto.m_nFrameSet];
+        QIcon icon = frame2icon(* frameSet[proto.m_nFrameNo]);
         ui->cbChangeTo->addItem(icon, proto.getName());
 
         // from page 2
@@ -358,11 +334,10 @@ void CWizSprite::load(const int index)
     const char *jumpModes [] = {
         "VLA3",
         "GIANA",
-        "MIXED",
-        NULL
+        "MIXED"
     };
 
-    for (int n = 0; jumpModes[n]; ++n) {
+    for (unsigned int n = 0; n < sizeof(jumpModes)/sizeof(const char*); ++n) {
         ui->cbJump->addItem(jumpModes[n]);
     }
 
@@ -396,7 +371,7 @@ void CWizSprite::load(const int index)
     // trigger
 
 //    ui->cTrigger->setChecked( proto.m_bNoTrigger != 0 );
-    ui->cTrigger->setChecked( proto.getOption(CProto::OPTION_NO_TRIGGER) );
+    ui->cTrigger->setChecked( proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP) );
 
     updateButtons();
 
@@ -466,7 +441,7 @@ void CWizSprite::save(const int index)
         qDebug("FrameSet size: %d", frameSet->getSize());
 
         if (frameSet->getSize()) {
-            proto.m_nFrameSet = gf.m_arrFrames.getSize();
+            proto.m_nFrameSet = gf.frames().getSize();
         } else {
             proto.m_nFrameSet = 0;
         }
@@ -581,7 +556,7 @@ void CWizSprite::save(const int index)
         proto.m_bAutoTrigger = 0;
     }
 
-    proto.setOption(CProto::OPTION_NO_TRIGGER, ui->cTrigger->checkState () == Qt::Checked);
+    proto.setOption(CProto::OPTION_NO_TRIGGER_FLIP, ui->cTrigger->checkState () == Qt::Checked);
 
     CObject & object = gf.m_arrProto.getObject( index );
     if (ui->cKillOffScreen->checkState() == Qt::Checked) {
@@ -607,11 +582,11 @@ void CWizSprite::save(const int index)
     } SOUND;
 
     SOUND sounds[] = {
-        { ui->cbSound_death, CObject::EO_DEATH, tr("play sound when sprite dies") },
-        { ui->cbSound_fall, CObject::EO_FALL, tr("play sound when sprite falls") },
-        { ui->cbSound_jumo, CObject::EO_JUMP, tr("play sound when sprite jumos") },
-        { ui->cbSound_move, CObject::EO_MOVE, tr("play sound when sprite moves") },
-        { ui->cbSound_spawn, CObject::EO_SPAWN, tr("play sound when sprite is created") }
+        { ui->cbSound_death, CObject::EO_DEATH, tr("play sound when the sprite dies") },
+        { ui->cbSound_fall, CObject::EO_FALL, tr("play sound when the sprite falls") },
+        { ui->cbSound_jumo, CObject::EO_JUMP, tr("play sound when the sprite jumps") },
+        { ui->cbSound_move, CObject::EO_MOVE, tr("play sound when the sprite moves") },
+        { ui->cbSound_spawn, CObject::EO_SPAWN, tr("play sound when the sprite is created") }
     };
 
     for (unsigned int i=0; i < sizeof(sounds) / sizeof(SOUND); ++i) {
@@ -634,16 +609,14 @@ void CWizSprite::save(const int index)
                 prefix = "-- ";
             }
 
-            if (proto.m_nClass == CLASS_PLAYER_OBJECT) {
+            if (proto.isPlayer()) {
                 eventCode += QString("%2playSound(\"%1\");\n")
-                        .arg(soundName)
-                        .arg(prefix);
+                        .arg(soundName, prefix);
             } else {
                 eventCode += QString("%2if isVisible(self) then\n"\
                                     "%2   playSound(\"%1\");\n" \
                                     "%2end\n")
-                        .arg(soundName)
-                        .arg(prefix);
+                        .arg(soundName, prefix);
             }
 
             object.setEvent(sounds[i].event, q2c(eventCode));
@@ -678,7 +651,7 @@ void CWizSprite::save(const int index)
 
             // decode the string
             for (unsigned int k=0; k < strlen(js.path);k +=3) {
-                char aim = strtol(q2c(sq.mid(k, 2)), NULL, 16);
+                char aim = strtol(q2c(sq.mid(k, 2)), nullptr, 16);
                 path.add(aim);
             }
         }
@@ -686,22 +659,11 @@ void CWizSprite::save(const int index)
 
     // if player firing is enable
     // we assign bullet to buddy slot
+    proto.m_bulletOptions = 0;
     if (ui->cPlayerFire->isChecked()) {
         proto.m_nProtoBuddy = ui->cbPlayerBullet->currentIndex();
         proto.m_bulletSound = ui->cbSound_bullet->currentIndex();
-        CFileWrap file;
-        if (file.open(":/scripts/templates/player_bullet.lua")) {
-            int size=file.getSize();
-            char *buf = new char[size+1];
-            buf[size]=0;
-            file.read(buf,size);
-            file.close();
-            qDebug("event:%s", buf);
-            object.setEvent(CObject::EO_FIRE, buf);
-            delete[]buf;
-        } else {
-            qDebug("can't open");
-        }
+        proto.m_bulletOptions |= CProto::BULLET_ENABLED;
     }
 
     if (getClass() != CLASS_PLAYER_OBJECT &&
@@ -712,7 +674,7 @@ void CWizSprite::save(const int index)
         } else if (getClass() >= CLASS_GENERIC_COS) {
             event = CObject::EO_DEATH;
         }
-        CFileWrap file;
+        QFileWrap file;
         if (file.open(":/scripts/templates/waypoint.lua")) {
             int size=file.getSize();
             char *buf = new char[size+1];
@@ -723,7 +685,7 @@ void CWizSprite::save(const int index)
             object.setEvent(event, buf);
             delete[]buf;
         } else {
-            qDebug("can't open");
+            qWarning("can't open");
         }
     }
 }

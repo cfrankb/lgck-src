@@ -22,8 +22,11 @@
 #include "LevelEntry.h"
 #include <cstdio>
 #include <zlib.h>
-#include "../shared/IFile.h"
+#include "IFile.h"
+#include "LuaVM.h"
 #include "helper.h"
+#include "Game.h"
+#include "Actor.h"
 
 CLayer::CLayer(const char* name, int type, int h, int v)
 {
@@ -51,7 +54,7 @@ CLayer::~CLayer()
 {
     if (m_arrEntries) {
         delete [] m_arrEntries;
-        m_arrEntries = NULL;
+        m_arrEntries = nullptr;
     }
 }
 
@@ -74,6 +77,11 @@ int CLayer::add (CLevelEntry &entry)
 }
 
 CLevelEntry & CLayer::operator [] (int n) const
+{
+    return (CLevelEntry &) m_arrEntries[n];
+}
+
+CLevelEntry & CLayer::atIndex(int n) const
 {
     return (CLevelEntry &) m_arrEntries[n];
 }
@@ -144,7 +152,7 @@ CLayer & CLayer::operator=(CLayer & s)
 {
     if (m_arrEntries) {
         delete [] m_arrEntries;
-        m_arrEntries = NULL;
+        m_arrEntries = nullptr;
     }
     m_selection.clear();
     m_size = s.getSize();
@@ -171,8 +179,8 @@ bool CLayer::read(IFile & file, bool compr)
     int ver = LAYER_VER;
     int size = 0;
     int entrySize = 0;
-    ULONG nTotalSize = 0;
-    ULONG nCompressSize = 0;
+    LONGUINT nTotalSize = 0;
+    LONGUINT nCompressSize = 0;
     forget();
     file.read (&ver, sizeof (ver));
     file.read (&m_size, sizeof (size));
@@ -195,18 +203,18 @@ bool CLayer::read(IFile & file, bool compr)
     }
     m_arrEntries = new CLevelEntry [ m_max ] ;
     if (compr) {
-        UINT8 *pCompressData = new UINT8 [ nCompressSize ];
+        uint8_t *pCompressData = new uint8_t [ nCompressSize ];
         if (nTotalSize != (m_size * sizeof(CLevelEntry))) {
-            qDebug("CLayer() : total uncompressed size doesn't match array size\n");
+            CLuaVM::debugv("CLayer() : total uncompressed size doesn't match array size\n");
             return false;
         }
         file.read(pCompressData, nCompressSize);
-        int err = uncompress((UINT8*)m_arrEntries,
+        int err = uncompress((uint8_t*)m_arrEntries,
                              &nTotalSize,
                              pCompressData,
                              nCompressSize);
         if (err) {
-            qDebug("CLayer::Read err=%d\n", err);
+            CLuaVM::debugv("CLayer::Read err=%d\n", err);
             return false;
         }
         delete [] pCompressData;
@@ -231,9 +239,9 @@ bool CLayer::read(IFile & file, bool compr)
 bool CLayer::write(IFile &file, bool compr)
 {
     int version = LAYER_VER;
-    ULONG nTotalSize = 0;
-    ULONG nCompressSize = 0;
-    UINT8 *pCompressData = NULL;
+    LONGUINT nTotalSize = 0;
+    LONGUINT nCompressSize = 0;
+    uint8_t *pCompressData = nullptr;
     file.write(&version,4);           // layer version
     file.write(&m_size,4);
     file << m_name;
@@ -243,9 +251,9 @@ bool CLayer::write(IFile &file, bool compr)
     file << (int) sizeof (CLevelEntry);
     nTotalSize = m_size * sizeof (CLevelEntry);
     if (compr) {
-        int err = compressData((UINT8 *)m_arrEntries, (ULONG)nTotalSize, &pCompressData, nCompressSize);
+        int err = compressData((uint8_t *)m_arrEntries, (LONGUINT)nTotalSize, &pCompressData, nCompressSize);
         if (err != Z_OK) {
-            qDebug("CLayer::Write error: %d", err);
+            CLuaVM::debugv("CLayer::Write error: %d", err);
         }
         file << (int) nTotalSize;
         file << (int) nCompressSize;
@@ -355,6 +363,11 @@ void CLayer::select(int i)
     m_selection.addEntry(m_arrEntries[i], i);
 }
 
+void CLayer::select(CSelection & selection)
+{
+    m_selection += selection;
+}
+
 int CLayer::getSelectionSize()
 {
     return m_selection.getSize();
@@ -390,4 +403,42 @@ void CLayer::getOffset(int & mx, int & my)
 {
     mx = m_mx;
     my = m_my;
+}
+
+int CLayer::countSpriteOfClass(CGame & game, int spriteClass)
+{
+    int count = 0;
+    for (int i=0; i < m_size; ++i) {
+        CProto & proto = game.protos().getProto(m_arrEntries[i]);
+        if (proto.m_nClass == spriteClass) {
+            ++ count;
+        }
+    }
+    return count;
+}
+
+int CLayer::countGoals()
+{
+    int count = 0;
+    for (int i=0; i < m_size; ++i) {
+        CLevelEntry & entry = m_arrEntries[i];
+        CActor actor = CActor(entry);
+        if (actor.isGoal()) {
+            ++ count;
+        }
+    }
+    return count;
+}
+
+CSelection & CLayer::selection()
+{
+    return m_selection;
+}
+
+void CLayer::resyncSelection()
+{
+    for (int i=0; i < m_selection.getSize(); ++i) {
+        int j = m_selection.getIndex(i);
+        m_selection.resync(m_arrEntries[j], i);
+    }
 }

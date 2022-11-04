@@ -15,11 +15,50 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _CONST_H
+#define _CONST_H
 
-namespace lgck
-{
+namespace lgck {
+    struct Input {
+        enum Action{
+            Up,
+            Down,
+            Left,
+            Right,
+            Jump,
+            Fire,
+            Action,
+            Special_1,
+            Special_2,
+            Count // this is not an action
+        };
+    };
+
+    struct Button {
+        enum JoyButton {
+            A,
+            B,
+            X,
+            Y,
+            L1,
+            L3,
+            R1,
+            R3,
+            Select,
+            Start,
+            Up,
+            Down,
+            Left,
+            Right,
+            Center,
+            Guide,
+            Count, // this is not a button
+            Invalid = -1,
+        };
+    };
+
     struct Key{
-        enum  	Code { 
+        enum Code {
             A = 'a', 
             B = 'b', 
             C = 'c', 
@@ -121,7 +160,10 @@ namespace lgck
             F14, 
             F15, 
             Pause,
-            Count 
+            Count,
+            Invalid = -1
         };
     };
 }
+
+#endif

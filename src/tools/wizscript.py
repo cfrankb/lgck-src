@@ -1,12 +1,6 @@
-#!/usr/bin/python
-from datetime import date
-import json
-import os
-
-def write_GPL(tfile, start, end):
-    tfile.write('''%s
+'''
     LGCK Builder Runtime
-    Copyright (C) 1999, %d  Francois Blanchette
+    Copyright (C) 1999, 2020  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,31 +14,37 @@ def write_GPL(tfile, start, end):
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-%s\n''' % (start, date.today().year, end))
+'''
+from datetime import date
+import json
+import os
+from lgckutil.license import *
+
+WIZSCRIPT_CONF = 'conf/wizscript.json'
 
 def makesafe(code):
     return code.strip().replace('"', '\\"').replace('\n', '\\n')
 
 def write_file(tfile):
-    write_GPL(tfile, '/*', '*/')
+    tfile.write(license_cpp)
     tfile.write('''
 #include "stdafx.h"
 #include "WizScript.h"
 
 WIZACTION CWizScript::m_actions[]=
 {\n''')
-    with open('wizscript.json') as sfile:
+    with open(WIZSCRIPT_CONF) as sfile:
         raw = sfile.read()
     data = json.loads(raw)
     for k,v in sorted(data.items()):
         name = k
-        print name
+        print(name)
         t = v['type']
         fname = v['fname']
         descr = v['descr']
         sampleName = 'wizscript/%s.sample.lua' % fname
         if not os.path.isfile(sampleName):
-            print 'creating: %s' % sampleName
+            print('creating: %s' % sampleName)
             tfileTmp = open(sampleName, 'a')
             tfileTmp.close()
         sfile = open(sampleName)
@@ -60,7 +60,7 @@ WIZACTION CWizScript::m_actions[]=
             print('   not defined: %s' % ('wizscript/%s.lua' % fname))
         tfile.write('    {"%s", "%s", "%s", "%s", "%s", "%s", "%s"},\n' % (name, fname, makesafe(descr), t, makesafe(sample), makesafe(code), makesafe(loader)))
         
-    tfile.write('    { NULL, NULL, NULL, NULL, NULL, NULL, NULL }\n')
+    tfile.write('    { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }\n')
     tfile.write('};\n')
 
 def main():

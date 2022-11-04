@@ -31,7 +31,6 @@
         <file>images/ronnie/properties.png</file>
         <file>images/ronnie/save.png</file>
         <file>images/ronnie/saveas.png</file>
-        <file>images/export.png</file>
         <file>res/gpl.txt</file>
         <file>images/girlsm-tr.png</file>
         <file>images/check.png</file>
@@ -41,7 +40,6 @@
         <file>res/functions.txt</file>
         <file>images/icon64.png</file>
         <file>res/license.txt</file>
-        <file>scripts/mobdebug.lua</file>
         <file>scripts/templates/player_bullet.lua</file>
         <file>images/pd/dagobert83_cancelx16.png</file>
         <file>images/tango/document-new.png</file>
@@ -83,5 +81,45 @@
         <file>images/pd/copy.png</file>
         <file>images/pd/gesloten_slot.png</file>
         <file>images/pd/1393320584.png</file>
+        <file>images/strawberrypntbrush.png</file>
+        <file>images/mouse-cursor.png</file>
+        <file>images/ftview-grid.png</file>
+        <file>images/icons8-erase-40.png</file>
+        <file>images/icons8-eraser-50.png</file>
+        <file>images/sketchpntbrush.png</file>
+        <file>images/splash/open.png</file>
+        <file>images/splash/tutorials.png</file>
+        <file>images/splash/new.png</file>
+        <file>images/splash/editor.png</file>
+        <file>res/meta/annie.proto</file>
+        <file>res/meta/annie.obl</file>
+        <file>res/meta/wallbrick.proto</file>
+        <file>res/meta/wallbrick.obl</file>
+        <file>res/meta/diamond.proto</file>
+        <file>res/meta/diamond.obl</file>
+        <file>res/meta/drago.proto</file>
+        <file>res/meta/drago.obl</file>
+        <file>res/meta/sparkle.proto</file>
+        <file>res/meta/sparkle.obl</file>
+        <file>res/meta/deico.proto</file>
+        <file>res/meta/deico.obl</file>
+        <file>res/meta/little_star (player bullet).proto</file>
+        <file>res/meta/little_star (player bullet).obl</file>
+        <file>res/meta/little_star (dead).proto</file>
+        <file>res/meta/little_star (dead).obl</file>
+        <file>res/meta/switch94.proto</file>
+        <file>res/meta/switch94.obl</file>
+        <file>res/meta/snake.proto</file>
+        <file>res/meta/snake.obl</file>
+        <file>res/meta/forcef94.proto</file>
+        <file>res/meta/forcef94.obl</file>
+        <file>images/Light-bulb-red.png</file>
+        <file>images/Light-bulb-green.png</file>
+        <file>images/Light-bulb-yellow.png</file>
+        <file>images/Light-bulb-white.png</file>
+        <file>images/Light-bulb-wine.png</file>
+        <file>res/const.txt</file>
+        <file>images/pd/primary-gnome-question.svg</file>
+        <file>images/Light-bulb-blue.png</file>
     </qresource>
 </RCC>

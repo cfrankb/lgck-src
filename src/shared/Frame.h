@@ -28,6 +28,8 @@ class CSS3Map;
 class CUndo;
 class IFile;
 
+#include "../shared/stdafx.h"
+
 // Frame.h : header file
 //
 
@@ -72,7 +74,7 @@ class CFrame
 {
     // Construction
 public:
-    CFrame(CFrame* src=NULL);
+    CFrame(CFrame* src=nullptr);
     CFrame(int p_nLen, int p_nHei);
 
     // Attributes
@@ -81,20 +83,20 @@ public:
         return x>= 0 && x < m_nLen && y >=0 && y < m_nHei;
     }
 
-    inline UINT32 & at(int x, int y) {
+    inline uint32_t & at(int x, int y) {
         return m_rgb[x + y * m_nLen];
     }
 
-    inline UINT8 alphaAt(int x, int y) {
+    inline uint8_t alphaAt(int x, int y) {
         return (m_rgb[x + y * m_nLen]) >> 24;
     }
 
-    inline UINT32 & point (int x, int y) {
+    inline uint32_t & point (int x, int y) {
         return * (m_rgb + x + y * m_nLen);
     }
 
-    inline UINT32 *getRGB() const { return m_rgb; }
-    void setRGB(UINT32 *rgb) { m_rgb = rgb; }
+    inline uint32_t *getRGB() const { return m_rgb; }
+    void setRGB(uint32_t *rgb) { m_rgb = rgb; }
     inline char map(int x, int y) { return m_map.at(x,y); }
     bool hasTransparency() const;
     bool isEmpty() const;
@@ -103,10 +105,10 @@ public:
 public:
     CFrame & operator = (const CFrame &src);
     void forget();
-    void detach() { m_rgb = NULL;}
+    void detach() { m_rgb = nullptr;}
     void updateMap();
     void resize( int len, int hei );
-    void setTransparency( UINT32 rgba );
+    void setTransparency( uint32_t rgba );
     void setTopPixelAsTranparency();
     void enlarge();    
     void flipV();
@@ -127,8 +129,8 @@ public:
     static const char* getChunkType();
     void abgr2argb();
     void argb2arbg();
-    void floodFill (int x, int y, UINT32 bOldColor, UINT32 bNewColor);
-    void floodFillAlpha (int x, int y, UINT8 oldAlpha, UINT8 newAlpha);
+    void floodFill (int x, int y, uint32_t bOldColor, uint32_t bNewColor);
+    void floodFillAlpha (int x, int y, uint8_t oldAlpha, uint8_t newAlpha);
     void fade(int factor);
     CFrame* toAlphaGray(int mx=0, int my=0, int cx=-1, int cy=-1);
     void fill(unsigned int rgba);
@@ -139,14 +141,14 @@ public:
     bool read (IFile & file, int version);
     void write (IFile &file);
 
-    void toBmp(UINT8 * & bmp, int & size);
-    void toPng(UINT8 * & png, int & size, UINT8 *obl5data=NULL, int obl5size=0);
-    static UINT32 toNet (const UINT32 a);
-    static const UINT32 *dosPal();
+    void toBmp(uint8_t * & bmp, int & size);
+    void toPng(uint8_t * & png, int & size, uint8_t *obl5data=nullptr, int obl5size=0);
+    static uint32_t toNet(const uint32_t a);
+    static const uint32_t *dosPal();
     bool draw(CDotArray * dots, int size, int mode=MODE_NORMAL);
     void save(CDotArray * dots, CDotArray * dotsOrg, int size);
     CFrame *clip(int mx, int my, int cx=-1, int cy=-1);
-    CFrameSet *explode(int count, short *xx, short *yy, CFrameSet *set=NULL);    
+    CFrameSet *explode(int count, short *xx, short *yy, CFrameSet *set=nullptr);
 
     void copy(CFrame *);
     void push();
@@ -171,36 +173,34 @@ public:
     };
 
     typedef struct {
-        UINT32 Lenght;      // 4 UINT8s
-        UINT8 ChunkType[4];
-        UINT32 Width;       //: 4 UINT8s
-        UINT32 Height;      //: 4 UINT8s
-        UINT8 BitDepth;     //: 1 UINT8
-        UINT8 ColorType;    //: 1 UINT8
-        UINT8 Compression;  //: 1 UINT8
-        UINT8 Filter;       //: 1 UINT8
-        UINT8 Interlace;    //: 1 UINT8
+        uint32_t Lenght;      // 4 uint8_ts
+        uint8_t ChunkType[4];
+        uint32_t Width;       //: 4 uint8_ts
+        uint32_t Height;      //: 4 uint8_ts
+        uint8_t BitDepth;     //: 1 uint8_t
+        uint8_t ColorType;    //: 1 uint8_t
+        uint8_t Compression;  //: 1 uint8_t
+        uint8_t Filter;       //: 1 uint8_t
+        uint8_t Interlace;    //: 1 uint8_t
     } png_IHDR;
 
     typedef struct {
-        UINT32 Lenght;      // 4 UINT8s
-        UINT8 ChunkType[4];
-        UINT32 CRC;
+        uint32_t Lenght;      // 4 uint8_ts
+        uint8_t ChunkType[4];
+        uint32_t CRC;
     } png_IEND;
 
     typedef struct {
-        UINT32 Length;      // sizeof all - 12
-        UINT8 ChunkType[4]; // OBL5
-        UINT32 Reserved;    // should be zero
-        UINT32 Version;     // should be zero
-        UINT32 Count;       // m_nSize
+        uint32_t Length;      // sizeof all - 12
+        uint8_t ChunkType[4]; // OBL5
+        uint32_t Reserved;    // should be zero
+        uint32_t Version;     // should be zero
+        uint32_t Count;       // m_nSize
         // Data : size m_nSize * 4 bytes
         // ...   list of width (short)
         // ...   list of height (short)
         // CRC  : size 4
     } png_OBL5;
-
-    void debug();
 
 protected:    
     enum {
@@ -210,12 +210,11 @@ protected:
     };
 
     int m_bCustomMap;
-    UINT32 *m_rgb;
+    uint32_t *m_rgb;
     CSS3Map m_map;
     CFrame **m_undoFrames;
     int m_undoPtr;
     int m_undoSize;
-    void outputDebug(const char *s);
     void init();
 };
 

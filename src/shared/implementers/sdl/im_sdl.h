@@ -22,6 +22,7 @@
 #include "interfaces/IImageManager.h"
 #include <unordered_map>
 #include <SDL2/SDL.h>
+#include <string>
 
 class CIMSdl: public IImageManager
 {

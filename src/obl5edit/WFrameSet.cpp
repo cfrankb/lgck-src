@@ -180,7 +180,7 @@ void CWFrameSet::addFrame(int index)
 
 void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
 {
-    UINT8 *png;
+    uint8_t *png;
     int pngSize;
     (*m_frameSet)[j]->toPng(png, pngSize);
 
@@ -357,7 +357,7 @@ void CWFrameSet::reload()
 {
     setAcceptDrops(true);
     setColumnCount( 2 );
-    setEditTriggers(0);
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
     setWordWrap(false);
     setRootIsDecorated(false);
     setAlternatingRowColors(true);

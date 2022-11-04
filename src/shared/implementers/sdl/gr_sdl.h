@@ -19,7 +19,7 @@
 #ifndef GR_SDL_H
 #define GR_SDL_H
 
-#include <cstring>
+#include <string>
 #include <SDL2/SDL.h>
 #include "../shared/interfaces/IGraphics.h"
 
@@ -38,19 +38,17 @@ public:
     const char* lastError();
     virtual ~CGRSdl();
     virtual const char* signature();
-    virtual void drawScreen();
-    virtual void getOffset(int & offsetX, int & offsetY);
     virtual void getScreenSize(int & len, int & hei);
     virtual void clear(unsigned int red, unsigned int green, unsigned int blue);
     virtual void clear(unsigned int rgb);
     virtual void paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true);
     virtual void paintImage(int x1, int y1, int frameSet, int frameNo);
-    virtual void paintImage(int x1, int y1, CFrame * frame, int frameSet, int frameNo);
     virtual void render(CFont & font, const char *text, int x, int y, const Color & color);
     virtual IDisplayManager* displayManager();
     virtual void ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill=true);
     virtual void ss_paintImage(int x1, int y1, int frameSet, int frameNo);
     virtual IImageManager *cache();
+    virtual bool isFlipped(){ return true; }
     void update();
     SDL_Renderer * renderer();
 
@@ -60,21 +58,11 @@ protected:
         SCREEN_HEIGHT = 480
     };
 
-    CGame *m_game;
     CIMSdl *m_imageManager;
-    CDisplayManager *m_displayManager;
     SDL_Window *m_window;
     SDL_Renderer *m_renderer;
     void queryDriver();
-    virtual void drawLayer (CLayer * layer, int mx, int my);
-    virtual void drawScene (CScene * layer);
-    virtual void drawInventory();
-    virtual void drawHP();
-    struct {
-        unsigned char red;
-        unsigned char green;
-        unsigned char blue;
-    } m_colorMod;
+
     std::string m_lastError;
 };
 

@@ -1,3 +1,20 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #ifndef FONT_H
 #define FONT_H
 
@@ -10,8 +27,8 @@ class CFont
 public:
     CFont();
     ~CFont();
-    void write(IFile & file);
-    void read(IFile & file);
+    bool write(IFile & file);
+    bool read(IFile & file);
 
     typedef struct
     {
@@ -39,10 +56,12 @@ public:
     int scaleY();
     int face();
     float fixup();
+    CFont &operator = (CFont & s);
 
 protected:
     enum {
-        VERSION = 0x0001
+        VERSION_1 = 0x0001,
+        VERSION_2 = 0x0002
     };
 
     inline int pow2roundup(int x)
@@ -56,7 +75,6 @@ protected:
         return x+1;
     }
 
-    static char m_signature[];
     std::unordered_map<char, CFont::Glyph> m_glyphs;
     std::unordered_map<std::string, std::string> m_props;
     std::string m_text;

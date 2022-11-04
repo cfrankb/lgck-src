@@ -19,9 +19,9 @@
 #include <QFile>
 #include "OBL5File.h"
 #include "../shared/Frame.h"
+#include "../shared/qtgui/qfilewrap.h"
 
-//#define q2c(__qstring__) (const char*) __qstring__.toAscii().constData()
-#define q2c(__qstring__) (const char*) __qstring__.toLatin1().data()
+#define q2c(__qstring__) static_cast<const char *>(__qstring__.toLatin1().data())
 
 COBL5File::COBL5File()
 {
@@ -34,7 +34,7 @@ COBL5File::~COBL5File()
 
 void COBL5File::init()
 {
-    strcpy(m_format, "OBL5");
+    m_format = "OBL5";
     m_dirty = false;
     m_currImage = -1;
 }
@@ -50,8 +50,8 @@ void COBL5File::forget()
 bool COBL5File::read()
 {
     bool result = false;
-    CFileWrap file;
-    if (file.open(q2c(m_fileName), "rb")) {
+    QFileWrap file;
+    if (file.open(m_fileName, "rb")) {
         CFrameSet set;
         char format[7];
         if (set.extract(file,format) && set.getSize()) {
@@ -62,7 +62,7 @@ bool COBL5File::read()
             }
             m_currImage = 0;
             if (CFrameSet::isFriendFormat(format)) {
-                strcpy(format, "OBL5");
+                strncpy(format, "OBL5", 5);
             }
             setFormat(format);
         } else {
@@ -81,10 +81,10 @@ bool COBL5File::read()
 bool COBL5File::write()
 {
     bool result = false;
-    CFileWrap file;
-    if (file.open(q2c(m_fileName), "wb")) {
+    QFileWrap file;
+    if (file.open(m_fileName, "wb")) {
         result = true;        
-        if (strcmp(m_format, "OBL5")==0) {
+        if (strcmp(m_format.c_str(), "OBL5")==0) {
             m_filter.write(file);
         } else {
             unsigned char *data;
@@ -156,7 +156,7 @@ CFrame * COBL5File::getCurrent() const
     if (m_currImage >= 0) {
         return m_filter[m_currImage];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -172,10 +172,10 @@ int COBL5File::getCurrentIndex()
 
 const char *COBL5File::getFormat()
 {
-    return m_format;
+    return m_format.c_str();
 }
 
 void COBL5File::setFormat(const char *format)
 {
-    strcpy(m_format, format);
+    m_format = format;
 }

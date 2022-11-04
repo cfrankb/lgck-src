@@ -1,6 +1,6 @@
-﻿/*
-    LGCK Builder GUI
-    Copyright (C) 1999, 2013  Francois Blanchette
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include <QColorDialog>
 #include <QMessageBox>
 #include <QFile>
+#include <QFileDialog>
 #include <QClipboard>
 #include "DlgEditLevel.h"
 #include "DlgSource.h"
@@ -42,6 +43,7 @@ CDlgEditLevel::CDlgEditLevel(QWidget *parent) :
     m_ui->btnIBkColor->setBuddy(m_ui->eIBkColor);
     m_ui->btnITextColor->setBuddy(m_ui->eITextColor);
     m_bNewLevel = false;
+    m_ui->btnMusic->hide();
 }
 
 CDlgEditLevel::~CDlgEditLevel()
@@ -78,17 +80,17 @@ void CDlgEditLevel::setColor(QLineEdit *edit, const QString color)
 
 QString CDlgEditLevel::getTitle ()
 {
-    return m_ui->title->text();
+    return m_ui->title->text().trimmed();
 }
 
 QString CDlgEditLevel::getHint()
 {
-    return m_ui->hint->toPlainText();
+    return m_ui->hint->toPlainText().trimmed();
 }
 
 QString CDlgEditLevel::getColor(QLineEdit *edit)
 {
-    return edit->text();
+    return edit->text().mid(0,6);
 }
 
 void CDlgEditLevel::load(CLevel *s)
@@ -101,6 +103,7 @@ void CDlgEditLevel::load(CLevel *s)
     setTitle(level.getSetting("title"));
     setHint(level.getSetting("hint"));
     m_ui->eUUID->setText(level.getSetting("uuid"));
+    m_ui->eAuthor->setText(level.getSetting("author"));
 
     // page 5
     setColor(m_ui->bkColor, level.getSetting("bkcolor"));
@@ -124,28 +127,25 @@ void CDlgEditLevel::load(CLevel *s)
         m_ui->cbEndLevel->addItem(endLevelOptions[i]);
     }
 
-    int goal = strtol(level.getSetting("goal"), NULL, 10);
+    int goal = strtol(level.getSetting("goal"), nullptr, 10);
     m_ui->cbEndLevel->setCurrentIndex( goal );
 
     for (int i=0; i < 32; ++i) {
-        if (i != 0) {
-            m_ui->cbTrigger->addItem(QString("%1").arg(i));
-        } else {
-            m_ui->cbTrigger->addItem(QString(tr("(none)")));
-        }
+        m_ui->cbTrigger->addItem(i != 0 ? QVariant(i).toString() : tr("(none)"));
     }
 
-    int trigger = strtol(level.getSetting("trigger"), NULL, 10);
+    int trigger = strtol(level.getSetting("trigger"), nullptr, 10);
     m_ui->cbTrigger->setCurrentIndex( trigger );
 
-    int wrap = strtol(level.getSetting("wrap"), NULL, 10);
+    int wrap = strtol(level.getSetting("wrap"), nullptr, 10);
     m_ui->cWrapUp->setChecked( wrap & CLevel::WRAP_UP );
     m_ui->cWrapDown->setChecked( wrap & CLevel::WRAP_DOWN );
     m_ui->cWrapLeft->setChecked( wrap & CLevel::WRAP_LEFT );
     m_ui->cWrapRight->setChecked( wrap & CLevel::WRAP_RIGHT );
     m_ui->cOpenTop->setChecked( wrap & CLevel::OPENTOP );
+    m_ui->cNoLookUp->setChecked( wrap & CLevel::NO_LOOK_UP );
 
-    int noGravity = strtol(level.getSetting("no_gravity"), NULL, 10);
+    int noGravity = strtol(level.getSetting("no_gravity"), nullptr, 10);
     m_ui->cNoGravity->setChecked( noGravity != 0 );
 
     // page3
@@ -161,7 +161,7 @@ void CDlgEditLevel::load(CLevel *s)
     m_ui->treeEvents->setColumnCount(2);
     m_ui->treeEvents->setColumnWidth(0, 128);
     m_ui->treeEvents->setColumnWidth(1, 128);
-    m_ui->treeEvents->setEditTriggers(0);
+    m_ui->treeEvents->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeEvents->setWordWrap(false);
     m_ui->treeEvents->setRootIsDecorated(false);
     m_ui->treeEvents->setAlternatingRowColors(true);
@@ -197,6 +197,7 @@ void CDlgEditLevel::save(CLevel *s)
     // page 1
     level.setSetting("title", q2c(getTitle()));
     level.setSetting("hint", q2c(getHint()));
+    level.setSetting("author", q2c(m_ui->eAuthor->text().trimmed()));
 
     // page5   
     level.setSetting("bkcolor", q2c(getColor(m_ui->bkColor)));
@@ -227,6 +228,10 @@ void CDlgEditLevel::save(CLevel *s)
 
     if (m_ui->cOpenTop->checkState() == Qt::Checked) {
         wrap += CLevel::OPENTOP;
+    }
+
+    if (m_ui->cNoLookUp->isChecked()) {
+        wrap += CLevel::NO_LOOK_UP;
     }
 
     level.setSetting("wrap", q2c(QString("%1").arg(wrap)));
@@ -264,7 +269,7 @@ void CDlgEditLevel::on_treeEvents_doubleClicked(QModelIndex index)
         return;
     }
 
-    CDlgSource *d = new CDlgSource((QWidget*) parent());
+    CDlgSource *d = new CDlgSource(static_cast<QWidget*>(parent()));
     d->init(m_gameFile);
     QString t = QString(tr("Edit Event ``%1``")).arg(CLevel::getEventName(index.row()));
     d->setWindowTitle(t);
@@ -313,4 +318,24 @@ void CDlgEditLevel::on_pushButton_clicked()
 {
     QClipboard *clip = QApplication::clipboard();
     clip->setText(m_ui->eUUID->text());
+}
+
+void CDlgEditLevel::on_btnMusic_clicked()
+{
+    QString fileFilter = tr("Music files (*.ogg)");
+    QString fileName = m_gameFile->m_path.c_str();
+    fileName = QFileDialog::getOpenFileName(this, tr("Select Music File"), fileName, fileFilter);
+    if (!fileName.isEmpty()) {
+#ifdef Q_OS_WIN32
+        fileName = fileName.replace("\\", "/");
+#endif
+        int len = m_gameFile->m_path.length();
+        qDebug("sub: %s", q2c(fileName.mid(0, len)));
+        qDebug("name: %s", q2c(fileName.mid(len)));
+        if (fileName.mid(0, len) == m_gameFile->m_path.c_str()) {
+            m_ui->eMusic->setText(fileName.mid(len));
+        } else {
+
+        }
+    }
 }

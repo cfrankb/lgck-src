@@ -24,6 +24,8 @@
 #include <QModelIndex>
 #include <QTreeWidgetItem>
 
+class CPath;
+
 namespace Ui {
     class CDlgPath;
 }
@@ -47,7 +49,7 @@ protected:
 
     void updateIcon(QTreeWidgetItem *item, int aim);
 
-    void *m_path;
+    CPath *m_path;
 
     enum {
         MAX_ICONS = 5

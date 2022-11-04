@@ -39,15 +39,17 @@
 #include "../shared/interfaces/ISound.h"
 #include "../shared/GameEvents.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "../shared/Game.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CDlgGame::CDlgGame(QWidget *parent) :
     QDialog(parent),
     m_ui(new Ui::CDlgGame)
 {
     m_ui->setupUi(this);
-    m_indexSettings = NULL;
-    m_countFrameSetUses = NULL;
+    m_indexSettings = nullptr;
+    m_countFrameSetUses = nullptr;
 }
 
 CDlgGame::~CDlgGame()
@@ -55,7 +57,7 @@ CDlgGame::~CDlgGame()
     delete m_ui;
     if (m_indexSettings) {
         delete [] m_indexSettings;
-        m_indexSettings = NULL;
+        m_indexSettings = nullptr;
     }
     if (m_countFrameSetUses) {
         delete [] m_countFrameSetUses;
@@ -90,7 +92,7 @@ void CDlgGame::on_treeSettings_doubleClicked(QModelIndex index)
 
     if (ok && (result != setting.value.c_str())) {
         setting.value = q2c(result);
-        setting.valueInt = strtol(setting.value.c_str(), NULL, 10);
+        setting.valueInt = strtol(setting.value.c_str(), nullptr, 10);
         QTreeWidgetItem * item = m_ui->treeSettings->topLevelItem( index.row() );
         item->setText(1, result);
         gf.setDirty( true );
@@ -106,7 +108,6 @@ void CDlgGame::on_btnDefaults_clicked()
         gf.restoreDefaults();
         QAbstractItemModel * model =  m_ui->treeSettings->model();
         int totalRows = model->rowCount();
-        //qDebug("totalRows: %d\n", totalRows);
         model->removeRows(0, totalRows);
         fillTreeSettings();
         gf.setDirty( true );
@@ -187,7 +188,8 @@ void CDlgGame::on_btnAddObject_clicked()
 
     int j = gf.m_arrProto.getSize();
     CProto proto;
-    sprintf(proto.m_szName, q2c(tr("object_%d")), j);
+    proto.resetUUID();
+    sprintf(proto.m_szName, q2c(tr("sprite_%d")), j);
     gf.m_arrProto.add( proto );
 
     d->load( j );
@@ -253,25 +255,9 @@ void CDlgGame::on_btnDeleteObject_clicked()
 void CDlgGame::updateIcon(QTreeWidgetItem * itm, int protoId)
 {
     QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
-
-    CGameFile & gf = *((CGameFile*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     CProto & proto = gf.m_arrProto[ protoId ];
-
-    CFrameSet & filter = *gf.m_arrFrames[proto.m_nFrameSet];
-    UINT8 *png;
-    int size;
-    filter[proto.m_nFrameNo]->toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
+    QIcon icon = frame2icon(gf.toFrame(proto.m_nFrameSet, proto.m_nFrameNo));
     item->setText(0, proto.m_szName);
     if (gf.m_className[proto.m_nClass].empty()) {
         item->setText(1, tr("Unknown class %1").arg( proto.m_nClass ));
@@ -333,8 +319,8 @@ void CDlgGame::on_treeSounds_doubleClicked(QModelIndex index)
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
 
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);
@@ -390,8 +376,8 @@ void CDlgGame::on_btnAddSound_clicked()
         } else {
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);
@@ -472,17 +458,14 @@ void CDlgGame::on_treeFrameSets_doubleClicked(QModelIndex index)
     }
 
     CDlgFrameSet * d = new CDlgFrameSet (this);
-    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.m_arrFrames[index.row()]->getName()) );
-    CFrameSet * frameSet = new CFrameSet (gf.m_arrFrames[index.row()]);
+    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.frames()[index.row()]->getName()) );
+    CFrameSet * frameSet = new CFrameSet (gf.frames()[index.row()]);
     d->init(frameSet);    
     if (d->exec() == QDialog::Accepted) {
         d->save();
-
-        qDebug("on_treeFrameSets_doubleClicked(QModelIndex index) save\n");
         gf.setDirty( true );
-
-        delete gf.m_arrFrames[ index.row() ];
-        gf.m_arrFrames.setAt( index.row(), frameSet);
+        delete gf.frames()[ index.row() ];
+        gf.frames().setAt( index.row(), frameSet);
 
         // update the imageCache
         gf.cache()->replace(index.row(), frameSet);
@@ -503,15 +486,13 @@ void CDlgGame::on_btnAddFrameSet_clicked()
 {
     CWizFrameSet *wiz = new CWizFrameSet( this );
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    int i = gf.m_arrFrames.getSize();
+    int i = gf.frames().getSize();
     wiz->init(i);
     if (wiz->exec()) {
         CFrameSet *frameSet = new CFrameSet (wiz->getFrameSet());
-        char name[32];
-        strcpy(name, wiz->getName());
-        frameSet->setName(name);
+        frameSet->setName(wiz->getName());
         // add new FrameSet
-        gf.m_arrFrames.add(frameSet);
+        gf.frames().add(frameSet);
         // add this new imageSet to the cache
         gf.cache()->add(frameSet);
         // update GUI
@@ -535,7 +516,7 @@ void CDlgGame::on_btnDeleteFrameSet_clicked()
         return;
     }
 
-    const CFrameSet & frameSet = * gf.m_arrFrames[index.row()];
+    const CFrameSet & frameSet = gf.toFrameSet(index.row());
 
     QMessageBox::StandardButton ret = QMessageBox::warning(this,  "",  tr("Are you sure that you want to delete\n"
                                                                           "`%1` ?") .arg(frameSet.getName()),
@@ -549,7 +530,7 @@ void CDlgGame::on_btnDeleteFrameSet_clicked()
         // delete all references
         gf.killFrameSet ( index.row() );
         // remove frameSet
-        gf.m_arrFrames.removeAt( index.row() );
+        gf.frames().removeAt( index.row() );
         // remove imageSet from cache
         gf.cache()->removeAt( index.row() );
 
@@ -563,20 +544,8 @@ void CDlgGame::updateIconFrameSet(QTreeWidgetItem * itm, int fs)
     CGameFile & gf = *((CGameFile*)m_gameFile);
     QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
 
-    CFrameSet & frameSet = *gf.m_arrFrames[ fs ];
-    UINT8 *png;
-    int size;
-    frameSet[ 0 ]->toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    CFrameSet & frameSet = gf.toFrameSet(fs);
+    QIcon icon = frame2icon(gf.toFrame(fs, 0));
 
     QString s;
     if (frameSet.getSize() < 2) {
@@ -601,19 +570,18 @@ void CDlgGame::on_treeFrameSets_itemSelectionChanged()
 void CDlgGame::on_treeLevels_doubleClicked(QModelIndex index)
 {
     CGameFile & gf = *((CGameFile*)m_gameFile);
-    int level = index.row();
-    CLevel & levelObj = *gf.m_arrLevels[ level ];
+    int levelId = index.row();
+    CLevel & levelObj = gf.getLevelObject(levelId);
     CDlgEditLevel *dlg = new CDlgEditLevel(this);
     dlg->setGameDB(m_gameFile);
-    QString s;
-    s.sprintf(q2c(tr("Edit level %.3d")), level + 1);
+    QString s = QString::asprintf(q2c(tr("Edit level %.3d")), levelId + 1);
     dlg->setWindowTitle(s);
     dlg->load(& levelObj);
     if (dlg->exec() == QDialog::Accepted) {
         dlg->save(& levelObj);
         gf.setDirty( true );
-        QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( level );
-        s.sprintf("%.3d", level + 1);
+        QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( levelId );
+        s = QString::asprintf("%.3d", levelId + 1);
         item->setText(0, s);
         item->setText(1, levelObj.getSetting("title"));
     }
@@ -641,8 +609,7 @@ void CDlgGame::on_btnAddLevel_clicked()
         gf.addLevel( level );
         gf.setDirty( true );
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        QString s;
-        s.sprintf("%.3d", gf.getSize());
+        QString s = QString::asprintf("%.3d", gf.getSize());
         item->setText(0, s);
         item->setText(1, level->getSetting("title"));
         m_ui->treeLevels->addTopLevelItem(item);
@@ -673,8 +640,7 @@ void CDlgGame::on_btnDeleteLevel_clicked()
 
         for (int i = level; i < gf.getSize(); ++i) {
             QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( i );
-            QString s;
-            s.sprintf("%.3d", i + 1);
+            QString s = QString::asprintf("%.3d", i + 1);
             item->setText(0, s);
             item->setText(1, gf[i]->getSetting("title"));
         }
@@ -771,7 +737,7 @@ void CDlgGame::init()
 
     m_ui->treeSettings->setColumnCount(2);
     m_ui->treeSettings->setColumnWidth(0, 128);
-    m_ui->treeSettings->setEditTriggers(0);
+    m_ui->treeSettings->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeSettings->setWordWrap(false);
     m_ui->treeSettings->setRootIsDecorated(false);
     m_ui->treeSettings->setAlternatingRowColors(true);
@@ -782,7 +748,7 @@ void CDlgGame::init()
 
     m_ui->treeObjects->setColumnCount(2);
     m_ui->treeObjects->setColumnWidth(0, 128);
-    m_ui->treeObjects->setEditTriggers(0);
+    m_ui->treeObjects->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeObjects->setWordWrap(false);
     m_ui->treeObjects->setRootIsDecorated(false);
     m_ui->treeObjects->setAlternatingRowColors(true);
@@ -802,7 +768,7 @@ void CDlgGame::init()
     m_ui->treeSounds->setColumnCount(2);
     m_ui->treeSounds->setColumnWidth(0, 128);
     m_ui->treeSounds->setColumnWidth(1, 64);
-    m_ui->treeSounds->setEditTriggers(0);
+    m_ui->treeSounds->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeSounds->setWordWrap(false);
     m_ui->treeSounds->setRootIsDecorated(false);
     m_ui->treeSounds->setAlternatingRowColors(true);
@@ -827,13 +793,13 @@ void CDlgGame::init()
     m_ui->treeFrameSets->setColumnCount(3);
     m_ui->treeFrameSets->setColumnWidth(0, 128);
     m_ui->treeFrameSets->setColumnWidth(1, 96);
-    m_ui->treeFrameSets->setEditTriggers(0);
+    m_ui->treeFrameSets->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeFrameSets->setWordWrap(false);
     m_ui->treeFrameSets->setRootIsDecorated(false);
     m_ui->treeFrameSets->setAlternatingRowColors(true);
     countFrameSetUses();
 
-    for (int i = 0; i < gf.m_arrFrames.getSize(); ++i) {
+    for (int i = 0; i < gf.frames().getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIconFrameSet( item, i );
         m_ui->treeFrameSets->addTopLevelItem(item);
@@ -844,15 +810,14 @@ void CDlgGame::init()
     m_ui->treeLevels->setColumnCount(2);
     m_ui->treeLevels->setColumnWidth(0, 48);
     m_ui->treeLevels->setColumnWidth(1, 128);
-    m_ui->treeLevels->setEditTriggers(0);
+    m_ui->treeLevels->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeLevels->setWordWrap(false);
     m_ui->treeLevels->setRootIsDecorated(false);
     m_ui->treeLevels->setAlternatingRowColors(true);
 
     for (int i = 0; i < gf.getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        QString s;
-        s.sprintf("%.3d", i + 1);
+        QString s = QString::asprintf("%.3d", i + 1);
         item->setText(0, s);
         item->setText(1, gf[i]->getSetting("title"));
         m_ui->treeLevels->addTopLevelItem(item);
@@ -863,7 +828,7 @@ void CDlgGame::init()
     m_ui->treeEvents->setColumnCount(2);
     m_ui->treeEvents->setColumnWidth(0, 128);
     m_ui->treeEvents->setColumnWidth(1, 96);
-    m_ui->treeEvents->setEditTriggers(0);
+    m_ui->treeEvents->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeEvents->setWordWrap(false);
     m_ui->treeEvents->setRootIsDecorated(false);
     m_ui->treeEvents->setAlternatingRowColors(true);

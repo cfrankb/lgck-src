@@ -1,9 +1,27 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "stdafx.h"
 #include "WizScript.h"
 #include "ui_WizScript.h"
 #include "FileWrap.h"
 #include "GameFile.h"
 #include "qtgui/cheat.h"
+#include "qtgui/qthelper.h"
 #include "Frame.h"
 
 void qtLua_init();
@@ -18,7 +36,7 @@ CWizScript::CWizScript(QWidget *parent) :
     QWizard(parent),
     ui(new Ui::CWizScript)
 {
-    m_gameFile = NULL;
+    m_gameFile = nullptr;
     ui->setupUi(this);
     qtLua_init();
     int wizID = externWidget(this);
@@ -28,7 +46,7 @@ CWizScript::CWizScript(QWidget *parent) :
         ui->cbAction->addItem(m_actions[i].name);
     }
     ui->sDesc->setText(m_actions[0].desc);
-    ui->sSample->setText(m_actions[0].sample);
+    ui->sSample->setPlainText(m_actions[0].sample);
     ui->sSample->setReadOnly(true);
     ui->sSample->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
@@ -67,7 +85,7 @@ void CWizScript::init(CGameFile *gf)
 void CWizScript::on_cbAction_currentIndexChanged(int index)
 {
     ui->sDesc->setText(m_actions[index].desc);
-    ui->sSample->setText(m_actions[index].sample);
+    ui->sSample->setPlainText(m_actions[index].sample);
     unloadScript();
     loadScript(index);
     m_index = index;
@@ -76,7 +94,7 @@ void CWizScript::on_cbAction_currentIndexChanged(int index)
 void CWizScript::loadScript(int id)
 {
     if (!m_gameFile) {
-        qDebug("gameFile not defined");
+        qCritical("gameFile not defined");
         return;
     }
     if (m_actions[id].loader[0]) {
@@ -124,29 +142,18 @@ std::string CWizScript::getScript()
 void CWizScript::initComboBox(QComboBox* combo, const char *type)
 {
     if (!m_gameFile) {
-        qDebug("m_gameFile is NULL");
+        qCritical("m_gameFile is NULL");
         return;
     }
 
-    //qDebug("type:%s", type);
     CGameFile & gf = *m_gameFile;
     if (strcmp(type, "sprite") == 0) {
         qDebug(">>sprite");
         CONST_DATA *data = gf.getSpriteList();
         for (int i=0; data[i].name != ""; ++i) {
-            CProto & proto = gf.m_arrProto[i];
-            CFrameSet & frameSet = *(gf.m_arrFrames[proto.m_nFrameSet]);
-            UINT8 *png;
-            int size;
-            frameSet[0]->toPng(png, size);
-            QImage img;
-            if (!img.loadFromData( png, size )) {
-                qDebug("failed to load png (%d)\n", i);
-            }
-            delete [] png;
-            QPixmap pm = QPixmap::fromImage(img);
-            QIcon icon;
-            icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+            CProto & proto = gf.toProto(i);
+            CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
+            QIcon icon = frame2icon(* frameSet[0]);
             combo->addItem(icon, data[i].value.c_str());
         }
         delete [] data;
@@ -165,18 +172,8 @@ void CWizScript::initComboBox(QComboBox* combo, const char *type)
         qDebug(">>image");
         CONST_DATA *data = gf.getImageList();
         for (int i=0; data[i].name != ""; ++i) {
-            CFrameSet & frameSet = *(gf.m_arrFrames[i]);
-            UINT8 *png;
-            int size;
-            frameSet[0]->toPng(png, size);
-            QImage img;
-            if (!img.loadFromData( png, size )) {
-                qDebug("failed to load png (%d)\n", i);
-            }
-            delete [] png;
-            QPixmap pm = QPixmap::fromImage(img);
-            QIcon icon;
-            icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+            CFrameSet & frameSet = gf.toFrameSet(i);
+            QIcon icon = frame2icon(* frameSet[0]);
             combo->addItem(icon, data[i].value.c_str());
         }
         delete [] data;

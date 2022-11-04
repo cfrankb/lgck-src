@@ -20,6 +20,7 @@
 #include "im_sdl.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"
+#include "../shared/LuaVM.h"
 
 #include <cstring>
 #include <SDL2/SDL.h>
@@ -31,7 +32,7 @@ CIMSdl::CIMSdl()
     m_max = GROWBY;
     m_imageSets = new ImageSet * [ m_max ];
     m_nextTexture = 0;
-    m_renderer = NULL;
+    m_renderer = nullptr;
 }
 
 CIMSdl::~CIMSdl()
@@ -39,7 +40,7 @@ CIMSdl::~CIMSdl()
     forget();
     if (m_imageSets) {
         delete [] m_imageSets;
-        m_imageSets = NULL;
+        m_imageSets = nullptr;
     }
 }
 
@@ -57,9 +58,8 @@ void CIMSdl::deleteImageSet(ImageSet &set)
 
 void CIMSdl::forget()
 {
-    qDebug("CIMSdl::forget()");
+    CLuaVM::debugv("CIMSdl::forget()");
     for (int i = 0; i < m_size; ++i) {
-     //   qDebug("CIMSdl::forget() %d",i);
         deleteImageSet(* m_imageSets[i]);
     }
     m_size = 0;
@@ -84,7 +84,7 @@ void CIMSdl::cacheInverse(int i, CFrameSet *filter)
     for (int x=0; x < filter->getSize(); ++x) {
         CFrame frame;
         frame.copy((*filter)[x]);
-        UINT32 *t = frame.getRGB();
+        uint32_t *t = frame.getRGB();
         for (int j=0; j < frame.m_nLen * frame.m_nHei; ++j) {
             t[j] = (t[j] & 0x00ffffff) + (t[j] & 0xff000000) / 2;
         }
@@ -105,7 +105,6 @@ void CIMSdl::cacheInverse(int i, CFrameSet *filter)
 
 void CIMSdl::removeAt(int i)
 {
-   // qDebug("removeAt: %d",i);
     deleteImageSet(* m_imageSets [i]);
     for (int j=i; j < m_size - 1; ++j) {
         m_imageSets[j] = m_imageSets[j + 1];
@@ -135,7 +134,7 @@ bool CIMSdl::hasInverse( int imageSet )
         imageSet = 0;
     }
 
-    return m_imageSets [ imageSet ]->inverse != NULL;
+    return m_imageSets [ imageSet ]->inverse != nullptr;
 }
 
 void CIMSdl::replace(int i, CFrameSet *filter)
@@ -146,7 +145,6 @@ void CIMSdl::replace(int i, CFrameSet *filter)
 
 int CIMSdl::insertAt(int i, CFrameSet *filter)
 {
-    //qDebug("%d %s", i, filter->getName());
     if (m_size == m_max) {
         m_max += GROWBY;
         ImageSet ** t = new ImageSet * [m_max];
@@ -164,7 +162,7 @@ int CIMSdl::insertAt(int i, CFrameSet *filter)
     is->size = filter->getSize();
     is->images = new unsigned int [ is->size ];
     memset(is->images, 0, sizeof(unsigned int)*is->size);
-    is->inverse = NULL;
+    is->inverse = nullptr;
 
     for (int x=0; x < filter->getSize(); ++x) {
         CFrame frame;
@@ -226,7 +224,7 @@ void CIMSdl::setRenderer(SDL_Renderer *renderer)
 
 int CIMSdl::add(const char *uuid, CFont *font)
 {
-    qDebug("adding font: %s %dx%d", uuid, font->width(), font->height());
+    CLuaVM::debugv("adding font: %s %dx%d", uuid, font->width(), font->height());
     ASSERT(font->pixels());
     makeCurrent();
     SDL_Surface* surface =

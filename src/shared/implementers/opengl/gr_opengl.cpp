@@ -20,18 +20,19 @@
 #include "im_opengl.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"
+
+#ifdef LGCK_QT
+    #include <QGLWidget>
+#endif
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+    #include <OpenGL/gl.h>
+    #include <OpenGL/glu.h>
 #else
-#ifdef _WIN32
-  #include <windows.h>
-#endif
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-#ifdef USE_QFILE
-#include <QGLWidget>
+    #ifdef _WIN32
+      #include <windows.h>
+    #endif
+    #include <GL/gl.h>
+    #include <GL/glu.h>
 #endif
 
 #include "im_opengl.h"
@@ -44,13 +45,9 @@
 #include "Inventory.h"
 #include "Level.h"
 #include "Font.h"
-
+#include "Display.h"
+#include "ISurface.h"
 #include "implementers/opengl/glhelper.h"
-
-// http://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Text_Rendering_01
-// http://www.opengl.org/archives/resources/features/fontsurvey/
-// http://students.cs.byu.edu/~bfish/glfontdl.php
-// http://stackoverflow.com/questions/8847899/opengl-how-to-draw-text-using-only-opengl-methods
 
 CGROpenGL::CGROpenGL(CGame *game)
 {
@@ -75,216 +72,9 @@ const char* CGROpenGL::signature()
 void CGROpenGL::getScreenSize(int & len, int & hei)
 {
     GLint viewport[4];
-    glGetIntegerv( GL_VIEWPORT, viewport );
+    glGetIntegerv(GL_VIEWPORT, viewport);
     len = viewport[2];
     hei = viewport[3];
-}
-
-void CGROpenGL::drawLayer(CLayer * layer, int mx, int my)
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX = 0;
-    int offsetY = 0;
-    int maxX  = m_game->BUFFERLEN;
-    if (maxX < screenLen)  {
-        offsetX = (screenLen - maxX) / 2;
-    }
-    int maxY  = m_game->BUFFERHEI;
-    if (maxY < screenHei)  {
-        offsetY = (screenHei - maxY) / 2;
-    }
-    CFrame *pFrame;
-    CLayer & l = (*layer);
-    int entries = l.getSize();
-    for (int i=0; i< entries; ++i) {
-        CLevelEntry & entry = l[i] ;
-        if ((entry.m_nProto & m_game->PROTO_POINTS) == m_game->PROTO_POINTS ) {
-            pFrame = (* m_game->m_points ) [entry.m_nFrameNo];
-        } else {
-            pFrame = (* m_game->m_arrFrames[entry.m_nFrameSet])[entry.m_nFrameNo];
-        }
-        int x = entry.m_nX - mx;
-        int y = entry.m_nY - my;
-        if (!((entry.m_nTriggerKey & m_game->TRIGGER_HIDDEN) ||
-            (x + pFrame->m_nLen <= 0) ||
-            (x >= screenLen) ||
-            (y + pFrame->m_nHei <= 0) ||
-            (y >= screenHei) ||
-            (entry.m_nFrameNo & 0x8000))) {
-            x += offsetX;
-            y += offsetY;
-            paintImage(x, screenHei - y, entry.m_nFrameSet, entry.m_nFrameNo);
-        }
-    }
-}
-
-void CGROpenGL::drawScene(CScene * layer)
-{
-    int mx = m_game->m_mx;
-    int my = m_game->m_my;
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-
-    int offsetX = 0;
-    int offsetY = 0;
-    int maxX  = m_game->BUFFERLEN;
-    if (maxX < screenLen)  {
-        offsetX = (screenLen - maxX) / 2;
-    }
-
-    int maxY  = m_game->BUFFERHEI;
-    if (maxY < screenHei)  {
-        offsetY = (screenHei - maxY) / 2;
-    }
-
-    CScene & scene = *layer;
-    int entries = scene.getSize();
-    CFrame *pFrame;
-    int frameSet;
-    for (int i=0; i< entries; ++i) {
-        CActor & entry = scene[i] ;
-        if ((entry.m_nProto & m_game->PROTO_POINTS) == m_game->PROTO_POINTS ) {
-            pFrame = (* m_game->m_points ) [entry.m_nFrameNo];
-            frameSet = m_game->var("pointsOBL");
-        } else {
-            pFrame = (* m_game->m_arrFrames[entry.m_nFrameSet])[entry.m_nFrameNo];
-            frameSet = entry.m_nFrameSet;
-        }
-        int x = entry.m_nX - mx;
-        int y = entry.m_nY - my;
-        if (!((entry.m_nTriggerKey & m_game->TRIGGER_HIDDEN) ||
-            (x + pFrame->m_nLen <= 0) ||
-            (x >= screenLen) ||
-            (y + pFrame->m_nHei <= 0) ||
-            (y >= screenHei) ||
-            (entry.m_nFrameNo & 0x8000))) {
-            x += offsetX;
-            y += offsetY;
-            paintImage(x, screenHei - y, pFrame, frameSet, entry.m_nFrameNo);
-        }
-    }
-}
-
-void CGROpenGL::drawHP()
-{
-    glDisable(GL_TEXTURE_2D);
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    CActor & player = m_game->getPlayer();
-    int x = 1;
-    int y = screenHei - 24;
-    UINT8 a = m_game->getDisplayAlpha();
-    if (a) {
-        paint(x,screenHei - y, x + player.getHP() * 2, screenHei - y - 16, 0x40ff00 + (a << 24));
-        paint(x,screenHei - y, x + player.getHP() * 2, screenHei - y - 16, 0xffffff + (a << 24), false);
-    }
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-}
-
-void CGROpenGL::getOffset(int & offsetX, int & offsetY)
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    offsetX = 0;
-    offsetY = 0;
-    int maxX  = m_game->BUFFERLEN;
-    if (maxX < screenLen)  {
-        offsetX = (screenLen - maxX) / 2;
-    }
-
-    int maxY  = m_game->BUFFERHEI;
-    if (maxY < screenHei)  {
-        offsetY = (screenHei - maxY) / 2;
-    }
-}
-
-void CGROpenGL::drawScreen()
-{
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    int offsetX;
-    int offsetY;
-    getOffset(offsetX, offsetY);    
-//    glDisable(GL_TEXTURE_2D);
-    clear(m_game->var("borderColor"));
-    paint(offsetX,
-          screenHei - offsetY,
-          screenLen - offsetX,
-          offsetY,
-          m_game->var("bkColor") | ALL_ALPHA);
-    glEnable(GL_TEXTURE_2D);
-    //glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glEnable (GL_BLEND);
-    //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_MULTISAMPLE);
-    int colorMod = m_game->var("colorMod") | ALL_ALPHA;
-    float blue = (colorMod & 0xff);// << 16;
-    float green = (colorMod & 0xff00) >> 8;
-    float red = (colorMod >> 16) & 0xff;
-    glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
-
-    for (int i = 0; i < m_game->m_layers->getSize(); ++i) {
-        int speeds[] = {0, 1, 2, 4, 8, 16, 32, 64, 128};
-        CLayer & layer = (*(m_game->m_layers))[i];
-        if (layer.getType() != CLayer::LAYER_MAIN) {
-            // draw background and foreground layers
-            int mx = 0, my = 0;
-            int h, v;                      
-            layer.getSpeed(h, v);
-            if (h == CLayer::SPEED_CUSTOM) {
-                layer.getOffset(mx, my);
-            } else {
-                if (h) {
-                    mx = m_game->m_mx / speeds[h];
-                }
-                if (v) {
-                    my = m_game->m_my / speeds[v];
-                }
-            }
-            drawLayer(&layer, mx, my);
-        } else {
-            // draw main layer
-            drawScene(m_game->m_sBK);
-            drawScene(m_game->m_sFW);
-        }
-    }
-//    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-//    glDisable(GL_TEXTURE_2D);
-    drawHP();
-//    glEnable(GL_TEXTURE_2D);
-    drawInventory();
-    m_displayManager->draw();
-    glDisable(GL_TEXTURE_2D);
-}
-
-void CGROpenGL::drawInventory()
-{
-    glEnable(GL_TEXTURE_2D);
-    int screenLen;
-    int screenHei;
-    getScreenSize(screenLen, screenHei);
-    const CInventory *inventory = m_game->getInventory();
-    int i = 0;
-    for (int j=0; inventory && (j < inventory->getSize()); ++j) {
-        if ((*inventory)[j] != 0) {
-            CProto proto = m_game->m_arrProto[(*inventory)[j]];
-            if (!proto.getOption(CProto::OPTION_INVENTORY_HIDDEN)) {
-                int imageSet = proto.m_nFrameSet;
-                int imageNo = proto.m_nFrameNo;
-                CFrame *frame = (*( m_game->m_arrFrames[imageSet]))[imageNo];
-                int x = screenLen - frame->m_nLen - 4;
-                int y = 32 * (i + 1) + 4;
-                paintImage(x, screenHei - y, imageSet, imageNo);
-                ++i;
-            }
-        }
-    }
 }
 
 void CGROpenGL::clear(unsigned int red, unsigned int green, unsigned int blue)
@@ -301,6 +91,7 @@ void CGROpenGL::clear(unsigned int rgb)
 
 void CGROpenGL::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
 {
+    glDisable(GL_TEXTURE_2D);
     unsigned int red = rgba & 0xff;
     unsigned int green = (rgba >> 8) & 0xff;
     unsigned int blue = (rgba >> 16) & 0xff;
@@ -321,27 +112,15 @@ void CGROpenGL::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fi
 
 void CGROpenGL::paintImage(int x1, int y1, int frameSet, int frameNo)
 {
+    glEnable(GL_TEXTURE_2D);
+    glEnable (GL_BLEND);
+    glDisable(GL_MULTISAMPLE);
+    glColor4f(m_colorMod.red / 255.0f, m_colorMod.green / 255.0f, m_colorMod.blue / 255.0f, 1.0f);
     unsigned int texture = m_imageManager->getImage(frameSet, frameNo);
-    CFrame *frame = (*( m_game->m_arrFrames[frameSet]))[frameNo];
+    CFrame & frame = m_game->toFrame(frameSet, frameNo);
     glBindTexture(GL_TEXTURE_2D, texture);
-    int ix = pow2roundup(frame->m_nLen);
-    int iy = pow2roundup(frame->m_nHei);
-    int x2 = x1 + ix;
-    int y2 = y1 - iy;
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(x1, y2, 0.0);
-        glTexCoord2f(0.0, 1.0f); glVertex3f(x1, y1, 0.0);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(x2, y1, 0.0);
-        glTexCoord2f(1.0f, 0.0); glVertex3f(x2, y2, 0.0);
-    glEnd();
-}
-
-void CGROpenGL::paintImage(int x1, int y1, CFrame *frame, int frameSet, int frameNo)
-{
-    unsigned int texture = m_imageManager->getImage(frameSet, frameNo);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    int ix = pow2roundup(frame->m_nLen);
-    int iy = pow2roundup(frame->m_nHei);
+    int ix = pow2roundup(frame.m_nLen);
+    int iy = pow2roundup(frame.m_nHei);
     int x2 = x1 + ix;
     int y2 = y1 - iy;
     glBegin(GL_QUADS);
@@ -386,10 +165,8 @@ void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color 
     unsigned int texture = font.textureId();
     ASSERT(texture);
 
-    //GLDEBUG();
     glEnable(GL_TEXTURE_2D); GLDEBUG();
     glEnable (GL_BLEND); GLDEBUG();
-    //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, texture); GLDEBUG();
     float xx = x;
     for (int i=0; text[i]; ++i) {

@@ -46,12 +46,12 @@ void CHitData::add(const CMapEntry & entry) {
     }
 }
 
-void CHitData::addBk(const UINT8 bkC) {
+void CHitData::addBk(const uint8_t bkC) {
     if (bkCount < MAX_TOUCH) {
         int i;
         for (i = 0; i < bkCount; ++i) {
             if (bkClass[i] == bkC) {
-                break;
+                return;
             }
         }
 
@@ -75,12 +75,12 @@ void CHitData::addBk(const UINT8 bkC) {
     }
 }
 
-void CHitData::addFw(const UINT8 fwC,const UINT16 fwE) {
+void CHitData::addFw(const uint8_t fwC,const uint16_t fwE) {
     if (fwCount < MAX_TOUCH) {
         int i;
         for (i = 0; i < fwCount; ++i) {
             if (fwEntry[i] == fwE) {
-                break;
+                return;
             }
         }
 
@@ -92,12 +92,12 @@ void CHitData::addFw(const UINT8 fwC,const UINT16 fwE) {
     }
 }
 
-void CHitData::addAc(const UINT8 acC,const UINT16 acE) {
+void CHitData::addAc(const uint8_t acC,const uint16_t acE) {
     if (acCount < MAX_TOUCH) {
         int i;
         for (i = 0; i < acCount; ++i) {
             if (acEntry[i] == acE) {
-                break;
+                return;
             }
         }
 
@@ -112,13 +112,7 @@ void CHitData::addAc(const UINT8 acC,const UINT16 acE) {
 /////////////////////////////////////////////////////////////////////
 // CMap()
 
-CMap::CMap():
-    m_len(0),
-    m_hei(0)
-{
-}
-
-CMap::CMap(const int sx=0, const int sy=0):
+CMap::CMap(const int sx, const int sy):
     m_len(sx),
     m_hei(sy)
 {
@@ -144,11 +138,11 @@ const Size CMap::size() const
     return s;
 }
 
-const Size CMap::size(const CFrame *frame)
+const Size CMap::size(const CFrame & frame)
 {
     Size s;
-    s.len = frame->m_nLen / GRID;
-    s.hei = frame->m_nHei / GRID;
+    s.len = frame.m_nLen / GRID;
+    s.hei = frame.m_nHei / GRID;
     return s;
 }
 
@@ -217,7 +211,7 @@ CMapEntry::~CMapEntry()
 
 }
 
-void CMapEntry::mapFw(UINT8 fwClass, UINT16 fwEntry)
+void CMapEntry::mapFw(uint8_t fwClass, uint16_t fwEntry)
 {
     if (m_fwCount < MAX_FW) {
         m_nFwClass[m_fwCount] = fwClass;
@@ -226,7 +220,7 @@ void CMapEntry::mapFw(UINT8 fwClass, UINT16 fwEntry)
     }
 }
 
-void CMapEntry::unMapFw(UINT16 fwEntry)
+void CMapEntry::unMapFw(uint16_t fwEntry)
 {
     int v = m_fwCount;
     for (int i=0, j=0; i < v; ++i) {
@@ -244,20 +238,20 @@ void CMapEntry::unMapFw(UINT16 fwEntry)
     }
 }
 
-void CMapEntry::getFw(int index, UINT8 & fwClass, UINT16 & fwEntry)
+void CMapEntry::getFw(int index, uint8_t & fwClass, uint16_t & fwEntry)
 {
     fwClass = m_nFwClass[index];
     fwEntry = m_nFwEntry[index];
 }
 
-void CMapEntry::mapAc(UINT8 acClass, UINT16 acEntry)
+void CMapEntry::mapAc(uint8_t acClass, uint16_t acEntry)
 {
     // TODO: implement this fully w/multiple support
     m_nAcClass = acClass;
     m_nAcEntry = acEntry;
 }
 
-void CMapEntry::unMapAc(UINT16 acEntry)
+void CMapEntry::unMapAc(uint16_t acEntry)
 {
     // TODO: implement this fully w/multiple support
     if (acEntry == m_nAcEntry) {

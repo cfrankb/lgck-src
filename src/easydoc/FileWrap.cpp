@@ -324,5 +324,6 @@ int CFileWrap::read(void *buf, int size)
 
 bool CFileWrap::open(const char *s, const char *mode)
 {
+    Q_UNUSED(mode);
     return open(QString(s));
 }

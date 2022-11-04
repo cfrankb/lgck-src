@@ -22,46 +22,47 @@
 #include "../shared/Animation.h"
 #include "../shared/Object.h"
 #include "../shared/FileWrap.h"
+#include "../shared/qtgui/qthelper.h"
+#include <QMessageBox>
 
 QString CDlgAnimation::m_sequences[] =
 {
-
 // AS_DEFAULT      = 0x00,
-    "This is the default animation that will run when this object is first spawned.",
+    tr("This is the default animation that will run when this object is first spawned."),
 // AS_IDLE         = 0x01,
-    "This is the idle animation that will switch on when this object has been idle for some time.",
+    tr("This is the idle animation that will switch on when this object has been idle for some time."),
 // AS_CUSTOM1      = 0x02,
-    "This is a custom animation reserved for user extensions.",
+    tr("This is a custom animation reserved for user extensions."),
 // AS_CUSTOM2      = 0x03,
-    "This is a custom animation reserved for user extensions."
+    tr("This is a custom animation reserved for user extensions.")
 };
 
 QString CDlgAnimation::m_sequenceGroups[] =
 {
     // AS_DEFAULT      = 0x00,
-    "Default group",
+    tr("Default group"),
     // AS_STAND        = 0x04,
-    "The engine will switch to running this animation when the object has stopped motion after moving %1.",
+    tr("The engine will switch to running this animation when the object has stopped motion after moving %1."),
     // AS_MOVE         = 0x08,
-    "The engine will switch to running this animation when the object is moving %1.",
+    tr("The engine will switch to running this animation when the object is moving %1."),
     // AS_JUMP         = 0x0c,
-    "The engine will switch to running this animation when the object is jumping %1.",
+    tr("The engine will switch to running this animation when the object is jumping %1."),
     // AS_HURT         = 0x10,
-    "The engine will switch to running this animation when the object is hurt %1.",
+    tr("The engine will switch to running this animation when the object is hurt %1."),
     // AS_ATTACK       = 0x14,
-    "The engine will switch to running this animation when the object is attacked %1.",
+    tr("The engine will switch to running this animation when the object is attacked %1."),
     // AS_RUN          = 0x18,
-    "The engine will switch to running this animation when the object is running %1.",
+    tr("The engine will switch to running this animation when the object is running %1."),
     // AS_DEAD         = 0x1c,
-    "The engine will switch to running this animation when the object is death %1.",
+    tr("The engine will switch to running this animation when the object is death %1."),
 };
 
 QString CDlgAnimation::m_aims[] =
 {
-    "up",
-    "down",
-    "left",
-    "right"
+    tr("up"),
+    tr("down"),
+    tr("left"),
+    tr("right")
 };
 
 CDlgAnimation::CDlgAnimation(QWidget *parent) :
@@ -72,21 +73,21 @@ CDlgAnimation::CDlgAnimation(QWidget *parent) :
 
     ui->treeIcons->setColumnCount(1);
     ui->treeIcons->setColumnWidth(0, 64);
-    ui->treeIcons->setEditTriggers(0);
+    ui->treeIcons->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->treeIcons->setWordWrap(false);
     ui->treeIcons->setRootIsDecorated(false);
     ui->treeIcons->setAlternatingRowColors(true);
 
     ui->treeSequence->setColumnCount(1);
     ui->treeSequence->setColumnWidth(0, 64);
-    ui->treeSequence->setEditTriggers(0);
+    ui->treeSequence->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->treeSequence->setWordWrap(false);
     ui->treeSequence->setRootIsDecorated(false);
     ui->treeSequence->setAlternatingRowColors(true);
 
     m_iconMax = GROWBY;
     m_iconCount = 0;
-    m_icons = (void **) new UINT8 * [m_iconMax];
+    m_icons = new uint8_t * [m_iconMax];
     m_iconSizes = new int[m_iconMax];
     m_animation = new CAnimation;
 }
@@ -95,7 +96,7 @@ CDlgAnimation::~CDlgAnimation()
 {
     delete ui;
     delete m_animation;
-    delete [] (UINT8**)m_icons;
+    delete [] m_icons;
     delete [] m_iconSizes;
 }
 
@@ -114,8 +115,8 @@ void CDlgAnimation::changeEvent(QEvent *e)
 void CDlgAnimation::addIcon(void *png, int size)
 {
     QImage img;
-    if (!img.loadFromData( (UINT8*)png, size )) {
-        qDebug("failed to load png\n");
+    if (!img.loadFromData( (uint8_t*)png, size )) {
+        qWarning("failed to load png\n");
     }
 
     QPixmap pm = QPixmap::fromImage(img);
@@ -126,33 +127,33 @@ void CDlgAnimation::addIcon(void *png, int size)
     item->setIcon(0, icon);
     ui->treeIcons->addTopLevelItem(item);
 
-    m_icons[m_iconCount] = (UINT8*)png;
+    m_icons[m_iconCount] = (uint8_t*)png;
     m_iconSizes[m_iconCount] = size;
     ++m_iconCount;
 
     if (m_iconCount == m_iconMax) {
         m_iconMax += GROWBY;
-        UINT8 ** t = new UINT8* [ m_iconMax ];
+        uint8_t ** t = new uint8_t* [ m_iconMax ];
         int * tt = new int [ m_iconMax];
         for (int i=0; i < m_iconCount; ++i) {
-            t [ i ] = (UINT8*)m_icons[i];
+            t [ i ] = (uint8_t*)m_icons[i];
             tt [ i ] = m_iconSizes [ i ];
         }
 
         delete [] m_icons;
         delete [] m_iconSizes;
-        m_icons = (void**)t;
+        m_icons = t;
         m_iconSizes = tt;
     }
 }
 
 void CDlgAnimation::addToSeq(int iconId, bool visualOnly)
 {
-    UINT8 * png = (UINT8*) m_icons[iconId];
+    uint8_t * png = (uint8_t*) m_icons[iconId];
 
     QImage img;
     if (!img.loadFromData( png, m_iconSizes[iconId] )) {
-        qDebug("failed to load png\n");
+        qWarning("failed to load png\n");
     }
 
     QPixmap pm = QPixmap::fromImage(img);
@@ -243,16 +244,17 @@ void CDlgAnimation::on_btRemove_clicked()
 void CDlgAnimation::on_btClearAll_clicked()
 {
     // TODO: add warning box
-
-    CAnimation & as = * m_animation;
-
-    int count = ui->treeSequence->model()->rowCount();
-    for (int i = count - 1; i >= 0; --i) {
-        ui->treeSequence->model()->removeRow( i );
+    QMessageBox::StandardButton reply = QMessageBox::warning(this, "", tr("Remove all the frames?"),
+        QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        CAnimation & as = * m_animation;
+        int count = ui->treeSequence->model()->rowCount();
+        for (int i = count - 1; i >= 0; --i) {
+            ui->treeSequence->model()->removeRow( i );
+        }
+        as.forget();
+        updateButtons();
     }
-
-    as.forget();
-    updateButtons();
 }
 
 void CDlgAnimation::load(CAnimation *a, int seqId)

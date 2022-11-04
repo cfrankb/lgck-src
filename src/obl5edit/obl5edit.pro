@@ -11,14 +11,14 @@ TARGET = obl5edit
 TEMPLATE = app
 INCLUDEPATH += ../shared/qtgui/ColorPicker
 INCLUDEPATH += ../shared
-win32:INCLUDEPATH += ../../redist/include
+win32:INCLUDEPATH += ../../../redist/include
 RESOURCES +=  obl5edit.qrc
 win32:RC_FILE = obl5edit.rc
 OTHER_FILES +=  TODO
 DEFINES += USE_QFILE=1
 win32:DEFINES += MAKE_WIN32
-win32:LIBS += -L../../redist/lib
-LIBS += -lz
+win32:LIBS += -L../../../redist/lib -lz -llua54
+unix:LIBS += -lz -llua5.2
 QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
 QMAKE_LFLAGS_WINDOWS += -Wl,--dynamicbase -Wl,--nxcompat
@@ -53,7 +53,9 @@ SOURCES += mainwindow.cpp \
     framewidget.cpp \
     previewwidget.cpp \
     previewscroll.cpp \
-    ../shared/helper.cpp
+    ../shared/helper.cpp \
+    ../shared/LuaVM.cpp \
+    ../shared/qtgui/qfilewrap.cpp
 
 HEADERS  += mainwindow.h \
     OBL5File.h \
@@ -84,7 +86,9 @@ HEADERS  += mainwindow.h \
     framescroll.h \
     framewidget.h \
     previewwidget.h \
-    previewscroll.h
+    previewscroll.h \
+    ../shared/LuaVM.h \
+    ../shared/qtgui/qfilewrap.h
 
 FORMS    += mainwindow.ui \
     DlgAbout.ui \

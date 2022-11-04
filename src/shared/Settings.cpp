@@ -24,7 +24,7 @@
 
 CSettings::CSettings()
 {
-    m_settings = NULL;
+    m_settings = nullptr;
     m_bReplaceAll = false;
 }
 
@@ -273,8 +273,6 @@ CSettings::SETTING & CSettings::operator [] (const char *param)
             return m_settings[i];
         }
     }
-
-    //qDebug("no param named `%s` found\n", q2c(param));
     return m_settings[i]; // return dummy placeholder
 }
 
@@ -290,7 +288,7 @@ CSettings & CSettings::operator = (CSettings & s)
 {
     if (m_settings) {
         delete [] m_settings;
-        m_settings = NULL;
+        m_settings = nullptr;
     }
 
     int size = s.getSize();
@@ -316,7 +314,7 @@ void CSettings::add(const char *param, const char *value)
 
     t[size].param = param;
     t[size].value = value;
-    t[size].valueInt = strtol(value, NULL, 10);
+    t[size].valueInt = strtol(value, nullptr, 10);
 
     delete [] m_settings;
     m_settings = t;
@@ -334,7 +332,7 @@ void CSettings::removeAll()
 {
     if (m_settings) {
         delete [] m_settings;
-        m_settings = NULL;
+        m_settings = nullptr;
     }
     m_settings = new SETTING[1];
 }

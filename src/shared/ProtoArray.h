@@ -21,6 +21,8 @@
 
 #include "LevelEntry.h"
 #include "Object.h"
+#include "ISerial.h"
+#include <unordered_map>
 
 // ProtoArray.h : header file
 //
@@ -29,33 +31,44 @@
 // CProtoArray 
 
 class CProtoIndex;
-class CFileWrap;
 class IFile;
 
-class CProtoArray
+class CProtoArray: public ISerial
 {
 
 // Construction
 public:
-        bool read (IFile & file);
-        bool write (IFile & file);
+        virtual bool read (IFile & file);
+        virtual bool write (IFile & file);
         CProto & getProto(CLevelEntry & entry);
+        int getProtoIdFromUuid (const char* uuid);
         CProtoArray();
+
+        typedef std::unordered_map<std::string, std::string> FixUpBlock;
+        typedef std::unordered_map<std::string, FixUpBlock> FixUpTable;
 
 // Attributes
 public:
-        int getSize();
+        int getSize() const;
         int getProtoIndex (const char* str);
         static int getEventCount();
         static const char * getEventName(int i);
 
 // Operations
 public:
-        void add (const CProto proto);
+        int add(const CProto proto);
         void forget();
         void removeAt (int n);
+        bool exportMeta(IFile & file, int i);
+        bool importMeta(IFile & file, FixUpTable *table=nullptr);
         CObject & getObject(int i);
         CProto & operator [] (int n);
+        CProtoArray & operator += (CProtoArray & src);
+        CProtoArray & operator = (CProtoArray & src);
+        CProto & get(int i) const;
+        int countSpriteOfGivenClass(int spriteClass);
+        int countAutoGoals();
+        void debug();
 
         // remove references
         void killProto (int nProto);
@@ -72,10 +85,10 @@ public:
         bool isIndexed();
         void resizeIndex(int newSize);
         void debugIndex();
-        void debugIndex(CFileWrap & file);
         int getIndexSize();
+        int indexOfUUID(const char *uuid);
 
-        CProtoIndex * createIndex(int pattern = 0);
+        CProtoIndex * createIndex(int pattern = 0, const char *search=nullptr);
 
 // Implementation
 public:
@@ -84,73 +97,23 @@ public:
 protected:
         void forgetIndex();
         bool readEx (IFile & file, int version);
+        void fixUUIDs();
+        void writeFixUpTable(IFile &file, CProtoArray & s);
+        bool readFixUpTable(IFile &file, FixUpTable & table);
 
         int *m_index;
         int m_indexSize;
 
         CObject * m_objects;
-	int m_nMax;
+        int m_nMax;
         int m_nSize;
-
         static std::string m_eventList[];
-
         static CProto m_protoTmp;
-
         enum {
-//            PROTO_VERSION = 0x1,
-//            PROTO_VERSION = 0x2,
-//            PROTO_VERSION = 0x3,
             PROTO_VERSION = 0x4,
-            GROWBY = 16
+            GROWBY = 16,
+            NOT_FOUND = -1
         };
 };
-
-class CProtoIndex
-{
-
-public:
-
-    enum {
-        FILTER_NONE = 0,
-        FILTER_BACKGROUND = 1,
-        FILTER_OBJECTS = 2,
-        FILTER_PLAYER = 3,
-        FILTER_MONSTER = 4,
-        FILTER_BULLET = 5,
-    };
-
-    CProtoIndex(CProtoArray *parent, int custom = FILTER_NONE);
-    ~CProtoIndex();
-
-    void init();
-    int findPos (int protoId);
-    int findProto (int protoId);
-
-    //int getAtIndex( int i );
-    void removeIndex (int pos );
-    void removeFromIndex (int protoId);
-    int insert(int protoId);
-    void resizeIndex(int newSize);
-    int getSize();
-    void forget();
-    void debug();
-    int operator [] (int i);
-    static const char* getFilterName(int i);
-    static int getFilterCount();
-
-protected:
-
-    bool isAccepted(int protoId);
-
-    int *m_index;
-    int m_size;
-    int m_custom;
-    CProtoArray * m_protoArray;
-
-    static std::string m_arrFilters[];
-};
-
-
-/////////////////////////////////////////////////////////////////////////////
 
 #endif

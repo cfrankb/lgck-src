@@ -20,6 +20,7 @@
 #include "im_opengl.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"
+#include "../shared/LuaVM.h"
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
@@ -50,7 +51,7 @@ CIMOpengl::~CIMOpengl()
     forget();
     if (m_imageSets) {
         delete [] m_imageSets;
-        m_imageSets = NULL;
+        m_imageSets = nullptr;
     }
 }
 
@@ -94,7 +95,7 @@ void CIMOpengl::cacheInverse(int i, CFrameSet *filter)
     for (int i=0; i < filter->getSize(); ++i) {
         CFrame frame;
         frame.copy((*filter)[i]);
-        UINT32 *t = frame.getRGB();
+        uint32_t *t = frame.getRGB();
         for (int j=0; j < frame.m_nLen * frame.m_nHei; ++j) {
             t[j] = (t[j] & 0x00ffffff) + (t[j] & 0xff000000) / 2;
         }
@@ -144,7 +145,7 @@ bool CIMOpengl::hasInverse( int imageSet )
         imageSet = 0;
     }
 
-    return m_imageSets [ imageSet ]->inverse != NULL;
+    return m_imageSets [ imageSet ]->inverse != nullptr;
 }
 
 void CIMOpengl::replace(int i, CFrameSet *filter)
@@ -172,7 +173,7 @@ int CIMOpengl::insertAt(int i, CFrameSet *filter)
     is->size = filter->getSize();
     is->images = new unsigned int [ is->size ];
     memset(is->images, 0, sizeof(unsigned int)*is->size);
-    is->inverse = NULL;
+    is->inverse = nullptr;
     glGenTextures(is->size, is->images);
 
     for (int j=0; j < filter->getSize(); ++j) {
@@ -215,13 +216,13 @@ int CIMOpengl::add(const char *uuid, CFont *font)
 {
     makeCurrent();
     GLuint textureId = -1;
-    GLint maxSize;
+    //GLint maxSize;
     glEnable(GL_TEXTURE_2D); GLDEBUG();
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize); GLDEBUG();
-    qDebug("MAXSIZE: %u", maxSize);
+    //glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxSize); GLDEBUG();
+    //CLuaVM::debugv("MAXSIZE: %u", maxSize);
 
     glGenTextures(1, &textureId); GLDEBUG();
-    qDebug("texture: %.8x", textureId);
+    CLuaVM::debugv("texture: %.8x", textureId);
     CFrame frame(font->width(), font->height());
     memcpy(frame.getRGB(), font->pixels(), font->width() * font->height() * sizeof(unsigned int));
     int ix = pow2roundup(frame.m_nLen);

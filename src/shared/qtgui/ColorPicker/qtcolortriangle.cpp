@@ -526,6 +526,7 @@ First copies a background image of the hue donut and its
 */
 void QtColorTriangle::paintEvent(QPaintEvent *e)
 {
+    Q_UNUSED(e);
     QPainter p(this);
     //if (e->rect().intersects(contentsRect()))
       //  p.setClipRegion(e->region().intersect(contentsRect()));

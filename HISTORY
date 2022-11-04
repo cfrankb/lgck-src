@@ -1,5 +1,35 @@
 HISTORY OF LGCK BUILDER
 
+
+*** 0.6.0.9
+
+- EDITOR: FontWizard lets you import system fonts
+- ENGINE: overlays now support multiline text
+- ENGINE: overlays can have custom fonts
+- ENGINE: major code clean up
+- ENGINE: abstracted keys and buttons
+- ENGINE: added Countdowns
+- EDITOR: mark/unmark all goals matching a sprite 
+- EDITOR: added debug output window
+- EDITOR: tile paint, eraser modes added
+- EDITOR: show TriggerKeys in editor
+- EDITOR: added Project Assistant that report and help fix common design errors
+- EDITOR: added sample sprite to New Games
+- EDITOR: replaced QScintilla with a native Qt solution
+- EDITOR: added GamePad support
+- EDITOR: lgck builder can export sprite meta (proto)
+- EDITOR: customize multiselection
+- EDITOR: new Overlay type Counter
+- EDITOR: added coins, lives and ammo bonuses
+- EDITOR: integrating player fire bullet w/ editSprite
+- EDITOR: added skill filter
+- EDITOR: added sprite search to Toolbox
+- TOOLS: migrated to qt 5.15
+- LUA: display_setFlagXY, display_setFont, display_setSource
+- LUA: countdown_set, countdown_start, countdown_stop
+- LUA: spriteIdFromUuid, sprite_freezeAll, sprite_unfreezeAll
+- BUG FIX: onleftClick/onRightClick doesn't work anymore
+
 *** 0.6.0.8
 
 - EDITOR: added portable option to package bundle (windows)

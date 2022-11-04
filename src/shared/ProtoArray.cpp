@@ -29,9 +29,14 @@
 #include "Game.h"
 #include "../shared/IFile.h"
 #include "../shared/FileWrap.h"
+#include "../shared/ProtoIndex.h"
+#include "helper.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CProtoArray
+
+constexpr const char * PRTO_SIGNATURE = "PRTO";
+constexpr const char * FIXU_SIGNATURE = "FIXU";
 
 CProtoArray::CProtoArray()
 {
@@ -39,7 +44,7 @@ CProtoArray::CProtoArray()
     m_nMax = GROWBY;
     m_objects = new CObject [ m_nMax ];
 
-    m_index = NULL;
+    m_index = nullptr;
     m_indexSize = 0;
 }
 
@@ -90,29 +95,28 @@ const char *CProtoArray::getEventName(int i)
 
 bool CProtoArray::read(IFile &file)
 {
-    INT32 nEntrySize = 0;
-    INT32 i = 0;
-    INT32 version = 0;
+    int32_t nEntrySize = 0;
+    int32_t i = 0;
+    int32_t version = 0;
 
     // clear array
     forget();
 
     // read file version
-    file.read(&i, sizeof(INT32));
+    file.read(&i, sizeof(int32_t));
     if (i == -1) {
-        file.read(&version, sizeof(INT32));
-        file.read(&i, sizeof(INT32));
+        file.read(&version, sizeof(int32_t));
+        file.read(&i, sizeof(int32_t));
     }
 
     // read entry size
     file.read(&nEntrySize, sizeof(nEntrySize));
-    //qDebug("entrySize:%d [%ld]\n", nEntrySize, sizeof(CProto));
     char *t = new char [ std::max(nEntrySize, (int)sizeof(CProto)) ];
-    memset(t, 0, sizeof(CProto));
 
     CProto* proto = (CProto*)t;
     // all the proto data
     while (i) {
+        memset(t, 0, sizeof(CProto));
         file.read(t, nEntrySize);
         if (version < 4) {
             // Fix-up this issue
@@ -122,6 +126,7 @@ bool CProtoArray::read(IFile &file)
         --i;
     }
 
+    fixUUIDs();
     delete [] t ;
 
     bool result = false;
@@ -139,11 +144,31 @@ bool CProtoArray::read(IFile &file)
         break;
 
         default:
-            qDebug("unknown proto.dat version (0x%.8x)\n", version);
+            CLuaVM::debugv("unknown proto.dat version (0x%.8x)\n", version);
         break;
     }
-
     return result;
+}
+
+void CProtoArray::fixUUIDs()
+{
+    for (int i = 0; i < m_nSize; ++i)	{
+        CProto & proto = m_objects[i].proto();
+        if (!proto.m_uuid[0]) {
+            proto.resetUUID();
+        }
+    }
+}
+
+int CProtoArray::indexOfUUID(const char *uuid)
+{
+    for (int i = 0; i < m_nSize; ++i)	{
+        CProto & proto = m_objects[i].proto();
+        if (!strcmp(proto.m_uuid, uuid)) {
+            return i;
+        }
+    }
+    return NOT_FOUND;
 }
 
 bool CProtoArray::readEx(IFile &file, int version)
@@ -154,8 +179,8 @@ bool CProtoArray::readEx(IFile &file, int version)
     }
 
     // read eventCount
-    INT32 eventCount = 0;
-    file.read(&eventCount, sizeof(INT32));
+    int32_t eventCount = 0;
+    file.read(&eventCount, sizeof(int32_t));
 
     std::string eventNames[eventCount];
     // read eventList
@@ -189,14 +214,15 @@ bool CProtoArray::readEx(IFile &file, int version)
             m_objects[i].readPaths(file);
         }
     }
+
     return true;
 }
 
 bool CProtoArray::write(IFile &file)
 {
-    INT32 nEntrySize = sizeof(CProto);
-    INT32 version = PROTO_VERSION;
-    INT32 marker = -1;
+    int32_t nEntrySize = sizeof(CProto);
+    int32_t version = PROTO_VERSION;
+    int32_t marker = -1;
 
     file.write(&marker, 4);
     file.write(&version, 4);
@@ -209,8 +235,8 @@ bool CProtoArray::write(IFile &file)
     }
 
     // write eventCount
-    INT32 eventCount = getEventCount();
-    file.write(&eventCount, sizeof(INT32));
+    int32_t eventCount = getEventCount();
+    file.write(&eventCount, sizeof(int32_t));
 
     // write eventList
     for (int i=0; i < eventCount; ++i) {
@@ -245,10 +271,9 @@ void CProtoArray::forget()
     forgetIndex();
 }
 
-void CProtoArray::add (const CProto proto)
+int CProtoArray::add(const CProto proto)
 {
     if (m_nSize == m_nMax) {
-
         m_nMax += GROWBY;
         CObject *t = new CObject[m_nMax];
         for (int i=0; i < m_nSize; i++) {
@@ -266,7 +291,7 @@ void CProtoArray::add (const CProto proto)
     // clear the animations
     obj.clearAnimations();
 
-    ++m_nSize;
+    return m_nSize++;
 }
 
 void CProtoArray::removeAt (int n)
@@ -277,8 +302,7 @@ void CProtoArray::removeAt (int n)
     --m_nSize;
 }
 
-
-CProto & CProtoArray::operator [] (int n)
+CProto & CProtoArray::get(int n) const
 {
     if ((n < 0) || (n >= m_nSize)) {
         return m_protoTmp;
@@ -287,7 +311,29 @@ CProto & CProtoArray::operator [] (int n)
     }
 }
 
-int CProtoArray::getSize()
+CProto & CProtoArray::operator [] (int n)
+{
+    return get(n);
+}
+
+CProtoArray & CProtoArray::operator += (CProtoArray & src)
+{
+    int j = getSize();
+    for (int i=0; i < src.getSize(); ++i) {
+        add(src.get(i));
+        getObject(j++) = src.getObject(i);
+    }
+    return *this;
+}
+
+CProtoArray & CProtoArray::operator = (CProtoArray & src)
+{
+    forget();
+    forgetIndex();
+    return (*this += src);
+}
+
+int CProtoArray::getSize() const
 {
     return m_nSize;
 }
@@ -323,14 +369,14 @@ void CProtoArray::killFrameSet (int nFrameSet)
 void CProtoArray::killProto (int nProto)
 {
     for (int i = 0; i < getSize(); ++i) {
-        INT16 * vars [] = {
+        int16_t * vars [] = {
             & m_objects[i].proto().m_nChProto,
             & m_objects[i].proto().m_nAutoBullet,
             & m_objects[i].proto().m_nAutoProto,
             & m_objects[i].proto().m_nProtoBuddy
         };
 
-        for (int j = 0; j < (int)(sizeof (vars) / sizeof(INT16*)); ++j) {
+        for (int j = 0; j < (int)(sizeof (vars) / sizeof(int16_t*)); ++j) {
             if ( *(vars[j]) == nProto ) {
                 *(vars[j]) = 0;
             }
@@ -379,6 +425,172 @@ CObject & CProtoArray::getObject(int i)
     return m_objects[i];
 }
 
+bool CProtoArray::exportMeta(IFile &file, int i)
+{
+    CProtoArray t;
+    int n = t.add(this->get(i)); // add proto
+    t.getObject(n) = this->getObject(i);
+    file.write(PRTO_SIGNATURE, 4);
+    uint32_t version = PROTO_VERSION;
+    file.write(&version, sizeof(uint32_t));
+    t.write(file);
+    writeFixUpTable(file, t);
+    return true;
+}
+
+bool CProtoArray::importMeta(IFile &file, FixUpTable *table)
+{
+    char sig[4];
+    file.read(sig, sizeof(sig));
+    uint32_t version = 0xffffffff;
+    file.read(&version, sizeof(version));
+    if (memcmp(sig, PRTO_SIGNATURE, sizeof(sig)) != 0) {
+        CLuaVM::debug("invalid signature");
+        return false;
+    }
+    if (version > PROTO_VERSION) {
+        CLuaVM::debug("invalid version");
+        return false;
+    }
+    CProtoArray t;
+    t.read(file);
+    *this += t;
+    if (table) {
+        readFixUpTable(file, *table);
+    }
+    return true;
+}
+
+void CProtoArray::writeFixUpTable(IFile & file, CProtoArray &s)
+{
+    typedef struct {
+        const char * el;
+        int protoId;
+    } FixUp;
+
+    FixUpTable table;
+    for (int i=0; i < s.getSize(); ++i) {
+        CProto & proto = s.getObject(i).proto();
+        const FixUp protoValues[] = {
+            {"chProto", proto.m_nChProto},
+            {"autoProto", proto.m_nAutoProto},
+            {"autoBullet", proto.m_nAutoBullet},
+            {"protoBuddy", proto.m_nProtoBuddy}
+        };
+        FixUpBlock & block = table[proto.m_uuid];
+        for (unsigned int j=0; j < sizeof(protoValues)/sizeof(FixUp); ++j) {
+            const FixUp & pv = protoValues[j];
+            int v = pv.protoId;
+            if (v) {
+                block[pv.el] = getObject(v).proto().m_uuid;
+            }
+        }
+    }
+    file.write(FIXU_SIGNATURE, 4);
+    FixUpTable::iterator it = table.begin();
+    uint32_t count = 0;
+    while(it != table.end()) {
+        count += it->second.size() ? 1 : 0;
+        ++it;
+    }
+    qDebug("table block count: %u", count);
+    file.write(&count, sizeof(count));
+    it = table.begin();
+    while(it != table.end()) {
+        FixUpBlock::iterator block_it = it->second.begin();
+        qDebug("sprite uuid %s [count: %u]", it->first.c_str(), static_cast<uint32_t>(it->second.size()));
+        uint32_t count = it->second.size();
+        if (count) {
+            file << it->first;
+            file.write(&count, sizeof(count));
+            while(block_it != it->second.end()) {
+                qDebug("    proto %s >> uuid: %s", block_it->first.c_str(), block_it->second.c_str());
+                file << block_it->first; // protoRole
+                file << block_it->second; // proto uuid
+                ++block_it;
+            }
+        }
+        ++it;
+    }
+}
+
+bool CProtoArray::readFixUpTable(IFile &file, FixUpTable & table)
+{
+    char signature[4];
+    file.read(signature, 4);
+    if (memcmp(signature, FIXU_SIGNATURE, 4)==0) {
+        uint32_t count = 0;
+        file.write(&count, sizeof(count));
+        for (uint32_t i=0; i < count; ++i) {
+            std::string protoUuid;
+            file >> protoUuid;
+            uint32_t keyCount = 0;
+            file.read(&keyCount, sizeof(keyCount));
+            for (uint32_t j=0; j < keyCount; ++j) {
+                std::string role;
+                std::string uuid;
+                file >> role;
+                file >> uuid;
+                table[protoUuid][role] = uuid;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+void CProtoArray::debug()
+{
+    qDebug("CProtoArray size: %d", m_nSize);
+    for (int i=0; i < getSize(); ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        qDebug("Sprite #%d [%s] - eventcount %d", i, proto.getName(), obj.getEventCount());
+        for (int j=0; j < obj.getEventCount(); ++j) {
+        //    qDebug("  event %d - %s", j, obj.getEvent(j));
+        }
+        obj.debug();
+    }
+}
+
+int CProtoArray::getProtoIdFromUuid (const char* uuid)
+{
+    for (int i=0; i < m_nSize; ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        if (strcmp(proto.m_uuid, uuid)==0) {
+            return i;
+        }
+    }
+    return NOT_FOUND;
+}
+
+int CProtoArray::countSpriteOfGivenClass(int spriteClass)
+{
+    int count = 0;
+    for (int i=0; i < m_nSize; ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        if (proto.m_nClass == spriteClass) {
+            ++ count;
+        }
+    }
+    return count;
+}
+
+int CProtoArray::countAutoGoals()
+{
+    int count = 0;
+    for (int i=0; i < m_nSize; ++i) {
+        CObject & obj = getObject(i);
+        CProto & proto = obj.proto();
+        if (proto.m_options & proto.OPTION_AUTO_GOAL) {
+            ++ count;
+        }
+    }
+    return count;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // indexing
 
@@ -396,7 +608,7 @@ void CProtoArray::forgetIndex ()
     m_indexSize = 0;
     if (m_index) {
         delete [] m_index;
-        m_index = NULL;
+        m_index = nullptr;
     }
 }
 
@@ -410,7 +622,7 @@ int CProtoArray::findIndexPos( int protoId )
     int i = 0;
     int min = 0;
     int max = m_indexSize - 1;
-    char *newName = m_objects[protoId].proto().getName();
+    const char *newName = m_objects[protoId].proto().getName();
     while (max >= min) {
         i = min + (max - min) / 2;
         int result = strcasecmp( m_objects[m_index[i]].proto().getName(), newName );
@@ -475,23 +687,13 @@ void CProtoArray::resizeIndex(int newSize)
 
 bool CProtoArray::isIndexed()
 {
-    return m_index != NULL;
+    return m_index != nullptr;
 }
 
 void CProtoArray::debugIndex()
 {
     for (int k = 0 ; k < m_indexSize; ++k) {
-        qDebug("index %d = %d (%s)\n", k, m_index[k], m_objects[ m_index[k] ].proto().getName());
-    }
-}
-
-void CProtoArray::debugIndex(CFileWrap & file)
-{
-    for (int k = 0 ; k < m_indexSize; ++k) {
-        const char *format = "index %-3d\t%d \t%s\n";
-        char *buf = new char[strlen(format) + 64];
-        sprintf(buf, format, k, m_index[k], m_objects[ m_index[k] ].proto().getName());
-        file += buf;
+        CLuaVM::debugv("index %d = %d (%s)\n", k, m_index[k], m_objects[ m_index[k] ].proto().getName());
     }
 }
 
@@ -500,309 +702,12 @@ int CProtoArray::getIndexSize()
     return m_indexSize;
 }
 
-CProtoIndex * CProtoArray::createIndex(int pattern)
+CProtoIndex * CProtoArray::createIndex(int pattern, const char *search)
 {
     CProtoIndex *index = new CProtoIndex(this, pattern);
+    if (search) {
+        index->setTextFilter(search);
+    }
     index->init();
     return index;
-}
-
-
-/////////////////////////////////////////////////////////////////////
-// CProtoIndex
-
-std::string CProtoIndex::m_arrFilters[] = {
-    "All Sprites",
-    "Background",
-    "Objects",
-    "Player",
-    "Monsters",
-    "Bullets"
-};
-
-const char *CProtoIndex::getFilterName(int i)
-{
-    return m_arrFilters[i].c_str();
-}
-
-int CProtoIndex::getFilterCount()
-{
-    return sizeof(m_arrFilters)/sizeof(std::string);
-}
-
-CProtoIndex::CProtoIndex(CProtoArray *parent, int custom)
-{
-    m_protoArray = parent;
-    m_index = NULL;
-    m_size = 0;
-    m_custom = custom;
-}
-
-void CProtoIndex::forget()
-{
-    if (m_index) {
-        delete m_index;
-        m_index = NULL;
-    }
-    m_size = 0;
-}
-
-CProtoIndex::~CProtoIndex()
-{
-    forget();
-}
-
-bool CProtoIndex::isAccepted(int protoId)
-{
-    CProto & proto = (*m_protoArray) [protoId];
-    int pClass =  proto.m_nClass ;
-
-    switch (m_custom) {
-    case FILTER_NONE:
-        return protoId != 0;
-
-    case FILTER_BACKGROUND:
-        return protoId != 0 && pClass < 0x10;
-
-    case FILTER_OBJECTS:
-        return pClass >= 0x10 && pClass < 0x1f;
-
-    case FILTER_PLAYER:
-        return pClass == 0x1f;
-
-    case FILTER_MONSTER:
-        return pClass >= 0x20 && pClass <= 0x40 ;
-
-    case FILTER_BULLET:
-        return pClass == CLASS_PLAYER_BULLET
-                || pClass == CLASS_CREATURE_BULLET;
-    }
-
-
-    return false;
-}
-
-void CProtoIndex::init()
-{
-    forget();
-    m_index = new int [ m_protoArray->getSize() ] ;
-    for (int j = 0; j < m_protoArray->getSize(); ++j) {
-        if (isAccepted(j)) {
-            insert(j);
-        }
-    }
-}
-
-// find the insert position for a new proto
-int CProtoIndex::findPos(int protoId)
-{
-    int i = 0;
-    int min = 0;
-    int max = m_size - 1;
-    char *newName = m_protoArray->getObject(protoId).proto().getName();
-    while (max >= min) {
-        i = min + (max - min) / 2;
-        int result = strcasecmp( m_protoArray->getObject(m_index[i]).proto().getName(), newName );
-        if (result <= 0) {
-            min = i + 1;
-        } else {
-            max = i - 1;
-        }
-    }
-
-    if (m_size && (strcasecmp( m_protoArray->getObject(m_index[i]).proto().getName(), newName) <= 0)) {
-        ++i;
-    }
-    return i;
-}
-
-// find the position for a given protoId
-int CProtoIndex::findProto (int protoId)
-{
-    for (int i=0; i< m_size; ++i) {
-        if (m_index[i]==protoId) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void CProtoIndex::removeIndex (int pos )
-{
-    for (int k = pos ; k < m_size - 1; ++k) {
-        m_index[k] = m_index[k + 1];
-    }
-    --m_size;
-}
-
-void CProtoIndex::removeFromIndex (int protoId)
-{
-    for (int k=0; k < m_size; ++k) {
-        if (m_index[k] > protoId) {
-            -- m_index[k];
-        } else {
-            if (m_index[k] == protoId) {
-                removeIndex ( k );
-                --k;
-            }
-        }
-    }
-}
-
-int CProtoIndex::insert(int protoId)
-{
-    int i = findPos( protoId );
-    for (int k = m_size ; k > i; --k) {
-        m_index[k] = m_index[k - 1];
-    }
-    m_index[i] = protoId;
-    ++m_size;
-
-    return i;
-}
-
-void CProtoIndex::resizeIndex(int newSize)
-{
-    int *t = new int [ newSize ] ;
-
-    for (int i = 0; i < m_size; ++i) {
-        t[i] = m_index[i] ;
-    }
-
-    delete [] m_index;
-    m_index = t;
-}
-
-int CProtoIndex::getSize()
-{
-    return m_size;
-}
-
-int CProtoIndex::operator [] (int i)
-{
-    return m_index[i];
-}
-
-void CProtoIndex::debug()
-{
-    CFileWrap file;
-    file.open("../debug/protoIndex.txt", "a");
-    char s[1024];
-    for (int k = 0 ; k < m_size; ++k) {
-        qDebug("index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
-        sprintf(s, "index %d = %d (%s)\n", k, m_index[k], m_protoArray->getObject( m_index[k] ).proto().getName());
-        file.write(s, strlen(s));
-    }
-
-    file += "\n--------------------------------------\n";
-    file.close();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// CProto
-
-CProto::CProto()
-{
-    memset (this, 0, sizeof(CProto));
-}
-
-CProto::~CProto()
-{
-}
-
-CProto & CProto::operator = (const CProto proto)
-{
-    memcpy (this, &proto, sizeof (CProto));
-    return *this;
-}
-
-bool CProto::operator == (const CProto proto) const
-{
-    return !memcmp (this, &proto, sizeof (CProto));
-}
-
-bool CProto::operator != (const CProto proto) const
-{
-    return memcmp (this, &proto, sizeof (CProto));
-}
-
-CProto::CProto (const CProto & proto)
-{
-    memcpy (this, &proto, sizeof (CProto));
-}
-
-CProto::CProto (const char* s)
-{
-    memset (this, 0, sizeof(CProto));
-    strcpy (m_szName, s);
-}
-
-void CProto::read(IFile &file, int nSize)
-{
-    if (!nSize) {
-        nSize = sizeof (CProto);
-    }
-
-    file.read(this, nSize);
-}
-
-void CProto::write(IFile &file)
-{
-    file.write(this, sizeof (CProto));
-}
-
-char *CProto::getName()
-{
-    return m_szName;
-}
-
-bool CProto::getOption(int option) const
-{
-    return (m_options & option) == option;
-}
-
-void CProto::setOption(int option, bool set)
-{
-    if (set) {
-        m_options |= option;
-    } else {
-        m_options -= m_options & option;
-    }
-}
-
-bool CProto::isStateSolid(int fromAim) const
-{
-    if (m_solidState & SOLID_OVERIDE) {
-        switch (fromAim) {
-        case CGame::UP:
-            return m_solidState & CProto::SOLID_DOWN;
-        case CGame::FALL:
-        case CGame::DOWN:
-            return m_solidState & CProto::SOLID_UP;
-        case CGame::LEFT:
-            return m_solidState & CProto::SOLID_RIGHT;
-        case CGame::RIGHT:
-            return m_solidState & CProto::SOLID_LEFT;
-        default:
-            return false;
-        }
-    } else {
-        return false;
-    }
-}
-
-bool CProto::isBkClass() const
-{
-    return m_nClass < CLASS_ANIMATED_THINGS;
-}
-
-bool CProto::isFkClass() const
-{
-    return m_nClass >= CLASS_ANIMATED_THINGS
-            && m_nClass < CLASS_GENERIC_COS;
-}
-
-bool CProto::isAcClass() const
-{
-    return m_nClass >= CLASS_GENERIC_COS;
 }

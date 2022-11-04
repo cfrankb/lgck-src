@@ -35,6 +35,7 @@
 #include <QSlider>
 #include "wbtncolor.h"
 #include "WizScript.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CLuaVM g_lua;
 std::unordered_map<unsigned int, void *> g_controls;
@@ -98,7 +99,7 @@ void qtLua_init()
         g_lua.registerFn(exports[i].fnName, exports[i].fnAddr);
     }
 
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(":/scripts/qtlua.lua", "r")) {
         int size = file.getSize();
         char *buf = new char[size+1];
@@ -112,7 +113,7 @@ void qtLua_init()
 
 void error(const char *name, int args)
 {
-    qDebug("error: fn `%s` needs `%d` args", name, args);
+    CLuaVM::debugv("error: fn `%s` needs `%d` args", name, args);
 }
 
 int addWidget(void * c)
@@ -130,10 +131,9 @@ int externWidget(void * c)
 
 int bindWidget(lua_State *L)
 {
-    const char *fn = "bind";
     int argc = lua_gettop(L);
     if ( argc != 2)  {
-        error(fn, 2);
+        error(__func__, 2);
     } else {
         int ID = lua_tointeger(L, 2);
         const char *s = lua_tostring(L, 1);
@@ -149,13 +149,11 @@ void bindWidget(const char *s, int ID)
 
 int findWidget(lua_State *L)
 {
-    const char *fn = "findWidget";
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        error(fn, 1);
+        error(__func__, 1);
     } else {
         const char *s = lua_tostring(L, 1);
-        //qDebug("findWidget %s => %d", s, g_bindings[s]);
         lua_pushinteger(L, g_bindings[s]);
         return 1;
     }
@@ -164,7 +162,7 @@ int findWidget(lua_State *L)
 
 void freeWidget(int id)
 {
-    g_controls[id] = NULL;
+    g_controls[id] = nullptr;
 }
 
 int findWidget(char *s)
@@ -174,10 +172,9 @@ int findWidget(char *s)
 
 int rgb2tuple(lua_State *L)
 {
-    const char *fn = "rgb2tuple";
     int argc = lua_gettop(L);
     if ( argc != 1)  {
-        error(fn, 1);
+        error(__func__, 1);
     } else {
         unsigned int rgb = lua_tointeger(L, 1);
         int red = rgb & 0xff;
@@ -196,10 +193,9 @@ int rgb2tuple(lua_State *L)
 // auto-generated
 int cwbtncolor_color(lua_State *L)
 {
-    const char *fn = "cwbtncolor_color";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<CWBtnColor*>(g_controls[id])->color();
@@ -211,10 +207,9 @@ int cwbtncolor_color(lua_State *L)
 
 int cwbtncolor_delete(lua_State *L)
 {
-    const char *fn = "cwbtncolor_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<CWBtnColor*>(g_controls[id]);
@@ -225,10 +220,9 @@ int cwbtncolor_delete(lua_State *L)
 
 int cwbtncolor_new(lua_State *L)
 {
-    const char *fn = "cwbtncolor_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new CWBtnColor());
     }
@@ -237,10 +231,9 @@ int cwbtncolor_new(lua_State *L)
 
 int cwbtncolor_setColor(lua_State *L)
 {
-    const char *fn = "cwbtncolor_setColor";
     int argc = lua_gettop(L);
     if (argc != 4) {
-       error(fn, 4);
+       error(__func__, 4);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -256,10 +249,9 @@ int cwbtncolor_setColor(lua_State *L)
 
 int cwizscript_accept(lua_State *L)
 {
-    const char *fn = "cwizscript_accept";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<CWizScript*>(g_controls[id])->accept();
@@ -269,10 +261,9 @@ int cwizscript_accept(lua_State *L)
 
 int cwizscript_addPage(lua_State *L)
 {
-    const char *fn = "cwizscript_addPage";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -285,10 +276,9 @@ int cwizscript_addPage(lua_State *L)
 
 int cwizscript_back(lua_State *L)
 {
-    const char *fn = "cwizscript_back";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<CWizScript*>(g_controls[id])->back();
@@ -298,10 +288,9 @@ int cwizscript_back(lua_State *L)
 
 int cwizscript_buttonText(lua_State *L)
 {
-    const char *fn = "cwizscript_buttonText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -314,10 +303,9 @@ int cwizscript_buttonText(lua_State *L)
 
 int cwizscript_currentId(lua_State *L)
 {
-    const char *fn = "cwizscript_currentId";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<CWizScript*>(g_controls[id])->currentId();
@@ -329,10 +317,9 @@ int cwizscript_currentId(lua_State *L)
 
 int cwizscript_delete(lua_State *L)
 {
-    const char *fn = "cwizscript_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<CWizScript*>(g_controls[id]);
@@ -343,10 +330,9 @@ int cwizscript_delete(lua_State *L)
 
 int cwizscript_initComboBox(lua_State *L)
 {
-    const char *fn = "cwizscript_initComboBox";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -360,10 +346,9 @@ int cwizscript_initComboBox(lua_State *L)
 
 int cwizscript_new(lua_State *L)
 {
-    const char *fn = "cwizscript_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new CWizScript());
     }
@@ -372,10 +357,9 @@ int cwizscript_new(lua_State *L)
 
 int cwizscript_next(lua_State *L)
 {
-    const char *fn = "cwizscript_next";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<CWizScript*>(g_controls[id])->next();
@@ -385,10 +369,9 @@ int cwizscript_next(lua_State *L)
 
 int cwizscript_reject(lua_State *L)
 {
-    const char *fn = "cwizscript_reject";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<CWizScript*>(g_controls[id])->reject();
@@ -398,10 +381,9 @@ int cwizscript_reject(lua_State *L)
 
 int cwizscript_removePage(lua_State *L)
 {
-    const char *fn = "cwizscript_removePage";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -412,10 +394,9 @@ int cwizscript_removePage(lua_State *L)
 
 int cwizscript_restart(lua_State *L)
 {
-    const char *fn = "cwizscript_restart";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<CWizScript*>(g_controls[id])->restart();
@@ -425,10 +406,9 @@ int cwizscript_restart(lua_State *L)
 
 int cwizscript_setButton(lua_State *L)
 {
-    const char *fn = "cwizscript_setButton";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -442,10 +422,9 @@ int cwizscript_setButton(lua_State *L)
 
 int cwizscript_setButtonText(lua_State *L)
 {
-    const char *fn = "cwizscript_setButtonText";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -459,10 +438,9 @@ int cwizscript_setButtonText(lua_State *L)
 
 int cwizscript_setDefaultProperty(lua_State *L)
 {
-    const char *fn = "cwizscript_setDefaultProperty";
     int argc = lua_gettop(L);
     if (argc != 4) {
-       error(fn, 4);
+       error(__func__, 4);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -478,10 +456,9 @@ int cwizscript_setDefaultProperty(lua_State *L)
 
 int cwizscript_setField(lua_State *L)
 {
-    const char *fn = "cwizscript_setField";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -495,10 +472,9 @@ int cwizscript_setField(lua_State *L)
 
 int cwizscript_setOption(lua_State *L)
 {
-    const char *fn = "cwizscript_setOption";
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
-       error(fn, 2);
+    if (argc < 2 || argc > 3) {
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -512,10 +488,9 @@ int cwizscript_setOption(lua_State *L)
 
 int cwizscript_setPage(lua_State *L)
 {
-    const char *fn = "cwizscript_setPage";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -529,10 +504,9 @@ int cwizscript_setPage(lua_State *L)
 
 int cwizscript_setSideWidget(lua_State *L)
 {
-    const char *fn = "cwizscript_setSideWidget";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -543,10 +517,9 @@ int cwizscript_setSideWidget(lua_State *L)
 
 int cwizscript_setStartId(lua_State *L)
 {
-    const char *fn = "cwizscript_setStartId";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -557,10 +530,9 @@ int cwizscript_setStartId(lua_State *L)
 
 int cwizscript_setSubTitleFormat(lua_State *L)
 {
-    const char *fn = "cwizscript_setSubTitleFormat";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -571,10 +543,9 @@ int cwizscript_setSubTitleFormat(lua_State *L)
 
 int cwizscript_setTitleFormat(lua_State *L)
 {
-    const char *fn = "cwizscript_setTitleFormat";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -585,10 +556,9 @@ int cwizscript_setTitleFormat(lua_State *L)
 
 int cwizscript_setVisible(lua_State *L)
 {
-    const char *fn = "cwizscript_setVisible";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -599,10 +569,9 @@ int cwizscript_setVisible(lua_State *L)
 
 int cwizscript_setWindowTitle(lua_State *L)
 {
-    const char *fn = "cwizscript_setWindowTitle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -613,10 +582,9 @@ int cwizscript_setWindowTitle(lua_State *L)
 
 int cwizscript_setWizardStyle(lua_State *L)
 {
-    const char *fn = "cwizscript_setWizardStyle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -627,10 +595,9 @@ int cwizscript_setWizardStyle(lua_State *L)
 
 int cwizscript_startId(lua_State *L)
 {
-    const char *fn = "cwizscript_startId";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<CWizScript*>(g_controls[id])->startId();
@@ -642,10 +609,9 @@ int cwizscript_startId(lua_State *L)
 
 int cwizscript_subTitleFormat(lua_State *L)
 {
-    const char *fn = "cwizscript_subTitleFormat";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<CWizScript*>(g_controls[id])->subTitleFormat();
@@ -657,10 +623,9 @@ int cwizscript_subTitleFormat(lua_State *L)
 
 int cwizscript_testOption(lua_State *L)
 {
-    const char *fn = "cwizscript_testOption";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -671,10 +636,9 @@ int cwizscript_testOption(lua_State *L)
 
 int cwizscript_titleFormat(lua_State *L)
 {
-    const char *fn = "cwizscript_titleFormat";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<CWizScript*>(g_controls[id])->titleFormat();
@@ -686,10 +650,9 @@ int cwizscript_titleFormat(lua_State *L)
 
 int cwizscript_validateCurrentPage(lua_State *L)
 {
-    const char *fn = "cwizscript_validateCurrentPage";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<CWizScript*>(g_controls[id])->validateCurrentPage();
@@ -701,10 +664,9 @@ int cwizscript_validateCurrentPage(lua_State *L)
 
 int cwizscript_wizardStyle(lua_State *L)
 {
-    const char *fn = "cwizscript_wizardStyle";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<CWizScript*>(g_controls[id])->wizardStyle();
@@ -716,10 +678,9 @@ int cwizscript_wizardStyle(lua_State *L)
 
 int qbuttongroup_addButton(lua_State *L)
 {
-    const char *fn = "qbuttongroup_addButton";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -733,10 +694,9 @@ int qbuttongroup_addButton(lua_State *L)
 
 int qbuttongroup_delete(lua_State *L)
 {
-    const char *fn = "qbuttongroup_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QButtonGroup*>(g_controls[id]);
@@ -747,10 +707,9 @@ int qbuttongroup_delete(lua_State *L)
 
 int qbuttongroup_exclusive(lua_State *L)
 {
-    const char *fn = "qbuttongroup_exclusive";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QButtonGroup*>(g_controls[id])->exclusive();
@@ -762,10 +721,9 @@ int qbuttongroup_exclusive(lua_State *L)
 
 int qbuttongroup_id(lua_State *L)
 {
-    const char *fn = "qbuttongroup_id";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -778,10 +736,9 @@ int qbuttongroup_id(lua_State *L)
 
 int qbuttongroup_new(lua_State *L)
 {
-    const char *fn = "qbuttongroup_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QButtonGroup());
     }
@@ -790,10 +747,9 @@ int qbuttongroup_new(lua_State *L)
 
 int qbuttongroup_removeButton(lua_State *L)
 {
-    const char *fn = "qbuttongroup_removeButton";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -804,10 +760,9 @@ int qbuttongroup_removeButton(lua_State *L)
 
 int qbuttongroup_setExclusive(lua_State *L)
 {
-    const char *fn = "qbuttongroup_setExclusive";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -818,10 +773,9 @@ int qbuttongroup_setExclusive(lua_State *L)
 
 int qbuttongroup_setId(lua_State *L)
 {
-    const char *fn = "qbuttongroup_setId";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -835,10 +789,9 @@ int qbuttongroup_setId(lua_State *L)
 
 int qcheckbox_autoExclusive(lua_State *L)
 {
-    const char *fn = "qcheckbox_autoExclusive";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QCheckBox*>(g_controls[id])->autoExclusive();
@@ -850,10 +803,9 @@ int qcheckbox_autoExclusive(lua_State *L)
 
 int qcheckbox_checkState(lua_State *L)
 {
-    const char *fn = "qcheckbox_checkState";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QCheckBox*>(g_controls[id])->checkState();
@@ -865,10 +817,9 @@ int qcheckbox_checkState(lua_State *L)
 
 int qcheckbox_delete(lua_State *L)
 {
-    const char *fn = "qcheckbox_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QCheckBox*>(g_controls[id]);
@@ -879,10 +830,9 @@ int qcheckbox_delete(lua_State *L)
 
 int qcheckbox_isCheckable(lua_State *L)
 {
-    const char *fn = "qcheckbox_isCheckable";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QCheckBox*>(g_controls[id])->isCheckable();
@@ -894,10 +844,9 @@ int qcheckbox_isCheckable(lua_State *L)
 
 int qcheckbox_isChecked(lua_State *L)
 {
-    const char *fn = "qcheckbox_isChecked";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QCheckBox*>(g_controls[id])->isChecked();
@@ -909,10 +858,9 @@ int qcheckbox_isChecked(lua_State *L)
 
 int qcheckbox_isTristate(lua_State *L)
 {
-    const char *fn = "qcheckbox_isTristate";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QCheckBox*>(g_controls[id])->isTristate();
@@ -924,10 +872,9 @@ int qcheckbox_isTristate(lua_State *L)
 
 int qcheckbox_new(lua_State *L)
 {
-    const char *fn = "qcheckbox_new";
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
-       error(fn, 0);
+    if (argc < 0 || argc > 1) {
+       error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
         return addWidget(new QCheckBox(arg0));
@@ -937,10 +884,9 @@ int qcheckbox_new(lua_State *L)
 
 int qcheckbox_setAutoExclusive(lua_State *L)
 {
-    const char *fn = "qcheckbox_setAutoExclusive";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -951,10 +897,9 @@ int qcheckbox_setAutoExclusive(lua_State *L)
 
 int qcheckbox_setCheckable(lua_State *L)
 {
-    const char *fn = "qcheckbox_setCheckable";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -965,10 +910,9 @@ int qcheckbox_setCheckable(lua_State *L)
 
 int qcheckbox_setChecked(lua_State *L)
 {
-    const char *fn = "qcheckbox_setChecked";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -979,10 +923,9 @@ int qcheckbox_setChecked(lua_State *L)
 
 int qcheckbox_setText(lua_State *L)
 {
-    const char *fn = "qcheckbox_setText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -993,10 +936,9 @@ int qcheckbox_setText(lua_State *L)
 
 int qcheckbox_setTristate(lua_State *L)
 {
-    const char *fn = "qcheckbox_setTristate";
     int argc = lua_gettop(L);
-    if (argc < 1 and argc > 2) {
-       error(fn, 1);
+    if (argc < 1 || argc > 2) {
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = (argc >= 2) ? lua_toboolean(L, 2) : true;
@@ -1007,10 +949,9 @@ int qcheckbox_setTristate(lua_State *L)
 
 int qcheckbox_text(lua_State *L)
 {
-    const char *fn = "qcheckbox_text";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QCheckBox*>(g_controls[id])->text();
@@ -1022,10 +963,9 @@ int qcheckbox_text(lua_State *L)
 
 int qcombobox_addItem(lua_State *L)
 {
-    const char *fn = "qcombobox_addItem";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -1036,10 +976,9 @@ int qcombobox_addItem(lua_State *L)
 
 int qcombobox_count(lua_State *L)
 {
-    const char *fn = "qcombobox_count";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QComboBox*>(g_controls[id])->count();
@@ -1051,10 +990,9 @@ int qcombobox_count(lua_State *L)
 
 int qcombobox_currentIndex(lua_State *L)
 {
-    const char *fn = "qcombobox_currentIndex";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QComboBox*>(g_controls[id])->currentIndex();
@@ -1066,10 +1004,9 @@ int qcombobox_currentIndex(lua_State *L)
 
 int qcombobox_currentText(lua_State *L)
 {
-    const char *fn = "qcombobox_currentText";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QComboBox*>(g_controls[id])->currentText();
@@ -1081,10 +1018,9 @@ int qcombobox_currentText(lua_State *L)
 
 int qcombobox_delete(lua_State *L)
 {
-    const char *fn = "qcombobox_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QComboBox*>(g_controls[id]);
@@ -1095,10 +1031,9 @@ int qcombobox_delete(lua_State *L)
 
 int qcombobox_duplicatesEnabled(lua_State *L)
 {
-    const char *fn = "qcombobox_duplicatesEnabled";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QComboBox*>(g_controls[id])->duplicatesEnabled();
@@ -1110,10 +1045,9 @@ int qcombobox_duplicatesEnabled(lua_State *L)
 
 int qcombobox_hasFrame(lua_State *L)
 {
-    const char *fn = "qcombobox_hasFrame";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QComboBox*>(g_controls[id])->hasFrame();
@@ -1125,10 +1059,9 @@ int qcombobox_hasFrame(lua_State *L)
 
 int qcombobox_hidePopup(lua_State *L)
 {
-    const char *fn = "qcombobox_hidePopup";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QComboBox*>(g_controls[id])->hidePopup();
@@ -1138,10 +1071,9 @@ int qcombobox_hidePopup(lua_State *L)
 
 int qcombobox_insertItem(lua_State *L)
 {
-    const char *fn = "qcombobox_insertItem";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1155,10 +1087,9 @@ int qcombobox_insertItem(lua_State *L)
 
 int qcombobox_insertPolicy(lua_State *L)
 {
-    const char *fn = "qcombobox_insertPolicy";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QComboBox*>(g_controls[id])->insertPolicy();
@@ -1170,10 +1101,9 @@ int qcombobox_insertPolicy(lua_State *L)
 
 int qcombobox_insertSeparator(lua_State *L)
 {
-    const char *fn = "qcombobox_insertSeparator";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1184,10 +1114,9 @@ int qcombobox_insertSeparator(lua_State *L)
 
 int qcombobox_isEditable(lua_State *L)
 {
-    const char *fn = "qcombobox_isEditable";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QComboBox*>(g_controls[id])->isEditable();
@@ -1199,10 +1128,9 @@ int qcombobox_isEditable(lua_State *L)
 
 int qcombobox_itemText(lua_State *L)
 {
-    const char *fn = "qcombobox_itemText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1215,10 +1143,9 @@ int qcombobox_itemText(lua_State *L)
 
 int qcombobox_maxCount(lua_State *L)
 {
-    const char *fn = "qcombobox_maxCount";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QComboBox*>(g_controls[id])->maxCount();
@@ -1230,10 +1157,9 @@ int qcombobox_maxCount(lua_State *L)
 
 int qcombobox_maxVisibleItems(lua_State *L)
 {
-    const char *fn = "qcombobox_maxVisibleItems";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QComboBox*>(g_controls[id])->maxVisibleItems();
@@ -1245,10 +1171,9 @@ int qcombobox_maxVisibleItems(lua_State *L)
 
 int qcombobox_minimumContentsLength(lua_State *L)
 {
-    const char *fn = "qcombobox_minimumContentsLength";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QComboBox*>(g_controls[id])->minimumContentsLength();
@@ -1260,10 +1185,9 @@ int qcombobox_minimumContentsLength(lua_State *L)
 
 int qcombobox_modelColumn(lua_State *L)
 {
-    const char *fn = "qcombobox_modelColumn";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QComboBox*>(g_controls[id])->modelColumn();
@@ -1275,10 +1199,9 @@ int qcombobox_modelColumn(lua_State *L)
 
 int qcombobox_new(lua_State *L)
 {
-    const char *fn = "qcombobox_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QComboBox());
     }
@@ -1287,10 +1210,9 @@ int qcombobox_new(lua_State *L)
 
 int qcombobox_removeItem(lua_State *L)
 {
-    const char *fn = "qcombobox_removeItem";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1301,10 +1223,9 @@ int qcombobox_removeItem(lua_State *L)
 
 int qcombobox_setCurrentIndex(lua_State *L)
 {
-    const char *fn = "qcombobox_setCurrentIndex";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1315,10 +1236,9 @@ int qcombobox_setCurrentIndex(lua_State *L)
 
 int qcombobox_setDuplicatesEnabled(lua_State *L)
 {
-    const char *fn = "qcombobox_setDuplicatesEnabled";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1329,10 +1249,9 @@ int qcombobox_setDuplicatesEnabled(lua_State *L)
 
 int qcombobox_setFrame(lua_State *L)
 {
-    const char *fn = "qcombobox_setFrame";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1343,10 +1262,9 @@ int qcombobox_setFrame(lua_State *L)
 
 int qgridlayout_addWidget(lua_State *L)
 {
-    const char *fn = "qgridlayout_addWidget";
     int argc = lua_gettop(L);
-    if (argc < 4 and argc > 6) {
-       error(fn, 4);
+    if (argc < 4 || argc > 6) {
+       error(__func__, 4);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1366,10 +1284,9 @@ int qgridlayout_addWidget(lua_State *L)
 
 int qgridlayout_delete(lua_State *L)
 {
-    const char *fn = "qgridlayout_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QGridLayout*>(g_controls[id]);
@@ -1380,10 +1297,9 @@ int qgridlayout_delete(lua_State *L)
 
 int qgridlayout_new(lua_State *L)
 {
-    const char *fn = "qgridlayout_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QGridLayout());
     }
@@ -1392,10 +1308,9 @@ int qgridlayout_new(lua_State *L)
 
 int qlabel_alignment(lua_State *L)
 {
-    const char *fn = "qlabel_alignment";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLabel*>(g_controls[id])->alignment();
@@ -1407,10 +1322,9 @@ int qlabel_alignment(lua_State *L)
 
 int qlabel_clear(lua_State *L)
 {
-    const char *fn = "qlabel_clear";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLabel*>(g_controls[id])->clear();
@@ -1420,10 +1334,9 @@ int qlabel_clear(lua_State *L)
 
 int qlabel_delete(lua_State *L)
 {
-    const char *fn = "qlabel_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QLabel*>(g_controls[id]);
@@ -1434,10 +1347,9 @@ int qlabel_delete(lua_State *L)
 
 int qlabel_hasScaledContents(lua_State *L)
 {
-    const char *fn = "qlabel_hasScaledContents";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLabel*>(g_controls[id])->hasScaledContents();
@@ -1449,10 +1361,9 @@ int qlabel_hasScaledContents(lua_State *L)
 
 int qlabel_hasSelectedText(lua_State *L)
 {
-    const char *fn = "qlabel_hasSelectedText";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLabel*>(g_controls[id])->hasSelectedText();
@@ -1464,10 +1375,9 @@ int qlabel_hasSelectedText(lua_State *L)
 
 int qlabel_indent(lua_State *L)
 {
-    const char *fn = "qlabel_indent";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLabel*>(g_controls[id])->indent();
@@ -1479,10 +1389,9 @@ int qlabel_indent(lua_State *L)
 
 int qlabel_margin(lua_State *L)
 {
-    const char *fn = "qlabel_margin";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLabel*>(g_controls[id])->margin();
@@ -1494,10 +1403,9 @@ int qlabel_margin(lua_State *L)
 
 int qlabel_new(lua_State *L)
 {
-    const char *fn = "qlabel_new";
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
-       error(fn, 0);
+    if (argc < 0 || argc > 1) {
+       error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
         return addWidget(new QLabel(arg0));
@@ -1507,10 +1415,9 @@ int qlabel_new(lua_State *L)
 
 int qlabel_openExternalLinks(lua_State *L)
 {
-    const char *fn = "qlabel_openExternalLinks";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLabel*>(g_controls[id])->openExternalLinks();
@@ -1522,10 +1429,9 @@ int qlabel_openExternalLinks(lua_State *L)
 
 int qlabel_selectedText(lua_State *L)
 {
-    const char *fn = "qlabel_selectedText";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QLabel*>(g_controls[id])->selectedText();
@@ -1537,10 +1443,9 @@ int qlabel_selectedText(lua_State *L)
 
 int qlabel_selectionStart(lua_State *L)
 {
-    const char *fn = "qlabel_selectionStart";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLabel*>(g_controls[id])->selectionStart();
@@ -1552,10 +1457,9 @@ int qlabel_selectionStart(lua_State *L)
 
 int qlabel_setAlignment(lua_State *L)
 {
-    const char *fn = "qlabel_setAlignment";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1566,10 +1470,9 @@ int qlabel_setAlignment(lua_State *L)
 
 int qlabel_setBuddy(lua_State *L)
 {
-    const char *fn = "qlabel_setBuddy";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1580,10 +1483,9 @@ int qlabel_setBuddy(lua_State *L)
 
 int qlabel_setFrameStyle(lua_State *L)
 {
-    const char *fn = "qlabel_setFrameStyle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1594,10 +1496,9 @@ int qlabel_setFrameStyle(lua_State *L)
 
 int qlabel_setIndent(lua_State *L)
 {
-    const char *fn = "qlabel_setIndent";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1608,10 +1509,9 @@ int qlabel_setIndent(lua_State *L)
 
 int qlabel_setMargin(lua_State *L)
 {
-    const char *fn = "qlabel_setMargin";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1622,10 +1522,9 @@ int qlabel_setMargin(lua_State *L)
 
 int qlabel_setNum(lua_State *L)
 {
-    const char *fn = "qlabel_setNum";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1636,10 +1535,9 @@ int qlabel_setNum(lua_State *L)
 
 int qlabel_setOpenExternalLinks(lua_State *L)
 {
-    const char *fn = "qlabel_setOpenExternalLinks";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1650,10 +1548,9 @@ int qlabel_setOpenExternalLinks(lua_State *L)
 
 int qlabel_setScaledContents(lua_State *L)
 {
-    const char *fn = "qlabel_setScaledContents";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1664,10 +1561,9 @@ int qlabel_setScaledContents(lua_State *L)
 
 int qlabel_setText(lua_State *L)
 {
-    const char *fn = "qlabel_setText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -1678,10 +1574,9 @@ int qlabel_setText(lua_State *L)
 
 int qlabel_setTextFormat(lua_State *L)
 {
-    const char *fn = "qlabel_setTextFormat";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1692,10 +1587,9 @@ int qlabel_setTextFormat(lua_State *L)
 
 int qlabel_setTextInteractionFlags(lua_State *L)
 {
-    const char *fn = "qlabel_setTextInteractionFlags";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -1706,10 +1600,9 @@ int qlabel_setTextInteractionFlags(lua_State *L)
 
 int qlabel_setWordWrap(lua_State *L)
 {
-    const char *fn = "qlabel_setWordWrap";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1720,10 +1613,9 @@ int qlabel_setWordWrap(lua_State *L)
 
 int qlabel_text(lua_State *L)
 {
-    const char *fn = "qlabel_text";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QLabel*>(g_controls[id])->text();
@@ -1735,10 +1627,9 @@ int qlabel_text(lua_State *L)
 
 int qlabel_textFormat(lua_State *L)
 {
-    const char *fn = "qlabel_textFormat";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLabel*>(g_controls[id])->textFormat();
@@ -1750,10 +1641,9 @@ int qlabel_textFormat(lua_State *L)
 
 int qlabel_textInteractionFlags(lua_State *L)
 {
-    const char *fn = "qlabel_textInteractionFlags";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLabel*>(g_controls[id])->textInteractionFlags();
@@ -1765,10 +1655,9 @@ int qlabel_textInteractionFlags(lua_State *L)
 
 int qlabel_wordWrap(lua_State *L)
 {
-    const char *fn = "qlabel_wordWrap";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLabel*>(g_controls[id])->wordWrap();
@@ -1780,10 +1669,9 @@ int qlabel_wordWrap(lua_State *L)
 
 int qlineedit_alignment(lua_State *L)
 {
-    const char *fn = "qlineedit_alignment";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLineEdit*>(g_controls[id])->alignment();
@@ -1795,10 +1683,9 @@ int qlineedit_alignment(lua_State *L)
 
 int qlineedit_backspace(lua_State *L)
 {
-    const char *fn = "qlineedit_backspace";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->backspace();
@@ -1808,10 +1695,9 @@ int qlineedit_backspace(lua_State *L)
 
 int qlineedit_copy(lua_State *L)
 {
-    const char *fn = "qlineedit_copy";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->copy();
@@ -1821,10 +1707,9 @@ int qlineedit_copy(lua_State *L)
 
 int qlineedit_cursorBackward(lua_State *L)
 {
-    const char *fn = "qlineedit_cursorBackward";
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
-       error(fn, 2);
+    if (argc < 2 || argc > 3) {
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1838,10 +1723,9 @@ int qlineedit_cursorBackward(lua_State *L)
 
 int qlineedit_cursorForward(lua_State *L)
 {
-    const char *fn = "qlineedit_cursorForward";
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
-       error(fn, 2);
+    if (argc < 2 || argc > 3) {
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1855,10 +1739,9 @@ int qlineedit_cursorForward(lua_State *L)
 
 int qlineedit_cursorMoveStyle(lua_State *L)
 {
-    const char *fn = "qlineedit_cursorMoveStyle";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLineEdit*>(g_controls[id])->cursorMoveStyle();
@@ -1870,10 +1753,9 @@ int qlineedit_cursorMoveStyle(lua_State *L)
 
 int qlineedit_cursorPosition(lua_State *L)
 {
-    const char *fn = "qlineedit_cursorPosition";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLineEdit*>(g_controls[id])->cursorPosition();
@@ -1885,10 +1767,9 @@ int qlineedit_cursorPosition(lua_State *L)
 
 int qlineedit_cut(lua_State *L)
 {
-    const char *fn = "qlineedit_cut";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->cut();
@@ -1898,10 +1779,9 @@ int qlineedit_cut(lua_State *L)
 
 int qlineedit_delete(lua_State *L)
 {
-    const char *fn = "qlineedit_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QLineEdit*>(g_controls[id]);
@@ -1912,10 +1792,9 @@ int qlineedit_delete(lua_State *L)
 
 int qlineedit_deselect(lua_State *L)
 {
-    const char *fn = "qlineedit_deselect";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->deselect();
@@ -1925,10 +1804,9 @@ int qlineedit_deselect(lua_State *L)
 
 int qlineedit_displayText(lua_State *L)
 {
-    const char *fn = "qlineedit_displayText";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QLineEdit*>(g_controls[id])->displayText();
@@ -1940,10 +1818,9 @@ int qlineedit_displayText(lua_State *L)
 
 int qlineedit_end(lua_State *L)
 {
-    const char *fn = "qlineedit_end";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1954,10 +1831,9 @@ int qlineedit_end(lua_State *L)
 
 int qlineedit_hasSelectedText(lua_State *L)
 {
-    const char *fn = "qlineedit_hasSelectedText";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLineEdit*>(g_controls[id])->hasSelectedText();
@@ -1969,10 +1845,9 @@ int qlineedit_hasSelectedText(lua_State *L)
 
 int qlineedit_home(lua_State *L)
 {
-    const char *fn = "qlineedit_home";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -1983,10 +1858,9 @@ int qlineedit_home(lua_State *L)
 
 int qlineedit_inputMask(lua_State *L)
 {
-    const char *fn = "qlineedit_inputMask";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QLineEdit*>(g_controls[id])->inputMask();
@@ -1998,10 +1872,9 @@ int qlineedit_inputMask(lua_State *L)
 
 int qlineedit_insert(lua_State *L)
 {
-    const char *fn = "qlineedit_insert";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -2012,10 +1885,9 @@ int qlineedit_insert(lua_State *L)
 
 int qlineedit_isModified(lua_State *L)
 {
-    const char *fn = "qlineedit_isModified";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLineEdit*>(g_controls[id])->isModified();
@@ -2027,10 +1899,9 @@ int qlineedit_isModified(lua_State *L)
 
 int qlineedit_isReadOnly(lua_State *L)
 {
-    const char *fn = "qlineedit_isReadOnly";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLineEdit*>(g_controls[id])->isReadOnly();
@@ -2042,10 +1913,9 @@ int qlineedit_isReadOnly(lua_State *L)
 
 int qlineedit_isRedoAvailable(lua_State *L)
 {
-    const char *fn = "qlineedit_isRedoAvailable";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLineEdit*>(g_controls[id])->isRedoAvailable();
@@ -2057,10 +1927,9 @@ int qlineedit_isRedoAvailable(lua_State *L)
 
 int qlineedit_isUndoAvailable(lua_State *L)
 {
-    const char *fn = "qlineedit_isUndoAvailable";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QLineEdit*>(g_controls[id])->isUndoAvailable();
@@ -2072,10 +1941,9 @@ int qlineedit_isUndoAvailable(lua_State *L)
 
 int qlineedit_maxLength(lua_State *L)
 {
-    const char *fn = "qlineedit_maxLength";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QLineEdit*>(g_controls[id])->maxLength();
@@ -2087,10 +1955,9 @@ int qlineedit_maxLength(lua_State *L)
 
 int qlineedit_new(lua_State *L)
 {
-    const char *fn = "qlineedit_new";
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
-       error(fn, 0);
+    if (argc < 0 || argc > 1) {
+       error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
         return addWidget(new QLineEdit(arg0));
@@ -2100,10 +1967,9 @@ int qlineedit_new(lua_State *L)
 
 int qlineedit_paste(lua_State *L)
 {
-    const char *fn = "qlineedit_paste";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->paste();
@@ -2113,10 +1979,9 @@ int qlineedit_paste(lua_State *L)
 
 int qlineedit_placeholderText(lua_State *L)
 {
-    const char *fn = "qlineedit_placeholderText";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QLineEdit*>(g_controls[id])->placeholderText();
@@ -2128,10 +1993,9 @@ int qlineedit_placeholderText(lua_State *L)
 
 int qlineedit_redo(lua_State *L)
 {
-    const char *fn = "qlineedit_redo";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->redo();
@@ -2141,10 +2005,9 @@ int qlineedit_redo(lua_State *L)
 
 int qlineedit_selectAll(lua_State *L)
 {
-    const char *fn = "qlineedit_selectAll";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->selectAll();
@@ -2154,10 +2017,9 @@ int qlineedit_selectAll(lua_State *L)
 
 int qlineedit_setAlignment(lua_State *L)
 {
-    const char *fn = "qlineedit_setAlignment";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2168,10 +2030,9 @@ int qlineedit_setAlignment(lua_State *L)
 
 int qlineedit_setCursorMoveStyle(lua_State *L)
 {
-    const char *fn = "qlineedit_setCursorMoveStyle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2182,10 +2043,9 @@ int qlineedit_setCursorMoveStyle(lua_State *L)
 
 int qlineedit_setCursorPosition(lua_State *L)
 {
-    const char *fn = "qlineedit_setCursorPosition";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2196,10 +2056,9 @@ int qlineedit_setCursorPosition(lua_State *L)
 
 int qlineedit_setInputMask(lua_State *L)
 {
-    const char *fn = "qlineedit_setInputMask";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -2210,10 +2069,9 @@ int qlineedit_setInputMask(lua_State *L)
 
 int qlineedit_setMaxLength(lua_State *L)
 {
-    const char *fn = "qlineedit_setMaxLength";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2224,10 +2082,9 @@ int qlineedit_setMaxLength(lua_State *L)
 
 int qlineedit_setModified(lua_State *L)
 {
-    const char *fn = "qlineedit_setModified";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2238,10 +2095,9 @@ int qlineedit_setModified(lua_State *L)
 
 int qlineedit_setPlaceholderText(lua_State *L)
 {
-    const char *fn = "qlineedit_setPlaceholderText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -2252,10 +2108,9 @@ int qlineedit_setPlaceholderText(lua_State *L)
 
 int qlineedit_setReadOnly(lua_State *L)
 {
-    const char *fn = "qlineedit_setReadOnly";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2266,10 +2121,9 @@ int qlineedit_setReadOnly(lua_State *L)
 
 int qlineedit_setSelection(lua_State *L)
 {
-    const char *fn = "qlineedit_setSelection";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2283,10 +2137,9 @@ int qlineedit_setSelection(lua_State *L)
 
 int qlineedit_setText(lua_State *L)
 {
-    const char *fn = "qlineedit_setText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -2297,10 +2150,9 @@ int qlineedit_setText(lua_State *L)
 
 int qlineedit_setTextMargins(lua_State *L)
 {
-    const char *fn = "qlineedit_setTextMargins";
     int argc = lua_gettop(L);
     if (argc != 5) {
-       error(fn, 5);
+       error(__func__, 5);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2318,10 +2170,9 @@ int qlineedit_setTextMargins(lua_State *L)
 
 int qlineedit_text(lua_State *L)
 {
-    const char *fn = "qlineedit_text";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QLineEdit*>(g_controls[id])->text();
@@ -2333,10 +2184,9 @@ int qlineedit_text(lua_State *L)
 
 int qlineedit_undo(lua_State *L)
 {
-    const char *fn = "qlineedit_undo";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QLineEdit*>(g_controls[id])->undo();
@@ -2346,10 +2196,9 @@ int qlineedit_undo(lua_State *L)
 
 int qlistwidget_addItem(lua_State *L)
 {
-    const char *fn = "qlistwidget_addItem";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -2360,10 +2209,9 @@ int qlistwidget_addItem(lua_State *L)
 
 int qlistwidget_count(lua_State *L)
 {
-    const char *fn = "qlistwidget_count";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QListWidget*>(g_controls[id])->count();
@@ -2375,10 +2223,9 @@ int qlistwidget_count(lua_State *L)
 
 int qlistwidget_currentRow(lua_State *L)
 {
-    const char *fn = "qlistwidget_currentRow";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QListWidget*>(g_controls[id])->currentRow();
@@ -2390,10 +2237,9 @@ int qlistwidget_currentRow(lua_State *L)
 
 int qlistwidget_delete(lua_State *L)
 {
-    const char *fn = "qlistwidget_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QListWidget*>(g_controls[id]);
@@ -2404,10 +2250,9 @@ int qlistwidget_delete(lua_State *L)
 
 int qlistwidget_insertItem(lua_State *L)
 {
-    const char *fn = "qlistwidget_insertItem";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2421,10 +2266,9 @@ int qlistwidget_insertItem(lua_State *L)
 
 int qlistwidget_isSortingEnabled(lua_State *L)
 {
-    const char *fn = "qlistwidget_isSortingEnabled";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QListWidget*>(g_controls[id])->isSortingEnabled();
@@ -2436,10 +2280,9 @@ int qlistwidget_isSortingEnabled(lua_State *L)
 
 int qlistwidget_new(lua_State *L)
 {
-    const char *fn = "qlistwidget_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QListWidget());
     }
@@ -2448,10 +2291,9 @@ int qlistwidget_new(lua_State *L)
 
 int qlistwidget_setCurrentRow(lua_State *L)
 {
-    const char *fn = "qlistwidget_setCurrentRow";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2462,10 +2304,9 @@ int qlistwidget_setCurrentRow(lua_State *L)
 
 int qlistwidget_setSortingEnabled(lua_State *L)
 {
-    const char *fn = "qlistwidget_setSortingEnabled";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2476,10 +2317,9 @@ int qlistwidget_setSortingEnabled(lua_State *L)
 
 int qlistwidget_sortItems(lua_State *L)
 {
-    const char *fn = "qlistwidget_sortItems";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2490,10 +2330,9 @@ int qlistwidget_sortItems(lua_State *L)
 
 int qradiobutton_autoExclusive(lua_State *L)
 {
-    const char *fn = "qradiobutton_autoExclusive";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QRadioButton*>(g_controls[id])->autoExclusive();
@@ -2505,10 +2344,9 @@ int qradiobutton_autoExclusive(lua_State *L)
 
 int qradiobutton_delete(lua_State *L)
 {
-    const char *fn = "qradiobutton_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QRadioButton*>(g_controls[id]);
@@ -2519,10 +2357,9 @@ int qradiobutton_delete(lua_State *L)
 
 int qradiobutton_isCheckable(lua_State *L)
 {
-    const char *fn = "qradiobutton_isCheckable";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QRadioButton*>(g_controls[id])->isCheckable();
@@ -2534,10 +2371,9 @@ int qradiobutton_isCheckable(lua_State *L)
 
 int qradiobutton_isChecked(lua_State *L)
 {
-    const char *fn = "qradiobutton_isChecked";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QRadioButton*>(g_controls[id])->isChecked();
@@ -2549,10 +2385,9 @@ int qradiobutton_isChecked(lua_State *L)
 
 int qradiobutton_new(lua_State *L)
 {
-    const char *fn = "qradiobutton_new";
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
-       error(fn, 0);
+    if (argc < 0 || argc > 1) {
+       error(__func__, 0);
     } else {
         const char* arg0 = (argc >= 1) ? lua_tostring(L, 1) : "";
         return addWidget(new QRadioButton(arg0));
@@ -2562,10 +2397,9 @@ int qradiobutton_new(lua_State *L)
 
 int qradiobutton_setAutoExclusive(lua_State *L)
 {
-    const char *fn = "qradiobutton_setAutoExclusive";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2576,10 +2410,9 @@ int qradiobutton_setAutoExclusive(lua_State *L)
 
 int qradiobutton_setCheckable(lua_State *L)
 {
-    const char *fn = "qradiobutton_setCheckable";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2590,10 +2423,9 @@ int qradiobutton_setCheckable(lua_State *L)
 
 int qradiobutton_setChecked(lua_State *L)
 {
-    const char *fn = "qradiobutton_setChecked";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2604,10 +2436,9 @@ int qradiobutton_setChecked(lua_State *L)
 
 int qradiobutton_setText(lua_State *L)
 {
-    const char *fn = "qradiobutton_setText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -2618,10 +2449,9 @@ int qradiobutton_setText(lua_State *L)
 
 int qradiobutton_text(lua_State *L)
 {
-    const char *fn = "qradiobutton_text";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QRadioButton*>(g_controls[id])->text();
@@ -2633,10 +2463,9 @@ int qradiobutton_text(lua_State *L)
 
 int qslider_delete(lua_State *L)
 {
-    const char *fn = "qslider_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QSlider*>(g_controls[id]);
@@ -2647,10 +2476,9 @@ int qslider_delete(lua_State *L)
 
 int qslider_hasTracking(lua_State *L)
 {
-    const char *fn = "qslider_hasTracking";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QSlider*>(g_controls[id])->hasTracking();
@@ -2662,10 +2490,9 @@ int qslider_hasTracking(lua_State *L)
 
 int qslider_invertedAppearance(lua_State *L)
 {
-    const char *fn = "qslider_invertedAppearance";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QSlider*>(g_controls[id])->invertedAppearance();
@@ -2677,10 +2504,9 @@ int qslider_invertedAppearance(lua_State *L)
 
 int qslider_invertedControls(lua_State *L)
 {
-    const char *fn = "qslider_invertedControls";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QSlider*>(g_controls[id])->invertedControls();
@@ -2692,10 +2518,9 @@ int qslider_invertedControls(lua_State *L)
 
 int qslider_isSliderDown(lua_State *L)
 {
-    const char *fn = "qslider_isSliderDown";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QSlider*>(g_controls[id])->isSliderDown();
@@ -2707,10 +2532,9 @@ int qslider_isSliderDown(lua_State *L)
 
 int qslider_maximum(lua_State *L)
 {
-    const char *fn = "qslider_maximum";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->maximum();
@@ -2722,10 +2546,9 @@ int qslider_maximum(lua_State *L)
 
 int qslider_minimum(lua_State *L)
 {
-    const char *fn = "qslider_minimum";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->minimum();
@@ -2737,12 +2560,11 @@ int qslider_minimum(lua_State *L)
 
 int qslider_new(lua_State *L)
 {
-    const char *fn = "qslider_new";
     int argc = lua_gettop(L);
-    if (argc < 0 and argc > 1) {
-       error(fn, 0);
+    if (argc < 0 || argc > 1) {
+       error(__func__, 0);
     } else {
-        int arg0 = (argc >= 1) ? lua_tointeger(L, 1) : Qt::Vertical;
+        int arg0 = (argc >= 1) ? lua_tointeger(L, 1) : static_cast<int>(Qt::Vertical);
         return addWidget(new QSlider(static_cast<Qt::Orientation>(arg0)));
     }
     return 0;
@@ -2750,10 +2572,9 @@ int qslider_new(lua_State *L)
 
 int qslider_orientation(lua_State *L)
 {
-    const char *fn = "qslider_orientation";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->orientation();
@@ -2765,10 +2586,9 @@ int qslider_orientation(lua_State *L)
 
 int qslider_pageStep(lua_State *L)
 {
-    const char *fn = "qslider_pageStep";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->pageStep();
@@ -2780,10 +2600,9 @@ int qslider_pageStep(lua_State *L)
 
 int qslider_setInvertedAppearance(lua_State *L)
 {
-    const char *fn = "qslider_setInvertedAppearance";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2794,10 +2613,9 @@ int qslider_setInvertedAppearance(lua_State *L)
 
 int qslider_setInvertedControls(lua_State *L)
 {
-    const char *fn = "qslider_setInvertedControls";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2808,10 +2626,9 @@ int qslider_setInvertedControls(lua_State *L)
 
 int qslider_setMaximum(lua_State *L)
 {
-    const char *fn = "qslider_setMaximum";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2822,10 +2639,9 @@ int qslider_setMaximum(lua_State *L)
 
 int qslider_setMinimum(lua_State *L)
 {
-    const char *fn = "qslider_setMinimum";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2836,10 +2652,9 @@ int qslider_setMinimum(lua_State *L)
 
 int qslider_setPageStep(lua_State *L)
 {
-    const char *fn = "qslider_setPageStep";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2850,10 +2665,9 @@ int qslider_setPageStep(lua_State *L)
 
 int qslider_setRange(lua_State *L)
 {
-    const char *fn = "qslider_setRange";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2867,10 +2681,9 @@ int qslider_setRange(lua_State *L)
 
 int qslider_setSingleStep(lua_State *L)
 {
-    const char *fn = "qslider_setSingleStep";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2881,10 +2694,9 @@ int qslider_setSingleStep(lua_State *L)
 
 int qslider_setSliderDown(lua_State *L)
 {
-    const char *fn = "qslider_setSliderDown";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2895,10 +2707,9 @@ int qslider_setSliderDown(lua_State *L)
 
 int qslider_setSliderPosition(lua_State *L)
 {
-    const char *fn = "qslider_setSliderPosition";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2909,10 +2720,9 @@ int qslider_setSliderPosition(lua_State *L)
 
 int qslider_setTickInterval(lua_State *L)
 {
-    const char *fn = "qslider_setTickInterval";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2923,10 +2733,9 @@ int qslider_setTickInterval(lua_State *L)
 
 int qslider_setTickPosition(lua_State *L)
 {
-    const char *fn = "qslider_setTickPosition";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -2937,10 +2746,9 @@ int qslider_setTickPosition(lua_State *L)
 
 int qslider_setTracking(lua_State *L)
 {
-    const char *fn = "qslider_setTracking";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -2951,10 +2759,9 @@ int qslider_setTracking(lua_State *L)
 
 int qslider_singleStep(lua_State *L)
 {
-    const char *fn = "qslider_singleStep";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->singleStep();
@@ -2966,10 +2773,9 @@ int qslider_singleStep(lua_State *L)
 
 int qslider_sliderPosition(lua_State *L)
 {
-    const char *fn = "qslider_sliderPosition";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->sliderPosition();
@@ -2981,10 +2787,9 @@ int qslider_sliderPosition(lua_State *L)
 
 int qslider_tickInterval(lua_State *L)
 {
-    const char *fn = "qslider_tickInterval";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->tickInterval();
@@ -2996,10 +2801,9 @@ int qslider_tickInterval(lua_State *L)
 
 int qslider_tickPosition(lua_State *L)
 {
-    const char *fn = "qslider_tickPosition";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->tickPosition();
@@ -3011,10 +2815,9 @@ int qslider_tickPosition(lua_State *L)
 
 int qslider_triggerAction(lua_State *L)
 {
-    const char *fn = "qslider_triggerAction";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3025,10 +2828,9 @@ int qslider_triggerAction(lua_State *L)
 
 int qslider_value(lua_State *L)
 {
-    const char *fn = "qslider_value";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSlider*>(g_controls[id])->value();
@@ -3040,10 +2842,9 @@ int qslider_value(lua_State *L)
 
 int qspinbox_cleanText(lua_State *L)
 {
-    const char *fn = "qspinbox_cleanText";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QSpinBox*>(g_controls[id])->cleanText();
@@ -3055,10 +2856,9 @@ int qspinbox_cleanText(lua_State *L)
 
 int qspinbox_delete(lua_State *L)
 {
-    const char *fn = "qspinbox_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QSpinBox*>(g_controls[id]);
@@ -3069,10 +2869,9 @@ int qspinbox_delete(lua_State *L)
 
 int qspinbox_maximum(lua_State *L)
 {
-    const char *fn = "qspinbox_maximum";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSpinBox*>(g_controls[id])->maximum();
@@ -3084,10 +2883,9 @@ int qspinbox_maximum(lua_State *L)
 
 int qspinbox_minimum(lua_State *L)
 {
-    const char *fn = "qspinbox_minimum";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSpinBox*>(g_controls[id])->minimum();
@@ -3099,10 +2897,9 @@ int qspinbox_minimum(lua_State *L)
 
 int qspinbox_new(lua_State *L)
 {
-    const char *fn = "qspinbox_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QSpinBox());
     }
@@ -3111,10 +2908,9 @@ int qspinbox_new(lua_State *L)
 
 int qspinbox_prefix(lua_State *L)
 {
-    const char *fn = "qspinbox_prefix";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QSpinBox*>(g_controls[id])->prefix();
@@ -3126,10 +2922,9 @@ int qspinbox_prefix(lua_State *L)
 
 int qspinbox_setMaximum(lua_State *L)
 {
-    const char *fn = "qspinbox_setMaximum";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3140,10 +2935,9 @@ int qspinbox_setMaximum(lua_State *L)
 
 int qspinbox_setMinimum(lua_State *L)
 {
-    const char *fn = "qspinbox_setMinimum";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3154,10 +2948,9 @@ int qspinbox_setMinimum(lua_State *L)
 
 int qspinbox_setPrefix(lua_State *L)
 {
-    const char *fn = "qspinbox_setPrefix";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -3168,10 +2961,9 @@ int qspinbox_setPrefix(lua_State *L)
 
 int qspinbox_setRange(lua_State *L)
 {
-    const char *fn = "qspinbox_setRange";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3185,10 +2977,9 @@ int qspinbox_setRange(lua_State *L)
 
 int qspinbox_setSingleStep(lua_State *L)
 {
-    const char *fn = "qspinbox_setSingleStep";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3199,10 +2990,9 @@ int qspinbox_setSingleStep(lua_State *L)
 
 int qspinbox_setSuffix(lua_State *L)
 {
-    const char *fn = "qspinbox_setSuffix";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -3213,10 +3003,9 @@ int qspinbox_setSuffix(lua_State *L)
 
 int qspinbox_setValue(lua_State *L)
 {
-    const char *fn = "qspinbox_setValue";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3227,10 +3016,9 @@ int qspinbox_setValue(lua_State *L)
 
 int qspinbox_singleStep(lua_State *L)
 {
-    const char *fn = "qspinbox_singleStep";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSpinBox*>(g_controls[id])->singleStep();
@@ -3242,10 +3030,9 @@ int qspinbox_singleStep(lua_State *L)
 
 int qspinbox_suffix(lua_State *L)
 {
-    const char *fn = "qspinbox_suffix";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         const QString & tmp = static_cast<QSpinBox*>(g_controls[id])->suffix();
@@ -3257,10 +3044,9 @@ int qspinbox_suffix(lua_State *L)
 
 int qspinbox_value(lua_State *L)
 {
-    const char *fn = "qspinbox_value";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QSpinBox*>(g_controls[id])->value();
@@ -3272,10 +3058,9 @@ int qspinbox_value(lua_State *L)
 
 int qvboxlayout_addWidget(lua_State *L)
 {
-    const char *fn = "qvboxlayout_addWidget";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3286,10 +3071,9 @@ int qvboxlayout_addWidget(lua_State *L)
 
 int qvboxlayout_delete(lua_State *L)
 {
-    const char *fn = "qvboxlayout_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QVBoxLayout*>(g_controls[id]);
@@ -3300,10 +3084,9 @@ int qvboxlayout_delete(lua_State *L)
 
 int qvboxlayout_new(lua_State *L)
 {
-    const char *fn = "qvboxlayout_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QVBoxLayout());
     }
@@ -3312,10 +3095,9 @@ int qvboxlayout_new(lua_State *L)
 
 int qwizard_accept(lua_State *L)
 {
-    const char *fn = "qwizard_accept";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QWizard*>(g_controls[id])->accept();
@@ -3325,10 +3107,9 @@ int qwizard_accept(lua_State *L)
 
 int qwizard_addPage(lua_State *L)
 {
-    const char *fn = "qwizard_addPage";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3341,10 +3122,9 @@ int qwizard_addPage(lua_State *L)
 
 int qwizard_back(lua_State *L)
 {
-    const char *fn = "qwizard_back";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QWizard*>(g_controls[id])->back();
@@ -3354,10 +3134,9 @@ int qwizard_back(lua_State *L)
 
 int qwizard_buttonText(lua_State *L)
 {
-    const char *fn = "qwizard_buttonText";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3370,10 +3149,9 @@ int qwizard_buttonText(lua_State *L)
 
 int qwizard_currentId(lua_State *L)
 {
-    const char *fn = "qwizard_currentId";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QWizard*>(g_controls[id])->currentId();
@@ -3385,10 +3163,9 @@ int qwizard_currentId(lua_State *L)
 
 int qwizard_delete(lua_State *L)
 {
-    const char *fn = "qwizard_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QWizard*>(g_controls[id]);
@@ -3399,10 +3176,9 @@ int qwizard_delete(lua_State *L)
 
 int qwizard_new(lua_State *L)
 {
-    const char *fn = "qwizard_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QWizard());
     }
@@ -3411,10 +3187,9 @@ int qwizard_new(lua_State *L)
 
 int qwizard_next(lua_State *L)
 {
-    const char *fn = "qwizard_next";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QWizard*>(g_controls[id])->next();
@@ -3424,10 +3199,9 @@ int qwizard_next(lua_State *L)
 
 int qwizard_reject(lua_State *L)
 {
-    const char *fn = "qwizard_reject";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QWizard*>(g_controls[id])->reject();
@@ -3437,10 +3211,9 @@ int qwizard_reject(lua_State *L)
 
 int qwizard_removePage(lua_State *L)
 {
-    const char *fn = "qwizard_removePage";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3451,10 +3224,9 @@ int qwizard_removePage(lua_State *L)
 
 int qwizard_restart(lua_State *L)
 {
-    const char *fn = "qwizard_restart";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         static_cast<QWizard*>(g_controls[id])->restart();
@@ -3464,10 +3236,9 @@ int qwizard_restart(lua_State *L)
 
 int qwizard_setButton(lua_State *L)
 {
-    const char *fn = "qwizard_setButton";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3481,10 +3252,9 @@ int qwizard_setButton(lua_State *L)
 
 int qwizard_setButtonText(lua_State *L)
 {
-    const char *fn = "qwizard_setButtonText";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3498,10 +3268,9 @@ int qwizard_setButtonText(lua_State *L)
 
 int qwizard_setDefaultProperty(lua_State *L)
 {
-    const char *fn = "qwizard_setDefaultProperty";
     int argc = lua_gettop(L);
     if (argc != 4) {
-       error(fn, 4);
+       error(__func__, 4);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -3517,10 +3286,9 @@ int qwizard_setDefaultProperty(lua_State *L)
 
 int qwizard_setField(lua_State *L)
 {
-    const char *fn = "qwizard_setField";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -3534,10 +3302,9 @@ int qwizard_setField(lua_State *L)
 
 int qwizard_setOption(lua_State *L)
 {
-    const char *fn = "qwizard_setOption";
     int argc = lua_gettop(L);
-    if (argc < 2 and argc > 3) {
-       error(fn, 2);
+    if (argc < 2 || argc > 3) {
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3551,10 +3318,9 @@ int qwizard_setOption(lua_State *L)
 
 int qwizard_setPage(lua_State *L)
 {
-    const char *fn = "qwizard_setPage";
     int argc = lua_gettop(L);
     if (argc != 3) {
-       error(fn, 3);
+       error(__func__, 3);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3568,10 +3334,9 @@ int qwizard_setPage(lua_State *L)
 
 int qwizard_setSideWidget(lua_State *L)
 {
-    const char *fn = "qwizard_setSideWidget";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3582,10 +3347,9 @@ int qwizard_setSideWidget(lua_State *L)
 
 int qwizard_setStartId(lua_State *L)
 {
-    const char *fn = "qwizard_setStartId";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3596,10 +3360,9 @@ int qwizard_setStartId(lua_State *L)
 
 int qwizard_setSubTitleFormat(lua_State *L)
 {
-    const char *fn = "qwizard_setSubTitleFormat";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3610,10 +3373,9 @@ int qwizard_setSubTitleFormat(lua_State *L)
 
 int qwizard_setTitleFormat(lua_State *L)
 {
-    const char *fn = "qwizard_setTitleFormat";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3624,10 +3386,9 @@ int qwizard_setTitleFormat(lua_State *L)
 
 int qwizard_setVisible(lua_State *L)
 {
-    const char *fn = "qwizard_setVisible";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         bool arg0 = lua_toboolean(L, 2);
@@ -3638,10 +3399,9 @@ int qwizard_setVisible(lua_State *L)
 
 int qwizard_setWindowTitle(lua_State *L)
 {
-    const char *fn = "qwizard_setWindowTitle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -3652,10 +3412,9 @@ int qwizard_setWindowTitle(lua_State *L)
 
 int qwizard_setWizardStyle(lua_State *L)
 {
-    const char *fn = "qwizard_setWizardStyle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3666,10 +3425,9 @@ int qwizard_setWizardStyle(lua_State *L)
 
 int qwizard_startId(lua_State *L)
 {
-    const char *fn = "qwizard_startId";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QWizard*>(g_controls[id])->startId();
@@ -3681,10 +3439,9 @@ int qwizard_startId(lua_State *L)
 
 int qwizard_subTitleFormat(lua_State *L)
 {
-    const char *fn = "qwizard_subTitleFormat";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QWizard*>(g_controls[id])->subTitleFormat();
@@ -3696,10 +3453,9 @@ int qwizard_subTitleFormat(lua_State *L)
 
 int qwizard_testOption(lua_State *L)
 {
-    const char *fn = "qwizard_testOption";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3710,10 +3466,9 @@ int qwizard_testOption(lua_State *L)
 
 int qwizard_titleFormat(lua_State *L)
 {
-    const char *fn = "qwizard_titleFormat";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QWizard*>(g_controls[id])->titleFormat();
@@ -3725,10 +3480,9 @@ int qwizard_titleFormat(lua_State *L)
 
 int qwizard_validateCurrentPage(lua_State *L)
 {
-    const char *fn = "qwizard_validateCurrentPage";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         bool tmp = static_cast<QWizard*>(g_controls[id])->validateCurrentPage();
@@ -3740,10 +3494,9 @@ int qwizard_validateCurrentPage(lua_State *L)
 
 int qwizard_wizardStyle(lua_State *L)
 {
-    const char *fn = "qwizard_wizardStyle";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         int tmp = static_cast<QWizard*>(g_controls[id])->wizardStyle();
@@ -3755,10 +3508,9 @@ int qwizard_wizardStyle(lua_State *L)
 
 int qwizardpage_delete(lua_State *L)
 {
-    const char *fn = "qwizardpage_delete";
     int argc = lua_gettop(L);
     if (argc != 1) {
-       error(fn, 1);
+       error(__func__, 1);
     } else {
         int id = lua_tointeger(L, 1);
         delete static_cast<QWizardPage*>(g_controls[id]);
@@ -3769,10 +3521,9 @@ int qwizardpage_delete(lua_State *L)
 
 int qwizardpage_new(lua_State *L)
 {
-    const char *fn = "qwizardpage_new";
     int argc = lua_gettop(L);
     if (argc != 0) {
-       error(fn, 0);
+       error(__func__, 0);
     } else {
         return addWidget(new QWizardPage());
     }
@@ -3781,10 +3532,9 @@ int qwizardpage_new(lua_State *L)
 
 int qwizardpage_setLayout(lua_State *L)
 {
-    const char *fn = "qwizardpage_setLayout";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         int arg0 = lua_tointeger(L, 2);
@@ -3795,10 +3545,9 @@ int qwizardpage_setLayout(lua_State *L)
 
 int qwizardpage_setSubTitle(lua_State *L)
 {
-    const char *fn = "qwizardpage_setSubTitle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);
@@ -3809,10 +3558,9 @@ int qwizardpage_setSubTitle(lua_State *L)
 
 int qwizardpage_setTitle(lua_State *L)
 {
-    const char *fn = "qwizardpage_setTitle";
     int argc = lua_gettop(L);
     if (argc != 2) {
-       error(fn, 2);
+       error(__func__, 2);
     } else {
         int id = lua_tointeger(L, 1);
         const char* arg0 = lua_tostring(L, 2);

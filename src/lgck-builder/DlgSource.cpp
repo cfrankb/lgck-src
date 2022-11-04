@@ -21,7 +21,8 @@
 #include <QPushButton>
 #include "WizScript.h"
 
-int CDlgSource::m_fontSize = 10;
+QFont CDlgSource::m_font = QFont("courrier", 10, QFont::DemiBold);
+COptionGroup CDlgSource::m_options;
 
 CDlgSource::CDlgSource(QWidget *parent) :
         QDialog(parent),
@@ -32,11 +33,12 @@ CDlgSource::CDlgSource(QWidget *parent) :
     m_btn = new QPushButton(icon, "");
     m_btn->setStatusTip(tr("scriptWiz"));
     m_ui->buttonBox->addButton(m_btn, QDialogButtonBox::ActionRole);
-    m_gameFile = NULL;
+    m_gameFile = nullptr;
     connect(m_btn, SIGNAL(pressed()), this, SLOT(wizButton()));
-    connect(this, SIGNAL(textInserted(const char*)), m_ui->eSource, SLOT(insertText(const char*)));
-    connect(this,SIGNAL(fontSizeChanged(int)), m_ui->eSource, SLOT(setFontSize(int)));
-    emit fontSizeChanged(m_fontSize);
+    connect(this, SIGNAL(textInserted(const QString &)), m_ui->eSource, SLOT(insertPlainText(const QString &)));
+    connect(this, SIGNAL(fontChanged(const QFont &)), m_ui->eSource, SLOT(setFont(const QFont &)));
+    emit fontChanged(m_font);
+    m_ui->eSource->setOptions(m_options);
 }
 
 CDlgSource::~CDlgSource()
@@ -47,7 +49,7 @@ CDlgSource::~CDlgSource()
 void CDlgSource::init(CGameFile *gf)
 {
     if (!gf) {
-        qDebug("gf is NULL");
+        qCritical("gf is NULL");
     }
     m_gameFile = gf;
 }
@@ -66,12 +68,12 @@ void CDlgSource::changeEvent(QEvent *e)
 
 void CDlgSource::setText(const QString s)
 {
-    m_ui->eSource->setText(s.trimmed());
+    m_ui->eSource->setPlainText(s.trimmed());
 }
 
 const QString CDlgSource::getText()
 {
-    return m_ui->eSource->text().trimmed();
+    return m_ui->eSource->toPlainText().trimmed();
 }
 
 void CDlgSource::setReadOnly() const
@@ -91,7 +93,12 @@ void CDlgSource::wizButton()
     m_ui->eSource->setFocus();
 }
 
-void CDlgSource::setFontSize(int size)
+void CDlgSource::setFont(const QFont &font)
 {
-    m_fontSize = size;
+    m_font = font;
+}
+
+void CDlgSource::setOptions(COptionGroup &options)
+{
+    m_options = options;
 }

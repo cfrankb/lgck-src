@@ -28,7 +28,7 @@
 #include "Layer.h"
 #include "helper.h"
 #include "../shared/FileWrap.h"
-#include "../shared/qtgui/cheat.h"
+#include "LuaVM.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CLevel
@@ -62,13 +62,14 @@ CSettings::SETTING CLevel::m_defaults[] =
     { "music", "", 0},
     { "closure", "500", 500},
     { "uuid", "", 0},
-    { "borderColor", "000000", 0},
+    { "borderColor", "000000", 0}, // 12
     { "introBkColor", "000000", 0},
     { "introTextColor", "ffffff", 0},
     { "introTime", "1500", 1500},
     { "width", "0", 0},
     { "height", "0", 0},
     { "colorMod", "ffffffff",0},
+    { "author", "",0}, // 19
     { "", "", 0 }
 };
 
@@ -111,36 +112,36 @@ bool CLevel::readLegacyV1(IFile & file)
     // legacy "level" w/o layer support
     int size = 0;
     int entrySize = 0;
-    ULONG totalSize = 0;
-    ULONG compressSize = 0;
+    LONGUINT totalSize = 0;
+    LONGUINT compressSize = 0;
 
     file.read(&size, sizeof (size));
     std::string t;
     m_settings << file;
     file >> t;                      // dummy marker (used to be description)
 
-    UINT8 t1;                       // dummy marker
+    uint8_t t1;                       // dummy marker
     file.read (&t1, sizeof (t1));   // used to be color palette index
     file.read (&entrySize, sizeof(entrySize));
     file.read (&totalSize, 4);
     file.read (&compressSize,4);
 
-    UINT8 *pCompressData = new UINT8 [ compressSize ];
+    uint8_t *pCompressData = new uint8_t [ compressSize ];
 
     if (totalSize != (size * sizeof(CLevelEntry))) {
-        qDebug("CLevel() : total uncompressed size doesn't match array size\n");
+        CLuaVM::debugv("CLevel() : total uncompressed size doesn't match array size\n");
         return false;
     }
 
     CLevelEntry *entries = new CLevelEntry [ size ] ;
     file.read(pCompressData, compressSize);
-    int err = uncompress((UINT8*)entries,
+    int err = uncompress((uint8_t*)entries,
                          &totalSize,
                          pCompressData,
                          compressSize);
 
     if (err) {
-        qDebug("CLevel::Read err=%d\n", err);
+        CLuaVM::debugv("CLevel::Read err=%d\n", err);
     }
 
     CLayer *layer = new CLayer(CLayer::LAYER_MAIN);
@@ -258,7 +259,7 @@ bool CLevel::read(IFile &file)
 
 void CLevel::insertAt(int i, CLayer *layer)
 {
-    addLayer(NULL);
+    addLayer(nullptr);
     for (int j = m_size - 1; j > i; --j) {
         m_layers[j] = m_layers[j-1];
     }
@@ -292,7 +293,7 @@ CLayer *CLevel::getMainLayer()
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int CLevel::getMainLayerId()
@@ -338,8 +339,9 @@ CLayer* CLevel::removeLayerById(int layerId)
     return layer;
 }
 
-bool CLevel::write(IFile & file, bool compr)
+bool CLevel::write(IFile & file)
 {
+    bool compr=true;
     int version = getVersion();
     int marker = COMPR;
     if (!compr) {
@@ -416,11 +418,9 @@ CLevel & CLevel::operator = (CLevel & s)
 {
     // TODO: redo this function
 
-    //qDebug("CLevel::operator = (CLevel & s)\n");
-
     if (m_layers) {
         delete [] m_layers;
-        m_layers = NULL;
+        m_layers = nullptr;
     }
 
     m_mx = s.m_mx;
@@ -454,7 +454,7 @@ int CLevel::getSettingInt(const char *param)
 void CLevel::setSetting(const char*param, const char *value, int mask)
 {
     m_settings [ param ].value = value;
-    m_settings [ param ].valueInt = strtol(value, NULL, 10) & mask;
+    m_settings [ param ].valueInt = strtol(value, nullptr, 10) & mask;
 }
 
 CSettings & CLevel::getSettings()
@@ -499,20 +499,6 @@ void CLevel::copyEvents(CLevel & src)
     for (int i=0; i < m_eventCount; ++i) {
         m_events[i]= src.getEvent(i);
     }
-}
-
-void CLevel::debug()
-{
-    /*
-    for (int i=0; i < m_settings.getSize(); ++i) {
-        qDebug("%d> %s %s %d\n",
-               i,
-               q2c(m_settings[i].param),
-               q2c(m_settings[i].value),
-                m_settings[i].valueInt
-        );
-    }
-    */
 }
 
 int CLevel::getVersion()

@@ -39,6 +39,8 @@ public:
     CSnd * operator [] (int n);
     CSnd * operator [] (const char*);
     void debug();
+    bool hasSound(int i);
+    bool hasSound(const char *s);
 
 private:
     enum {

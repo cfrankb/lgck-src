@@ -85,9 +85,7 @@ void CTasks::add(CTask *task)
 void CTasks::removeAt(int i)
 {
     delete m_tasks[i];
-  //  qDebug("delete [%d] size=%d", i, m_size);
     for (int j=i; j < m_size -1; ++j) {
-    //    qDebug("m_tasks[%d] = m_tasks[%d]", j , j +1);
         m_tasks[j] = m_tasks[j + 1];
     }
     --m_size;
@@ -107,7 +105,7 @@ void CTasks::forget()
 {
     for (int i=0; i< m_size; ++i) {
         delete m_tasks[i];
-        m_tasks[i] = NULL;
+        m_tasks[i] = nullptr;
     }
     m_size = 0;
 }

@@ -22,10 +22,6 @@
 #include <string>
 #include "IFile.h"
 
-#ifdef USE_QFILE
-class QFile;
-#endif
-
 class CFileWrap: public IFile
 {
 public:
@@ -57,11 +53,7 @@ public:
 
 protected:
 
-#ifdef USE_QFILE
-    QFile * m_file;
-#else
     FILE * m_file;
-#endif
 
     typedef struct {
         char *fileName;

@@ -25,6 +25,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <unistd.h>
+#include "IFile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CSndArray
@@ -55,7 +56,7 @@ void CSndArray::forget()
     for (int i=0; i < m_nSize; ++i) {
         if (m_arrSnds[i]) {
             delete m_arrSnds[i];
-            m_arrSnds[i] = NULL;
+            m_arrSnds[i] = nullptr;
          }
     }
     m_nSize = 0;
@@ -69,7 +70,7 @@ void CSndArray::removeAt(int n)
     }
 
     --m_nSize;
-    m_arrSnds[m_nSize] = NULL;
+    m_arrSnds[m_nSize] = nullptr;
 }
 
 void CSndArray::add(CSnd * pSnd)
@@ -82,7 +83,7 @@ void CSndArray::add(CSnd * pSnd)
         }
 
         for (int i=0; i < m_nSize; i++) {
-            m_arrSnds[i] = NULL;
+            m_arrSnds[i] = nullptr;
         }
         delete [] m_arrSnds;
         m_arrSnds = t;
@@ -92,16 +93,11 @@ void CSndArray::add(CSnd * pSnd)
     m_nSize++;
 }
 
-CSnd t_Snd;
-
 CSnd * CSndArray::operator [](int n)
 {
     if (n < 0 || n >= m_nSize) {
-        //qDebug("CSnd: Warning value \"%d\" is out of bound.\n",
-          //     n);
-        return &t_Snd;
-    }
-    else {
+        return nullptr;
+    } else {
         return m_arrSnds[n];
     }
 }
@@ -109,14 +105,27 @@ CSnd * CSndArray::operator [](int n)
 CSnd * CSndArray::operator [](const char *name)
 {
     for (int n = 0; n < m_nSize; ++n) {
-        if (!strcmp(name,m_arrSnds[n]->getName())) {
-            return m_arrSnds[n];
+        CSnd * snd = m_arrSnds[n];
+        if (!strcmp(name,snd->getName())) {
+            return snd;
         }
     }
+    return nullptr;
+}
 
-    //qDebug("CSnd: Warning no such sound (\"%s\") in array .\n",
-      //     name);
-    return &t_Snd;
+bool CSndArray::hasSound(int i)
+{
+    return !(i < 0 || i >= m_nSize);
+}
+
+bool CSndArray::hasSound(const char *name)
+{
+    for (int i = 0; i < m_nSize; ++i) {
+        if (!strcmp(name,m_arrSnds[i]->getName())) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void CSndArray::debug()
@@ -147,7 +156,6 @@ CSnd::CSnd(const CSnd * snd)
     copy(*snd);
 }
 
-
 CSnd::CSnd(const char* name, char *data, int size)
 {
     init();
@@ -160,7 +168,7 @@ CSnd::~CSnd()
 {
     if (m_data) {
         delete [] m_data;
-        m_data = NULL;
+        m_data = nullptr;
     }
 
     m_size = 0;
@@ -168,7 +176,7 @@ CSnd::~CSnd()
 
 void CSnd::init()
 {
-    m_data = NULL;
+    m_data = nullptr;
     m_size = 0;
     m_uid = rand();
 }
@@ -221,7 +229,7 @@ CSnd & CSnd::copy(const CSnd & src)
 {
     if (m_data) {
         delete [] m_data;
-        m_data = NULL;
+        m_data = nullptr;
     }
 
     m_size = src.getSize();
@@ -261,4 +269,18 @@ void CSnd::debug()
         t[4] = 0;
         memcpy(t, m_data, 4);
     }
+}
+
+bool CSnd::read(IFile & file)
+{
+    UNUSED(file);
+    return true;
+}
+
+bool CSnd::write(IFile & file)
+{
+    if (getSize()) {
+        file.write(getData(), getSize());
+    }
+    return true;
 }

@@ -1,14 +1,35 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "Font.h"
 #include "IFile.h"
 #include <cstring>
 #include "stdafx.h"
+#include "helper.h"
+#include "LuaVM.h"
+#include <zlib.h>
 
-char CFont::m_signature[]="LGCKFONT";
+#define SIGNATURE "LGCKFONT"
 
 CFont::CFont()
 {
-    m_pixels = NULL;
+    m_pixels = nullptr;
     m_text = "";
+    m_textureId = 0;
 }
 
 CFont::~CFont()
@@ -20,20 +41,21 @@ void CFont::forget()
 {
     if (m_pixels) {
         delete [] m_pixels;
-        m_pixels= NULL;
+        m_pixels= nullptr;
     }
     m_width = 0;
     m_height = 0;
   //  m_text = "";
     m_glyphs.clear();
     m_props.clear();
+    m_textureId = 0;
 }
 
 void CFont::setPixmap(const char *glyphs, unsigned int *pixmap, int width, int height)
 {
     if (m_pixels) {
         delete [] m_pixels;
-        m_pixels= NULL;
+        m_pixels= nullptr;
     }
     m_pixels = new unsigned int[width*height];
     m_width = width;
@@ -57,11 +79,12 @@ int CFont::getSize()
     return m_glyphs.size();
 }
 
-void CFont::write(IFile & file)
+bool CFont::write(IFile & file)
 {
     // header
-    int version = VERSION;
-    file.write(m_signature, 8);
+    int version = VERSION_2;
+    const char *signature = SIGNATURE;
+    file.write(signature, 8);
     file.write(&version, 4);
     file.write(&m_width, 2);
     file.write(&m_height, 2);
@@ -89,19 +112,29 @@ void CFont::write(IFile & file)
         file << kv.second;
     }
     // pixels
-    file.write(m_pixels, m_width * m_height * sizeof(unsigned int));
+    unsigned char *out_data;
+    unsigned long out_size;
+    compressData(reinterpret_cast<unsigned char*>(m_pixels), m_width * m_height * sizeof(unsigned int), &out_data, out_size);
+    file.write(&out_size, 4);
+    file.write(out_data, out_size);
+    delete [] out_data;
+    return true;
 }
 
-void CFont::read(IFile & file)
+bool CFont::read(IFile & file)
 {
     forget();
     char signature[8];
     int version = 0;
     // header
     file.read(signature, 8);
-    ASSERT(!memcmp(signature, m_signature,8));
+    ASSERT(!memcmp(signature, SIGNATURE,8));
     file.read(&version, 4);
-    ASSERT(version==VERSION);
+    //ASSERT(version==VERSION);
+    if (version != VERSION_1 && version != VERSION_2) {
+        CLuaVM::debugv("invalid version: %d", version);
+        return false;
+    }
     m_width = m_height = 0;
     file.read(&m_width, 2);
     file.read(&m_height, 2);
@@ -135,12 +168,26 @@ void CFont::read(IFile & file)
     }
     // pixels
     int h = pow2roundup(m_height);
-    m_pixels = new unsigned int[m_width*h];
-    file.read(m_pixels, m_width * m_height * sizeof(unsigned int));
     m_height = h;
-    for (int i=0; i < m_width*m_height; ++i) {
-//        m_pixels[i]=0xff0000ff;
+    m_pixels = new unsigned int[m_width*h];
+    unsigned long totalSize = m_width * m_height * sizeof(unsigned int);
+    if (version == VERSION_1) {
+        file.read(m_pixels, totalSize);
+    } else if (version == VERSION_2) {
+        unsigned long tmpSize = 0;
+        file.read(&tmpSize, 4);
+        unsigned char *tmp = new unsigned char[tmpSize];
+        file.read(tmp, tmpSize);
+        int err = uncompress(reinterpret_cast<unsigned char*>(m_pixels),
+                             &totalSize,
+                             tmp,
+                             tmpSize);
+        if (err) {
+            CLuaVM::debugv("CFont::Read err=%d\n", err);
+            return false;
+        }
     }
+    return true;
 }
 
 void CFont::setScale(int px, int scaleX, int scaleY)
@@ -170,7 +217,6 @@ void CFont::FaceSize(int size)
     ASSERT(m_pxRef);
     m_face = size;
     m_scale = (float)size / (float)m_pxRef * fixup();
-   //qDebug("m_scale: %f %d/%d",m_scale, size, m_pxRef);
 }
 
 int CFont::Advance(const char *text)
@@ -221,3 +267,27 @@ float CFont::fixup()
 {
     return 0.80;
 }
+
+CFont &CFont::operator = (CFont & s)
+{
+    m_glyphs = s.m_glyphs;
+    m_props = s.m_props;
+    m_text = s.m_text;
+    m_width = s.m_width;
+    m_height = s.m_height;
+    m_pxRef = s.m_pxRef;
+    m_scaleX = s.m_scaleX;
+    m_scaleY = s.m_scaleY;
+    m_scale = s.m_scale;
+    m_face = s.m_face;
+    m_textureId = s.m_textureId;
+    int h = pow2roundup(m_height);
+    m_pixels = new unsigned int[m_width*h];
+    if (s.pixels()) {
+        memcpy(m_pixels, s.pixels(), m_width * m_height * 4);
+    } else {
+        memset(m_pixels, 0, m_width * m_height * 4);
+    }
+    return * this;
+}
+

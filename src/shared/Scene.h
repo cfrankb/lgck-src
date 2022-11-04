@@ -20,12 +20,14 @@
 #define SCENE_H
 
 #include "Actor.h"
+#include "ISurface.h"
+#include "../shared/stdafx.h"
 
 class CLayer;
 class CGame;
 class IFile;
 
-class CScene
+class CScene: public ISurface
 {
 public:
     CScene();
@@ -36,8 +38,10 @@ public:
     void removeAt(int i);
     void forget();
     CActor & operator [] (int i) const;
+    CActor & get(int i) const;
+    virtual CLevelEntry & atIndex (int i) const;
     void setOwner(CGame *game, bool bk);
-    int getSize() const;
+    virtual int getSize() const;
     int findPlayerEntry();
     void hideSystemObject(bool bHide);
     int countGoals();
@@ -46,13 +50,16 @@ public:
     int whoIs(int x, int y);
     void map();
     void manageAuto();
-    int findBySeed(UINT32 seed);
+    int findBySeed(uint32_t seed);
     const CScene & operator = (const CLayer & layer);
     void read(IFile &file);
     void write(IFile & file);
     const CScene & operator = (const CScene & s);
     void notifyClosure();
     void notifyAll(int eventId);
+    void freezeAll(int targetGroup, int typeId=0);
+    void unfreezeAll(int targetGroup, int typeId);
+    bool isTarget(CActor *actor, int targetGroup, int typeId);
 
 protected:
     CActor **m_actors;
@@ -64,6 +71,14 @@ protected:
     enum {
         GROWBY = 32,
         VERSION = 0x0002
+    };
+
+    enum {
+        GROUP_NOTHING,
+        GROUP_ALL_MONSTERS,
+        GROUP_CLASS,
+        GROUP_PROTOTYPE,
+        GROUP_ALL
     };
 
     unsigned int m_seed;

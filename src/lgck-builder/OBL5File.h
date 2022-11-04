@@ -57,7 +57,7 @@ protected:
     QString m_lastError;
     bool m_dirty;
     int m_currImage;
-    char m_format[7];
+    std::string m_format;
     CFrameSet m_filter;
 };
 

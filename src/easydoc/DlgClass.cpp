@@ -109,7 +109,7 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
     m_ui->treeFn->setColumnCount(3);
     m_ui->treeFn->setColumnWidth(0, 16);
     m_ui->treeFn->setColumnWidth(1, 64);
-    m_ui->treeFn->setEditTriggers(0);
+    m_ui->treeFn->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeFn->setWordWrap(false);
     m_ui->treeFn->setRootIsDecorated(false);
     m_ui->treeFn->setAlternatingRowColors(true);
@@ -124,7 +124,7 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
 
     m_ui->treeVar->setColumnCount(2);
     m_ui->treeVar->setColumnWidth(0, 64);
-    m_ui->treeVar->setEditTriggers(0);
+    m_ui->treeVar->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeVar->setWordWrap(false);
     m_ui->treeVar->setRootIsDecorated(false);
     m_ui->treeVar->setAlternatingRowColors(true);
@@ -282,7 +282,7 @@ void CDlgClass::on_treeFn_doubleClicked(QModelIndex index)
 
 void CDlgClass::on_treeVar_doubleClicked(QModelIndex index)
 {
-    Param var = m_cl->variables()[index.row()];
+    Param & var = m_cl->variables()[index.row()];
     CDlgParam *d = new CDlgParam ( (QWidget*) parent());
     d->load( &var );
     d->setWindowTitle(tr("edit variable"));

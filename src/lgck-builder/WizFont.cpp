@@ -1,9 +1,27 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "WizFont.h"
 #include "ui_WizFont.h"
 
 #include <QPainter>
 #include <QFontDatabase>
 #include "Font.h"
+#include "FileWrap.h"
 
 char CWizFont::m_text[] = "abcdefghijklmnopqrstuvwxyz" \
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
@@ -29,9 +47,9 @@ CWizFont::~CWizFont()
 void CWizFont::updateFont(const QString & fontName)
 {
     QImage image;
-    bool bold = false;//ui->cBold->isChecked();
-    bool grid = false;//ui->cGrid->isChecked();
-    bool white = true;//ui->cWhite->isChecked();
+    bool bold = false;
+    bool grid = false;
+    bool white = true;
     createBitmap(image, fontName, bold, grid, white);
     ui->sImage->setPixmap(QPixmap::fromImage(image));
 }
@@ -103,14 +121,10 @@ void CWizFont::on_cbFonts_currentIndexChanged(const QString &arg1)
     updateFont(arg1);
 }
 
-void CWizFont::importFont(CFont & font)
+void CWizFont::importFont(CFont & font, QString &name)
 {
-//  QString tmp = ui->cbFonts->currentText()+".fnt";
-//  QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), tmp, tr(m_fileFilter));
- // if (fileName.isEmpty()) {
-  //    return;
- // }
   QString fontName = ui->cbFonts->currentText();
+  name = fontName;
   QImage image;
   bool bold = false;//ui->cBold->isChecked();
   createBitmap(image, fontName, bold, false, false);
@@ -148,9 +162,9 @@ void CWizFont::importFont(CFont & font)
               }
           }
           CFont::Glyph glyph = {
-              xx * XSCALE,
-              yy * YSCALE,
-              maxx,//std::min(maxx+2, (int)XSCALE),
+              static_cast<short>(xx * XSCALE),
+              static_cast<short>(yy * YSCALE),
+              static_cast<short>(maxx),
               YSCALE
           };
           font.addGlyph(m_text[i], glyph);
@@ -161,18 +175,6 @@ void CWizFont::importFont(CFont & font)
   }
   font.setScale(FONTSIZE, XSCALE, YSCALE);
   font.setPixmap(m_text, pixels, w, h);
-  /*QImage img2(
-       reinterpret_cast<unsigned char *>(pixels),
-       size.width(),
-       size.height(),
-       size.width() * sizeof(unsigned int),
-       QImage::Format_RGB32);
 
-  CFileWrap file;
-  if (file.open(fileName.toLatin1().data(), "wb")) {
-      font.write(file);
-      file.close();
-  }*/
- // img2.save("/home/cfrankb/2.png", "PNG");
   delete [] pixels;
 }

@@ -23,7 +23,7 @@ This file is part of colorPickerWidget.
 #include <QDesktopWidget>
 #include "screen.h"
 
-screen::screen()
+CScreen::CScreen()
 {
     label = new QLabel(this);
     label->setPixmap(QPixmap::grabWindow(QApplication::desktop()->winId()));
@@ -32,7 +32,7 @@ screen::screen()
 }
 
 
-void screen::mousePressEvent(QMouseEvent *event)
+void CScreen::mousePressEvent(QMouseEvent *event)
 {
     emit colorSelected( label->pixmap()->toImage().pixel( event->pos() ) );
     close();

@@ -22,10 +22,12 @@
 #include "../shared/Frame.h"
 #include "../shared/FileWrap.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "DlgGotoLevel.h"
 #include <QMessageBox>
 #include <QMenu>
 #include <QFileDialog>
+#include "../shared/qtgui/qfilewrap.h"
 
 CWFrameSet::CWFrameSet(QWidget *parent)
     : QTreeWidget(parent)
@@ -176,19 +178,7 @@ void CWFrameSet::addFrame(int index)
 
 void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
 {
-    UINT8 *png;
-    int pngSize;
-    (*m_frameSet)[j]->toPng(png, pngSize);
-
-    QImage img;
-    if (!img.loadFromData( png, pngSize )) {
-        qDebug("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    QIcon icon = frame2icon(*(*m_frameSet)[j]);
     icon.actualSize(QSize(32,32));
 
     QString s = QString(tr("%1 x %2")) .arg( (*m_frameSet)[j]->m_nLen) . arg((*m_frameSet)[j]->m_nHei);
@@ -198,8 +188,8 @@ void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
 
 void CWFrameSet::addFile( QString fileName )
 {
-    CFileWrap file;
-    if (file.open( q2c(fileName) )) {
+    QFileWrap file;
+    if (file.open(fileName)) {
         CFrameSet images;
         char format[5];
         if (images.extract(file, format)) {
@@ -323,12 +313,12 @@ void CWFrameSet::sliceImage()
         int j = index;
         CFrame *frame = (*m_frameSet)[j];
         dlg->initSizes(std::max(frame->m_nLen, frame->m_nHei));
-        dlg->setLevel( 0 );
+        dlg->setLevelId( 0 );
         if (dlg->exec() == QDialog::Accepted) {
             int sizes[] = {
                 16, 24, 32, 48, 64, 96, 128, 256
             };
-            int pxSize = sizes[dlg->getLevel()];
+            int pxSize = sizes[dlg->getLevelId()];
             CFrameSet *frames = frame->split(pxSize);
             model()->removeRow(j);
             m_frameSet->removeAt(j);
@@ -354,7 +344,7 @@ void CWFrameSet::reload()
     clear();
     setAcceptDrops(true);
     setColumnCount( 2 );
-    setEditTriggers(0);
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
     setWordWrap(false);
     setRootIsDecorated(false);
     setAlternatingRowColors(true);

@@ -27,7 +27,10 @@
 #include "../shared/Layer.h"
 #include "../shared/GameEvents.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include "../shared/interfaces/ISound.h"
+#include "../shared/Proto.h"
+#include "../shared/ProtoIndex.h"
 #include <QMenu>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -41,23 +44,26 @@
 #include "DlgFrameSet.h"
 #include "WizSprite.h"
 #include "Snd.h"
-#include "WFileSave.h"
+#include "WFileDialog.h"
 #include "OBL5File.h"
 #include "displayconfig.h"
 #include "Display.h"
 #include "dlgdisplay.h"
-
-static const char g_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
-static const char g_oblFilter[] = "Object Blocks (*.obl *.obl5)";
-static const char g_pngFilter[] = "PNG Images (*.png)";
+#include "fontmanager.h"
+#include "Font.h"
+#include "WizFont.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CToolBoxDock::CToolBoxDock(QWidget *parent) :
     QDockWidget(parent),
     m_ui(new Ui::CToolBoxDock)
 {
     m_ui->setupUi(this);
-    m_index = NULL;
+    m_index = nullptr;
     m_ui->tabWidget->setCurrentIndex(0);
+    setWidget(m_ui->tabWidget);
+    connect(this, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),
+            this, SLOT(docked(Qt::DockWidgetArea)));
 }
 
 CToolBoxDock::~CToolBoxDock()
@@ -65,7 +71,7 @@ CToolBoxDock::~CToolBoxDock()
     delete m_ui;
     if (m_index) {
         delete (CProtoIndex*)m_index;
-        m_index = NULL;
+        m_index = nullptr;
     }
     clearSprites();
 }
@@ -82,6 +88,21 @@ void CToolBoxDock::changeEvent(QEvent *e)
     }
 }
 
+void CToolBoxDock::docked(Qt::DockWidgetArea area)
+{
+    setMinimumWidth(TOOLBAR_WIDTH);
+    switch (area) {
+    case Qt::DockWidgetArea::TopDockWidgetArea:
+    case Qt::DockWidgetArea::BottomDockWidgetArea:
+        m_ui->tabWidget->setTabPosition(QTabWidget::North);
+        setMaximumWidth(640);
+        break;
+    default:
+         m_ui->tabWidget->setTabPosition(QTabWidget::West);
+         setMaximumWidth(TOOLBAR_WIDTH);
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // page 2
 
@@ -95,7 +116,7 @@ void CToolBoxDock::copySprite()
     ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
     int protoId = data->protoId;
 
-    CGame & gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
 
     // create dialog
 
@@ -111,6 +132,7 @@ void CToolBoxDock::copySprite()
 
     CProto & newProto = gf.m_arrProto[ j ];
     sprintf(newProto.m_szName, q2c(tr("sprite_%d")), j);
+    newProto.resetUUID();
 
     CProtoIndex *protoIndex = (CProtoIndex *)m_index;
     protoIndex->resizeIndex( protoIndex->getSize() + 1);
@@ -118,17 +140,13 @@ void CToolBoxDock::copySprite()
 
     QAbstractItemModel * model =  m_ui->treeObjects->model();
     if (!model) {
-        qDebug("model is null\n");
+        qCritical("model is null\n");
     }
-
     model->insertRow(pos);
-
     item = m_ui->treeObjects->topLevelItem( pos );
-    m_ui->treeObjects->setCurrentItem( item );
     updateIcon( item, gf.m_arrProto.getSize() - 1 );
-
+    m_ui->treeObjects->setCurrentItem( item );
     gf.setDirty(true);
-
     delete d;
 }
 
@@ -162,7 +180,7 @@ void CToolBoxDock::editSprite()
     ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
     int protoId = data->protoId;
 
-    CGame & gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     int row = indexProto->findProto(protoId);
 
     CProto proto = gf.m_arrProto[protoId];
@@ -180,7 +198,7 @@ void CToolBoxDock::editSprite()
 
             QAbstractItemModel * model =  m_ui->treeObjects->model();
             if (!model) {
-                qDebug("model is null\n");
+                qCritical("model is null\n");
             }
             if (pos != row) {
                 model->removeRow(row);
@@ -188,9 +206,8 @@ void CToolBoxDock::editSprite()
             }
             //indexProto->debug();
             QTreeWidgetItem * item = m_ui->treeObjects->topLevelItem( pos );
-            m_ui->treeObjects->setCurrentItem( item );
             updateIcon( item, protoId );
-
+            m_ui->treeObjects->setCurrentItem( item );
             gf.setDirty(true);
         }
     }
@@ -213,7 +230,7 @@ void CToolBoxDock::on_btnAddSprite_clicked()
 
 void CToolBoxDock::createSprite()
 {
-    CGameFile & gf = *((CGameFile*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     int j = gf.m_arrProto.getSize();
     CProto proto;
     sprintf(proto.m_szName, q2c(tr("sprite_%d")), j);
@@ -224,15 +241,15 @@ void CToolBoxDock::createSprite()
     wiz->load(j);
     if (wiz->exec()) {
         wiz->save(j);
+        gf.m_arrProto[j].resetUUID();
         // if we create a new frameset
-        if (gf.m_arrProto[j].m_nFrameSet == gf.m_arrFrames.getSize()) {
+        if (gf.m_arrProto[j].m_nFrameSet == gf.frames().getSize()) {
             qDebug("new frameSet created");
-            int frameSet = gf.m_arrFrames.getSize();
-            gf.m_arrFrames.add(wiz->getFrameSet());
-            wiz->getFrameSet()->debug();
+            int frameSet = gf.frames().getSize();
+            gf.frames().add(wiz->getFrameSet());
             char name[256];
             sprintf(name,"img%d",frameSet);
-            gf.m_arrFrames[frameSet]->setName(name);
+            gf.frames()[frameSet]->setName(name);
             gf.cache()->add( wiz->getFrameSet() );
             gf.m_arrProto[j].m_nFrameSet = frameSet;
             gf.m_arrProto[j].m_nFrameNo = 0;
@@ -240,17 +257,17 @@ void CToolBoxDock::createSprite()
             // delete the frameSet if we don't need it
             delete wiz->getFrameSet();
         }
-        CProtoIndex *protoIndex = (CProtoIndex *)m_index;
+        CProtoIndex *protoIndex = m_index;
         protoIndex->resizeIndex( protoIndex->getSize() + 1);
         int pos = protoIndex->insert( gf.m_arrProto.getSize() - 1 );
         QAbstractItemModel * model =  m_ui->treeObjects->model();
         if (!model) {
-            qDebug("model is null\n");
+            qCritical("model is null\n");
         }
         model->insertRow(pos);
         QTreeWidgetItem * item = m_ui->treeObjects->topLevelItem( pos );
+        updateIcon(item, gf.m_arrProto.getSize() - 1);
         m_ui->treeObjects->setCurrentItem( item );
-        updateIcon( item, gf.m_arrProto.getSize() - 1 );
         gf.setDirty(true);
         if (QMessageBox::question(this, "", tr("Do you want to edit your new sprite?"),
                                  QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
@@ -264,9 +281,9 @@ void CToolBoxDock::createSprite()
 
 void CToolBoxDock::checkFrameSetUses(int frameSet)
 {
-    CGame & gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     int *uses = gf.countFrameSetUses();
-    CFrameSet *fs = gf.m_arrFrames[frameSet];
+    CFrameSet *fs = gf.frames()[frameSet];
     if (!uses[frameSet]) {
         QMessageBox::StandardButton
                 ret = QMessageBox::warning(
@@ -275,7 +292,7 @@ void CToolBoxDock::checkFrameSetUses(int frameSet)
                            "Do you want to remove it?").arg(fs->getName()),
                     QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes) {
-            gf.m_arrFrames.removeAt(frameSet);
+            gf.frames().removeAt(frameSet);
             gf.killFrameSet(frameSet);
         }
     }
@@ -284,7 +301,7 @@ void CToolBoxDock::checkFrameSetUses(int frameSet)
 
 void CToolBoxDock::on_btnDeleteSprite_clicked()
 {
-    CGame & gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     CProtoIndex *protoIndex = (CProtoIndex *)m_index;
     QModelIndex index = m_ui->treeObjects->currentIndex();
     if (!protoIndex) {
@@ -333,9 +350,9 @@ void CToolBoxDock::on_btnDeleteSprite_clicked()
     }
 }
 
-void CToolBoxDock::updateIcon(void * itm, int protoId)
+void CToolBoxDock::updateIcon(QTreeWidgetItem *itm, int protoId)
 {
-    QTreeWidgetItem * item = (QTreeWidgetItem *) itm;
+    QTreeWidgetItem * item = itm;
     // TODO: make sure to delete these pointers to prevent memory leaks
 
     ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
@@ -349,23 +366,11 @@ void CToolBoxDock::updateIcon(void * itm, int protoId)
     v.setValue( data );
     item->setData(0, Qt::UserRole, v);
 
-    CGame & gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     CProto & proto = gf.m_arrProto[ protoId ];
 
-    CFrameSet & filter = *gf.m_arrFrames[proto.m_nFrameSet];
-    UINT8 *png;
-    int size;
-    filter[proto.m_nFrameNo]->toPng(png, size);
-
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png\n");
-    }
-    delete [] png;
-
-    QPixmap pm = QPixmap::fromImage(img);
-    QIcon icon;
-    icon.addPixmap(pm, QIcon::Normal, QIcon::On);
+    CFrameSet & filter = *gf.frames()[proto.m_nFrameSet];
+    QIcon icon = frame2icon(* filter[proto.m_nFrameNo]);
     icon.actualSize(QSize(32,32));
 
     QString className;
@@ -382,7 +387,7 @@ void CToolBoxDock::updateIcon(void * itm, int protoId)
 
 void CToolBoxDock::updateObjects (int OldframeSet, int newFrameSet)
 {
-    CGame & gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     for (int i = 0; i < gf.m_arrProto.getSize(); ++i) {
         CProtoIndex * indexProto = (CProtoIndex*) m_index;
 
@@ -402,6 +407,24 @@ void CToolBoxDock::updateObjects (int OldframeSet, int newFrameSet)
 
 void CToolBoxDock::on_treeObjects_itemSelectionChanged()
 {
+    QModelIndex indexObject = m_ui->treeObjects->currentIndex();
+    QTreeWidgetItem * item = m_ui->treeObjects->currentItem();
+    int protoId = CGame::INVALID;
+    if (item && indexObject.row() != -1) {
+        ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
+        protoId = data->protoId;
+        const CProto & proto = m_gameFile->m_arrProto.get(protoId);
+        qDebug("spriteSelected: proto: [%d] at index [%d] [%s]",
+               protoId,
+               indexObject.row(),
+               proto.getName());
+    } else {
+        qDebug("spriteSelected: proto: [%d] at index [%d] [%s]",
+               protoId,
+               indexObject.row(),
+               "invalid");
+    }
+    emit currentProtoChanged(protoId);
     updateButtons();
 }
 
@@ -455,9 +478,9 @@ void CToolBoxDock::reloadSprites()
         delete (CProtoIndex*) m_index;
     }
 
-    CGame &gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     int filter = m_ui->cbFilterSprites->currentIndex();
-    m_index = gf.m_arrProto.createIndex(filter);
+    m_index = gf.m_arrProto.createIndex(filter, q2c(m_ui->eSearchSprite->text().trimmed()));
     CProtoIndex *index = (CProtoIndex*) m_index;
 
     clearSprites();
@@ -466,7 +489,7 @@ void CToolBoxDock::reloadSprites()
     m_ui->treeObjects->geometry().getRect(&x, &y, &w, &h);
     m_ui->treeObjects->setColumnWidth(0, 32);
     m_ui->treeObjects->setColumnWidth(1, 96);
-    m_ui->treeObjects->setEditTriggers(0);
+    m_ui->treeObjects->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeObjects->setWordWrap(true);
     m_ui->treeObjects->setRootIsDecorated(false);
     m_ui->treeObjects->setIconSize(QSize(32,32));
@@ -485,13 +508,13 @@ void CToolBoxDock::reloadSprites()
 
 void CToolBoxDock::reloadSounds()
 {
-    CGame &gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     int count = m_ui->treeSounds->model()->rowCount();
     m_ui->treeSounds->model()->removeRows(0, count);
     m_ui->treeSounds->setColumnCount(2);
     m_ui->treeSounds->setColumnWidth(0, 128);
     m_ui->treeSounds->setColumnWidth(1, 64);
-    m_ui->treeSounds->setEditTriggers(0);
+    m_ui->treeSounds->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeSounds->setWordWrap(false);
     m_ui->treeSounds->setRootIsDecorated(false);
     m_ui->treeSounds->setAlternatingRowColors(true);
@@ -513,21 +536,20 @@ void CToolBoxDock::reloadSounds()
 
 void CToolBoxDock::reloadLevels()
 {
-    CGame &gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     int count = m_ui->treeLevels->model()->rowCount();
     m_ui->treeLevels->model()->removeRows(0, count);
     m_ui->treeLevels->setColumnCount(2);
     m_ui->treeLevels->setColumnWidth(0, 32);
     m_ui->treeLevels->setColumnWidth(1, 70);
-    m_ui->treeLevels->setEditTriggers(0);
+    m_ui->treeLevels->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeLevels->setWordWrap(false);
     m_ui->treeLevels->setRootIsDecorated(false);
     m_ui->treeLevels->setAlternatingRowColors(true);
 
     for (int i = 0; i < gf.getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
-        QString s;
-        s.sprintf("%.3d", i + 1);
+        QString s = QString::asprintf("%.3d", i + 1);
         item->setText(0, s);
         item->setText(1, gf[i]->getSetting("title"));
         m_ui->treeLevels->addTopLevelItem(item);
@@ -538,15 +560,8 @@ void CToolBoxDock::reloadEvents()
 {
     // page 6: events
 
-    CGame &gf = *((CGame*)m_gameFile);
-    int count = m_ui->treeEvents->model()->rowCount();
-    m_ui->treeEvents->model()->removeRows(0, count);
-    m_ui->treeEvents->setColumnCount(1);
-    m_ui->treeEvents->setColumnWidth(0, 128);
-    m_ui->treeEvents->setEditTriggers(0);
-    m_ui->treeEvents->setWordWrap(false);
-    m_ui->treeEvents->setRootIsDecorated(false);
-    m_ui->treeEvents->setAlternatingRowColors(true);
+    CGameFile & gf = *m_gameFile;
+    initTree(m_ui->treeEvents);
 
     QIcon iconBlank;
     iconBlank.addFile(":/images/blank.png");
@@ -572,15 +587,8 @@ void CToolBoxDock::reloadDisplays()
     // page x: displays
     qDebug("reload displays()");
 
-    CGame &gf = *((CGame*)m_gameFile);
-    int count = m_ui->treeDisplays->model()->rowCount();
-    m_ui->treeDisplays->model()->removeRows(0, count);
-    m_ui->treeDisplays->setColumnCount(1);
-    m_ui->treeDisplays->setColumnWidth(0, 128);
-    m_ui->treeDisplays->setEditTriggers(0);
-    m_ui->treeDisplays->setWordWrap(false);
-    m_ui->treeDisplays->setRootIsDecorated(false);
-    m_ui->treeDisplays->setAlternatingRowColors(true);
+    CGameFile & gf = *m_gameFile;
+    initTree(m_ui->treeDisplays);
 
     QIcon iconBlank;
     iconBlank.addFile(":/images/blank.png");
@@ -610,6 +618,7 @@ void CToolBoxDock::reload()
     reloadLevels();
     reloadEvents();
     reloadDisplays();
+    reloadFonts();
     updateButtons();
 }
 
@@ -709,7 +718,7 @@ void CToolBoxDock::on_cbFilterSprites_currentIndexChanged(int index)
 
 void CToolBoxDock::on_btnDeleteSound_clicked()
 {
-    CGame & gf = *((CGame*)m_gameFile);
+    CGame & gf = *(static_cast<CGame*>(m_gameFile));
     QModelIndex index = m_ui->treeSounds->currentIndex();
     if (index.row() < 1) {
         QMessageBox::warning(this, "", tr("This Sound cannot be deleted."), QMessageBox::Ok);
@@ -751,7 +760,7 @@ void CToolBoxDock::on_treeSounds_doubleClicked(QModelIndex index)
 
 void CToolBoxDock::on_btnAddSound_clicked()
 {
-    CGame & gf = *((CGame*)m_gameFile);
+    CGame & gf = *(static_cast<CGame*>(m_gameFile));
     CSnd *snd = new CSnd();
     QString wavFilter = tr("Wav sounds (*.wav)");
     QString oggFilter = tr("OggSound (*.ogg)");
@@ -769,8 +778,8 @@ void CToolBoxDock::on_btnAddSound_clicked()
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
 
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);
@@ -851,7 +860,7 @@ void CToolBoxDock::on_btnDeleteLevel_clicked()
 
 void CToolBoxDock::on_treeEvents_doubleClicked(QModelIndex index)
 {
-    CGameFile & gf = *((CGameFile*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     CGameEvents & events = *(gf.getEvents());
     CDlgSource *d = new CDlgSource ( (QWidget*) parent());
     d->init(m_gameFile);
@@ -882,7 +891,7 @@ void CToolBoxDock::on_treeEvents_doubleClicked(QModelIndex index)
 
 void CToolBoxDock::on_btnClearAll_clicked()
 {
-    CGameFile & gf = *((CGameFile*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     if (QMessageBox::warning(this, "", tr("Are you sure that you want to clear all the events"),
                              QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok) {
         QIcon iconBlank;
@@ -913,8 +922,7 @@ void CToolBoxDock::deleteLevel(int index)
     for (int i = index; i > 0  && i < m_gameFile->getSize(); ++i) {
         QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( i );
         if (item) {
-            QString s;
-            s.sprintf("%.3d", i + 1);
+            QString s = QString::asprintf("%.3d", i + 1);
             item->setText(0, s);
         }
     }
@@ -929,9 +937,8 @@ void CToolBoxDock::addLevel()
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(0);
     int index = m_gameFile->getSize() - 1;
-    CLevel & level =  *(m_gameFile->m_arrLevels[ index ]);
-    QString s;
-    s.sprintf("%.3d", index + 1);
+    CLevel & level = m_gameFile->getLevelObject(index);
+    QString s = QString::asprintf("%.3d", index + 1);
     item->setText(0, s);
     item->setText(1, level.getSetting("title"));
     m_ui->treeLevels->addTopLevelItem(item);
@@ -950,9 +957,8 @@ void CToolBoxDock::editLevel(int index)
 {
     QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( index );
     if (item) {
-        CLevel & levelObj =  *(m_gameFile->m_arrLevels[ index ]);
-        QString s;
-        s.sprintf("%.3d", index + 1);
+        CLevel & levelObj = m_gameFile->getLevelObject(index);
+        QString s = QString::asprintf("%.3d", index + 1);
         item->setText(0, s);
         item->setText(1, levelObj.getSetting("title"));
         selectLevel(index);
@@ -964,19 +970,15 @@ void CToolBoxDock::moveLevel(int fromIndex, int toIndex)
     m_ui->treeLevels->model()->removeRow(fromIndex);
     m_ui->treeLevels->model()->insertRow(toIndex);
     QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( toIndex );
-    CLevel & levelObj =  *(m_gameFile->m_arrLevels[ toIndex ]);
-    QString s;
-    s.sprintf("%.3d", toIndex + 1);
+    CLevel & levelObj = m_gameFile->getLevelObject(toIndex);
+    QString s = QString::asprintf("%.3d", toIndex + 1);
     item->setText(0, s);
     item->setText(1, levelObj.getSetting("title"));
-
     for (int i = 0; i < m_gameFile->getSize(); ++i) {
         QTreeWidgetItem * item = m_ui->treeLevels->topLevelItem( i );
-        QString s;
-        s.sprintf("%.3d", i + 1);
+        QString s = QString::asprintf("%.3d", i + 1);
         item->setText(0, s);
     }
-
     selectLevel(toIndex);
 }
 
@@ -1061,7 +1063,7 @@ void CToolBoxDock::on_treeSounds_customContextMenuRequested(QPoint pos)
 void CToolBoxDock::editSound()
 {
     QModelIndex index = m_ui->treeSounds->currentIndex();
-    CGame & gf = *((CGame*)m_gameFile);
+    CGame & gf = *(static_cast<CGame*>(m_gameFile));
 
     if (index.row()<0) {
         return;
@@ -1074,7 +1076,7 @@ void CToolBoxDock::editSound()
 
     CSnd snd ( (* gf.m_arrSounds[ index.row() ]) );
     QString wavFilter = tr("Wav sounds (*.wav)");
-    QString oggFilter = tr("OggSound (*.ogg)");
+    QString oggFilter = tr("Ogg sounds (*.ogg)");
     QString allFilter = tr("Popular sound files (*.wav *.ogg *.flac *.aiff *.au)");
     static QString fileFilter = allFilter + ";;" + wavFilter + ";;" + oggFilter ;
 
@@ -1089,8 +1091,8 @@ void CToolBoxDock::editSound()
             fileFilter = wavFilter + ";;" + oggFilter + ";;" + allFilter;
         }
 
-        CFileWrap file;
-        if (file.open( q2c(fileName) )) {
+        QFileWrap file;
+        if (file.open(fileName)) {
             int size = file.getSize();
             char *data = new char[size];
             file.read(data, size);
@@ -1174,7 +1176,7 @@ void CToolBoxDock::renameSound()
 
 void CToolBoxDock::editFrames()
 {
-    CGame & gf = * static_cast<CGame*>(m_gameFile);
+    CGameFile & gf = *m_gameFile;
     QModelIndex index = m_ui->treeObjects->currentIndex();
     if (!m_index) {
         return;
@@ -1187,15 +1189,15 @@ void CToolBoxDock::editFrames()
     int fs = proto.m_nFrameSet;
 
     CDlgFrameSet * d = new CDlgFrameSet (this);
-    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.m_arrFrames[fs]->getName()) );
-    CFrameSet * frameSet = new CFrameSet (gf.m_arrFrames[fs]);
+    d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(gf.frames()[fs]->getName()) );
+    CFrameSet * frameSet = new CFrameSet (gf.frames()[fs]);
     d->init(frameSet);
     if (d->exec() == QDialog::Accepted) {
         qDebug("on_treeFrameSets_doubleClicked(QModelIndex index) save\n");
         gf.setDirty( true );
         // replace frameSet
-        delete gf.m_arrFrames[ fs ];
-        gf.m_arrFrames.setAt( fs, frameSet);
+        delete gf.frames()[ fs ];
+        gf.frames().setAt( fs, frameSet);
         // update the imageCache
         gf.cache()->replace(fs, frameSet);
         updateFrameSet(fs);
@@ -1226,6 +1228,10 @@ void CToolBoxDock::updateFrameSet(int frameSet)
 
 void CToolBoxDock::exportSprite()
 {
+    const QString oblFilter = QObject::tr("Object Blocks (*.obl *.obl5)");
+    const QString pngFilter = QObject::tr("PNG Images (*.png)");
+    const QString metaFilter = QObject::tr("Metadata (*.proto)");
+
     CProtoIndex * indexProto = (CProtoIndex*) m_index;
     QTreeWidgetItem * item = m_ui->treeObjects->currentItem();
     if (!item || !indexProto) {
@@ -1237,26 +1243,21 @@ void CToolBoxDock::exportSprite()
 
     CGame & gf = *((CGame*)m_gameFile);
     CProto & proto = gf.m_arrProto[protoId];
-    CFrameSet * frameSet = gf.m_arrFrames[proto.m_nFrameSet];
-    COBL5File oblDoc;
+    CFrameSet * frameSet = gf.frames()[proto.m_nFrameSet];
 
+    QString selected = pngFilter + "\n" + oblFilter + "\n" + metaFilter;
+    QString suffix = "png";
+    QString fileName = proto.getName();
     QStringList filters;
-    QString selected = tr(g_oblFilter) + "\n" + tr(g_pngFilter);
-    QString suffix = "obl";
-    QString fileName = "";
+    filters.append(pngFilter);
+    filters.append(oblFilter);
+    filters.append(metaFilter);
 
-    selected = tr(g_pngFilter) + "\n" + tr(g_oblFilter);
-    suffix = "png";
-    filters.append(tr(g_pngFilter));
-    filters.append(tr(g_oblFilter));
-
-    CWFileSave * dlg = new CWFileSave(this,tr("Save As"),"",selected);
-
+    CWFileDialog * dlg = new CWFileDialog(this,tr("Save As"), QDir::homePath(), selected);
     dlg->setNameFilters(filters);
     dlg->setAcceptMode(QFileDialog::AcceptSave);
     dlg->setDefaultSuffix(suffix);
-
-    connect(dlg, SIGNAL(filterSelected(QString)), dlg, SLOT(changeDefaultSuffix(QString)));
+    dlg->selectNameFilter(pngFilter); // workarround for default suffix not being set
     if (dlg->exec()) {
         QStringList fileNames = dlg->selectedFiles();
         if (fileNames.count()>0) {
@@ -1264,18 +1265,35 @@ void CToolBoxDock::exportSprite()
         }
     }
 
-    char outFormat[5];
+    std::string outFormat;
     if (!fileName.isEmpty()) {
         selected = dlg->selectedNameFilter();
-        if (selected == tr(g_oblFilter)) {
-            strcpy(outFormat, "OBL5");
-        } else {
-            strcpy(outFormat, "PNG");
+        bool isObl = true;
+        if (selected == oblFilter) {
+            outFormat = "OBL5";
+        } else if(selected == pngFilter) {
+            outFormat = "PNG";
+        } else if(selected == metaFilter) {
+            outFormat = "PRTO";
+            isObl = false;
         }
-        oblDoc.setFormat(outFormat);
-        oblDoc.getImageSet() = *frameSet;
-        oblDoc.setFileName(fileName);
-        oblDoc.write();
+        bool result = false;
+        if (isObl) {
+            COBL5File oblDoc;
+            oblDoc.setFormat(outFormat.c_str());
+            oblDoc.getImageSet() = *frameSet;
+            oblDoc.setFileName(fileName);
+            result = oblDoc.write();
+        } else {
+            QFileWrap file;
+            if (file.open(fileName, "wb")) {
+                result = m_gameFile->m_arrProto.exportMeta(file, protoId);
+                file.close();
+            }
+        }
+        if (!result) {
+            QMessageBox::warning(static_cast<QWidget*>(parent()), "", tr("Failed to export."));
+        }
     }
     delete dlg;
 }
@@ -1295,6 +1313,9 @@ void CToolBoxDock::on_treeDisplays_doubleClicked(const QModelIndex &index)
         if (dlg.exec() == QDialog::Accepted) {
             dlg.save(d);
             gf.setDirty(true);
+            QTreeWidgetItem * item = m_ui->treeDisplays->topLevelItem( i );
+            m_ui->treeDisplays->setCurrentItem( item );
+            item->setText(0, d.name());
         }
     }
 }
@@ -1331,7 +1352,7 @@ void CToolBoxDock::on_btnDeleteDisplay_clicked()
 
 void CToolBoxDock::on_btnAddDisplay_clicked()
 {
-    CGame & gf = *((CGame*)m_gameFile);
+    CGameFile & gf = *m_gameFile;
     CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
     CDlgDisplay dlg;
     CDisplay d = CDisplay("", 0, 0, 0);
@@ -1347,7 +1368,7 @@ void CToolBoxDock::on_btnAddDisplay_clicked()
         conf.add(d);
         QAbstractItemModel * model =  m_ui->treeDisplays->model();
         if (!model) {
-            qDebug("model is null\n");
+            qCritical("model is null\n");
         }
         model->insertRow(pos);
         QTreeWidgetItem * item = m_ui->treeDisplays->topLevelItem( pos );
@@ -1439,4 +1460,207 @@ void CToolBoxDock::editEvent()
 {
     QModelIndex index = m_ui->treeEvents->currentIndex();
     on_treeEvents_doubleClicked(index);
+}
+
+void CToolBoxDock::updateIcon(int protoId)
+{
+    int i = m_index->findProto(protoId);
+    if (i !=  -1) {
+        QTreeWidgetItem * item =  m_ui->treeObjects->topLevelItem(i);
+        updateIcon(item, protoId);
+    }
+}
+
+void CToolBoxDock::initTree(QTreeWidget *tree)
+{
+    int count = tree->model()->rowCount();
+    tree->model()->removeRows(0, count);
+    tree->setColumnCount(1);
+    tree->setColumnWidth(0, 128);
+    tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    tree->setWordWrap(false);
+    tree->setRootIsDecorated(false);
+    tree->setAlternatingRowColors(true);
+}
+
+void CToolBoxDock::reloadFonts()
+{
+    // page x: fonts
+    qDebug("reload fonts()");
+
+    CGameFile & gf = *m_gameFile;
+    QTreeWidget *tree = m_ui->treeFonts;
+    initTree(tree);
+
+    QIcon iconBlank;
+    iconBlank.addFile(":/images/blank.png");
+
+    QIcon iconCheck;
+    iconCheck.addFile(":/images/pd/gesloten_slot.png");
+
+    CFontManager & fonts = *(gf.getFonts());
+    for (int i = 0; i < fonts.getSize(); ++i) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(0);
+        item->setText(0, fonts.nameAt(i));
+        if (!i) {
+            item->setIcon(0, iconCheck);
+        } else {
+            item->setIcon(0, iconBlank);
+        }
+        tree->addTopLevelItem(item);
+    }
+    m_ui->btnDeleteFont->setEnabled(false);
+}
+
+void CToolBoxDock::on_treeFonts_doubleClicked(const QModelIndex &index)
+{
+    if (index.row() > 0) {
+        editFont();
+    }
+}
+
+void CToolBoxDock::on_treeFonts_clicked(const QModelIndex &index)
+{
+    int i = index.row();
+    m_ui->btnDeleteFont->setEnabled(i != 0);
+}
+
+void CToolBoxDock::on_treeFonts_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidget *tree = m_ui->treeFonts;
+    QTreeWidgetItem * item = tree->itemAt(pos);
+    if (item) {
+        // Make sure this item is selected
+        tree->setCurrentItem( item );
+
+        QModelIndex index = tree->currentIndex();
+        int i = index.row();
+
+        // create pop-up
+        QMenu menu(tree);
+        QAction *actionAdd = new QAction(tr("New Font"), &menu);
+        menu.addAction(actionAdd);
+        if (i != 0) {
+            QAction *actionEdit = new QAction(tr("Rename Font"), &menu);
+            menu.addAction(actionEdit);
+            QAction *actionDelete = new QAction(tr("Delete Font"), &menu);
+            menu.addAction(actionDelete);
+            connect(actionDelete, SIGNAL(triggered()), this, SLOT(on_btnDeleteFont_clicked()));
+            // create an action and connect it to a signal
+            connect(actionEdit, SIGNAL(triggered()), this, SLOT(editFont()));
+        }
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddFont_clicked()));
+        menu.exec(tree->mapToGlobal(pos));
+    } else {
+        QMenu menu(tree);
+        QAction *actionAdd = new QAction(tr("New Font"), &menu);
+        menu.addAction(actionAdd);
+
+        connect(actionAdd, SIGNAL(triggered()), this, SLOT(on_btnAddFont_clicked()));
+        menu.exec(tree->mapToGlobal(pos));
+    }
+}
+
+void CToolBoxDock::on_btnAddFont_clicked()
+{
+    CWizFont *wiz = new CWizFont(static_cast<QWidget*>(parent()));
+    if (wiz->exec()) {
+        CFont font;
+        QString name;
+        wiz->importFont(font, name);
+        CGameFile & gf = *m_gameFile;
+        CFontManager & fonts = *(gf.getFonts());
+        int pos = fonts.getSize();
+        int x = 0;
+        QString newName = name;
+        while (fonts.indexOf(q2c(newName)) != CFontManager::NOT_FOUND) {
+            ++x;
+            newName = QString("%1_%2").arg(name).arg(x);
+        }
+        fonts.add(font, q2c(newName));
+
+        QTreeWidget * tree = m_ui->treeFonts;
+        QAbstractItemModel * model =  tree->model();
+        if (!model) {
+            qCritical("model is null\n");
+        }
+        model->insertRow(pos);
+        QTreeWidgetItem * item = tree->topLevelItem( pos );
+        tree->setCurrentItem( item );
+        item->setText(0, newName);
+        QIcon iconBlank;
+        iconBlank.addFile(":/images/blank.png");
+        item->setIcon(0, iconBlank);
+        gf.setDirty(true);
+        m_ui->btnDeleteFont->setEnabled(true);
+    }
+}
+
+void CToolBoxDock::on_btnDeleteFont_clicked()
+{
+    CGameFile & gf = *m_gameFile;
+    CDisplayConfig & conf = *(m_gameFile->getDisplayConfig());
+    QTreeWidget * tree = m_ui->treeFonts;
+    QModelIndex index = tree->currentIndex();
+    int i = index.row();
+    if (i == -1) {
+        QMessageBox::warning(this, "", tr("No Font selected."), QMessageBox::Ok);
+        return;
+    }
+    if (i == 0) {
+        QMessageBox::warning(this, "", tr("This Font is owned by the engine and cannot be deleted."), QMessageBox::Ok);
+        return;
+    }
+    CFontManager & fonts = *(gf.getFonts());
+    QMessageBox::StandardButton
+            ret = QMessageBox::warning(
+                this,  "",  tr("Are you sure that you want to delete\n"
+                               "`%1` ?") .arg(fonts.nameAt(i)),
+                QMessageBox::Ok | QMessageBox::Cancel);
+    if (ret == QMessageBox::Ok) {
+        // remove visual
+        QAbstractItemModel * model =  m_ui->treeFonts->model();
+        model->removeRow( index.row() );
+        fonts.removeAt(i);
+        gf.setDirty( true );
+        conf.killFont(i);
+        m_ui->btnDeleteFont->setEnabled(false);
+    }
+}
+
+void CToolBoxDock::editFont()
+{
+    QTreeWidget *tree = m_ui->treeFonts;
+    QModelIndex index = tree->currentIndex();
+    int i = index.row();
+    if (i < 0) {
+        return;
+    }
+    if (!i) {
+        QMessageBox::warning(this, "", tr("This font cannot be renamed."),  QMessageBox::Ok);
+        return;
+    }
+    bool ok;
+    QString text = QInputDialog::getText(static_cast<QWidget*>(parent()), tr("Rename Font"),
+                                         tr("Font name:"), QLineEdit::Normal,
+                                         m_gameFile->getFonts()->nameAt(i), &ok);
+    if (ok && !text.isEmpty()) {
+        CFontManager & fonts = *(m_gameFile->getFonts());
+        int x = 0;
+        QString newName = text;
+        while (fonts.indexOf(q2c(newName)) != i && fonts.indexOf(q2c(newName)) != CFontManager::NOT_FOUND) {
+            ++x;
+            newName = QString("%1_%2").arg(text).arg(x);
+        }
+        m_gameFile->getFonts()->setName(i, q2c(newName));
+        QTreeWidgetItem * item = tree->topLevelItem( index.row() );
+        item->setText(0, text);
+        m_gameFile->setDirty(true);
+    }
+}
+
+void CToolBoxDock::on_eSearchSprite_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    reloadSprites();
 }

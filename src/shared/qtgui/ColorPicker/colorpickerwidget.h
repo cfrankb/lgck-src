@@ -57,7 +57,7 @@ private:
 
     QGridLayout *layout;
 
-    screen *ecran;
+    CScreen *ecran;
 };
 
 #endif // COLORPICKERWIDGET_H

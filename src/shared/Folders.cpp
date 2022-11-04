@@ -20,6 +20,7 @@
 #include <string.h>
 #include "../shared/FileWrap.h"
 #include "Folders.h"
+#include "ISerial.h"
 
 CFolders::CFolders()
 {
@@ -29,6 +30,7 @@ CFolders::CFolders()
     m_size = 0;
     m_max = GROWBY;
     m_folders = new CFolder[m_max];
+    m_file = nullptr;
 }
 
 CFolders::~CFolders()
@@ -46,23 +48,18 @@ CFolder * CFolders::operator [] (const char * name)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
-bool CFolders::open(const char* fileName, bool create)
+bool CFolders::open(IFile *file, bool create)
 {
+    m_file = file;
     if (create) {
-        if (m_file.open(fileName, "wb")) {
-            m_file.close();
-            m_file.open(fileName, "rb+");
-            m_offset = -1;
-            m_fileSize = HEADER_SIZE;
-            return writeHeader();
-        }
+        m_offset = -1;
+        m_fileSize = HEADER_SIZE;
+        return writeHeader();
     } else {
-        if (m_file.open(fileName, "rb")) {
-            return readHeader() && readFolderIndex() && readFileIndex();
-        }
+        return readHeader() && readFolderIndex() && readFileIndex();
     }
 
     return false;
@@ -71,12 +68,13 @@ bool CFolders::open(const char* fileName, bool create)
 bool CFolders::writeHeader()
 {
     // main header
-    m_file.seek(0);
+    IFile & file = *m_file;
+    file.seek(0);
 
-    m_file.write("VFF1", 4);
-    m_file << m_version;
-    m_file << m_fileSize;
-    m_file << m_offset;
+    file.write("VFF1", 4);
+    file << m_version;
+    file << m_fileSize;
+    file << m_offset;
 
     return true;
 }
@@ -84,13 +82,15 @@ bool CFolders::writeHeader()
 bool CFolders::readHeader()
 {
     // main header
-    m_file.seek(0);
+    IFile & file = *m_file;
+
+    file.seek(0);
     char signature[5];
 
-    m_file.read(signature, 4);
-    m_file >> m_version;
-    m_file >> m_fileSize;
-    m_file >> m_offset;
+    file.read(signature, 4);
+    file >> m_version;
+    file >> m_fileSize;
+    file >> m_offset;
     return true;
 }
 
@@ -102,13 +102,14 @@ bool CFolders::writeFolderIndex()
         m_fileSize += INDEX_HEADER_SIZE + m_max * FOLDER_ENTRY_SIZE;
     }
 
-    m_file.seek(m_offset);
-    m_file << m_size;
-    m_file << m_max;
+    IFile & file = *m_file;
+    file.seek(m_offset);
+    file << m_size;
+    file << m_max;
 
     // folderIndexEntry
     for (int i=0; i < m_max; ++i) {
-        m_folders[i].writeFolderIndex(m_file);
+        m_folders[i].writeFolderIndex(*m_file);
     }
 
     return true;
@@ -122,10 +123,11 @@ bool CFolders::readFolderIndex()
         return true;
     }
 
-    m_file.seek(m_offset);
-    m_file >> m_size;
+    IFile & file = *m_file;
+    file.seek(m_offset);
+    file >> m_size;
     int max;
-    m_file >> max;
+    file >> max;
 
     // allocate more memory if needed
     if (max > m_max) {
@@ -138,7 +140,7 @@ bool CFolders::readFolderIndex()
 
     // folderIndexEntry
     for (int i=0; i < m_max; ++i){
-        m_folders[i].readFolderIndex(m_file);
+        m_folders[i].readFolderIndex(*m_file);
     }
 
     return true;
@@ -156,12 +158,11 @@ bool CFolders::writeFileIndex()
             m_fileSize += CFolder::FILELIST_HEADER_SIZE + m_folders[i].m_max * CFolder::FILELIST_ENTRY_SIZE;
         }
 
-        m_folders[i].writeFileIndex(m_file);
+        m_folders[i].writeFileIndex(*m_file);
     }
 
     return true;
 }
-
 
 bool CFolders::readFileIndex()
 {
@@ -171,7 +172,7 @@ bool CFolders::readFileIndex()
         // or otherwise invalidated
         if ( m_folders[i].m_offset != -1) {
             // create a new index
-            m_folders[i].readFileIndex(m_file);
+            m_folders[i].readFileIndex(*m_file);
         }
     }
 
@@ -208,8 +209,8 @@ void CFolders::addFile(CFolder & folder, const char* srcfileName, const char* fi
             char *buffer = new char[size];
             file.read(buffer, size);
             file.close();
-            m_file.seek(m_fileSize);
-            m_file.write(buffer, size);
+            m_file->seek(m_fileSize);
+            m_file->write(buffer, size);
             delete [] buffer;
         }
     }
@@ -243,7 +244,7 @@ CFolder::CFileEntry * CFolders::checkOut(const char * filePath)
     if (folder) {
         return (*folder)[fileName.c_str()] ;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -262,11 +263,11 @@ CFolder::~CFolder()
 {
     if (m_files) {
         delete [] m_files;
-        m_files = NULL;
+        m_files = nullptr;
     }
 }
 
-bool CFolder::writeFolderIndex(CFileWrap & file)
+bool CFolder::writeFolderIndex(IFile & file)
 {
     char t [MAX_NAME + 1];
     memset( t, 0, MAX_NAME + 1);
@@ -277,7 +278,7 @@ bool CFolder::writeFolderIndex(CFileWrap & file)
     return true;
 }
 
-bool CFolder::readFolderIndex(CFileWrap & file)
+bool CFolder::readFolderIndex(IFile & file)
 {
     char t [MAX_NAME + 1];
     memset( t, 0, MAX_NAME + 1);
@@ -288,14 +289,14 @@ bool CFolder::readFolderIndex(CFileWrap & file)
     return true;
 }
 
-const CFolder CFolder::operator = (CFolder & s)
+const CFolder &CFolder::operator =(CFolder & s)
 {
     m_name = s.getName();
     m_offset = s.getOffset();
     return *this;
 }
 
-bool CFolder::writeFileIndex(CFileWrap & file)
+bool CFolder::writeFileIndex(IFile &file)
 {
     // fileIndexHeader
     file.seek(m_offset);
@@ -310,7 +311,7 @@ bool CFolder::writeFileIndex(CFileWrap & file)
     return true;
 }
 
-bool CFolder::readFileIndex(CFileWrap & file)
+bool CFolder::readFileIndex(IFile &file)
 {
     // fileIndexHeader
     file.seek(m_offset);
@@ -366,12 +367,58 @@ CFolder::CFileEntry * CFolder::operator [] (const char* fileName)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 CFolder::CFileEntry * CFolder::operator [] (int i)
 {
-    if ( i <0 || i >= m_size) return NULL;
+    if ( i <0 || i >= m_size) return nullptr;
     return & m_files[i];
 }
 
+bool CFolders::writeFile(IFile & file, ISerial & serial, CFolder & folder, const char *name)
+{
+    int bSize = getSize();
+    file.seek(bSize);
+    serial.write(file);
+    int aSize = file.getSize();
+    folder.addFile(name, bSize, aSize - bSize);
+    m_fileSize += (aSize - bSize);
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////
+// CFileEntry
+
+bool CFolder::CFileEntry::writeFileIndex (IFile &file)
+{
+    char t [MAX_FILENAME + 1];
+    memset(t, 0, MAX_FILENAME + 1);
+    memccpy(t, m_name.c_str(), 0, MAX_FILENAME);
+
+    file.write(t, MAX_FILENAME);
+    file << m_offset;
+    file << m_size;
+
+    return true;
+}
+
+bool CFolder::CFileEntry::readFileIndex (IFile &file)
+{
+    char t [MAX_FILENAME + 1];
+    memset(t, 0, MAX_FILENAME + 1);
+
+    file.read(t, MAX_FILENAME);
+    m_name = t;
+    file >> m_offset;
+    file >> m_size;
+
+    return true;
+}
+
+CFolder::CFileEntry & CFolder::CFileEntry::operator = (CFileEntry & s) {
+    m_name = s.getName();
+    m_offset = s.getOffset();
+    m_size = s.getSize();
+    return *this;
+}

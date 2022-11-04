@@ -55,30 +55,12 @@ CDlgPathDir::CDlgPathDir(QWidget *parent) :
 
     // cache all the icons
     for (int i=0; i < MAX_ICONS; ++i) {
-
-        CFileWrap file;
-        if (file.open(q2c(QString(":/images/%1").arg(m_iconNames[i])))) {
-
-            int size = file.getSize();
-            UINT8 *png = new UINT8 [ size ];
-            file.read(png, size);
-            file.close();
-
-            QImage img;
-            if (!img.loadFromData( png, size )) {
-                qDebug("failed to load png\n");
-            }
-
-            QPixmap pm = QPixmap::fromImage(img);
-            QIcon icon;
-            icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-            ui->cbAim->addItem(icon, m_iconText[i]);
-
-            delete [] png;
-
-        } else {
+        QIcon icon = QPixmap(QString(":/images/%1").arg(m_iconNames[i]));
+        if (icon.isNull()) {
             ui->cbAim->addItem(QIcon(), m_iconText[i]);
-            qDebug("failed to load icon: %s\n", q2c(m_iconNames[i]));
+            qWarning("failed to load icon: %s\n", q2c(m_iconNames[i]));
+        } else {
+            ui->cbAim->addItem(icon, m_iconText[i]);
         }
     }
 }
@@ -100,7 +82,7 @@ void CDlgPathDir::changeEvent(QEvent *e)
     }
 }
 
-void CDlgPathDir::load(const char aim)
+void CDlgPathDir::load(const uint8_t aim)
 {
     for (int i=0; i < MAX_ICONS; ++i) {
         if (m_iconValues[i] == aim) {
@@ -109,7 +91,7 @@ void CDlgPathDir::load(const char aim)
     }
 }
 
-void CDlgPathDir::save(char & aim)
+void CDlgPathDir::save(uint8_t & aim)
 {
     if (ui->cbAim->currentIndex() != -1) {
         aim = m_iconValues[ui->cbAim->currentIndex()];

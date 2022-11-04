@@ -22,9 +22,11 @@
 #include "../shared/LevelEntry.h"
 #include "../shared/Selection.h"
 #include <string>
+#include "../shared/ISurface.h"
 class IFile;
+class CGame;
 
-class CLayer
+class CLayer: public ISurface
 {
 public:
     CLayer(int type=LAYER_BK);
@@ -35,13 +37,14 @@ public:
 
     int add (CLevelEntry &entry);
     CLevelEntry & operator [] (int n) const;
+    virtual CLevelEntry & atIndex (int n) const;
     void removeAt(int n);
     void insertAt (int n, CLevelEntry & entry);
     int findProto (int nProto, int nStartAt=0);
     void killProto(int nProto);
     void killFrameSet (int nFrameSet);
     CLayer & operator = (CLayer & source);
-    int getSize() const { return m_size; }
+    virtual int getSize() const { return m_size; }
     void setSize( int size ) { m_size = size; }
     void forget() { m_size = 0; }
     bool read(IFile &, bool compr=true);
@@ -60,13 +63,18 @@ public:
     void clearSelection();
     void selectSingle(int i);
     void select(int i);
+    void select(CSelection & selection);
     int getSelectionSize();
     bool isInSelection(int index);
     void removeFromSelection(int index);
-    void unSelectedAt(int i);    
+    void unSelectedAt(int i);
+    CSelection & selection();
+    void resyncSelection();
 
     void setOffset(int mx, int my);
     void getOffset(int & mx, int & my);
+    int countSpriteOfClass(CGame &game, int spriteClass);
+    int countGoals();
 
     enum {
         LAYER_BK,

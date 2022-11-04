@@ -20,6 +20,7 @@
 #define _LUAVM_H__
 
 #include <stdio.h>
+#include <functional>
 
 extern "C" {
 #include <lua5.2/lauxlib.h>
@@ -27,39 +28,40 @@ extern "C" {
 #include <lua5.2/lualib.h>
 }
 
+#include <unordered_map>
+
 class CLuaVM
 {
 public:
 
     CLuaVM();
     ~CLuaVM();
-    char *getDebugText();
     lua_State * getState();
     int exec(const char *luaCode);
 
-    void debug(const char *s);
     void clearLog();
     void registerFn(const char * fnName, lua_CFunction fn);
     void registerInt(const char *name, int value);
     void registerString(const char *name, const char *value);
     void registerBool(const char* name, bool value);
-    void reportErrors( int status );
-    void reportErrors( int status, const char *fnName );
+    void reportErrors( int status, const char *fnName = nullptr);
 
     // lua interface
+    enum Callback {
+        Debug,
+        Error
+    };
 
+    typedef std::function<void(const char *)> CallbackFct;
+    static void setCallback(int callbackID, CallbackFct callback);
     static int debug(lua_State *L);
-    static int test(lua_State *L);
+    static void debug(const char *s);
+    static void error(const char *s);
+    static void debugv(const char *fmt, ...);
 
 protected:
-
-    static void addDebugString(const char *s);
-    static void addDebugLine(char *line, int size);
-
+    static std::unordered_map<int, CallbackFct> m_callback;
     lua_State *m_luaState;
-    static char *m_debug;
-    static int m_debugLines;
-    static int m_debugSize;
 };
 
 #endif

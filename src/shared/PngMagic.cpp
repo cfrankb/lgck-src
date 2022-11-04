@@ -1,3 +1,20 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "stdafx.h"
 #include "PngMagic.h"
 #include "FileWrap.h"
@@ -9,7 +26,6 @@
 #include <cstdio>
 #include <cmath>
 #include "CRC.h"
-//#include <QDebug>
 
 /* These describe the color_type field in png_info. */
 /* color type masks */
@@ -31,7 +47,7 @@ CPngMagic::CPngMagic()
 {
 }
 
-UINT8 CPngMagic::PaethPredictor(UINT8 a, UINT8 b, UINT8 c)
+uint8_t CPngMagic::PaethPredictor(uint8_t a, uint8_t b, uint8_t c)
 {
      int p = a + b - c ; //initial estimate
      int pa = std::abs((float)p - a); //distances to a, b, c
@@ -60,8 +76,8 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
     png_IHDR ihdr;
     memset(&ihdr, 0, sizeof(png_IHDR));
 
-    UINT8 plte[256][3];
-    UINT8 trns[256];
+    uint8_t plte[256][3];
+    uint8_t trns[256];
     for (int i=0; i < 256; i++) {
         trns[i] = 255;
     }
@@ -75,10 +91,10 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
     bool trns_found = false;
     //bool oblt_found = false;
 
-    UINT8 *cData = NULL;
+    uint8_t *cData = nullptr;
     int obl5t_count = 0;
-    short *obl5t_xx = NULL;
-    short *obl5t_yy = NULL;
+    short *obl5t_xx = nullptr;
+    short *obl5t_yy = nullptr;
     int cDataSize = 0;
 
     while (pos < fileSize) {
@@ -90,11 +106,11 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
         chunkType[4] = 0;
         file.read(chunkType, 4); pos += 4;
 
-        UINT8 * p = new UINT8 [ chunkSize + 4] ;
+        uint8_t * p = new uint8_t [ chunkSize + 4] ;
         file.read(p + 4, chunkSize); pos += chunkSize;
         //memset(chunkData + chunkSize, 0, 4);
         memcpy(p, chunkType, 4);
-        UINT8 *chunkData = p + 4;
+        uint8_t *chunkData = p + 4;
 
         int crc32;
         file.read(&crc32, 4); pos += 4;
@@ -109,7 +125,7 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
         }
 
         if (memcmp (chunkType, "IHDR", 4) == 0) {
-            memcpy( ((UINT8*)&ihdr) + 8, chunkData, chunkSize );
+            memcpy( ((uint8_t*)&ihdr) + 8, chunkData, chunkSize );
             memcpy(ihdr.ChunkType, chunkType, 4);
             ihdr.Lenght = chunkSize;
             /*
@@ -130,13 +146,13 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
 
         if (memcmp (chunkType, "IDAT", 4) == 0) {
             if (cData) {
-                UINT8 *tmp = new UINT8 [ cDataSize + chunkSize ];
+                uint8_t *tmp = new uint8_t [ cDataSize + chunkSize ];
                 memcpy( tmp, cData, cDataSize );
                 delete [] cData;
                 cData = tmp;
                 memcpy( cData + cDataSize, chunkData, chunkSize);
             } else {
-                cData = new UINT8 [ chunkSize ];
+                cData = new uint8_t [ chunkSize ];
                 memcpy( cData, chunkData, chunkSize);
             }
             cDataSize += chunkSize;
@@ -193,8 +209,8 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
                 frame->m_nHei += offsetY;
             }
             //printf("len: %d; hei: %d\n", images[0].m_nLen, images[0].m_nHei);
-            frame->setRGB( new UINT32 [ frame->m_nLen * frame->m_nHei ] );
-            memset(frame->getRGB(), 0, sizeof(UINT32) * frame->m_nLen * frame->m_nHei);
+            frame->setRGB( new uint32_t [ frame->m_nLen * frame->m_nHei ] );
+            memset(frame->getRGB(), 0, sizeof(uint32_t) * frame->m_nLen * frame->m_nHei);
 
             if (ihdr.BitDepth == 8) {
                 valid = _8bpp(frame, cData, cDataSize, ihdr, plte, trns_found, trns, offsetY);
@@ -230,12 +246,12 @@ bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
 
 bool CPngMagic::_8bpp(
         CFrame *&frame,
-        UINT8 *cData,
+        uint8_t *cData,
         int cDataSize,
         const png_IHDR &ihdr,
-        const UINT8 plte[][3],
+        const uint8_t plte[][3],
         const bool trns_found,
-        const UINT8 trns[],
+        const uint8_t trns[],
         int offsetY)
 {
     int pixelWidth = -1;
@@ -257,15 +273,15 @@ bool CPngMagic::_8bpp(
     //printf("pixelWidth: %d\n", pixelWidth);
     //printf("pitch: %d\n", pitch);
 
-    ULONG dataSize = pitch * CFrame::toNet(ihdr.Height);
-    UINT8 *data = new UINT8 [ dataSize ];
+    LONGUINT dataSize = pitch * CFrame::toNet(ihdr.Height);
+    uint8_t *data = new uint8_t [ dataSize ];
     //    printf("total data:%d\n", ((int)dataSize));
 
     int err = uncompress(
-                (UINT8 *)data,
-                (ULONG *)& dataSize,
-                (UINT8 *)cData,
-                (ULONG) cDataSize);
+                (uint8_t *)data,
+                (LONGUINT *)& dataSize,
+                (uint8_t *)cData,
+                (LONGUINT) cDataSize);
 
     if (err) {
 //        set.setLastError("error in decomp");
@@ -275,15 +291,15 @@ bool CPngMagic::_8bpp(
     }
 
     bool valid = true;
-    UINT32 *rgb = frame->getRGB();
+    uint32_t *rgb = frame->getRGB();
 
     for (int y=0; y < (int) CFrame::toNet(ihdr.Height); y++) {
-        UINT8 *line = & data[pitch * y + 1];
-        UINT8 *prLine = NULL;
+        uint8_t *line = & data[pitch * y + 1];
+        uint8_t *prLine = nullptr;
         if (y) {
             prLine = & data[pitch * (y - 1) + 1];
         }
-        UINT8 filtering = data[pitch * y];
+        uint8_t filtering = data[pitch * y];
         bool handled = true;
 
         switch ( filtering ) {
@@ -293,16 +309,16 @@ bool CPngMagic::_8bpp(
         case 1:
             for (int x=0; x < (int) CFrame::toNet(ihdr.Width); x++) {
 
-                UINT32 p = 0;
-                UINT32 c = 0;
+                uint32_t p = 0;
+                uint32_t c = 0;
                 if (x) {
                     memcpy(&p, & line[ (x - 1) * pixelWidth ], pixelWidth);
                 }
 
                 memcpy(&c, & line[ x * pixelWidth ], pixelWidth);
 
-                UINT8 *pc = (UINT8*)&c;
-                UINT8 *pp = (UINT8*)&p;
+                uint8_t *pc = (uint8_t*)&c;
+                uint8_t *pp = (uint8_t*)&p;
 
                 for (int i=0; i < pixelWidth; i++) {
                     pc [i] += pp [i];
@@ -315,16 +331,16 @@ bool CPngMagic::_8bpp(
         case 2:
             for (int x=0; x < (int) CFrame::toNet(ihdr.Width); x++) {
 
-                UINT32 p = 0;
-                UINT32 c = 0;
+                uint32_t p = 0;
+                uint32_t c = 0;
                 if (y) {
                     memcpy(&p, & prLine[ x * pixelWidth ], pixelWidth);
                 }
 
                 memcpy(&c, & line[ x * pixelWidth ], pixelWidth);
 
-                UINT8 *pc = (UINT8*)&c;
-                UINT8 *pp = (UINT8*)&p;
+                uint8_t *pc = (uint8_t*)&c;
+                uint8_t *pp = (uint8_t*)&p;
 
                 for (int i=0; i < pixelWidth; i++) {
                     pc [i] += pp [i];
@@ -337,8 +353,8 @@ bool CPngMagic::_8bpp(
         case 3:
             for (int x=0; x < (int) CFrame::toNet(ihdr.Width); x++) {
 
-                UINT32 a = 0; // left
-                UINT32 b = 0; // above (Prior)
+                uint32_t a = 0; // left
+                uint32_t b = 0; // above (Prior)
 
                 if (x) {
                     memcpy(&a, & line[ (x - 1) * pixelWidth ], pixelWidth);
@@ -348,9 +364,9 @@ bool CPngMagic::_8bpp(
                     memcpy(&b, & prLine[ x * pixelWidth ], pixelWidth);
                 }
 
-                UINT8 *pa = (UINT8*) &a;
-                UINT8 *pb = (UINT8*) &b;
-                UINT8 *ph = & line[ x * pixelWidth ];
+                uint8_t *pa = (uint8_t*) &a;
+                uint8_t *pb = (uint8_t*) &b;
+                uint8_t *ph = & line[ x * pixelWidth ];
 
                 for (int i=0; i < pixelWidth; i++) {
                     ph [i] += (pa [i] + pb[i]) / 2;
@@ -361,9 +377,9 @@ bool CPngMagic::_8bpp(
 
         case 4:
             for (int x = 0; x < (int) CFrame::toNet(ihdr.Width); x++) {
-                UINT32 a = 0; // left
-                UINT32 b = 0; // above
-                UINT32 c = 0; // above-left
+                uint32_t a = 0; // left
+                uint32_t b = 0; // above
+                uint32_t c = 0; // above-left
 
                 if (x) {
                     memcpy(&a, & line[ (x - 1) * pixelWidth ], pixelWidth);
@@ -376,11 +392,11 @@ bool CPngMagic::_8bpp(
                     }
                 }
 
-                UINT8 *pa = (UINT8*) &a;
-                UINT8 *pb = (UINT8*) &b;
-                UINT8 *pc = (UINT8*) &c;
+                uint8_t *pa = (uint8_t*) &a;
+                uint8_t *pb = (uint8_t*) &b;
+                uint8_t *pc = (uint8_t*) &c;
 
-                UINT8 *ph = & line[ x * pixelWidth ];
+                uint8_t *ph = & line[ x * pixelWidth ];
                 for (int i=0; i< pixelWidth; i++) {
                     ph[i] += PaethPredictor(pa[i], pb[i], pc[i]);
                 }
@@ -393,7 +409,7 @@ bool CPngMagic::_8bpp(
 
         if (handled) {
             for (int x=0; x < (int) CFrame::toNet(ihdr.Width); x++) {
-                UINT32 rgba = 0xff000000;
+                uint32_t rgba = 0xff000000;
                 switch (pixelWidth) {
                 case 1:
                     memcpy(&rgba, plte[ line [ x ] ], 3);
@@ -422,12 +438,12 @@ bool CPngMagic::_8bpp(
 
 bool CPngMagic::_4bpp(
         CFrame *&frame,
-        UINT8 *cData,
+        uint8_t *cData,
         int cDataSize,
         const png_IHDR &ihdr,
-        const UINT8 plte[][3],
+        const uint8_t plte[][3],
         const bool trns_found,
-        const UINT8 trns[],
+        const uint8_t trns[],
         int offsetY)
 {
     int height = CFrame::toNet(ihdr.Height);
@@ -445,15 +461,15 @@ bool CPngMagic::_4bpp(
     //printf("pixelWidth: %d\n", pixelWidth);
     //printf("pitch: %d\n", pitch);
 
-    ULONG dataSize = pitch * CFrame::toNet(ihdr.Height);
-    UINT8 *data = new UINT8 [ dataSize ];
+    uint64_t dataSize = pitch * CFrame::toNet(ihdr.Height);
+    uint8_t *data = new uint8_t [ dataSize ];
     //    printf("total data:%d\n", ((int)dataSize));
 
     int err = uncompress(
-                (UINT8 *)data,
-                (ULONG *)& dataSize,
-                (UINT8 *)cData,
-                (ULONG) cDataSize);
+                (uint8_t *)data,
+                (LONGUINT *)& dataSize,
+                (uint8_t *)cData,
+                (LONGUINT) cDataSize);
 
     if (err) {
 //        set.setLastError("error in decomp");
@@ -463,15 +479,15 @@ bool CPngMagic::_4bpp(
     }
 
     bool valid = true;
-    UINT32 *rgb = frame->getRGB();
+    uint32_t *rgb = frame->getRGB();
 
     for (int y=0; y < height; y++) {
-        UINT8 *line = & data[pitch * y + 1];
-        //UINT8 *prLine = NULL;
+        uint8_t *line = & data[pitch * y + 1];
+        //uint8_t *prLine = nullptr;
         //if (y) {
           //  prLine = & data[pitch * (y - 1) + 1];
         //}
-        UINT8 filtering = data[pitch * y];
+        uint8_t filtering = data[pitch * y];
         bool handled = true;
 
         switch ( filtering ) {
@@ -484,8 +500,8 @@ bool CPngMagic::_4bpp(
 
         if (handled) {
             for (int x=0; x < width; x++) {
-                UINT32 rgba = 0;
-                UINT8 index = line [ x / 2 ];
+                uint32_t rgba = 0;
+                uint8_t index = line [ x / 2 ];
                 if (x & 1) {
                     index &= 0x0f;
                 } else {

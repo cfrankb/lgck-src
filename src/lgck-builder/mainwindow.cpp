@@ -31,6 +31,10 @@
 #include <QScrollArea>
 #include <QFileSystemWatcher>
 #include <QByteArray>
+#include <QOperatingSystemVersion>
+#include <QFlags>
+#include <QSysInfo>
+#include <QToolButton>
 #include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/FileWrap.h"
@@ -42,10 +46,13 @@
 #include "../shared/interfaces/IImageManager.h"
 #include "../shared/interfaces/IMusic.h"
 #include "../shared/interfaces/ISound.h"
-#include "../shared/implementers/opengl/im_qtopengl.h"
 #include "../shared/implementers/sdl/mu_sdl.h"
 #include "../shared/implementers/sdl/sn_sdl.h"
 #include "../shared/GameEvents.h"
+#include "../shared/Frame.h"
+#include "../shared/inputs/qt/kt_qt.h"
+#include "../shared/qtgui/qthelper.h"
+#include "../shared/Countdown.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "DlgEditLevel.h"
@@ -69,42 +76,115 @@
 #include "Snapshot.h"
 #include "ToolBoxDock.h"
 #include "thread_updater.h"
-#include "../shared/ss_version.h"
-#include "WizFont.h"
-#include <QSysInfo>
 #include "levelviewgl.h"
 #include "levelscroll.h"
 #include "helper.h"
 #include "DlgDistributeGame.h"
-#include "ExportGame.h"
+#include "exportgame.h"
+#include "infodock.h"
+#include "gamefixer.h"
+#include "dlgindicator.h"
+#include "launcher.h"
+#include "options.h"
+#include "../shared/qtgui/qfilewrap.h"
 
-char MainWindow::m_appName[] = "LGCK builder";
-char MainWindow::m_author[] = "cfrankb";
+#ifdef LGCK_GAMEPAD
+#include <QtGamepad/QGamepad>
+#endif
 
-#define WEB_PATH QString("http://cfrankb.com/lgck/")
-#define UPDATER_URL "http://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s"
+const char MainWindow::m_appName[] = "LGCK builder";
+const char MainWindow::m_author[] = "cfrankb";
+const QString MainWindow::m_appTitle = MainWindow::tr("LGCK builder IDE");
 
-#define MAX_FONT_SIZE 50
-#define MIN_FONT_SIZE 10
-#define DEFAULT_FONT_SIZE MIN_FONT_SIZE
-#define RUNTIME_DEFAULT_ARGS "%1"
+constexpr const char WEB_PATH[] = "https://cfrankb.com/lgck/";
+constexpr const char UPDATER_URL[] = "https://cfrankb.com/lgck/api/chkv.php?ver=%s&driver=%s&os=%s&uuid=%s&product=%s";
+
+/* do not translate */
+constexpr const char EDITOR[] = "Editor";
+constexpr int MIN_FONT_SIZE = 10;
+constexpr int MAX_FONT_SIZE = 50;
+constexpr int DEFAULT_FONT_SIZE = MIN_FONT_SIZE;
+constexpr char DEFAULT_FONT_NAME[] = "Courier";
+constexpr char FONT_SIZE[] = "fontSize";
+constexpr char FONT_NAME[] = "fontName";
+constexpr char SKIP_SPLASH[] = "skipSplash";
+constexpr char ENABLE_AUTO_COMPLETE[] = "enableAutocomplete";
+constexpr char ENABLE_HIGHLIGHT[] = "enableHighlight";
+constexpr char ENABLE_WHITESPACE[] = "enableWhiteSpace";
+constexpr char ENABLE_WORDWRAP[] = "enableWordWrap";
+constexpr char GENERAL [] = "";
+constexpr char GRIDCOLOR[] = "gridColor";
+constexpr char SHOWGRID[] = "showGrid";
+constexpr char TRIGGER_KEY_COLOR[] = "triggerKeyColor";
+constexpr char TRIGGER_KEY_FONT_SIZE[] = "triggerKeyFontSize";
+constexpr char TRIGGER_KEY_SHOW[] = "showTriggerKey";
+constexpr char GRIDSIZE[] = "gridSize";
+constexpr char LAST_PROJECTS[] = "lastProjects";
+constexpr char TESTLEVEL[] = "TestLevel";
+constexpr char SKILL[] = "skill";
+constexpr char LIVES[] = "lives";
+constexpr char SCORE[] = "score";
+constexpr char START_HP[] = "start_hp";
+constexpr char CONTINUE[] = "continue";
+constexpr char XTICK_MAX_RATE[] = "tick_max_rate";
+constexpr char LAST_FOLDER[] = "rememberLastFolder";
+constexpr char FOLDERS[] = "Folders";
+constexpr char FOLDER_LGCKDB[] = "lgckdb";
+constexpr char INPUTS [] = "Inputs";
+constexpr char SKILL_FILTER[] = "skill_filter";
+
+#define O_STR(s,k) (*m_options)[s].get(k).toString()
+#define O_INT(s,k) (*m_options)[s].get(k).toInt()
+#define O_BOOL(s,k) (*m_options)[s].get(k).toBool()
+#define O_SET(s,k,v) (*m_options)[s].set(k,v)
+
+/* do not translate */
+constexpr char actionNames[][16] = {
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Jump",
+    "Fire",
+    "Action",
+    "Special1",
+    "Special2"
+};
+
+/* do not translate */
+constexpr char actionKeys[][16] = {
+    "Up", "Down", "Left", "Right",
+    "Space", "Shift", "Z", "", ""
+};
+
+/* do not translate */
+constexpr char actionButtons[][16] = {
+    "Up", "Down", "Left", "Right",
+    "A", "B", "X", "", ""
+};
+
+
+MainWindow *me = nullptr;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    // Gamepad
+#ifdef LGCK_GAMEPAD
+    m_gamepad = nullptr;
+    initGamePad();
+#endif
 
-    QString s;
-    QString appVersion;
-    int version = SS_LGCK_VERSION;
-    for (int i=0; i < 4; ++i) {
-        s = QString("%1").arg(version % 256);
-        version /= 256;
-        if (i) {
-            appVersion = s + "." + appVersion  ;
-        } else {
-            appVersion = s + appVersion ;
-        }
-    }
+    // Init Settings
+    initSettings();
+
+    // Setup the timer for the indicator
+    changeTickMaxRate();
+    m_timerIndicator.setInterval(500);
+    m_timerIndicator.stop();
+    m_ready = false;
+    me = this;
+    QString appVersion = formatVersion(false);
 
     QCoreApplication::setOrganizationDomain("");
     QCoreApplication::setOrganizationName(m_author);
@@ -112,12 +192,14 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setApplicationVersion(appVersion);
 
     ui->setupUi(this);
-    m_proto = -1;
-    m_event = -1;
-    m_gridColor[0] = 0;
-    m_gridSize = 32;
-    m_fontSize = DEFAULT_FONT_SIZE;
+#ifndef LGCK_RUNTIME
+    ui->actionDistribution_Package->setDisabled(true);
+#endif
+    m_proto = CGame::INVALID;
+    m_event = CGame::INVALID;
     m_viewMode = VM_EDITOR;
+    m_fixer = new CGameFixer;
+    m_fixer->setGame(&m_doc);
     // initToolBar() must be placed before update menus.
     initToolBar();
     m_scroll = new CLevelScroll(this, &m_doc);
@@ -144,12 +226,12 @@ MainWindow::MainWindow(QWidget *parent)
             m_scroll, SLOT(leaveEditPath()));
     setMinimumHeight(this->maximumHeight());
 
-    m_labels[0] = new QLabel("", ui->statusBar, 0);
+    m_labels[0] = new QLabel("", ui->statusBar);
     ui->statusBar->addWidget(m_labels[0], LABEL0_SIZE);
-    m_labels[2] = new QLabel("", ui->statusBar, 0);
+    m_labels[2] = new QLabel("", ui->statusBar);
     ui->statusBar->addWidget(m_labels[2], 150);
     m_labels[2]->setAlignment(Qt::AlignRight);
-    m_labels[1] = new QLabel("", ui->statusBar, 0);
+    m_labels[1] = new QLabel("", ui->statusBar);
     m_labels[1]->setAlignment(Qt::AlignRight);
     ui->statusBar->addWidget(m_labels[1], 640 - LABEL0_SIZE);
 
@@ -157,9 +239,7 @@ MainWindow::MainWindow(QWidget *parent)
     initFileMenu();
     updateMenus();
 
-    // Setup the timer
-    m_timer.setInterval(1000 / TICK_MAX_RATE);
-    m_timer.start();
+    // Setup the timer for the screen refresh
     m_time.start();
     m_nextTick = m_time.elapsed() + TICK_SCALE;
 
@@ -168,13 +248,12 @@ MainWindow::MainWindow(QWidget *parent)
     m_toolBox->hide();
     m_toolBox->setGameDB(&m_doc);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_toolBox);
-    m_toolBox->setMaximumWidth(TOOLBAR_WIDTH);
-    m_toolBox->setMinimumWidth(TOOLBAR_WIDTH);
 
     connect(this, SIGNAL(frameSetChanged(int)),
             m_toolBox, SLOT(updateFrameSet(int)));
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(viewEvent()));
+    connect(&m_timerIndicator, SIGNAL(timeout()), this, SLOT(updateIndicator()));
     m_toolBox->init();
 
     // link the toolBox to MainWindow
@@ -205,8 +284,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_toolBox, SIGNAL(spriteDeleted(int)),
             this, SLOT(deleteSprite(int)));
 
-  //  connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
-    //        this, SLOT(showToolBox(bool)));
     connect(m_toolBox, SIGNAL(visibilityChanged(bool)),
                      ui->action_ShowToolbox, SLOT(setChecked(bool)));
     connect(ui->action_ShowToolbox, SIGNAL(triggered(bool)),
@@ -224,6 +301,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(spriteCreated()),
             m_toolBox, SLOT(createSprite()));
 
+    connect(this, SIGNAL(spriteUpdated(int)),
+            m_toolBox, SLOT(updateIcon(int)));
+
     connect(this, SIGNAL(gridVisible(bool)),
             m_lview, SLOT(showGrid(bool)));
 
@@ -236,29 +316,72 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(gridSizeChanged(int)),
             m_lview, SLOT(setGridSize(int)));
 
+    connect(this, SIGNAL(gridSizeChanged(int)),
+            m_scroll, SLOT(setGridSize(int)));
+
     connect(this, SIGNAL(levelSelected(int)),
             m_scroll, SLOT(changeLevel(int)));
+
+    connect(this, SIGNAL(spritePaintStateChanged(bool)),
+            m_scroll, SLOT(setPaintState(bool)));
+
+    connect(m_toolBox, SIGNAL(currentProtoChanged(int)),
+            m_scroll, SLOT(changeProto(int)));
+
+    connect(m_toolBox, SIGNAL(currentProtoChanged(int)),
+            this, SLOT(changeProtoIcon(int)));
+
+    connect(this, &MainWindow::currentFrameChanged,
+            m_scroll, &CLevelScroll::changeProtoFrame);
+    connect(this, &MainWindow::skillFilterChanged,
+            m_lview, &CLevelViewGL::setSkillFilters);
+    connect(this, &MainWindow::skillFilterChanged,
+            m_scroll, &CLevelScroll::setSkillFilters);
+
+    connect(this, SIGNAL(eraserStateChanged(bool)),
+            m_scroll, SLOT(setEraserState(bool)));
+
+    connect(this, SIGNAL(triggerKeyColorChanged(QString)),
+            m_lview, SLOT(setTriggerKeyColor(QString)));
+
+    connect(this, SIGNAL(triggerKeyShow(bool)),
+            m_lview, SLOT(showTriggerKey(bool)));
+
+    connect(this, SIGNAL(triggerKeyFontSizeChanged(int)),
+            m_lview, SLOT(setTriggerFontSize(int)));
+
+    // debugOutput
+    m_infoDock = new CInfoDock(this);
+    m_infoDock->setWindowTitle(tr("Debug output"));
+    m_infoDock->setAllowedAreas(Qt::DockWidgetAreas(Qt::BottomDockWidgetArea));
+    this->addDockWidget(Qt::BottomDockWidgetArea, m_infoDock);
+    connect(this, SIGNAL(debugText(QString)),
+            m_infoDock, SLOT(appendText(QString)));
+    connect(this, SIGNAL(errorText(QString)),
+            m_infoDock, SLOT(appendError(QString)));
+    connect(m_infoDock, SIGNAL(visibilityChanged(bool)),
+                     ui->actionDebugOutput, SLOT(setChecked(bool)));
+
+    CLuaVM::setCallback(CLuaVM::Debug, newDebugString);
+    CLuaVM::setCallback(CLuaVM::Error, newErrorString);
+    emit debugText(tr("LuaVM ready.\n"));
 
     // reload settings
     reloadSettings();
     CSndSDL *sn = new CSndSDL();
-    m_doc.attach((ISound*)sn);
+    m_doc.attach(static_cast<ISound*>(sn));
     CMusicSDL *mu = new CMusicSDL();
-    m_doc.attach((IMusic*)mu);
+    m_doc.attach(static_cast<IMusic*>(mu));
     m_updater = new CThreadUpdater();
     if (m_bUpdate) {
         connect(m_updater,SIGNAL(newVersion(QString, QString)),this, SLOT(updateEditor(QString, QString)));
-        //checkVersion();
     }
-
-    // TODO: implement watcher
-    // https://stackoverflow.com/questions/10044853/how-to-use-qfilesystemwatcher-to-monitor-a-folder-for-change
-    m_watcher = new QFileSystemWatcher(this);
 }
 
 void MainWindow::createEventEditor()
 {
     // Create the event Editor
+    qDebug("createEventEditor");
 
     m_editEvents = new CWEditEvents(this);
     m_editEvents->setWindowTitle(tr("Event script"));
@@ -289,17 +412,27 @@ void MainWindow::createEventEditor()
     connect(this, SIGNAL(textInserted(const char*)),
             m_editEvents, SLOT(insertText(const char*)));
 
-    connect(this, SIGNAL(fontSizeChanged(int)),
-            m_editEvents, SLOT(setFontSize(int)));
+    connect(this, SIGNAL(fontChanged(const QFont &)),
+            m_editEvents, SLOT(setFont(const QFont &)));
+
+    connect(this, SIGNAL(editorOptionChanged(COptionGroup &)),
+            m_editEvents, SLOT(setOptions(COptionGroup &)));
 
     if (m_editEvents) {
         m_editEvents->hide();
     }
 
-    emit fontSizeChanged(m_fontSize);
+    emit fontChanged(currentFont());
+    emit editorOptionChanged((*m_options)[EDITOR]);
 }
 
-QTime & MainWindow::getTime()
+
+QFont MainWindow::currentFont()
+{
+    return QFont(O_STR(EDITOR, FONT_NAME), O_INT(EDITOR, FONT_SIZE), QFont::DemiBold);
+}
+
+QElapsedTimer & MainWindow::getTime()
 {
     return m_time;
 }
@@ -327,21 +460,28 @@ void MainWindow::hideView(bool hide)
 
 void MainWindow::focusInEvent ( QFocusEvent * event )
 {
-    m_lview->setFocus();
+   // m_lview->setFocus();
     event->ignore();
 }
 
 MainWindow::~MainWindow()
 {
+    m_timer.stop();
+    m_timerIndicator.stop();
     delete ui;
-    //delete m_lview;
-    delete (CMusicSDL*) m_doc.music();
-    m_doc.attach((IMusic*)NULL);
-    delete (CSndSDL*) m_doc.sound();
-    m_doc.attach((ISound*)NULL);
+    delete static_cast<CMusicSDL*>(m_doc.music());
+    m_doc.attach(static_cast<IMusic*>(nullptr));
+    delete static_cast<CSndSDL*>(m_doc.sound());
+    m_doc.attach(static_cast<ISound*>(nullptr));
     while (m_updater && m_updater->isRunning());
     if (m_updater) {
         delete m_updater;
+    }
+    if (m_options) {
+        delete m_options;
+    }
+    if (m_fixer) {
+        delete m_fixer;
     }
 }
 
@@ -366,7 +506,7 @@ void MainWindow::open(QString fileName)
     commitAll();
     if (maybeSave()) {
         if (fileName.isEmpty()) {
-            fileName = QFileDialog::getOpenFileName(this, "", fileName, tr("LGCK games (*.lgckdb)"));
+            fileName = QFileDialog::getOpenFileName(nullptr, tr("Open"), fileName, tr("LGCK Projects (*.lgckdb)"));
         }
         loadFileName(fileName);
     }
@@ -377,28 +517,27 @@ void MainWindow::open(QString fileName)
 void MainWindow::loadFileName(const QString & fileName)
 {
     if (!fileName.isEmpty()) {
-        QString oldFileName = m_doc.getFileName();
+        QString oldFileName = m_fileName;
         QApplication::setOverrideCursor(Qt::WaitCursor);
         m_doc.setFileName(fileName.toStdString().c_str());
-        if (!m_doc.read())  {
+        m_fileName = fileName;
+        QFileWrap file;
+        if (!file.open(fileName) || !m_doc.read(file))  {
             warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
             m_doc.forget();
             m_doc.init();
             m_doc.setFileName(q2c(oldFileName));
+            m_fileName = oldFileName;
             // update fileList
             QSettings settings;
             QStringList files = settings.value("recentFileList").toStringList();
             files.removeAll(fileName);
             settings.setValue("recentFileList", files);
-
         }
-        qDebug("MakeCurrent()");
-
         QApplication::restoreOverrideCursor();
-
         updateRecentFileActions();
         reloadRecentFileActions();
-
+        memorizeFilePath();
     }
     updateTitle();
     m_lview->makeCurrent();
@@ -415,15 +554,17 @@ void MainWindow::loadFileName(const QString & fileName)
 bool MainWindow::save()
 {
     commitAll();
-    QString oldFileName = m_doc.getFileName();
+    QString oldFileName = m_fileName;
     if (m_doc.isUntitled()) {
         if (!saveAs())
             return false;
     }
 
-    if (!m_doc.write() || !updateTitle())  {
+    QFileWrap file;
+    if (!file.open(m_fileName, "wb") || !m_doc.write(file) || !updateTitle()) {
         warningMessage(tr("Can't write file"));
         m_doc.setFileName(q2c(oldFileName));
+        m_fileName = oldFileName;
         return false;
     }
     m_doc.setDirty(false);
@@ -435,18 +576,27 @@ bool MainWindow::save()
 bool MainWindow::saveAs()
 {
     commitAll();
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr("LGCK games (*.lgckdb)"));
-    //qDebug("picked : %s\n", q2c(fileName));
+    QString fileName =
+            QFileDialog::getSaveFileName(
+                this,
+                tr("Save As"),
+                m_doc.getFileName(),
+                tr("LGCK Projects (*.lgckdb)")
+            );
     if (fileName.isEmpty())
         return false;
+    if (!fileName.endsWith(".lgckdb", Qt::CaseInsensitive)) {
+        fileName.append(".lgckdb");
+    }
     m_doc.setFileName(q2c(fileName));
+    m_fileName = fileName;
+    memorizeFilePath();
     return true;
 }
 
 void MainWindow::warningMessage(const QString message)
 {
-    QMessageBox msgBox(QMessageBox::Warning, m_appName, message, 0, this);
-    msgBox.exec();
+    QMessageBox::warning(this, m_appName, message);
 }
 
 bool MainWindow::updateTitle()
@@ -457,7 +607,7 @@ bool MainWindow::updateTitle()
     } else {
         file = QFileInfo(m_doc.getFileName()).fileName();
     }
-    setWindowTitle(tr("%1[*] - %2").arg(file).arg(tr("LGCK builder IDE")));
+    setWindowTitle(tr("%1[*] - %2").arg(file, m_appTitle));
     return true;
 }
 
@@ -465,7 +615,7 @@ void MainWindow::on_actionPrevious_triggered()
 {
     if (m_doc.m_nCurrLevel) {
         --m_doc.m_nCurrLevel;
-        m_lview->setFocus();
+       // m_lview->setFocus();
         repaint();
         updateMenus();
         showLayerName();
@@ -478,7 +628,7 @@ void MainWindow::on_actionNext_triggered()
 {
     if (m_doc.m_nCurrLevel < m_doc.getSize() - 1 ) {
         ++m_doc.m_nCurrLevel;
-        m_lview->setFocus();
+      //  m_lview->setFocus();
         repaint();
         updateMenus();
         showLayerName();
@@ -499,20 +649,23 @@ void MainWindow::closeEvent(QCloseEvent *event)
     } else {
         event->ignore();
     }
+    leaveGameMode();
     saveSettings();
+    CLuaVM::setCallback(CLuaVM::Debug, nullptr);
+    CLuaVM::setCallback(CLuaVM::Error, nullptr);
 }
 
 void MainWindow::on_actionOpen_triggered()
 {
     open("");
-    m_lview->setFocus();
+    //m_lview->setFocus();
     updateMenus();
 }
 
 void MainWindow::on_actionSave_triggered()
 {
     save();
-    m_lview->setFocus();
+   // m_lview->setFocus();
 }
 
 void MainWindow::on_actionSave_as_triggered()
@@ -520,7 +673,7 @@ void MainWindow::on_actionSave_as_triggered()
     if (saveAs()) {
         save();
     }
-    m_lview->setFocus();
+   // m_lview->setFocus();
 }
 
 void MainWindow::on_actionRevert_triggered()
@@ -544,7 +697,7 @@ void MainWindow::openRecentFile()
     if (action) {
         open(action->data().toString());
     }
-    m_lview->setFocus();
+  //  m_lview->setFocus();
     updateMenus();
 }
 
@@ -552,7 +705,7 @@ void MainWindow::initFileMenu()
 {
     // gray out the open recent `nothin' yet`
     ui->action_nothin_yet->setEnabled(false);
-    for (int i = 0; i < MaxRecentFiles; i++) {
+    for (int i = 0; i < MAX_PROJECTS; i++) {
         m_recentFileActs[i] = new QAction(this);
         m_recentFileActs[i]->setVisible(false);
         ui->menuOpen_recent->addAction(m_recentFileActs[i]);
@@ -569,7 +722,7 @@ void MainWindow::reloadRecentFileActions()
 {
     QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
-    int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
+    int numRecentFiles = qMin(files.size(), (int)O_INT(GENERAL, LAST_PROJECTS));
     for (int i = 0; i < numRecentFiles; ++i) {
         QString text = tr("&%1 %2").arg(i + 1).arg(QFileInfo(files[i]).fileName());
         m_recentFileActs[i]->setText(text);
@@ -577,7 +730,7 @@ void MainWindow::reloadRecentFileActions()
         m_recentFileActs[i]->setVisible(true);
         m_recentFileActs[i]->setStatusTip(files[i]);
     }
-    for (int j = numRecentFiles; j < MaxRecentFiles; ++j)
+    for (int j = numRecentFiles; j < (int)O_INT(GENERAL, LAST_PROJECTS); ++j)
         m_recentFileActs[j]->setVisible(false);
     ui->action_nothin_yet->setVisible(numRecentFiles == 0);
 }
@@ -590,7 +743,7 @@ void MainWindow::updateRecentFileActions()
     files.removeAll(fileName);
     if (!fileName.isEmpty()) {
         files.prepend(fileName);
-        while (files.size() > MaxRecentFiles)
+        while (files.size() > O_INT(GENERAL, LAST_PROJECTS))
             files.removeLast();
     }
     settings.setValue("recentFileList", files);
@@ -623,11 +776,10 @@ void MainWindow::on_actionLast_level_triggered()
 void MainWindow::on_actionEdit_Level_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CDlgEditLevel *dlg = new CDlgEditLevel(this);
         dlg->setGameDB(&m_doc);
-        QString s;
-        s.sprintf(q2c(tr("Edit level %.3d")), m_doc.m_nCurrLevel + 1);
+        QString s = QString::asprintf(q2c(tr("Edit level %.3d")), m_doc.m_nCurrLevel + 1);
         dlg->setWindowTitle(s);
         dlg->load(& level);
         if (dlg->exec() == QDialog::Accepted) {
@@ -646,7 +798,7 @@ void MainWindow::on_actionEdit_Game_Info_triggered()
     d->init();
     d->exec();
     m_toolBox->reload();
-    m_lview->setFocus();
+   // m_lview->setFocus();
     showLayerName();
     reloadLayerCombo();
     delete d;
@@ -658,20 +810,18 @@ void MainWindow::paintEvent(QPaintEvent * event) {
 
 void MainWindow::updateMenus()
 {
-    bool result = !(m_viewMode == VM_GAME);
     QAction * actionsGame[] = {
         ui->actionDebug,
         ui->actionQuit_Game,
         ui->actionPause,
-        ui->actionRestart,
-        NULL
+        ui->actionRestart
     };
 
-    for (int i=0; actionsGame[i]; ++i) {
+    for (uint32_t i=0; i < sizeof(actionsGame)/sizeof(QAction*); ++i) {
         actionsGame[i]->setEnabled( m_viewMode == VM_GAME );
     }
 
-    for (int j = 0; j < MaxRecentFiles; ++j) {
+    for (int j = 0; j < O_INT(GENERAL, LAST_PROJECTS); ++j) {
         m_recentFileActs[j]->setEnabled( m_viewMode != VM_GAME );
     }
 
@@ -688,10 +838,12 @@ void MainWindow::updateMenus()
             ui->actionMove_Level,
             ui->actionDelete_Level,
             ui->actionRemove_All,
+            ui->actionMark_All_as_Goals,
+            ui->actionUnmark_All_as_Goals,
             ui->actionCopy_Object,
             ui->actionDelete_Object,
             ui->actionSend_to_back,
-            ui->actionBrint_to_front,
+            ui->actionBring_to_front,
             ui->actionCustomize,
             ui->actionEdit_Object,
             ui->actionEdit_Images,
@@ -720,15 +872,19 @@ void MainWindow::updateMenus()
             ui->actionDelete,
             ui->actionEdit_Path,
             ui->actionView_Code,
-            NULL
+            ui->actionNormal,
+            ui->actionHell,
+            ui->actionNightmare,
+            ui->actionInsane,
+            ui->actionAll_Skills
         };
-        for (int i=0; actionsEditor[i]; ++i) {
+        for (uint32_t i=0; i < sizeof(actionsEditor)/sizeof(QAction*); ++i) {
             actionsEditor[i]->setEnabled(false);
         }
         m_comboEvents->setEnabled(false);
         m_comboLayers->setEnabled(false);
     } else {
-        result = m_doc.getSize() != 0;
+        bool result = m_doc.getSize() != 0;
         ui->actionNew_file->setEnabled(true);
         ui->actionOpen->setEnabled(true);
         ui->actionSave->setEnabled(true);
@@ -751,7 +907,7 @@ void MainWindow::updateMenus()
         bool resultSingle = result;
         bool resultMulti = result;
         if (result) {
-            CLevel & level = * m_doc[m_doc.m_nCurrLevel];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             resultSingle = layer.isSingleSelection();
             resultMulti = layer.getSelectionSize();
@@ -771,7 +927,7 @@ void MainWindow::updateMenus()
         }
 
         bool enable = resultSingle;
-        bool enableMulti = resultMulti;       
+        bool enableMulti = resultMulti;
         if (m_viewMode == VM_SPRITE_EVENTS) {
             enable = false;
             enableMulti = false;
@@ -779,7 +935,6 @@ void MainWindow::updateMenus()
         } else {
             ui->actionCreateSprite->setEnabled( true ) ;
         }
-
         ui->actionCut->setEnabled( enableMulti );
         ui->actionCopy->setEnabled( enableMulti );
         ui->actionDelete->setEnabled( enableMulti );
@@ -788,18 +943,20 @@ void MainWindow::updateMenus()
         ui->actionUndo->setEnabled( false );
         ui->actionRedo->setEnabled( false );
         ui->actionSearch->setEnabled( false );
+        ui->actionMark_All_as_Goals->setEnabled( enableMulti );
+        ui->actionUnmark_All_as_Goals->setEnabled( enableMulti );
 
         ui->actionRemove_All->setEnabled( enableMulti );
-        ui->actionBrint_to_front->setEnabled( enableMulti );
+        ui->actionBring_to_front->setEnabled( enableMulti );
         ui->actionSend_to_back->setEnabled( enableMulti );
         ui->actionCopy_Object->setEnabled( enableMulti );
         ui->actionDelete_Object->setEnabled( enableMulti );
-        ui->actionCustomize->setEnabled( enable );
+        ui->actionCustomize->setEnabled( enableMulti );
         ui->actionEdit_Object->setEnabled( enable );
         ui->actionEdit_Images->setEnabled( enable );
         ui->actionEdit_Path->setEnabled( enable );
         if (result && m_doc.getSize()) {
-            CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             result = false;
             if (layer.isSingleSelection()) {
@@ -822,10 +979,13 @@ void MainWindow::updateMenus()
         } else {
             m_comboEvents->setCurrentIndex(0);
         }
+        ui->actionNormal->setEnabled(true);
+        ui->actionHell->setEnabled(true);
+        ui->actionNightmare->setEnabled(true);
+        ui->actionInsane->setEnabled(true);
+        ui->actionAll_Skills->setEnabled(true);
     }
-
     ui->actionScriptWizard->setEnabled(m_viewMode == VM_SPRITE_EVENTS);
-    //ui->actionScriptWizard->setEnabled(true);
 }
 
 void MainWindow::on_actionCreate_Level_triggered()
@@ -839,6 +999,10 @@ void MainWindow::on_actionCreate_Level_triggered()
     dlg->setNewLevel();
     dlg->load( level );
     if (dlg->exec() == QDialog::Accepted) {
+        if (m_doc.getSize()==0) {
+            // init font on first level
+            m_doc.initFonts();
+        }
         dlg->save( level );
         m_doc.addLevel( level );
         m_doc.setDirty( true );
@@ -864,7 +1028,7 @@ void MainWindow::on_actionDelete_Level_triggered()
         if (ret == QMessageBox::Ok) {
             m_doc.setDirty( true );
             int index = m_doc.m_nCurrLevel;
-            delete m_doc[ m_doc.m_nCurrLevel ] ;
+            delete & m_doc.getCurrentLevel();
             m_doc.removeLevel ( m_doc.m_nCurrLevel );
             if ( m_doc.m_nCurrLevel > m_doc.getSize() - 1) {
                 -- m_doc.m_nCurrLevel ;
@@ -888,9 +1052,9 @@ void MainWindow::on_actionGo_to_level_triggered()
         dlg->setWindowTitle(tr("Go to level..."));
         dlg->setGameDB(& m_doc);
         dlg->init();
-        dlg->setLevel( m_doc.m_nCurrLevel );
+        dlg->setLevelId( m_doc.m_nCurrLevel );
         if (dlg->exec() == QDialog::Accepted) {
-            m_doc.m_nCurrLevel = dlg->getLevel();
+            m_doc.m_nCurrLevel = dlg->getLevelId();
             updateMenus();
             showLayerName();
             reloadLayerCombo();
@@ -907,20 +1071,20 @@ void MainWindow::on_actionMove_Level_triggered()
         dlg->setWindowTitle(tr("Move level to..."));
         dlg->setGameDB(& m_doc);
         dlg->init();
-        dlg->setLevel( m_doc.m_nCurrLevel );
+        dlg->setLevelId( m_doc.m_nCurrLevel );
         int indexFrom = m_doc.m_nCurrLevel;
         if (dlg->exec() == QDialog::Accepted
-            && m_doc.m_nCurrLevel != dlg->getLevel()) {
-            int level = dlg->getLevel();
-            CLevel *levelObj = m_doc [ m_doc.m_nCurrLevel ];
-            m_doc.removeLevel( m_doc.m_nCurrLevel );
-            m_doc.insertLevel( level, levelObj );
-            m_doc.m_nCurrLevel = level;
+            && m_doc.m_nCurrLevel != dlg->getLevelId()) {
+            int levelId = dlg->getLevelId();
+            CLevel & level = m_doc.getCurrentLevel();
+            m_doc.removeLevel(m_doc.m_nCurrLevel);
+            m_doc.insertLevel(levelId, &level);
+            m_doc.m_nCurrLevel = levelId;
             m_doc.setDirty( true );
             updateMenus();
             showLayerName();
             reloadLayerCombo();
-            emit levelMoved(indexFrom, level);
+            emit levelMoved(indexFrom, levelId);
         }
         delete dlg;
     }
@@ -930,8 +1094,8 @@ void MainWindow::on_actionDelete_Object_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             layer->removeSelectedSprites();
@@ -946,8 +1110,8 @@ void MainWindow::on_actionRemove_All_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *level = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer & layer =  * (level->getCurrentLayer());
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer & layer = *(level.getCurrentLayer());
         if (layer.getSelectionSize()) {
             QString msg;
             if (layer.isSingleSelection()) {
@@ -987,7 +1151,7 @@ void MainWindow::on_actionSend_to_back_triggered()
     // TODO: implement multi select
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc [ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         int selCount = layer.getSelectionSize();
         if (selCount) {
@@ -1021,11 +1185,11 @@ void MainWindow::on_actionSend_to_back_triggered()
     }
 }
 
-void MainWindow::on_actionBrint_to_front_triggered()
+void MainWindow::on_actionBring_to_front_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc [ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         int selCount = layer.getSelectionSize();
         if (selCount) {
@@ -1073,6 +1237,7 @@ void MainWindow::on_actionNew_file_triggered()
             m_toolBox->init();
             setViewMode(VM_EDITOR);
             m_doc.setDirty(true);
+            on_actionCreate_Level_triggered();
         }
         delete wiz;
     }
@@ -1096,26 +1261,27 @@ void MainWindow::on_actionTest_Level_triggered()
 {
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
         m_doc.initFonts();
+        m_doc.countdowns()->removeAll();
         CDlgTestLevel *dlg = new CDlgTestLevel(this);
-        dlg->setSkill(m_skill);
-        dlg->setHP(m_start_hp);
-        dlg->setScore(m_score);
-        dlg->setLives(m_lives);
-        dlg->setContinue(m_bContinue);
+        dlg->setSkill(O_INT(TESTLEVEL, SKILL));
+        dlg->setHP(O_INT(TESTLEVEL, START_HP));
+        dlg->setScore(O_INT(TESTLEVEL, SCORE));
+        dlg->setLives(O_INT(TESTLEVEL, LIVES));
+        dlg->setContinue(O_BOOL(TESTLEVEL, CONTINUE));
         dlg->setExternal(m_runtimeExternal);
         dlg->setRez(m_rez);
-        CLevel * level = m_doc [ m_doc.m_nCurrLevel ];
-        dlg->analyseLevel(level);
+        CLevel & level = m_doc.getCurrentLevel();
+        dlg->analyseLevel(&level);
         if (dlg->exec()) {
-            m_skill = dlg->getSkill();
-            m_start_hp = dlg->getHP();
-            m_score = dlg->getScore();
-            m_lives = dlg->getLives();
-            m_bContinue = dlg->getContinue();
+            O_SET(TESTLEVEL, SKILL, dlg->getSkill());
+            O_SET(TESTLEVEL, START_HP, dlg->getHP());
+            O_SET(TESTLEVEL, SCORE, dlg->getScore());
+            O_SET(TESTLEVEL, LIVES, dlg->getLives());
+            O_SET(TESTLEVEL, CONTINUE, dlg->getContinue());
             m_rez = dlg->getRez();
             m_rezH = dlg->getHeight();
             m_rezW = dlg->getWidth();
-            qDebug("skill: %d", m_skill);
+            qDebug("skill: %d", O_INT(TESTLEVEL, SKILL));
             QString errMsg = "";
             if (!m_doc.getSize()) {
                 errMsg = tr("No level available to play.");
@@ -1138,12 +1304,16 @@ void MainWindow::on_actionTest_Level_triggered()
 
             if (errMsg.isEmpty()) {
                 m_doc.clearKeys();
-                m_doc.setVitals(m_start_hp, m_lives, m_score);
-                m_doc.setSkill(m_skill);
+                m_doc.resetAllCounters();
+                m_doc.setVitals(
+                            O_INT(TESTLEVEL, START_HP),
+                            O_INT(TESTLEVEL, LIVES),
+                            O_INT(TESTLEVEL, SCORE)
+                            );
+                m_doc.setSkill(O_INT(TESTLEVEL, SKILL));
                 m_doc.initLua();
                 m_runtimeExternal = dlg->isExternal();
                 if (dlg->isExternal()){
-                // http://stackoverflow.com/questions/19442400/qt-execute-external-program
                     goExternalRuntime();
                 } else {
                     // set the start level
@@ -1151,8 +1321,7 @@ void MainWindow::on_actionTest_Level_triggered()
                     testLevel(true);
                 }
             } else {
-                 QMessageBox msgBox(QMessageBox::Warning, QString(m_appName), errMsg, 0, this);
-                 msgBox.exec();
+                 QMessageBox::warning(this, m_appName, errMsg);
             }
         }
         delete dlg;
@@ -1162,8 +1331,7 @@ void MainWindow::on_actionTest_Level_triggered()
 
 void MainWindow::testLevel(bool initSound)
 {   
-    QPixmap pixmap(":/images/0000-1.png");
-    QSplashScreen splash(pixmap);
+    QSplashScreen splash(QPixmap(":/images/0000-1.png"));
     splash.show();
     splash.showMessage(tr("Please wait..."));
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -1199,6 +1367,7 @@ void MainWindow::handleGameEvents()
                 if (m_doc.m_nCurrLevel < m_doc.getSize() - 1) {
                     ++m_doc.m_nCurrLevel;
                 } else {
+                    qDebug(">>>> images: %d", m_doc.frames().getSize());
                     QMessageBox::information(this, tr(m_appName),
                                              tr("You have sucessfully completed this level."));
                     break;
@@ -1212,15 +1381,15 @@ void MainWindow::handleGameEvents()
             break;
 
         case CGame::EVENT_TIMEOUT:
-            if (!m_bContinue) {
+            if (!O_BOOL(TESTLEVEL, CONTINUE)) {
                 QMessageBox::information(this, tr(m_appName),
                                      tr("You ran out of time."));
-                break;
             }
+            /* fall through */
 
         case CGame::EVENT_PLAYER_DIED:
             --m_doc.counter("lives");
-            if (!m_bContinue) {
+            if (!O_BOOL(TESTLEVEL, CONTINUE)) {
                 QMessageBox::information(this, tr(m_appName),
                                          tr("You were killed."));
             } else {
@@ -1255,14 +1424,14 @@ void MainWindow::handleGameEvents()
             m_doc.m_nCurrLevel = m_start_level;
             emit levelSelected(m_start_level);
             emit focusGL();
-            m_doc.removePointsOBL();
+            leaveGameMode();
         }
     }
 }
 
 void MainWindow::viewEvent()
 {
-    m_lview->setFocus();
+   // m_lview->setFocus();
     switch (m_viewMode) {
     case VM_GAME:
         handleGameEvents();
@@ -1294,13 +1463,22 @@ void MainWindow::showAppSettings(int tab)
     connect(d, SIGNAL(versionCheck()), this, SLOT(checkVersion()));
     QString s = QString(tr("%1 Settings").arg(m_appName));
     d->setWindowTitle(s);
-    d->showGrid(m_bShowGrid);
-    d->setGridColor(QString(m_gridColor));
-    d->setGridSize(m_gridSize);         
+    d->showGrid(O_BOOL(GENERAL, SHOWGRID));
+    d->setGridColor(O_STR(GENERAL, GRIDCOLOR));
+    d->setGridSize(O_INT(GENERAL, GRIDSIZE));
+    d->setTriggerKeyColor(O_STR(GENERAL, TRIGGER_KEY_COLOR));
+    d->setShowTriggerKey(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
     d->setUpdater(m_bUpdate, m_updateURL);
-    d->setFontSize(m_fontSize);
+    d->setFontSize(O_INT(EDITOR, FONT_SIZE));
+    d->setFont(O_STR(EDITOR, FONT_NAME));
+    d->enableWordWrap(O_BOOL(EDITOR, ENABLE_WORDWRAP));
+    d->enableHighlight(O_BOOL(EDITOR, ENABLE_HIGHLIGHT));
+    d->enableWhiteSpace(O_BOOL(EDITOR, ENABLE_WHITESPACE));
+    d->enableAutocomplete(O_BOOL(EDITOR, ENABLE_AUTO_COMPLETE));
+    d->setLastProjects(O_INT(GENERAL, LAST_PROJECTS));
+    d->setTickMaxRate(O_INT(GENERAL, XTICK_MAX_RATE));
+    d->setLastFolder(O_BOOL(GENERAL, LAST_FOLDER));
     d->setCurrentTab(tab);
-    qDebug("Font Size: %d", m_fontSize);
     QAction **actions = actionShortcuts();
     QStringList listActions;
     QStringList listShortcuts;
@@ -1310,12 +1488,15 @@ void MainWindow::showAppSettings(int tab)
         listShortcuts.append(s.toString());
         listActions.append(a->text());
     }
-    d->setSkill(m_skill);
-    d->setHP(m_start_hp);
-    d->setScore(m_score);
-    d->setLives(m_lives);
+    d->setSkill(O_INT(TESTLEVEL, SKILL));
+    d->setHP(O_INT(TESTLEVEL, START_HP));
+    d->setScore(O_INT(TESTLEVEL, SCORE));
+    d->setLives(O_INT(TESTLEVEL, LIVES));
+    d->setContinue(O_BOOL(TESTLEVEL, CONTINUE));
     d->setRuntime(m_runtime, m_runtimeArgs);
-    d->setSkipSplashScreen(m_skipSplash);
+    d->setSkipSplashScreen(O_BOOL(EDITOR, SKIP_SPLASH));
+    d->setTriggerFontSize(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
+    d->setJoyButtons(& m_doc.joyStateEntry(0));
     d->init();
     d->load(listActions, listShortcuts, defaultShortcuts());
     if (d->exec() == QDialog::Accepted) {
@@ -1325,22 +1506,40 @@ void MainWindow::showAppSettings(int tab)
             QAction *a = actions[i];
             a->setShortcut(QKeySequence(listShortcuts[i]));
         }
-        m_bShowGrid = d->isShowGrid();
-        emit gridVisible(m_bShowGrid);
+        O_SET(GENERAL, SHOWGRID, d->isShowGrid());
+        emit gridVisible(O_BOOL(GENERAL, SHOWGRID));
         emit gridSizeChanged(d->getGridSize());
-        m_gridSize = d->getGridSize();
+        O_SET(GENERAL, GRIDSIZE, d->getGridSize());
         emit gridColorChanged(d->getGridColor());
-        strcpy(m_gridColor, q2c(d->getGridColor().mid(0,6)));
-        ui->action_ShowGrid->setChecked(m_bShowGrid);
+        O_SET(GENERAL, GRIDCOLOR, d->getGridColor().mid(0,6));
+        O_SET(GENERAL, TRIGGER_KEY_COLOR, d->getTriggerKeyColor().mid(0,6));
+        ui->action_ShowGrid->setChecked(O_BOOL(GENERAL, SHOWGRID));
         m_lview->repaint();
-        m_skill = d->getSkill();
-        m_start_hp = d->getHP();
-        m_score = d->getScore();
-        m_lives = d->getLives();
-        m_fontSize = d->getFontSize();
+        O_SET(TESTLEVEL, SKILL, d->getSkill());
+        O_SET(TESTLEVEL, START_HP, d->getHP());
+        O_SET(TESTLEVEL, SCORE, d->getScore());
+        O_SET(TESTLEVEL, LIVES, d->getLives());
+        O_SET(TESTLEVEL, CONTINUE, d->getContinue());
+        O_SET(EDITOR, FONT_SIZE, d->getFontSize());
+        O_SET(EDITOR, FONT_NAME, d->getFont());
+        O_SET(EDITOR, SKIP_SPLASH, d->getSkipSplashScreen());
+        O_SET(EDITOR, ENABLE_WORDWRAP, d->wordWrap());
+        O_SET(EDITOR, ENABLE_HIGHLIGHT, d->highlight());
+        O_SET(EDITOR, ENABLE_WHITESPACE, d->whiteSpace());
+        O_SET(EDITOR, ENABLE_AUTO_COMPLETE, d->autocomplete());
+        O_SET(GENERAL, TRIGGER_KEY_SHOW, d->getShowTriggerKey());
+        O_SET(GENERAL, TRIGGER_KEY_FONT_SIZE, d->getTriggerFontSize());
+        emit triggerKeyFontSizeChanged(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
         d->getRuntime(m_runtime, m_runtimeArgs);
-        emit fontSizeChanged(m_fontSize);
-        m_skipSplash = d->getSkipSplashScreen();
+        emit fontChanged(currentFont());
+        emit editorOptionChanged((*m_options)[EDITOR]);
+        emit triggerKeyColorChanged(O_STR(GENERAL, TRIGGER_KEY_COLOR));
+        emit triggerKeyShow(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
+        O_SET(GENERAL, LAST_PROJECTS, d->lastProjects());
+        O_SET(GENERAL, XTICK_MAX_RATE, d->tickMaxRate());
+        O_SET(GENERAL, LAST_FOLDER, d->lastFolder());
+        changeTickMaxRate();
+        d->getJoyButtons(& m_doc.joyStateEntry(0));
     }
     delete d;
 }
@@ -1356,7 +1555,7 @@ void MainWindow::showLayerName()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         QString s = QString("%1: %2").arg(m_doc.m_nCurrLevel+1)
                     .arg(layer.getName());
@@ -1375,8 +1574,8 @@ void MainWindow::on_actionGo_to_layer_triggered()
         dlg->setGameDB(&m_doc);
         dlg->initLayers(m_doc.m_nCurrLevel);
         if (dlg->exec()) {
-            CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
-            int layerId = dlg->getLevel();
+            CLevel & level = m_doc.getCurrentLevel();
+            int layerId = dlg->getLevelId();
             level.setCurrentLayerById(layerId);
             showLayerName();
             reloadLayerCombo();
@@ -1395,8 +1594,8 @@ void MainWindow::on_actionMove_Layer_triggered()
         dlg->setGameDB(&m_doc);
         dlg->initLayers(m_doc.m_nCurrLevel);
         if (dlg->exec()) {
-            CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
-            int to = dlg->getLevel();
+            CLevel & level = m_doc.getCurrentLevel();
+            int to = dlg->getLevelId();
             int from = level.getCurrentLayerById();
             if (to != from) {
                 CLayer * layer = level.removeLayerById(from);
@@ -1417,7 +1616,7 @@ void MainWindow::on_actionCreate_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CDlgLayer * dlg = new CDlgLayer(this);
         dlg->setWindowTitle(tr("Create new layer"));
         if (dlg->exec()) {
@@ -1449,7 +1648,7 @@ void MainWindow::on_actionDelete_layer_triggered()
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
 
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int layerId = level.getCurrentLayerById();
         CLayer * layer = level.getCurrentLayer();
         // TODO: detect main layer by type
@@ -1477,7 +1676,7 @@ void MainWindow::on_actionPrevious_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int layerId = level.getCurrentLayerById();
         if (layerId) {
             level.setCurrentLayerById(--layerId);
@@ -1492,7 +1691,7 @@ void MainWindow::on_actionNext_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int layerId = level.getCurrentLayerById();
         if (layerId < level.getSize() - 1) {
             level.setCurrentLayerById(++layerId);
@@ -1507,7 +1706,7 @@ void MainWindow::on_actionEdit_layer_triggered()
 {
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         // TODO: detect main layer by type
         CLayer * layer = level.getCurrentLayer();
         if (layer->getType() != CLayer::LAYER_MAIN) {
@@ -1538,11 +1737,14 @@ void MainWindow::on_actionEdit_layer_triggered()
 
 void MainWindow::on_actionC_declarations_triggered()
 {
-    QString fileFilter = tr("Text files (*.txt)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(q2c(fileFilter)));
+    QString fileFilter = tr("Header files (*.h)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        CFileWrap file;
-        if (file.open(q2c(fileName), "wb")) {
+        if (!fileName.endsWith(".h", Qt::CaseInsensitive)) {
+            fileName.append(".h");
+        }
+        QFileWrap file;
+        if (file.open(fileName, "wb")) {
             file += "// Constants declarations for C/C++\r\n" \
                     "// ====================================\r\n\r\n" \
                     "// *** OBJECT TYPES\r\n\r\n" ;
@@ -1553,8 +1755,7 @@ void MainWindow::on_actionC_declarations_triggered()
                         name[i] = '_';
                     }
                 }
-                QString s;
-                s.sprintf("#define OBJECT_%-40s %d \r\n", q2c(name), n);
+                QString s = QString::asprintf("#define OBJECT_%-40s %d \r\n", q2c(name), n);
                 file += q2c(s);
             }
             file += "\r\n// *** OBJECT CLASSES\r\n\r\n" ;
@@ -1566,8 +1767,7 @@ void MainWindow::on_actionC_declarations_triggered()
                             name[i] = '_';
                         }
                     }
-                    QString s;
-                    s.sprintf("#define CLASS_%-40s0x%.2x\r\n",  q2c(name), n);
+                    QString s = QString::asprintf("#define CLASS_%-40s0x%.2x\r\n",  q2c(name), n);
                     file += q2c(s);
                 }
             }
@@ -1582,10 +1782,13 @@ void MainWindow::on_actionC_declarations_triggered()
 void MainWindow::on_actionRuntime_Lua_triggered()
 {
     QString fileFilter = tr("Lua script (*.lua)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", tr(q2c(fileFilter)));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
     if (!fileName.isEmpty()) {
-        CFileWrap file;
-        if (file.open(q2c(fileName), "wb")) {
+        if (!fileName.endsWith(".lua", Qt::CaseInsensitive)) {
+            fileName.append(".lua");
+        }
+        QFileWrap file;
+        if (file.open(fileName, "wb")) {
             std::string lua;
             m_doc.generateRuntimeLua(lua);
             file += lua.c_str();
@@ -1599,9 +1802,12 @@ void MainWindow::on_actionRuntime_Lua_triggered()
 
 void MainWindow::initToolBar()
 {
+    QSize size = QSize(TOOLBAR_ICON_SIZE,TOOLBAR_ICON_SIZE);
+
+    // main toolbar
     ui->toolBar->setObjectName("mainToolbar");
     ui->toolBar->setWindowTitle(tr("Main"));
-    ui->toolBar->setIconSize( QSize(16,16) );
+    ui->toolBar->setIconSize(size);
     ui->toolBar->addAction(ui->actionNew_file);
     ui->toolBar->addAction(ui->actionOpen);
     ui->toolBar->addAction(ui->actionSave);
@@ -1609,27 +1815,37 @@ void MainWindow::initToolBar()
     ui->toolBar->addAction(ui->actionCreate_Level);
     ui->toolBar->addAction(ui->actionEdit_Level);
     ui->toolBar->addAction(ui->actionTest_Level);
+    m_btnIndicator = new QToolButton(ui->toolBar);
+    m_btnIndicator->setIcon(QIcon(":/images/Light-bulb-white.png"));
+    m_btnIndicator->setToolTip(tr("Analyzing"));
+    m_btnIndicator->resize(size);
+    connect(m_btnIndicator, SIGNAL (clicked()), this, SLOT(indicatorTriggered()));
+    ui->toolBar->addWidget(m_btnIndicator);
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->actionPrevious);
     ui->toolBar->addAction(ui->actionNext);
     ui->toolBar->addAction(ui->actionGo_to_level);
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->actionSprite_Editor);
+
+    // layer toolbar
     m_comboLayers = new QComboBox(this);
     m_comboLayers->setDisabled(true);
     m_layerToolbar = new QToolBar("Layer", this);
-    m_layerToolbar->setIconSize( QSize(16,16) );
+    m_layerToolbar->setIconSize(size);
     m_layerToolbar->setObjectName("toolbar2");
     m_layerToolbar->addWidget(m_comboLayers);
     m_layerToolbar->addAction(ui->actionCreate_layer);
     m_layerToolbar->addAction(ui->actionEdit_layer);
     m_layerToolbar->addAction(ui->actionDelete_layer);
     addToolBar(m_layerToolbar);
-    m_levelToolbar = new QToolBar("Level", this);
-    m_levelToolbar->setIconSize( QSize(16,16) );
-    m_levelToolbar->setObjectName("toolbar1");
+
+    // level toolbar
     m_comboEvents = new QComboBox(this);
     reloadEventCombo();
+    m_levelToolbar = new QToolBar(tr("Level"), this);
+    m_levelToolbar->setIconSize(size);
+    m_levelToolbar->setObjectName("toolbar1");
     m_levelToolbar->addWidget(m_comboEvents);
     m_levelToolbar->addAction(ui->actionScriptWizard);
     m_levelToolbar->addAction(ui->actionEdit_Object);
@@ -1640,14 +1856,27 @@ void MainWindow::initToolBar()
     m_levelToolbar->addAction(ui->actionCut);
     m_levelToolbar->addAction(ui->actionPaste);
     m_levelToolbar->addAction(ui->actionDelete);
+    m_levelToolbar->addSeparator();
+    m_levelToolbar->addAction(ui->actionSprite_Paint);
+    ui->actionSprite_Paint->setIcon(QIcon(":/images/strawberrypntbrush.png"));
+    ui->actionSprite_Paint->setStatusTip(tr("Paint the tile under the cursor with the given sprite"));
+    m_actionEraser = m_levelToolbar->addAction(QIcon(":/images/icons8-erase-40.png"), tr("Eraser"));
+    m_actionEraser->setCheckable(true);
+    m_actionEraser->setStatusTip(tr("Erase the sprite under the cursor"));
+    connect(m_actionEraser, SIGNAL(toggled(bool)), this, SLOT(eraserToggled(bool)));
+    addToolBar(m_levelToolbar);
+    m_protoIcon = new QToolButton();
+    m_protoIcon->setToolTip(tr("Sprite painter"));
+    m_protoIcon->setStatusTip(tr("Current Sprite selected for painting"));
+    m_protoIcon->setPopupMode(QToolButton::MenuButtonPopup);
+    m_levelToolbar->addWidget(m_protoIcon);
+
     connect(m_comboEvents, SIGNAL(currentIndexChanged(int)), this, SLOT(comboChanged(int)));
     connect(m_comboLayers, SIGNAL(currentIndexChanged(int)), this, SLOT(layerChanged(int)));
     connect(m_comboEvents, SIGNAL(highlighted(int)), this, SLOT(reloadEventCombo()));
-    addToolBar(m_levelToolbar);
+
     connect(ui->toolBar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionMainToolbar_toggled(bool)));
-
-
     connect(m_levelToolbar, SIGNAL(visibilityChanged(bool)),
             this, SLOT(on_actionLevelToolbar_toggled(bool)));
     connect(m_layerToolbar, SIGNAL(visibilityChanged(bool)),
@@ -1659,7 +1888,7 @@ void MainWindow::comboChanged(int v)
     if (v != 0){
         --v;
         if (m_viewMode == VM_EDITOR && m_doc.getSize()) {
-            CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             if (layer.isSingleSelection()) {
                 CLevelEntry entry = layer.getSelection(0);
@@ -1684,25 +1913,34 @@ void MainWindow::comboChanged(int v)
 
 void MainWindow::on_actionPause_triggered()
 {
-    if ((m_viewMode == VM_GAME)) {
+    if (m_viewMode == VM_GAME) {
         m_doc.flipPause();
     }
 }
 
-void MainWindow::on_actionQuit_Game_triggered()
+void MainWindow::leaveGameMode()
 {
-    if ((m_viewMode == VM_GAME)) {
+    qDebug("IN leaveGameMode: frames %d", m_doc.frames().getSize());
+    qDebug("IN pointsOBL_texture: %llu", m_doc.var("pointsOBL_texture"));
+    if (m_viewMode == VM_GAME) {
         setViewMode(VM_EDITOR);
-        m_doc.removePointsOBL();
         updateMenus();
         m_doc.stopMusic();
         emit scrollbarShown(true);
     }
+    m_doc.removePointsOBL();
+    qDebug("OUT leaveGameMode: frames %d", m_doc.frames().getSize());
+    qDebug("OUT pointsOBL_texture: %llu", m_doc.var("pointsOBL_texture"));
+}
+
+void MainWindow::on_actionQuit_Game_triggered()
+{
+    leaveGameMode();
 }
 
 void MainWindow::on_actionDebug_triggered()
 {
-    //if ((m_viewMode == VM_GAME)) {
+    //if (m_viewMode == VM_GAME) {
       //  m_doc.flipDebugConsole();
     //}
 }
@@ -1733,20 +1971,21 @@ void MainWindow::on_actionView_Source_triggered()
 void MainWindow::on_actionEdit_Object_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
-        if (layer.isSingleSelection()) { //.m_currEntry != -1) {
-            CLevelEntry entry = layer.getSelection(0);//[layer.m_currEntry];
+        if (layer.isSingleSelection()) {
+            CLevelEntry entry = layer.getSelection(0);
+            CProto & currProto = m_doc.m_arrProto[entry.m_nProto];
             const CProto proto = m_doc.m_arrProto[entry.m_nProto];
             CDlgObject *d = new CDlgObject (this);
             d->setGameDB(&m_doc);
             d->load( entry.m_nProto );
             if (d->exec() == QDialog::Accepted) {
                 d->save( entry.m_nProto );
-                //    if (gf.m_arrProto.getObject( m_proto ) != object) {
-                if (proto != m_doc.m_arrProto[ entry.m_nProto ]) {
+                if (proto != currProto) {
                     m_doc.setDirty(true);
                 }
+                emit spriteUpdated(entry.m_nProto);
             }
             delete d;
         }
@@ -1756,25 +1995,25 @@ void MainWindow::on_actionEdit_Object_triggered()
 void MainWindow::on_actionCustomize_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
-        if (layer.isSingleSelection()) {
-            CDlgEntry *d = new CDlgEntry (this);
+        if (layer.selection().getSize()) {
+            CDlgEntry *d = new CDlgEntry(this);
             d->setGameDB( & m_doc);
-
-            int triggers[CGameFile::TRIGGER_KEYS + 1];
-            memset(&triggers, 0, sizeof(triggers));
-            for (int i=0; i < layer.getSize(); ++i) {
-                int trigger = layer[i].m_nTriggerKey & CGameFile::TRIGGER_KEYS;
-                ++triggers[trigger];
-            }
-            d->init(triggers);
             d->load(layer.getSelectionIndex(0));
-            CLevelEntry entry = layer.getSelection(0);
+            if (layer.isMultiSelection()) {
+                d->loadMultiSelection(layer.selection());
+            }
             if (d->exec() == QDialog::Accepted) {
-                d->save(layer.getSelectionIndex(0));
-                if (entry != layer.getSelection(0)) {
-                    m_doc.setDirty( true );
+                CSelection & selection = layer.selection();
+                for (int i=0; i < selection.getSize(); ++i) {
+                    int j = layer.getSelectionIndex(i);
+                    d->save(j, layer.isMultiSelection());
+                    if (selection.cacheAtIndex(i) != layer[j]) {
+                        selection.resync(layer[j], i);
+                        m_doc.setDirty(true);
+                    }
+                    emit spriteUpdated(layer[j].m_nProto);
                 }
             }
             delete d;
@@ -1784,14 +2023,13 @@ void MainWindow::on_actionCustomize_triggered()
 
 void MainWindow::on_actionImages_triggered()
 {
-    CWizFrameSet *wiz = new CWizFrameSet( (QWidget*)parent() );
-    wiz->init(m_doc.m_arrFrames.getSize());
+    CWizFrameSet *wiz = new CWizFrameSet(static_cast<QWidget*>(parent()));
+    wiz->init(m_doc.frames().getSize());
     if (wiz->exec()) {
         CFrameSet *frameSet = new CFrameSet (wiz->getFrameSet());
-        char name[32];
-        strcpy(name, wiz->getName());
-        frameSet->setName(name);
-        m_doc.m_arrFrames.add(frameSet);
+        std::string name = wiz->getName();
+        frameSet->setName(name.c_str());
+        m_doc.frames().add(frameSet);
         // add this new imageSet to the cache
         m_doc.cache()->add(frameSet);
         // set the doc to dirty
@@ -1805,12 +2043,12 @@ void MainWindow::showContextMenu(const QPoint& pos)
     // TODO: disable in game mode
     if (!(m_viewMode == VM_GAME)) {
         if (m_doc.getSize()) {
-            CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+            CLevel & level = m_doc.getCurrentLevel();
             CLayer & layer = * level.getCurrentLayer();
             int x = pos.x() & 0xfff8;
             int y = pos.y() & 0xfff8;
-            CGameFile * gf = (CGameFile*) &m_doc;
-            int index = gf->whoIs( level, x + level.m_mx, y + level.m_my);
+            CGameFile * gf = &m_doc;
+            int index = gf->whoIs( level, x + level.m_mx, y + level.m_my, O_INT(GENERAL, SKILL_FILTER));
             if (index == -1 || !layer.isInSelection(index)) {
                 layer.selectSingle( index );
             }
@@ -1828,11 +2066,14 @@ void MainWindow::showContextMenu(const QPoint& pos)
                 menu.addSeparator();
                 menu.addAction(ui->actionCopy);
                 menu.addAction(ui->actionSend_to_back);
-                menu.addAction(ui->actionBrint_to_front);
+                menu.addAction(ui->actionBring_to_front);
                 menu.addSeparator();
                 menu.addAction(ui->actionCut);
                 menu.addAction(ui->actionDelete);
-                menu.addAction(ui->actionRemove_All);
+                QMenu* submenuA = menu.addMenu( tr("All instances") );
+                submenuA->addAction(ui->actionRemove_All);
+                submenuA->addAction(ui->actionMark_All_as_Goals);
+                submenuA->addAction(ui->actionUnmark_All_as_Goals);
                 menu.exec(m_lview->mapToGlobal(pos));
             } else {
                 // level menu items
@@ -1865,7 +2106,7 @@ void MainWindow::reloadLayerCombo()
     bool enable = false;
     m_comboLayers->clear();
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         int currLayer = level.getCurrentLayerById();
         for (int i=0; i < level.getSize(); ++i) {
             CLayer & layer = level[i];
@@ -1887,7 +2128,7 @@ void MainWindow::reloadEventCombo()
     }
     bool set = false;
     if (m_doc.getSize() && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             CLevelEntry & entry = layer.getSelection(0);
@@ -2029,6 +2270,7 @@ void MainWindow::deleteSprite(int sprite)
 {
     updateMenus();
     emit spriteDeleted(sprite);
+    changeProtoIcon(CGame::INVALID);
 }
 
 void MainWindow::changeSprite(int sprite)
@@ -2053,7 +2295,7 @@ void MainWindow::changeViewMode()
 void MainWindow::on_actionView_Code_triggered()
 {
     if (m_doc.getSize() && (m_viewMode == VM_EDITOR)) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             if (m_viewMode != VM_SPRITE_EVENTS) {
@@ -2076,21 +2318,13 @@ void MainWindow::on_actionCreateSprite_triggered()
 
 void MainWindow::on_actionDocumentation_triggered()
 {
-    QString url = QString("%1manual.htm?v=%2.%3.%4.%5").arg(WEB_PATH)
-            .arg(CGame::getVersion() >> 24 & 0xff)
-            .arg(CGame::getVersion() >> 16 & 0xff)
-            .arg(CGame::getVersion() >> 8 & 0xff)
-            .arg(CGame::getVersion() & 0xff);
+    QString url = QString("%1manual.htm?v=%2").arg(WEB_PATH, formatVersion(true));
     QDesktopServices::openUrl(url);
 }
 
 void MainWindow::on_actionTutorials_triggered()
 {
-    QString url = QString("%1tutorial.htm?v=%2.%3.%4.%5").arg(WEB_PATH)
-            .arg(CGame::getVersion() >> 24 & 0xff)
-            .arg(CGame::getVersion() >> 16 & 0xff)
-            .arg(CGame::getVersion() >> 8 & 0xff)
-            .arg(CGame::getVersion() & 0xff);
+    QString url = QString("%1tutorial.htm?v=%2").arg(WEB_PATH, formatVersion(true));
     QDesktopServices::openUrl(url);
 }
 
@@ -2108,8 +2342,8 @@ void MainWindow::on_actionCut_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             // copy sprites to clippy
@@ -2120,8 +2354,7 @@ void MainWindow::on_actionCut_triggered()
                 int j = layer->getSelectionIndex(i);
                 clipboard->addEntry(entry, j);
             }
-            clipboard->applyDelta(script->m_mx, script->m_my);
-      //      qDebug("mx=%d my=%d",script->m_mx, script->m_my);
+            clipboard->applyDelta(level.m_mx, level.m_my);
             layer->removeSelectedSprites();
             m_doc.setDirty(true);
             m_lview->repaint();
@@ -2134,21 +2367,19 @@ void MainWindow::on_actionCopy_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             // copy sprites tp clippy
             CSelection *clipboard = m_doc.getClipboard();
             clipboard->clear();
             for (int i=0; i < layer->getSelectionSize(); ++i) {
-    //            qDebug("copy select %d", i);
                 CLevelEntry & entry = layer->getSelection(i);
                 int j = layer->getSelectionIndex(i);
                 clipboard->addEntry(entry,j);
             }
-            clipboard->applyDelta(script->m_mx, script->m_my);
-  //          qDebug("clipboard size: %d", clipboard->getSize());
+            clipboard->applyDelta(level.m_mx, level.m_my);
             updateMenus();
         }
     }
@@ -2157,7 +2388,7 @@ void MainWindow::on_actionCopy_triggered()
 void MainWindow::on_actionPaste_triggered()
 {
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         CSelection *clipboard = m_doc.getClipboard();
         int selCount = clipboard->getSize();
@@ -2183,8 +2414,8 @@ void MainWindow::on_actionDelete_triggered()
 {
     if (m_doc.getSize()
             && m_viewMode == VM_EDITOR) {
-        CLevel *script = m_doc [ m_doc.m_nCurrLevel ];
-        CLayer *layer = script->getCurrentLayer();
+        CLevel & level = m_doc.getCurrentLevel();
+        CLayer *layer = level.getCurrentLayer();
         if (layer->isMultiSelection()
                 || layer->isSingleSelection()) {
             int selCount = layer->getSelectionSize();
@@ -2205,7 +2436,7 @@ void MainWindow::on_actionDelete_triggered()
 void MainWindow::on_actionCopy_Object_triggered()
 {
     if (m_doc.getSize() && !(m_viewMode == VM_GAME)) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         int selCount = layer.getSelectionSize();
         if (selCount) {
@@ -2282,7 +2513,7 @@ QAction** MainWindow::actionShortcuts()
         ui->actionTest_Level,
         ui->actionAbout,
         ui->actionNew_file,
-        ui->actionBrint_to_front,
+        ui->actionBring_to_front,
         ui->actionSend_to_back,
         ui->actionDelete_Object,
         ui->actionMove_Level,
@@ -2329,7 +2560,10 @@ QAction** MainWindow::actionShortcuts()
         ui->actionScriptWizard,
         ui->actionLayer_ToolBar,
         ui->actionEdit_Images,
-        NULL
+        ui->actionDebugOutput,
+        ui->actionSprite_Paint,
+        m_actionEraser,
+        nullptr
     };
     return actions;
 }
@@ -2341,9 +2575,7 @@ void MainWindow::saveSettings()
     settings.setValue("saveSettings", ui->actionSave_Settings->isChecked());
     bool saveSettings = ui->actionSave_Settings->isChecked();
     if (saveSettings) {
-        settings.setValue("showGrid", m_bShowGrid);
-        settings.setValue("gridColor", QString(m_gridColor));
-        settings.setValue("gridSize", m_gridSize);
+        // shortcuts
         settings.beginGroup("Shortcuts");
         QAction **actions = actionShortcuts();
         for (uint i=0; actions[i];++i) {
@@ -2357,33 +2589,32 @@ void MainWindow::saveSettings()
         settings.setValue("levelToolbar", ui->actionLevelToolbar->isChecked());
         settings.setValue("layerToolbar", ui->actionLayer_ToolBar->isChecked());
         settings.setValue("statusbar", ui->actionStatus_bar->isChecked());
+        settings.setValue("debugOutput", ui->actionDebugOutput->isChecked());
         settings.setValue("toolBox", m_bShowToolBox);
         settings.endGroup();
+
+        settings.beginGroup("Tools");
+        settings.setValue("eraserTool", m_actionEraser->isChecked());
+        settings.setValue("paintTool", ui->actionSprite_Paint->isChecked());
+        settings.endGroup();
+
         settings.beginGroup("UI_Components");
         settings.setValue("mainWindow:geometry", this->saveGeometry());
         settings.setValue("mainWindow:state", this->saveState());
         settings.setValue("version", UI_VERSION);
-       // settings.setValue("mainWindow:pos", this->geometry());
         settings.endGroup();
-        settings.beginGroup("TestLevel");
-        settings.setValue("skill", m_skill);
-        settings.setValue("start_hp", m_start_hp);
-        settings.setValue("score", m_score);
-        settings.setValue("lives", m_lives);
-        settings.setValue("continue", m_bContinue);
-        settings.endGroup();
+
         settings.beginGroup("Updater");
         settings.setValue("updater_check", m_bUpdate);
         settings.setValue("updater_url", m_updateURL);
         settings.setValue("uuid", m_uuid);
-        QString ver;
-        formatVersion(ver);
+        QString ver = formatVersion(false);
         settings.setValue("version", ver);
         settings.endGroup();
-        settings.beginGroup("Editor");
-        settings.setValue("fontSize", m_fontSize);
-        settings.setValue("skipSplash", m_skipSplash);
-        settings.endGroup();
+
+        // Editor
+        m_options->write(settings);
+
         // Runtime
         settings.beginGroup("Runtime");
         settings.setValue("path", m_runtime);
@@ -2391,44 +2622,71 @@ void MainWindow::saveSettings()
         settings.setValue("external", m_runtimeExternal);
         settings.setValue("rez", m_rez);
         settings.endGroup();
+
+        // inputs
+        writeButtonConfig(settings);
         settings.sync();
     }
 }
 
-void MainWindow::formatVersion(QString &ver)
+void MainWindow::initSettings()
 {
-    int version = SS_LGCK_VERSION;
-    int vv[4]={0,0,0,0};
-    for (int i=3; i >= 0; --i) {
-        vv[i] = version & 0xff;
-        version /= 256;
-    }
-    ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+    // add default values
+    qDebug("initSettings");
+    m_options = new COptions;
+    COptionGroup & editor = (*m_options)[EDITOR];
+    editor.set(FONT_SIZE, DEFAULT_FONT_SIZE)
+            .set(FONT_NAME, DEFAULT_FONT_NAME)
+            .set(SKIP_SPLASH, false)
+            .set(ENABLE_AUTO_COMPLETE, true)
+            .set(ENABLE_WORDWRAP, true)
+            .set(ENABLE_HIGHLIGHT, true)
+            .set(ENABLE_WHITESPACE, true);
+
+    COptionGroup & general = (*m_options)[GENERAL];
+    general.set(GRIDCOLOR, "a0b0c0")
+            .set(SHOWGRID, true)
+            .set(TRIGGER_KEY_COLOR, "FFFF00")
+            .set(TRIGGER_KEY_FONT_SIZE, 24)
+            .set(TRIGGER_KEY_SHOW, true)
+            .set(GRIDSIZE, 32)
+            .set(LAST_PROJECTS, 4)
+            .set(XTICK_MAX_RATE, 100)
+            .set(LAST_FOLDER, true)
+            .set(SKILL_FILTER, CGame::SKILL_FLAG_ALL);
+
+    COptionGroup & testLevel = (*m_options)[TESTLEVEL];
+    testLevel.set(SKILL, 0)
+            .set(LIVES, 5)
+            .set(SCORE, 0)
+            .set(START_HP, 32)
+            .set(CONTINUE, true);
+
+    COptionGroup & folders = (*m_options)[FOLDERS];
+    folders.set(FOLDER_LGCKDB, "");
+
+    QSettings settings(m_author, m_appName);
+    qDebug("read settings");
+    m_options->read(settings);
 }
 
 void MainWindow::reloadSettings()
 {
+    qDebug("reloadSettings");
     QSettings settings;
     qDebug() << settings.fileName();
+
     // grid
-    m_bShowGrid = settings.value("showGrid", true).toBool();
-    emit gridVisible(m_bShowGrid);
-    ui->action_ShowGrid->setChecked(m_bShowGrid);
-    QString color = settings.value("gridColor", "a0b0c0").toString();
-    emit gridColorChanged(color);
-    strcpy(m_gridColor, q2c(color.mid(0,6)));
-    m_gridSize = settings.value("gridSize", 32).toInt() & 0xf0;
-    emit gridSizeChanged(m_gridSize > 0 ? m_gridSize : 32);
+    emit gridVisible(O_BOOL(GENERAL, SHOWGRID));
+    ui->action_ShowGrid->setChecked(O_BOOL(GENERAL, SHOWGRID));
+    emit gridColorChanged(O_STR(GENERAL, GRIDCOLOR));
+    emit gridSizeChanged(O_INT(GENERAL, GRIDSIZE) > 0 ? O_INT(GENERAL, GRIDSIZE) : 32);
+    emit triggerKeyColorChanged(O_STR(GENERAL, TRIGGER_KEY_COLOR));
+    emit triggerKeyShow(O_BOOL(GENERAL, TRIGGER_KEY_SHOW));
+    emit triggerKeyFontSizeChanged(O_INT(GENERAL, TRIGGER_KEY_FONT_SIZE));
     bool saveSettings = settings.value("saveSettings", true).toBool();
     ui->actionSave_Settings->setChecked(saveSettings);
-    // TestLevel
-    settings.beginGroup("TestLevel");
-    m_skill = settings.value("skill", 0).toInt();
-    m_lives = settings.value("lives", 5).toInt();
-    m_score = settings.value("score", 0).toInt();
-    m_start_hp = settings.value("start_hp", 32).toInt();
-    m_bContinue = settings.value("continue", true).toBool();
-    settings.endGroup();
+
     // save default shortcuts
     defaultShortcuts();
     // restore settings from config
@@ -2456,6 +2714,8 @@ void MainWindow::reloadSettings()
     levelToolbar ? m_levelToolbar->show() : m_levelToolbar->hide();
     layerToolbar ? m_layerToolbar->show() : m_layerToolbar->hide();
     statusBar ? ui->statusBar->show() : ui->statusBar->hide();
+    bool debugOutput = settings.value("debugOutput", false).toBool();
+    debugOutput ? m_infoDock->show() : m_infoDock->hide();
     // toolbox
     m_bShowToolBox = settings.value("toolBox", true).toBool();
     showToolBox(m_bShowToolBox);
@@ -2469,8 +2729,7 @@ void MainWindow::reloadSettings()
     char *uuid = getUUID();
     m_uuid = settings.value("uuid", uuid).toString();
     delete []uuid;
-    QString currVersion;
-    formatVersion(currVersion);
+    QString currVersion = formatVersion(false);
     if (currVersion != savedVersion) {
         m_updateURL = UPDATER_URL;
     }
@@ -2484,11 +2743,19 @@ void MainWindow::reloadSettings()
     m_rez = settings.value("rez", 0).toInt();
     settings.endGroup();
 
-    settings.beginGroup("Editor");
-    m_fontSize = settings.value("fontSize", DEFAULT_FONT_SIZE).toInt();
-    m_skipSplash = settings.value("skipSplash", false).toBool();
-    emit fontSizeChanged(m_fontSize);
+    // Editor
+    emit fontChanged(currentFont());
+    emit editorOptionChanged((*m_options)[EDITOR]);
+
+    // Tools
+    settings.beginGroup("Tools");
+    m_actionEraser->setChecked(settings.value("eraserTool", false).toBool());
+    ui->actionSprite_Paint->setChecked(settings.value("paintTool", false).toBool());
     settings.endGroup();
+
+    updateSkillFiltersCheckbox(O_INT(GENERAL, SKILL_FILTER));
+    // Inputs
+    readButtonConfig(settings);
 }
 
 void MainWindow::setVisible(bool visible)
@@ -2515,7 +2782,7 @@ void MainWindow::setVisible(bool visible)
 void MainWindow::on_actionEdit_Path_triggered()
 {
     if (m_doc.getSize() && m_viewMode == VM_EDITOR) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         CPathBlock & paths = *(m_doc.getPaths());
         int selCount = layer.getSelectionSize();
@@ -2555,8 +2822,8 @@ void MainWindow::on_actionStatus_bar_toggled(bool arg1)
 
 void MainWindow::on_action_ShowGrid_toggled(bool arg1)
 {
-    m_bShowGrid = arg1;
-    emit gridVisible(m_bShowGrid);
+    O_SET(GENERAL, SHOWGRID, arg1);
+    emit gridVisible(O_BOOL(GENERAL, SHOWGRID));
     m_lview->repaint();
 }
 
@@ -2570,7 +2837,7 @@ void MainWindow::layerChanged(int layerId)
     if (m_doc.m_nCurrLevel != -1
         && m_doc.getSize()
         && layerId != -1) {
-        CLevel & level = *m_doc.m_arrLevels[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         level.setCurrentLayerById(layerId);
         showLayerName();
     }
@@ -2586,7 +2853,7 @@ void MainWindow::on_actionLayer_ToolBar_toggled(bool arg1)
 void MainWindow::closePath()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         CLevelEntry & entry = layer[m_pathEntry];
         CPathBlock & paths = *(m_doc.getPaths());
@@ -2622,50 +2889,16 @@ void MainWindow::updateEditor(const QString &url, const QString &ver)
     }
 }
 
-
-const char *getWindowsVersion()
-{
-    switch(QSysInfo::windowsVersion())
-    {
-    case QSysInfo::WV_2000: return "Windows 2000";
-    case QSysInfo::WV_XP: return "Windows XP";
-    case QSysInfo::WV_VISTA: return "Windows Vista";
-    case QSysInfo::WV_WINDOWS7: return "Windows 7";
-    case QSysInfo::WV_WINDOWS8: return "Windows 8";
-    case QSysInfo::WV_WINDOWS8_1:	return "Windows 8.1";
-    case QSysInfo::WV_WINDOWS10: return "Windows 10";
-    default: return "Windows";
-    }
-}
-
 void MainWindow::checkVersion()
 {
-    int version = SS_LGCK_VERSION;
-    int vv[4]={0,0,0,0};
-    for (int i=3; i >= 0; --i) {
-        vv[i] = version & 0xff;
-        version /= 256;
-    }
-
-    QString os = "";
-#ifdef Q_OS_LINUX
-    os = "Linux";
-#elif defined(Q_OS_WIN32)
-    os = getWindowsVersion();
-#elif define(Q_OS_UNIX)
-    os = "Unix";
-#elif define(Q_OS_DARWIN)
-    os = "Mac";
-#endif
-    os.replace(" ", "+");
     QString productVersion = QSysInfo::productVersion();
     QString productType = QSysInfo::productType();
-    QString ver = QString().sprintf("%.2d.%.2d.%.2d.%.2d", vv[0], vv[1], vv[2], vv[3]);
+    QString ver = formatVersion(false);
     QString driver = QGuiApplication::platformName();
-    QString url = QString().sprintf(q2c(m_updateURL),
+    QString url = QString::asprintf(q2c(m_updateURL),
                                     q2c(ver),
                                     q2c(driver),
-                                    q2c(os),
+                                    q2c(QSysInfo::kernelType()),
                                     q2c(m_uuid),
                                     q2c(QString(productType + "+" + productVersion)));
     while (m_updater->isRunning());
@@ -2693,46 +2926,44 @@ void MainWindow::makeCurrent()
 
 void MainWindow::on_actionIncrease_Font_Size_triggered()
 {
-    ++ m_fontSize;
-    if (m_fontSize > MAX_FONT_SIZE) {
-        m_fontSize = MAX_FONT_SIZE;
-    }
-    emit fontSizeChanged(m_fontSize);
+    int fontSize = O_INT(EDITOR, FONT_SIZE);
+    ++ fontSize;
+    O_SET(EDITOR, FONT_SIZE, fontSize > MAX_FONT_SIZE ? MAX_FONT_SIZE : fontSize);
+    emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionDecrease_Font_Size_triggered()
 {
-    -- m_fontSize;
-    if (m_fontSize < MIN_FONT_SIZE) {
-        m_fontSize = MIN_FONT_SIZE;
-    }
-    emit fontSizeChanged(m_fontSize);
+    int fontSize = O_INT(EDITOR, FONT_SIZE);
+    -- fontSize;
+    O_SET(EDITOR, FONT_SIZE, fontSize < MIN_FONT_SIZE ? MIN_FONT_SIZE : fontSize);
+    emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionReset_Font_Size_triggered()
 {
-    m_fontSize = DEFAULT_FONT_SIZE;
-    emit fontSizeChanged(m_fontSize);
+    O_SET(EDITOR, FONT_SIZE, DEFAULT_FONT_SIZE);
+    emit fontChanged(currentFont());
 }
 
 void MainWindow::on_actionEdit_Images_triggered()
 {
     if (m_doc.getSize()) {
-        CLevel & level = * m_doc[ m_doc.m_nCurrLevel ];
+        CLevel & level = m_doc.getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         if (layer.isSingleSelection()) {
             CLevelEntry entry = layer.getSelection(0);
             const CProto proto = m_doc.m_arrProto[entry.m_nProto];
             int fs = proto.m_nFrameSet;
             CDlgFrameSet * d = new CDlgFrameSet (this);
-            d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(m_doc.m_arrFrames[fs]->getName()) );
-            CFrameSet * frameSet = new CFrameSet (m_doc.m_arrFrames[fs]);
+            d->setWindowTitle ( QString(tr("Edit Image Set `%1`")).arg(m_doc.frames()[fs]->getName()) );
+            CFrameSet * frameSet = new CFrameSet (m_doc.frames()[fs]);
             d->init(frameSet);
             if (d->exec() == QDialog::Accepted) {
                 m_doc.setDirty( true );
                 // replace frameSet
-                delete m_doc.m_arrFrames[ fs ];
-                m_doc.m_arrFrames.setAt( fs, frameSet);
+                delete m_doc.frames()[ fs ];
+                m_doc.frames().setAt( fs, frameSet);
                 // update the imageCache
                 m_doc.cache()->replace(fs, frameSet);
                 //updateFrameSet
@@ -2743,18 +2974,6 @@ void MainWindow::on_actionEdit_Images_triggered()
             delete d;
         }
     }
-}
-
-void MainWindow::on_actionImport_Font_triggered()
-{
-    QMessageBox::information(this, tr(m_appName),
-                    tr("Not implemented yet !"),
-                    QMessageBox::Ok);
-
-    //CWizFont *wiz = new CWizFont( static_cast<QWidget*>(parent()) );
-    //if (wiz->exec()) {
-        // TODO: implement this
-    //}
 }
 
 bool MainWindow::checkExecutible(const QString exec, QString & errMsg)
@@ -2783,14 +3002,14 @@ void MainWindow::goExternalRuntime()
 {
     QString filename = m_doc.getFileName();
     QStringList list;
-    QStringList tmp = m_runtimeArgs.split(" ", QString::SkipEmptyParts);
+    QStringList tmp = m_runtimeArgs.split(" ", Qt::SkipEmptyParts);
     QListIterator<QString> itr(tmp);
     while (itr.hasNext()) {
         QString current = itr.next().trimmed();
         if (!current.isEmpty()) {
             current = current.replace("%1", filename)
                     .replace("%2", QString::number(m_doc.m_nCurrLevel))
-                    .replace("%3", QString::number(m_skill))
+                    .replace("%3", QString::number(O_INT(TESTLEVEL, SKILL)))
                     .replace("%4", QString::number(m_rezW))
                     .replace("%5", QString::number(m_rezH));
             list.append(current);
@@ -2807,29 +3026,29 @@ void MainWindow::goExternalRuntime()
     }
     if (!errMsg.isEmpty()){
         warningMessage(errMsg);
-        showAppSettings(CDlgAppSettings::TAB_RUNTIME);
+        showAppSettings(CDlgAppSettings::TAB_TESTLEVEL);
     }
 }
 
 void MainWindow::on_actionSprite_Editor_triggered()
 {
-    QString appDir = QCoreApplication::applicationDirPath();
-    qDebug() << appDir;
-#ifdef Q_OS_WIN32
-    QString cmd = "obl5edit.exe";
-#else
-    QString cmd = "obl5edit";
-#endif
-    QString runtime = "\"" + appDir + "/" + cmd + "\"";
-    bool result = QProcess::startDetached(runtime);
+    Path outPath;
+    if (!getCmd(SPRITE_EDITOR, outPath)) {
+        QMessageBox::warning(this, m_appName, tr("Couldn't find executable: %1").arg(SPRITE_EDITOR));
+        return;
+    }
+    QString runtime = "\"" + outPath.path + "/" + outPath.cmd + "\"";
+    bool result = launchProcess(outPath);
     if (!result) {
-        QString errMsg = tr("Running external editor failed: %1").arg(runtime);
-        warningMessage(errMsg);
+        QMessageBox::warning(this, m_appName, tr("Running external editor failed: %1").arg(runtime));
     }
 }
 
 void MainWindow::exportGame()
 {
+    QMessageBox::warning(this, m_appTitle, tr("Export game is unavailable at this time."));
+    return;
+
     if (m_doc.isDirty() || m_doc.m_path.empty()) {
         if (!saveAs()) {
             return;
@@ -2863,21 +3082,17 @@ void MainWindow::updateFrameSet(const QString & fileName)
     qDebug() << QString("frameset updated: %1").arg(fileName);
 }
 
-QByteArray state;
 void MainWindow::showEvent(QShowEvent* pEvent)
 {
     QMainWindow::showEvent(pEvent);
-    qDebug("showEvent");
-    if (state.length()) {
-        qDebug("restoring now...");
-        this->restoreState(state);
-        state.clear();
+    if (m_state.length()) {
+        this->restoreState(m_state);
+        m_state.clear();
     }
 }
 
 void MainWindow::changeEvent(QEvent* e)
 {
-    qDebug("ischecked: %d eventtype: %d", (int) ui->action_ShowToolbox->isChecked(), e->type());
     if (e->type() == QEvent::WindowStateChange) {
         //   WindowStateChange = 105
         QWindowStateChangeEvent* ev = static_cast<QWindowStateChangeEvent*>(e);
@@ -2893,7 +3108,344 @@ void MainWindow::changeEvent(QEvent* e)
         }
     } else if (e->type() == QEvent::ActivationChange) {
         // ActivationChange = 99,                  // window activation has changed
-        state = this->saveState();
+        m_state = this->saveState();
     }
     QMainWindow::changeEvent(e);
+}
+
+ void MainWindow::markAsGoal(bool isGoal)
+ {
+     if (m_doc.getSize()
+             && m_viewMode == VM_EDITOR) {
+         CLevel & level = m_doc.getCurrentLevel();
+         CLayer & layer = *(level.getCurrentLayer());
+         if (layer.getSelectionSize()) {
+             QString msg;
+             if (layer.isSingleSelection()) {
+                 if (isGoal) {
+                     msg = tr("Do you want to mark all instances of this sprite on\n" \
+                        "the current layer as goals?");
+                 } else {
+                     msg = tr("Do you want to unmark all instances of this sprite on\n" \
+                        "the current layer as goals?");
+                 }
+             } else {
+                 if (isGoal) {
+                     msg = tr("Do you want to mark all instances of the selected sprites on\n" \
+                        "the current layer as goals?");
+                 } else {
+                     msg = tr("Do you want to unmark all instances of the selected sprites on\n" \
+                        "the current layer as goals?");
+                 }
+             }
+             QMessageBox::StandardButton ret =  QMessageBox::warning(this, tr(m_appName), msg  ,
+                      QMessageBox::Yes | QMessageBox::No);
+             if (ret == QMessageBox::Yes) {
+                 for (int k=0; k < layer.getSelectionSize(); ++k) {
+                     CLevelEntry obj = layer.getSelection(k);
+                     for (int i=0; i < layer.getSize(); ++i) {
+                         CLevelEntry & entry = layer[i];
+                         if (layer[i].m_nProto == obj.m_nProto) {
+                             if (isGoal) {
+                                 entry.markAsGoal();
+                             } else {
+                                 entry.unMarkAsGoal();
+                             }
+                         }
+                     }
+                 }
+                 layer.resyncSelection();
+                 m_doc.setDirty(true);
+             }
+             m_lview->repaint();
+             updateMenus();
+         }
+     }
+ }
+void MainWindow::on_actionMark_All_as_Goals_triggered()
+{
+   markAsGoal( true );
+}
+
+void MainWindow::on_actionUnmark_All_as_Goals_triggered()
+{
+    markAsGoal( false );
+}
+
+void MainWindow::newDebugString(const char *s)
+{
+    emit me->debugText(QString(s));
+}
+
+void MainWindow::newErrorString(const char *s)
+{
+    emit me->errorText(QString(s));
+}
+
+void MainWindow::on_actionDebugOutput_toggled(bool arg1)
+{
+    ui->actionDebugOutput->setChecked(arg1);
+    arg1 ? m_infoDock->show() : m_infoDock->hide();
+}
+
+void MainWindow::on_actionSprite_Paint_toggled(bool checked)
+{
+    ui->actionSprite_Paint->setChecked(checked);
+    emit spritePaintStateChanged(checked);
+}
+
+void MainWindow::eraserToggled(bool checked)
+{
+    qDebug("eraserToggled()");
+    m_actionEraser->setChecked(checked);
+    emit eraserStateChanged(checked);
+}
+
+void MainWindow::changeProtoIcon(int protoId)
+{
+    CProto proto = m_doc.toProto(protoId > 0 ? protoId : 0);
+    m_protoIcon->setToolTip(protoId > 0 ? proto.getName() : "");
+    m_protoIcon->setIcon(frame2icon(m_doc.toFrame(proto)));
+    QMenu *menu = new QMenu();
+    for (int i=0; protoId >0 && i < m_doc.toFrameSet(proto.m_nFrameSet).getSize(); ++i) {
+        QAction *action = new QAction(frame2icon(m_doc.toFrame(proto.m_nFrameSet, i)), QString("%1").arg(i + 1));
+        uint w = (protoId << 16) + i;
+        action->setData(w);
+        menu->addAction(action);
+        connect(action, &QAction::triggered, this, &MainWindow::toggleProtoFrame);
+    }
+    m_protoIcon->setMenu(menu);
+}
+
+void MainWindow::toggleProtoFrame()
+{
+    // https://stackoverflow.com/questions/28646914/qaction-with-custom-parameter
+
+    QAction *act = qobject_cast<QAction *>(sender());
+    QVariant v = act->data();
+    uint32_t w = v.toUInt();
+    qDebug("w: 0x%x", w);
+
+    int protoId = w >> 16;
+    int frameId = w & 0xffff;
+    CProto proto = m_doc.toProto(protoId > 0 ? protoId : 0);
+    m_protoIcon->setIcon(frame2icon(m_doc.toFrame(proto.m_nFrameSet, frameId)));
+    emit currentFrameChanged(protoId, frameId);
+}
+
+void MainWindow::updateIndicator()
+{   static int cycle = 0;
+    if (m_ready) {
+        if (cycle % 4 == 0) {
+            m_fixer->troubleshoot();
+        }
+        m_btnIndicator->setIcon(QIcon(m_fixer->getIcon()));
+        m_btnIndicator->setToolTip(m_fixer->getTooltip());
+        m_btnIndicator->setStatusTip(m_fixer->getStatus());
+    }
+    ++cycle;
+}
+
+void MainWindow::setReady(bool ready)
+{
+    m_ready = ready;
+    if (m_ready) {
+        m_timerIndicator.start();
+    } else {
+        m_timerIndicator.stop();
+    }
+}
+
+void MainWindow::indicatorTriggered()
+{
+    if (m_fixer->ready()){
+        CDlgIndicator dlg;
+        dlg.setWindowTitle(tr("Project Assistant"));
+        dlg.setText(m_fixer->getText());
+        dlg.exec();
+    }
+}
+
+void MainWindow::changeTickMaxRate()
+{
+    m_timer.setInterval(1000 / O_INT(GENERAL, XTICK_MAX_RATE));
+    m_timer.start();
+}
+
+void MainWindow::memorizeFilePath()
+{
+    QDir d = QFileInfo(m_doc.getFileName()).absoluteDir();
+    QString absolutePath = d.absolutePath();
+    qDebug() << "absolutePath:" << absolutePath;
+    O_SET(FOLDERS, FOLDER_LGCKDB, absolutePath);
+}
+
+void MainWindow::notifyJoyEvent(lgck::Button::JoyButton button, char value)
+{
+    qDebug() << QString("Button %1 %2").arg(m_doc.buttonText(button)).arg(value);
+    m_doc.setJoyButton(button, value);
+}
+
+#ifdef LGCK_GAMEPAD
+void MainWindow::initGamePad()
+{
+    auto gamepads = QGamepadManager::instance()->connectedGamepads();
+    qDebug(!gamepads.isEmpty() ? "gamepad found" : "no gamepad found");
+    if (gamepads.isEmpty()) {
+        return;
+    }
+    m_gamepad = new QGamepad(*gamepads.begin(), this);
+    qDebug() << "name: " << m_gamepad->name() << m_gamepad->deviceId();
+
+    connect(this, &MainWindow::joyEventOccured, this, &MainWindow::notifyJoyEvent);
+
+    connect(m_gamepad, &QGamepad::buttonAChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::A, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonBChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::B, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonXChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::X, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonYChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Y, pressed);
+    });
+
+    connect(m_gamepad, &QGamepad::buttonL1Changed, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::L1, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonR1Changed, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::R1, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonSelectChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Select, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonStartChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Start, pressed);
+    });
+
+    connect(m_gamepad, &QGamepad::buttonGuideChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Guide, pressed);
+    });
+
+    connect(m_gamepad, &QGamepad::buttonUpChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Up, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonDownChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Down, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonLeftChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Left, pressed);
+    });
+    connect(m_gamepad, &QGamepad::buttonRightChanged, this, [](bool pressed){
+        emit me->joyEventOccured(lgck::Button::Right, pressed);
+    });
+}
+#endif
+
+void MainWindow::readButtonConfig(QSettings & settings)
+{
+    QStringList buttonUsed;
+    QStringList keyUsed;
+    settings.beginGroup(INPUTS);
+    for (int i=0; i < lgck::Input::Count; ++i) {
+        const char *actionName = actionNames[i];
+        CGame::JoyStateEntry & entry = m_doc.joyStateEntry(i);
+        QString buttonText = settings.value(QString("button_%1").arg(actionName), "").toString();
+        QString qtKeyText = settings.value(QString("key_%1").arg(actionName), "").toString();
+        if (buttonText.isEmpty() && !buttonUsed.contains(actionButtons[i])) {
+            buttonText = actionButtons[i];
+            buttonUsed.append(buttonText);
+        }
+        if (qtKeyText.isEmpty() && !keyUsed.contains(actionKeys[i])) {
+            qtKeyText = actionKeys[i];
+            keyUsed.append(qtKeyText);
+        }
+        entry.keyCode = static_cast<lgck::Key::Code>(CKeyTranslator::translateText2Lgck(qtKeyText));
+        entry.button = static_cast<lgck::Button::JoyButton>(m_doc.findButtonText(q2c(buttonText)));
+    }
+    settings.endGroup();
+}
+
+void MainWindow::writeButtonConfig(QSettings &settings)
+{
+    settings.beginGroup(INPUTS);
+    for (int i=0; i < lgck::Input::Count; ++i) {
+        const char *actionName = actionNames[i];
+        CGame::JoyStateEntry & entry = m_doc.joyStateEntry(i);
+        const char *buttonText = entry.button >= 0 ? m_doc.buttonText(entry.button) : "";
+        QString qtKeyText;
+        int qtKeyCode = CKeyTranslator::translateLgck2Text(entry.keyCode, qtKeyText);
+        Q_UNUSED(qtKeyCode);
+        settings.setValue(QString("button_%1").arg(actionName), buttonText);
+        settings.setValue(QString("key_%1").arg(actionName), qtKeyText);
+    }
+    settings.endGroup();
+}
+
+void MainWindow::on_actionJoyState_Mapping_triggered()
+{
+    QString fileFilter = tr("JoyState Dump (*.bin)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export..."), "", fileFilter);
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".bin", Qt::CaseInsensitive)) {
+            fileName.append(".bin");
+        }
+        QFileWrap file;
+        if (file.open(fileName, "wb")) {
+            m_doc.exportJoyStateMap(file);
+            file.close();
+        }  else {
+            // write error
+            warningMessage( QString(tr("can't write to %1")).arg(fileName) );
+        }
+    }
+}
+
+void MainWindow::updateSkillFlag(int flag, bool bit)
+{
+    int curr = O_INT(GENERAL, SKILL_FILTER);
+    curr = bit ? curr | flag : curr & (CGame::SKILL_FLAG_ALL ^ flag);
+    O_SET(GENERAL, SKILL_FILTER, curr);
+    emit skillFilterChanged(curr);
+}
+
+void MainWindow::on_actionHell_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_HELL, arg1);
+}
+
+void MainWindow::on_actionNormal_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_NORMAL, arg1);
+}
+
+void MainWindow::on_actionNightmare_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_NIGHTMARE, arg1);
+}
+
+void MainWindow::on_actionInsane_toggled(bool arg1)
+{
+    updateSkillFlag(1 << CGame::SKILL_INSANE, arg1);
+}
+
+void MainWindow::on_actionAll_Skills_triggered()
+{
+    updateSkillFiltersCheckbox(CGame::SKILL_FLAG_ALL);
+}
+
+void MainWindow::updateSkillFiltersCheckbox(int skillval)
+{
+    QAction *skills [] = {
+        ui->actionNormal,
+        ui->actionNightmare,
+        ui->actionHell,
+        ui->actionInsane
+    };
+    for (unsigned int i=0; i < sizeof(skills) / sizeof(QAction*); ++i) {
+        int flag = 1 << i;
+        skills[i]->setChecked(skillval & flag);
+    }
 }

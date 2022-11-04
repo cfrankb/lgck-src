@@ -1,3 +1,20 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "wbtncolor.h"
 #include <QColorDialog>
 #include <QLineEdit>
@@ -5,7 +22,7 @@
 CWBtnColor::CWBtnColor(QWidget *parent) :
     QPushButton(parent)
 {
-    m_buddy = NULL;
+    m_buddy = nullptr;
     m_red = 0;
     m_blue = 0;
     m_red = 0;
@@ -39,8 +56,7 @@ void CWBtnColor::click()
     int result = d->exec();
     if (result == QDialog::Accepted) {
         QColor color = d->selectedColor();//d->currentColor();
-        QString newColor;
-        newColor.sprintf("%.2x%.2x%.2x", color.red(), color.green(), color.blue());
+        QString newColor = QString::asprintf("%.2x%.2x%.2x", color.red(), color.green(), color.blue());
         m_red = color.red();
         m_green = color.green();
         m_blue = color.blue();
@@ -57,6 +73,7 @@ void CWBtnColor::click()
 void CWBtnColor::setBuddy(QLineEdit* q)
 {
     m_buddy = q;
+    q->setInputMask("hhhhhh");
     connect(q, SIGNAL(textChanged(QString)), this, SLOT(setColor(QString)));
     connect(this, SIGNAL(colorChanged(QString)), q, SLOT(setText(QString)));
 }

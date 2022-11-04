@@ -33,6 +33,8 @@ class CTasks;
 class CGameEvents;
 class CSettings;
 class CDisplayConfig;
+class CFontManager;
+class CActor;
 
 typedef struct
 {
@@ -55,7 +57,7 @@ public:
     /////////////////////////////////////////////////////////////////
     // public enums
 
-    enum {
+    enum: uint8_t {
         UP          	= 0,
         DOWN			= 1,
         LEFT			= 2,
@@ -68,19 +70,11 @@ public:
         RIGHT_UP		= 5,
         LEFT_DOWN		= 6,
         RIGHT_DOWN		= 7,
-        PAUSE			= -2,
-        SEPARATOR		= -1,
+        PAUSE			= 0xfe,
+        SEPARATOR		= 0xff,
         FALL            = 254,
         HERE			= 255
     } SPRITE_AIM;
-
-    enum {
-        TRIGGER_KEYS    = 0x1f,
-        TRIGGER_GOAL    = 0x20,
-        TRIGGER_FROZEN  = 0x40,
-        TRIGGER_HIDDEN	= 0x80,
-        TRIGGER_MASK    = 0xf0
-    } TRIGGER;
 
     // settings
     enum {
@@ -115,8 +109,17 @@ public:
         PARAM_LIVES             = 28,
         PARAM_HP                = 29,
         PARAM_LIVES_MAX         = 30,
-        PARAM_HP_MAX            = 31
+        PARAM_HP_MAX            = 31,
+        PARAM_SKILL_FILTER      = 32
     } PARAM_GAME;
+
+    enum {
+        SKILL_NORMAL            = 0,
+        SKILL_NIGHTMARE         = 1,
+        SKILL_HELL              = 2,
+        SKILL_INSANE            = 3,
+        SKILL_FLAG_ALL          = 0xf
+    };
 
     /////////////////////////////////////////////////////////////////
     // variables
@@ -141,19 +144,20 @@ public:
 
     // classes
     enum {
-        MAX_CLASSES = 256
+        MAX_CLASSES         = 256,
+        INVALID             = -1
     };
 
     std::string m_className [ MAX_CLASSES ];
     std::string m_classInfo [ MAX_CLASSES ];
-    UINT8 m_classType [ MAX_CLASSES ];
-    UINT8 m_classLock [ MAX_CLASSES ];
+    uint8_t m_classType [ MAX_CLASSES ];
+    uint8_t m_classLock [ MAX_CLASSES ];
 
-    static unsigned int getVersion();
+    static uint32_t getEngineVersion();
     bool isUntitled ();
     bool isDirty() const;
     void setDirty(const bool dirty);
-    int whoIs(CLevel & script, int x, int y);
+    int whoIs(CLevel & script, int x, int y, int skillFilters=0xf);
     const char * getFileName();
     void setFileName(const char * fileName);
     int getSize();
@@ -161,7 +165,11 @@ public:
 
     CLevel * operator [] (int n);
     CLevel * getLevel(int i);
+    CLevel & getLevelObject(int i);
+    CLevel & getCurrentLevel();
+
     int getLevelByUUID(const char *uuid);
+    int getLevelByTitle(const char *title);
     void insertLevel(int n, CLevel *level);
     void addLevel(CLevel *level);
     void removeLevel (int n);
@@ -173,13 +181,28 @@ public:
     CGameEvents * getEvents();
     CSettings * getSettings();
     CDisplayConfig * getDisplayConfig();
+    CFontManager  *getFonts();
     int * countFrameSetUses();
+    CFrame & toFrame(int frameSet, int frameNo);
+    CFrame & toFrame(CLevelEntry &entry);
+    CFrame & toFrame(CActor & actor);
+    CFrame & toFrame(CProto & proto);
+    CFrameSet & toFrameSet(int frameSet);
+    CFrameArray & frames();
+    CProto & toProto(int protoId);
+    inline CProtoArray & protos() {
+        return m_arrProto;
+    }
+
+    int addFrameSet(CFrameSet *pFrameSet);
 
     /////////////////////////////////////////////////////////////////
     // i/o
 
-    bool read(const char *filepath=NULL);
-    bool write(const char *filepath=NULL);
+    bool read(const char *filepath=nullptr);
+    bool read(IFile & file);
+    bool write(const char *filepath=nullptr);
+    bool write(IFile & file);
 
     /////////////////////////////////////////////////////////////////
     // settings
@@ -198,14 +221,15 @@ protected:
     CGameEvents *m_events;
     CSettings *m_settings;
     CDisplayConfig *m_displayConfig;
+    CFontManager *m_fontManager;
     typedef struct {
         std::string name;
         std::string src;
     } SOUND;
     typedef struct {
-        UINT32 id;
-        UINT32 game_uid;
-        UINT32 filler[2];
+        uint32_t id;
+        uint32_t game_uid;
+        uint32_t filler[2];
     } VERSION;
     std::string m_lastError;
     CSelection *m_clipboard;

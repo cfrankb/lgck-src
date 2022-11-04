@@ -1,3 +1,20 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "DlgTestLevel.h"
 #include "ui_DlgTestLevel.h"
 
@@ -25,7 +42,7 @@ CDlgTestLevel::CDlgTestLevel(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QString options[] = {
+    QString skillOptions[] = {
         tr("Normal - I'm just a kid"),
         tr("Nightmare - No sweat !"),
         tr("Hell - Bring it on !"),
@@ -33,15 +50,14 @@ CDlgTestLevel::CDlgTestLevel(QWidget *parent) :
     };
 
     this->setWindowTitle(tr("Test level"));
-    for (unsigned int i=0; i< sizeof(options)/sizeof(QString); ++i) {
-        ui->cbSkill->addItem(options[i]);
+    for (unsigned int i=0; i< sizeof(skillOptions)/sizeof(QString); ++i) {
+        ui->cbSkill->addItem(skillOptions[i], i);
     }
 
     ui->cbSkill->setFocus();
 
     for (int i=1; i< 255; ++i) {
-        QString s = QString("%1").arg(i);
-        ui->cbLives->addItem(s);
+        ui->cbLives->addItem(QVariant(i).toString(), i);
     }
 
     // TODO: make visible again when implemented
@@ -70,7 +86,7 @@ void CDlgTestLevel::setSkill(int skill)
 
 int CDlgTestLevel::getSkill()
 {
-    return ui->cbSkill->currentIndex();
+    return ui->cbSkill->currentData().toInt();
 }
 
 void CDlgTestLevel::setLives(int lives)
@@ -81,33 +97,27 @@ void CDlgTestLevel::setLives(int lives)
 
 int CDlgTestLevel::getHP()
 {
-    QString s = ui->eHitPoints->text().trimmed();
-    bool ok;
-    return s.toInt( &ok, 10 );
+    return ui->eHitPoints->text().trimmed().toInt();
 }
 
 int CDlgTestLevel::getScore()
 {
-    QString s = ui->eScore->text().trimmed();
-    bool ok;
-    return s.toInt( &ok, 10 );
+    return ui->eScore->text().trimmed().toInt();
 }
 
 int CDlgTestLevel::getLives()
 {
-    return ui->cbLives->currentIndex()+1;
+    return ui->cbLives->currentData().toInt();
 }
 
 void CDlgTestLevel::setScore(int score)
 {
-    QString s = QString("%1").arg(score);
-    ui->eScore->setText(s);
+    ui->eScore->setText(QVariant(score).toString());
 }
 
 void CDlgTestLevel::setHP(int hp)
 {
-    QString s = QString("%1").arg(hp);
-    ui->eHitPoints->setText(s);
+    ui->eHitPoints->setText(QVariant(hp).toString());
 }
 
 bool CDlgTestLevel::getContinue()

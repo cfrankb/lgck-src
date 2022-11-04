@@ -1,3 +1,20 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "DlgSelect.h"
 #include "ui_DlgSelect.h"
 #include <QDebug>
@@ -5,35 +22,23 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
+#include "launcher.h"
 
 CDlgSelect::CDlgSelect(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CDlgSelect)
 {
     ui->setupUi(this);
-
     m_state = CLOSE;
 
     connect(ui->btnNew, SIGNAL(clicked()), this, SLOT(newFile()));
     connect(ui->btnOpen, SIGNAL(clicked()), this, SLOT(openFile()));
     connect(ui->btnSkip, SIGNAL(clicked()), this, SLOT(skipBox()));
 
-    int red=0;
-    int green=0xf0;
-    int blue=0xe0;
-    ui->btnNew->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
-        .arg(red).arg(green).arg(blue));
     ui->btnNew->setCursor(Qt::PointingHandCursor);
-    ui->btnOpen->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
-        .arg(red).arg(green).arg(blue));
     ui->btnOpen->setCursor(Qt::PointingHandCursor);
-    ui->btnSpriteEditor->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
-        .arg(red).arg(green).arg(blue));
     ui->btnSpriteEditor->setCursor(Qt::PointingHandCursor);
-    ui->btnTutorials->setStyleSheet( QString("* { background-color: rgb(%1,%2,%3) }")
-        .arg(red).arg(green).arg(blue));
     ui->btnTutorials->setCursor(Qt::PointingHandCursor);
-
 }
 
 CDlgSelect::~CDlgSelect()
@@ -68,19 +73,15 @@ void CDlgSelect::on_btnNoShow_clicked()
 
 void CDlgSelect::on_btnSpriteEditor_clicked()
 {
-    QString appDir = QCoreApplication::applicationDirPath();
-    qDebug() << appDir;
-#ifdef Q_OS_WIN32
-    QString cmd = "obl5edit.exe";
-#else
-    QString cmd = "obl5edit";
-#endif
-    QString runtime = "\"" + appDir + "/" + cmd + "\"";
-    bool result = QProcess::startDetached(runtime);
+    Path outPath;
+    if (!getCmd(SPRITE_EDITOR, outPath)) {
+        QMessageBox::warning(this, "", tr("Couldn't find executable: %1").arg(SPRITE_EDITOR));
+        return;
+    }
+    QString runtime = "\"" + outPath.path + "/" + outPath.cmd + "\"";
+    bool result = launchProcess(outPath);
     if (!result) {
-        QString errMsg = tr("Running external editor failed: %1").arg(runtime);
-        QMessageBox msgBox(QMessageBox::Warning, "m_appName", errMsg, 0, this);
-        msgBox.exec();
+        QMessageBox::warning(this, "", tr("Running external editor failed: %1").arg(runtime));
     }
 }
 

@@ -30,6 +30,7 @@
 #include "../shared/PathBlock.h"
 #include "../shared/Path.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qthelper.h"
 #include <stdio.h>
 
 CDlgEntry::CDlgEntry(QWidget *parent) :
@@ -60,86 +61,97 @@ void CDlgEntry::changeEvent(QEvent *e)
     }
 }
 
-void CDlgEntry::init(const int *triggers)
+/* track trigger keys in-use */
+void CDlgEntry::init()
 {
+    CLevel & level = m_gameFile->getCurrentLevel();
+    CLayer & layer = * level.getCurrentLayer();
+    int triggers[TRIGGER_KEYS + 1];
+    memset(&triggers, 0, sizeof(triggers));
+    for (int i=0; i < layer.getSize(); ++i) {
+        int trigger = layer[i].m_nTriggerKey & TRIGGER_KEYS;
+        ++triggers[trigger];
+    }
+
     QIcon iconBlank;
     iconBlank.addFile(":/images/blank.png");
     QIcon iconCheck;
     iconCheck.addFile(":/images/check.png");
 
-    for (int n = 0; n <= CGameFile::TRIGGER_KEYS; ++n) {
+    char s[3];
+    for (int n = 0; n <= TRIGGER_KEYS; ++n) {
         if (n) {
-            QString s = QString(tr("%1")).arg(n);
+            sprintf(s, "%.2d", n);
             if (triggers[n]) {
-                m_ui->cbTriggerKey->addItem(iconCheck, s);
+                m_ui->cbTriggerKey->addItem(iconCheck, s, QVariant(n));
             } else {
-                m_ui->cbTriggerKey->addItem(iconBlank, s);
+                m_ui->cbTriggerKey->addItem(iconBlank, s, QVariant(n));
             }
         }
         else {
-            m_ui->cbTriggerKey->addItem(tr("(none)"));
+            m_ui->cbTriggerKey->addItem(tr("(none)"), QVariant(n));
         }
     }
-
     m_ui->tabWidget->setCurrentIndex(0);
 }
 
 void CDlgEntry::load(const int entryPos)
 {
+    init();
     m_entry = entryPos;
-    CGameFile &gf = *((CGameFile*)m_gameFile);
-    CLevel & level = (* gf[gf.m_nCurrLevel]);
+    CGameFile &gf = *m_gameFile;
+    CLevel & level = m_gameFile->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];
-    m_ui->cbTriggerKey->setCurrentIndex( entry.m_nTriggerKey & CGameFile::TRIGGER_KEYS );
+    m_ui->cbTriggerKey->setCurrentIndex( entry.m_nTriggerKey & TRIGGER_KEYS );
 
     // attributs
 
-    if (entry.m_nTriggerKey & 0x80) {
+    if (entry.m_nTriggerKey & TRIGGER_HIDDEN) {
        m_ui->cHidden->setChecked( true );
     }
 
-    if (entry.m_nTriggerKey & 0x40) {
+    if (entry.m_nTriggerKey & TRIGGER_FROZEN) {
        m_ui->cFrozen->setChecked( true );
     }
 
-    if (entry.m_nTriggerKey & 0x20) {
+    if (entry.m_nTriggerKey & TRIGGER_GOAL) {
        m_ui->cExtra2->setChecked( true );
     }
 
-    //if (entry.m_nTriggerKey & 0x10) {
-       //m_ui->cExtra1->setChecked( true );
-    //}
-
     // difficulty levels
 
-    if (entry.m_nActionMask & 0x1) {
+    if (entry.m_nActionMask & DIFFICULTY_NORMAL) {
        m_ui->cD01->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x2) {
+    if (entry.m_nActionMask & DIFFICULTY_NIGHTMARE) {
        m_ui->cD02->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x4) {
+    if (entry.m_nActionMask & DIFFICULTY_HELL) {
        m_ui->cD04->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x8) {
+    if (entry.m_nActionMask & DIFFICULTY_INSANE) {
        m_ui->cD08->setChecked( true );
     }
 
     // trigger flip
 
-    if (entry.m_nActionMask & 0x20) {
+    if (entry.m_nActionMask & TRIGGER_DEATH_FLIP) {
+        m_ui->cDeathFlip->setChecked(true);
+    }
+
+    if (entry.m_nActionMask & TRIGGER_GOAL) {
        m_ui->cF20->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x40) {
+    if (entry.m_nActionMask & TRIGGER_FROZEN) {
        m_ui->cF40->setChecked( true );
     }
 
-    if (entry.m_nActionMask & 0x80) {
+    if (entry.m_nActionMask & TRIGGER_HIDDEN) {
        m_ui->cF80->setChecked( true );
     }
 
@@ -155,8 +167,7 @@ void CDlgEntry::load(const int entryPos)
        m_ui->eHint->setPlainText(table->get(entry.m_string));
     }
 
-    char pathId[8];
-    sprintf(pathId, "0x%.4x", entry.m_path);
+    QString pathId = QString::asprintf("0x%.4x", entry.m_path);
     QString s = QString(tr("path: %1").arg(pathId));
     m_ui->sPath->setText(s);
     CPathBlock & paths = *(gf.getPaths());
@@ -199,8 +210,8 @@ void CDlgEntry::enablePlaybackOptions(bool enable)
 
 void CDlgEntry::updateText()
 {   
-    CGameFile &gf = *((CGameFile*)m_gameFile);
-    CProto & proto = gf.m_arrProto[ m_proto ];
+    CGameFile & gf = *m_gameFile;
+    CProto & proto = gf.toProto(m_proto);
     QString sName = QString(tr("%1 - %2")).arg(m_entry).arg(proto.getName());
     m_ui->sObject->setText( sName );
     m_ui->sClass->setText( gf.m_className [ proto.m_nClass ].c_str() );
@@ -209,96 +220,105 @@ void CDlgEntry::updateText()
 
 void CDlgEntry::enableCheckboxes()
 {
-   CGameFile &gf = *((CGameFile*)m_gameFile);
-   CProto & proto = gf.m_arrProto[ m_proto ];
+   CProto & proto = m_gameFile->toProto(m_proto);
    bool result = proto.m_nClass >= 0x10;
 
    // trigger key
    m_ui->cbTriggerKey->setEnabled( result );
 
-   // attributs
+   // attributes
    m_ui->cHidden->setEnabled( result ) ;
    m_ui->cFrozen->setEnabled( result ) ;
    m_ui->cExtra2->setEnabled( result ) ;
-   //m_ui->cExtra1->setEnabled( result ) ;
 
    // trigger flip
    m_ui->cF20->setEnabled( result ) ;
    m_ui->cF40->setEnabled( result ) ;
    m_ui->cF80->setEnabled( result ) ;
+   m_ui->cDeathFlip->setEnabled( result ) ;
 }
 
-void CDlgEntry::save(const int entryPos)
+void CDlgEntry::save(const int entryPos, bool isMulti)
 {
-    CGameFile &gf = *((CGameFile*)m_gameFile);
-
-    CLevel & level = (* gf[gf.m_nCurrLevel]);
+    CLevel & level = m_gameFile->getCurrentLevel();
     CLayer & layer = * level.getCurrentLayer();
     CLevelEntry & entry = layer[entryPos];
-    entry.m_nTriggerKey = m_ui->cbTriggerKey->currentIndex();
+    int triggerKeyId = m_ui->cbTriggerKey->itemData(m_ui->cbTriggerKey->currentIndex()).toInt();
+    entry.m_nTriggerKey = triggerKeyId == -1 ?
+                entry.m_nTriggerKey :
+                (entry.m_nTriggerKey & (0xff ^ TRIGGER_KEYS)) | triggerKeyId;
 
-    // attributs
+    // attributes
+    typedef struct {
+        uint8_t *target;
+        uint8_t mask;
+        QCheckBox * cbox;
+    } Control;
 
-    if (m_ui->cHidden->isChecked()) {
-       entry.m_nTriggerKey += 0x80;
+    Control controls[] = {
+        // trigger state
+        {& entry.m_nTriggerKey, TRIGGER_GOAL, m_ui->cExtra2},
+        {& entry.m_nTriggerKey, TRIGGER_FROZEN, m_ui->cFrozen},
+        {& entry.m_nTriggerKey, TRIGGER_HIDDEN, m_ui->cHidden},
+
+        // difficulty level
+        {& entry.m_nActionMask, DIFFICULTY_NORMAL, m_ui->cD01},
+        {& entry.m_nActionMask, DIFFICULTY_NIGHTMARE, m_ui->cD02},
+        {& entry.m_nActionMask, DIFFICULTY_HELL, m_ui->cD04},
+        {& entry.m_nActionMask, DIFFICULTY_INSANE, m_ui->cD08},
+
+        // flip
+        {& entry.m_nActionMask, TRIGGER_DEATH_FLIP, m_ui->cDeathFlip},
+        {& entry.m_nActionMask, TRIGGER_GOAL, m_ui->cF20},
+        {& entry.m_nActionMask, TRIGGER_FROZEN, m_ui->cF40},
+        {& entry.m_nActionMask, TRIGGER_HIDDEN, m_ui->cF80},
+    };
+
+    for (unsigned int i = 0; i < sizeof(controls)/sizeof(Control); ++i) {
+        Control & c = controls[i];
+        uint8_t & t = *c.target;
+        if (c.cbox->isTristate()) {
+            if (c.cbox->checkState()==Qt::Unchecked) {
+                t &= (0xff ^ c.mask);
+            } else if (c.cbox->checkState()==Qt::Checked) {
+                t |= c.mask;
+            }
+        } else {
+            if (c.cbox->isChecked()) {
+                t |= c.mask;
+            } else {
+                t &= (0xff ^ c.mask);
+            }
+        }
     }
 
-    if (m_ui->cFrozen->isChecked()) {
-       entry.m_nTriggerKey += 0x40;
+    if (m_ui->btnNextImage->isEnabled() || m_ui->btnPrevImage->isEnabled()
+            || m_ui->btnObject->isEnabled()) {
+        entry.m_nFrameSet = m_currSet;
+        entry.m_nFrameNo = m_currImage;
     }
 
-    if (m_ui->cExtra2->isChecked()) {
-       entry.m_nTriggerKey += 0x20;
+    if (!isMulti) {
+        saveNonCombining(entryPos);
     }
+}
 
-    // difficulty levels
-
-    entry.m_nActionMask = 0;
-
-    if (m_ui->cD01->isChecked()) {
-       entry.m_nActionMask += 0x1;
-    }
-
-    if (m_ui->cD02->isChecked()) {
-       entry.m_nActionMask += 0x2;
-    }
-
-    if (m_ui->cD04->isChecked()) {
-       entry.m_nActionMask += 0x4;
-    }
-
-    if (m_ui->cD08->isChecked()) {
-       entry.m_nActionMask += 0x8;
-    }
-
-    // trigger flip
-
-    if (m_ui->cF20->isChecked()) {
-       entry.m_nActionMask += 0x20;
-    }
-
-    if (m_ui->cF40->isChecked()) {
-       entry.m_nActionMask += 0x40;
-    }
-
-    if (m_ui->cF80->isChecked()) {
-       entry.m_nActionMask += 0x80;
-    }
-
-    entry.m_nFrameSet = m_currSet;
-    entry.m_nFrameNo = m_currImage;
+void CDlgEntry::saveNonCombining(const int entryPos)
+{
+    CGameFile &gf = *m_gameFile;
+    CLevel & level = m_gameFile->getCurrentLevel();
+    CLayer & layer = * level.getCurrentLayer();
+    CLevelEntry & entry = layer[entryPos];
 
     // save string to string table
     CStringTable *table = gf.getStringTable();
     QString str = m_ui->eHint->toPlainText();
     str = str.trimmed();
     if (entry.m_string) {
-        const char* s = q2c(str);
-        entry.m_string = table->set(entry.m_string, s);
+        entry.m_string = table->set(entry.m_string, q2c(str));
     } else {
         if (!str.isEmpty()) {
-            const char* s = q2c(str);
-            entry.m_string = table->add(s);
+            entry.m_string = table->add(q2c(str));
         }
     }
 
@@ -328,14 +348,14 @@ void CDlgEntry::save(const int entryPos)
 
 void CDlgEntry::on_btnObject_clicked()
 {
-    CGameFile &gf = *((CGameFile*)m_gameFile);
-    CProto proto = gf.m_arrProto[m_proto];
+    CGameFile &gf = *m_gameFile;
+    CProto proto = gf.toProto(m_proto);
     CDlgObject *d = new CDlgObject (this);
     d->setGameDB(m_gameFile);
     d->load( m_proto );
     if (d->exec() == QDialog::Accepted) {
         d->save( m_proto );
-        if (proto != gf.m_arrProto[ m_proto ]) {
+        if (proto != gf.toProto(m_proto)) {
             gf.setDirty(true);
             updateText();
             enableCheckboxes();
@@ -350,32 +370,21 @@ void CDlgEntry::on_btnObject_clicked()
 
 void CDlgEntry::setImage(int frameSet, int frameNo)
 {
-    CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[frameSet];
-    UINT8 *png;
-    int size;
-    fs[frameNo]->toPng(png, size);
-    QImage img;
-    if (!img.loadFromData( png, size )) {
-        qDebug("failed to load png $$\n");
-    }
-    delete [] png;
-    QPixmap pm = QPixmap::fromImage(img);
+    CFrameSet & fs = m_gameFile->toFrameSet(frameSet);
+    QPixmap pm = frame2pixmap(* fs[frameNo]);
     m_ui->sImage->setPixmap(pm);
 }
 
 void CDlgEntry::on_btnNextImage_clicked()
 {
-    CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[m_currSet];
+    CFrameSet & fs = m_gameFile->toFrameSet(m_currSet);
     m_currImage = (m_currImage + 1) % fs.getSize();
     setImage(m_currSet, m_currImage);
 }
 
 void CDlgEntry::on_btnPrevImage_clicked()
 {
-    CGameFile & gf = *m_gameFile;
-    CFrameSet & fs = *gf.m_arrFrames[m_currSet];
+    CFrameSet & fs = m_gameFile->toFrameSet(m_currSet);
     --m_currImage;
     if (m_currImage < 0) {
         m_currImage = std::max(fs.getSize() - 1, 0);
@@ -407,12 +416,11 @@ void CDlgEntry::on_btnRawPath_clicked()
     QString s;
     CPath & path = *m_path;
     for (int i=0; i < path.getSize(); ++i) {
-        QString tmp;
         if (i) {
             s += " ";
         }
-        tmp.sprintf("%2.2x", path[i]);
-        s += tmp.mid(0,2);
+        QString tmp = QString::asprintf("%2.2x", path[i]);
+        s += tmp.midRef(0,2);
     }
 
     bool ok = false;
@@ -425,7 +433,7 @@ void CDlgEntry::on_btnRawPath_clicked()
         result = result.trimmed();
         // decode the string
         for (int k=0; k < result.length(); k +=3) {
-            char aim = strtol(q2c(result.mid(k, 2)), NULL, 16);
+            char aim = strtol(q2c(result.mid(k, 2)), nullptr, 16);
             if (CPath::isValidAim(aim)) {
                 tmp.add(aim);
             }
@@ -438,5 +446,68 @@ void CDlgEntry::on_btnRawPath_clicked()
             s = QString(tr("path size: %1 move").arg(0));
         }
         m_ui->sPathSize->setText(s);
+    }
+}
+
+void CDlgEntry::loadMultiSelection(CSelection & selection)
+{
+    TriggerMask mask = selection.compareMask();
+    m_ui->tabWidget->removeTab(2);
+    m_ui->tabWidget->removeTab(1);
+    m_ui->btnObject->setDisabled(true);
+    setWindowTitle(tr("Multiple Selections [%1]").arg(selection.getSize()));
+
+    // attributs
+    typedef struct {
+        int state;
+        QCheckBox * cbox;
+    } Control;
+
+    Control controls[] = {
+        // trigger state
+        {mask.triggerKeyDiff & TRIGGER_HIDDEN, m_ui->cHidden},
+        {mask.triggerKeyDiff & TRIGGER_FROZEN, m_ui->cFrozen},
+        {mask.triggerKeyDiff & TRIGGER_GOAL, m_ui->cExtra2},
+
+        // difficulty level
+        {mask.actionMaskDiff & DIFFICULTY_NORMAL, m_ui->cD01},
+        {mask.actionMaskDiff & DIFFICULTY_NIGHTMARE, m_ui->cD02},
+        {mask.actionMaskDiff & DIFFICULTY_HELL, m_ui->cD04},
+        {mask.actionMaskDiff & DIFFICULTY_INSANE, m_ui->cD08},
+
+        // flip
+        {mask.actionMaskDiff & TRIGGER_DEATH_FLIP, m_ui->cDeathFlip},
+        {mask.actionMaskDiff & TRIGGER_GOAL, m_ui->cF20},
+        {mask.actionMaskDiff & TRIGGER_FROZEN, m_ui->cF40},
+        {mask.actionMaskDiff & TRIGGER_HIDDEN, m_ui->cF80},
+    };
+
+    for (unsigned int i = 0; i < sizeof(controls)/sizeof(Control); ++i) {
+        if (controls[i].state) {
+            controls[i].cbox->setTristate(true);
+            controls[i].cbox->setCheckState(Qt::PartiallyChecked);
+        }
+    }
+
+    // is triggerKeyId in a cloud state
+    if (mask.triggerKeyDiff & TRIGGER_KEYS) {
+        m_ui->cbTriggerKey->insertItem(0, tr("???"), QVariant(-1));
+        m_ui->cbTriggerKey->setCurrentIndex(0);
+    }
+
+    // image is in cloud state
+    if (!mask.sameImage) {
+        m_ui->sImage->setPixmap(QPixmap(":/images/pd/primary-gnome-question.svg"));
+        m_ui->btnNextImage->setDisabled(true);
+        m_ui->btnPrevImage->setDisabled(true);
+    }
+
+    if (!mask.sameProto) {
+        QStringList list;
+        for (int i=0; i< selection.getSize(); ++i) {
+            list << QString("%1").arg(selection.getIndex(i));
+        }
+        m_ui->sObject->setText(list.join(", "));
+        m_ui->sClass->setText("-");
     }
 }

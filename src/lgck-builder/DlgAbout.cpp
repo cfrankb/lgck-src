@@ -21,9 +21,9 @@
 #include "../shared/stdafx.h"
 #include <QDesktopServices>
 #include <QUrl>
-#include "../shared/FileWrap.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "../shared/Credits.h"
-#include "../shared/ss_version.h"
+#include "../shared/qtgui/qthelper.h"
 
 CDlgAbout::CDlgAbout(QWidget *parent) :
     QDialog(parent),
@@ -32,24 +32,10 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     m_ui->setupUi(this);
 
     // About
-    QString s;
-    QString ver;
-    int version = SS_LGCK_VERSION;
-    for (int i=0; i < 4; ++i) {
-        s = QString("%1").arg(version % 256);
-        version /= 256;
-        if (i) {
-            ver =  s + "." + ver  ;
-        } else {
-            ver = s + ver ;
-        }
-    }
-    ver = "<b>" + tr("Version %1").arg(ver) + "</b>";
-
-    m_ui->sVersion->setText(ver);
+    m_ui->sVersion->setText("<b>" + tr("Version %1").arg(formatVersion(true)) + "</b>");
 
     // license GPL
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(":/res/gpl.txt")) {
         int size = file.getSize();
         char *buf = new char[ size + 1 ];
@@ -77,7 +63,7 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     // team
     m_ui->treeTeam->setColumnCount(2);
     m_ui->treeTeam->setColumnWidth(0, 128);
-    m_ui->treeTeam->setEditTriggers(0);
+    m_ui->treeTeam->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_ui->treeTeam->setWordWrap(false);
     m_ui->treeTeam->setRootIsDecorated(false);
     m_ui->treeTeam->setAlternatingRowColors(true);

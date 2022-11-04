@@ -24,8 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <sys/time.h>
-#include "../shared/FileWrap.h"
+#include <cstring>
 #include "../shared/Folders.h"
 #include "../shared/Game.h"
 #include "../shared/vlamits3.h"
@@ -53,6 +52,19 @@
 #include "../shared/IFile.h"
 #include "../shared/Font.h"
 #include "displayconfig.h"
+#include "fontmanager.h"
+#include "Countdown.h"
+
+#ifdef USE_QFILE
+    #define FILEWRAP QFileWrap
+    #include "../shared/qtgui/qfilewrap.h"
+#else
+    #define FILEWRAP CFileWrap
+    #include "../shared/FileWrap.h"
+#endif
+
+constexpr char SIGNATURE_JOYSTATEMAP[] = "JOYS";
+constexpr uint32_t REVISION_JOYSTATEMAP = 0;
 
 #define JM_VLA3     0
 #define JM_GIANA    1
@@ -63,7 +75,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CGame
 
-int CGame::m_arrPoints[]=
+const int CGame::m_arrPoints[]=
 {
     0,
     10,
@@ -80,6 +92,37 @@ int CGame::m_arrPoints[]=
     10000
 };
 
+const CGame::JoyStateEntry CGame::m_defaultJoyStateMap[lgck::Input::Count] = {
+    {lgck::Key::Up, lgck::Button::Up},
+    {lgck::Key::Down, lgck::Button::Down},
+    {lgck::Key::Left, lgck::Button::Left},
+    {lgck::Key::Right, lgck::Button::Right},
+    {lgck::Key::Space, lgck::Button::A},
+    {lgck::Key::LShift, lgck::Button::B},
+    {lgck::Key::Z, lgck::Button::Invalid}, // action (z-key)
+    {lgck::Key::Invalid, lgck::Button::Invalid},
+    {lgck::Key::Invalid, lgck::Button::Invalid}
+};
+
+constexpr char gamePadButtons[][8]{
+    "A",
+    "B",
+    "X",
+    "Y",
+    "L1",
+    "L3",
+    "R1",
+    "R3",
+    "Select",
+    "Start",
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Center",
+    "Guide"
+};
+
 CGame::CGame():CGameFile()
 {
     // Game General Init
@@ -87,31 +130,32 @@ CGame::CGame():CGameFile()
     setLevel ( 0 );
     m_keys = new char[lgck::Key::Count];
     clearKeys();
-    m_music = NULL;
+    m_music = nullptr;
     m_inventoryTable = new CInventoryTable();
-    //m_counters = new CCounters;
     m_inventoryTable->reset(true);
-    m_points = NULL;
+    m_points = nullptr;
     m_game = this;
     var("skill") = 0;
     var("level") = 0;
     m_mx = 0;
     m_my = 0;
+    counter("coins") = 0;
     counter("lives") = 0;
     counter("endLevel") = 0;
     m_layers = new CLevel;
-    var("pointsOBL") = 0;
+    var("pointsOBL_texture") = 0;
     m_sBK = new CScene();
     m_sFW = new CScene();
     m_sBK->setOwner( this, true );
     m_sFW->setOwner( this, false );
     CActor::setGame( this );
-    m_graphics = NULL;
-    m_sound = NULL;
+    m_graphics = nullptr;
+    m_sound = nullptr;
     svar("WarpTo") = INVALID;
     m_snapshot = new CSnapshot;
     m_tasks = new CTasks;
-    m_font = NULL;
+    copyDefaultJoyStateMap();
+    m_countdowns = new CCountdown;
 }
 
 CGame::~CGame()
@@ -121,12 +165,12 @@ CGame::~CGame()
 
     if (m_points) {
         delete m_points;
-        m_points = NULL;
+        m_points = nullptr;
     }
 
     if (m_layers) {
         delete m_layers;
-        m_layers = NULL;
+        m_layers = nullptr;
     }
 
     if (m_imageManager) {
@@ -140,26 +184,19 @@ CGame::~CGame()
     delete m_sFW;
     delete m_snapshot;
     delete m_tasks;
-    if (m_font) {
-        delete m_font;
-    }
-
+    delete m_countdowns;
+    m_countdowns = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////
 // attributes
-
-int CGame::getVersion()
-{
-    return CGameFile::getVersion();
-}
 
 int CGame::getTicks()
 {
     return getTickCount();
 }
 
-CLevel *CGame::getLayers()
+CLevel *CGame::layers()
 {
     return m_layers;
 }
@@ -169,23 +206,40 @@ CLevel *CGame::getLayers()
 
 void CGame::updateJoyState()
 {
-    var("joyState") =  m_keys[lgck::Key::Up] * CGame::JOY_UP
-                   | m_keys[lgck::Key::Down] * CGame::JOY_DOWN
-                   | m_keys[lgck::Key::Left] * CGame::JOY_LEFT
-                   | m_keys[lgck::Key::Right] * CGame::JOY_RIGHT
-                   | m_keys[lgck::Key::Space] * CGame::JOY_JUMP
-                   | m_keys[lgck::Key::LShift] * CGame::JOY_FIRE ;
+    unsigned int state = 0;
+    int flagValue = 1;
+    for (unsigned int i=0; i < sizeof(m_joyStateMap)/sizeof(JoyStateEntry); ++i){
+        const JoyStateEntry & entry = m_joyStateMap[i];
+        state |= ((entry.keyCode >= 0 ? m_keys[entry.keyCode] : 0) |
+            (entry.button >= 0 ? m_buttons[entry.button] : 0)) * flagValue;
+        flagValue *= 2;
+    }
+    var("joyState") = state;
+}
+
+bool CGame::isJoyActionOn(int action)
+{
+    const JoyStateEntry & entry = m_joyStateMap[action];
+    return ((entry.keyCode >= 0 ? m_keys[entry.keyCode] : 0) |
+        (entry.button >= 0 ? m_buttons[entry.button] : 0)) != 0;
+}
+
+void CGame::clearActionKey(int action)
+{
+    const JoyStateEntry & entry = m_joyStateMap[action];
+    entry.keyCode >= 0 ? m_keys[entry.keyCode] = 0: 0;
+    entry.button >= 0 ? m_buttons[entry.button] = 0 : 0;
 }
 
 /////////////////////////////////////////////////////////////////////
 // bkColor
 
-UINT32 CGame::getBkColor()
+uint32_t CGame::getBkColor()
 {
     return var("bkColor");
 }
 
-void CGame::setBkColor(UINT32 bkColor)
+void CGame::setBkColor(uint32_t bkColor)
 {
     var("bkColor") = bkColor;
 }
@@ -232,7 +286,7 @@ void CGame::setPause(bool state) {
 
     var("pause") = (int)state;
     int i = displays()->findDisplay("pause");
-    if ( i != -1) {
+    if ( i != INVALID) {
         CDisplay & display = displays()->getAt(i);
         display.setVisible( var("pause") != 0);
     }
@@ -242,7 +296,7 @@ void CGame::flipPause() {
 
     var("pause") ^= 1;
     int i = displays()->findDisplay("pause");
-    if ( i != -1) {
+    if ( i != INVALID ) {
         CDisplay & display = displays()->getAt(i);
         display.setVisible( var("pause") != 0 );
     }
@@ -279,11 +333,11 @@ int CGame::getScore() {
 // trigger
 
 bool CGame::wasTriggerCalled() {
-    return var("LevelTriggerCalled");
+    return var("__levelTriggerCalled");
 }
 
 void CGame::setTriggerState( bool state ) {
-    var("LevelTriggerCalled") = state;
+    var("__levelTriggerCalled") = state;
 }
 
 // timeLeft
@@ -362,7 +416,7 @@ void CGame::nextTick()
 
 // joyState
 
-UINT32 CGame::getJoyState() {
+uint32_t CGame::getJoyState() {
     return var("joyState");
 }
 
@@ -394,7 +448,7 @@ void CGame::setHealth(int hp)
     if ( svar("playerEntry") ) {
         CActor & player = (*m_sFW) [ svar("playerEntry") ];
         //player.m_hp = hp;
-        player.set(EXTRA_HP, hp);
+        player.set(lgck::EXTRA_HP, hp);
     }
 }
 
@@ -419,7 +473,7 @@ void CGame::cacheImages()
             m_imageManager->add( m_arrFrames[i] );
         }
     }else{
-        qDebug("IImageManager not implemented");
+        CLuaVM::debugv("IImageManager not implemented");
     }
 }
 
@@ -437,6 +491,9 @@ void CGame::clearKeys()
 {
     for (unsigned int i = 0; i < lgck::Key::Count; ++i) {
         m_keys[i] = 0;
+    }
+    for (unsigned int i = 0; i < lgck::Button::Count; ++i) {
+        m_buttons[i] = 0;
     }
 }
 
@@ -462,13 +519,13 @@ void CGame::splitLevel(CLevel *level, CScene *sBK, CScene *sFW)
     CProtoArray & arrProto = m_arrProto;
     CLayer *main = level->getMainLayer();
     if (!main) {
-        qDebug("main layer is null\n");
+        CLuaVM::debugv("main layer is null\n");
         return;
     }
 
-    int skill_mask[] = {1, 2, 4, 8};
-    int mask = skill_mask[getSkill()];
-    //qDebug("SKILL:%d MASK(%d)",getSkill(), mask);
+    // skill mask is 1, 2, 4 or 8
+    int mask = 1 << getSkill();
+
     // insert dummy entry at pos 0
     CActor tmp;
     sFW->add(tmp);
@@ -491,11 +548,11 @@ void CGame::splitLevel(CLevel *level, CScene *sBK, CScene *sFW)
 
 bool CGame::calculateWorldSize(CLevel *s, int &width, int &height)
 {
-    int largerX = -1;
-    int largerY = -1;
+    int largerX = INVALID;
+    int largerY = INVALID;
     CLayer *main = s->getMainLayer();
     if (!main) {
-        qDebug("main is null\n");
+        CLuaVM::debugv("main is null\n");
         return false;
     }
     for (int i=0; i < main->getSize(); ++i) {
@@ -516,27 +573,41 @@ bool CGame::calculateWorldSize(CLevel *s, int &width, int &height)
     return true;
 }
 
-bool CGame::resetDefaultDisplays()
-{   
-    qDebug("************ CGame::resetDefaultDisplays()");
-
+void CGame::restoreDisplays(CDisplayConfig *config)
+{
     IDisplayManager *dm = displays();
-    if (!dm) {
-        qDebug("IDisplayManager not attached\n");
-        return false;
-    }
-    clearDisplay();
-
-    CDisplayConfig & conf = *m_displayConfig;
+    CDisplayConfig & conf = *config;
     for (int i=0; i < m_displayConfig->getSize(); ++i) {
         // copy displays from displayConf to DisplayManager
         CDisplay * display = conf[i];
         dm->add(*display);
     }
+}
+
+void CGame::saveDisplays(CDisplayConfig *config)
+{
+    IDisplayManager *dm = displays();
+    CDisplayConfig & conf = *config;
+    config->forget();
+    for (int i=0; i < dm->getSize(); ++i) {
+        // copy displays from displayConf to DisplayManager
+        conf.add(dm->getAt(i));
+    }
+}
+
+bool CGame::resetDefaultDisplays()
+{   
+    IDisplayManager *dm = displays();
+    if (!dm) {
+        CLuaVM::debugv("IDisplayManager not attached\n");
+        return false;
+    }
+    clearDisplay();
+    restoreDisplays(m_displayConfig);
     return true;
 }
 
-unsigned int CGame::bgr2rgb(unsigned int bgr, int alpha)
+unsigned int CGame::bgr2rgb(uint32_t bgr, int alpha)
 {
     int blue = bgr & 0xff;
     int green = (bgr >> 8) & 0xff;
@@ -572,17 +643,16 @@ bool CGame::initLevel(int n)
         }
     }
 
-    qDebug("opening music");
+    CLuaVM::debugv("opening music");
     // start music
     const char* music = s->getSetting("music");
     if (music[0]) {
-        char filePath[strlen(music)+m_path.length()+1];
-        strcpy(filePath, m_path.c_str());
-        strcat(filePath, music);
-        if (m_music && m_music->open(filePath)) {
+        std::string filePath;
+        filePath = m_path.c_str() + std::string(music);
+        if (m_music && m_music->open(filePath.c_str())) {
             m_music->play();
         } else {
-            qDebug("failed to music");
+            CLuaVM::debugv("failed to music");
         }
     }
 
@@ -605,13 +675,13 @@ bool CGame::initLevel(int n)
     svar("WarpTo") = INVALID;
 
     // Save the background rgb value for future use
-    var("bkColor") = bgr2rgb(strtol(s->getSetting("bkcolor"), NULL, 16));
+    var("bkColor") = bgr2rgb(strtol(s->getSetting("bkcolor"), nullptr, 16));
 
     // Save the border rgb value for future use
-    var("borderColor") = bgr2rgb(strtol(s->getSetting("borderColor"), NULL, 16));
+    var("borderColor") = bgr2rgb(strtol(s->getSetting("borderColor"), nullptr, 16));
 
     // Save colorMod
-    var("colorMod") = strtol(s->getSetting("colorMod"), NULL, 16);
+    var("colorMod") = strtol(s->getSetting("colorMod"), nullptr, 16);
 
     // allocate the collision map
     if (!snapshotReloading) {
@@ -626,7 +696,7 @@ bool CGame::initLevel(int n)
     }
 
     // Find the player object
-    if ( (svar("playerEntry") = m_sFW->findPlayerEntry()) == -1) {
+    if ( (svar("playerEntry") = m_sFW->findPlayerEntry()) == INVALID) {
         m_lastError = "Missing player object!";
         return false;
     }
@@ -635,10 +705,12 @@ bool CGame::initLevel(int n)
     m_sBK->hideSystemObject(true);
     m_sFW->hideSystemObject(true);
 
-    setWrap(strtol(s->getSetting("wrap"), NULL, 10)) ;
-    if (!resetDefaultDisplays()) {
-        m_lastError = "Display Manager not attached!";
-        return false;
+    setWrap(strtol(s->getSetting("wrap"), nullptr, 10)) ;
+    if (!snapshotReloading) {
+        if (!resetDefaultDisplays()) {
+            m_lastError = "Display Manager not attached!";
+            return false;
+        }
     }
     setPause(false) ;
     setDisplayState(true, 0);
@@ -646,29 +718,29 @@ bool CGame::initLevel(int n)
     resetTicks();
 
     // Init PlayerObject
-    qDebug("init player\n");
-    if (svar("playerEntry") != -1) {
+    CLuaVM::debugv("init player\n");
+    if (svar("playerEntry") != INVALID) {
         CActor & player = (*m_sFW)[svar("playerEntry")];
         player.callEvent(CObject::EO_ACTIVATE);
         centerOnPlayer(player);
         player.setState(CHitData::STATE_HIT | CHitData::STATE_BEGINNING, true);
         if (!snapshotReloading) {
-            player.set(EXTRA_HP, 50);
+            player.set(lgck::EXTRA_HP, 50);
         }
-        player.set(EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
+        player.set(lgck::EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
     }
 
     int tick_rate = s->getSettingInt( CLevel::SPARAM_TICK_RATE );
     if (!tick_rate) {
         tick_rate = DEFAULT_TICK_RATE;
-        qDebug("default tick rate\n");
+        CLuaVM::debugv("default tick rate\n");
     }
 
     var("TICK_SCALE") = 1000 / tick_rate;
     setTimeLeft( s->getSettingInt("time") );
 
     // level specific settings
-    qDebug("init level settings\n");
+    CLuaVM::debugv("init level settings\n");
     microtime(&m_startTime);
     var("startTime") = m_startTime;
     counter("nextTick") = var("TICK_SCALE");
@@ -678,7 +750,8 @@ bool CGame::initLevel(int n)
     counter("goalLeft") = m_sFW->countGoals();
     setEndLevel( false );
     setLevelGoal( s->getSettingInt(CLevel::SPARAM_GOAL ) );
-    setLookUp ( (*m_settings)[PARAM_LOOKUP].valueInt > 0 );
+    setLookUp ( (*m_settings)[PARAM_LOOKUP].valueInt > 0
+                && !(s->getSettingInt(CLevel::SPARAM_WRAP ) & CLevel::NO_LOOK_UP));
     counter("closureEvent") = EVENT_NO_EVENT;
     counter("closureTime") = 0;
     counter("closureDelay") = s->getSettingInt("closure");
@@ -704,23 +777,23 @@ void CGame::moveTo(int x, int y)
 bool CGame::managePlayer()
 {
     updateJoyState();
-    if (svar("playerEntry") == -1) {
+    if (svar("playerEntry") == INVALID) {
         return false;
     }
 
     CActor & player = getPlayer();
-    player.set(EXTRA_FLAGS, player.checkHit());
+    player.set(lgck::EXTRA_FLAGS, player.checkHit());
     player.callEvent(CObject::EO_HANDLER);
 
     /////////////////////////////////////////////////////////////////
     // if the death flag is on, set the death state
-    if (player.get(EXTRA_FLAGS) & CHitData::FLAG_DEATH) {
+    if (player.get(lgck::EXTRA_FLAGS) & CHitData::FLAG_DEATH) {
         player.setState(CHitData::STATE_DEAD, true);
     }
 
     /////////////////////////////////////////////////////////////////
     // Check if player is falling
-    int bFall = player.canFall() && player.get(EXTRA_PATHDIR) == -1;
+    int bFall = player.canFall() && player.get(lgck::EXTRA_PATHDIR) == INVALID;
     /*
     if (bFall) {
         qDebug("grace:%d",player.m_fallGrace);
@@ -741,7 +814,7 @@ bool CGame::managePlayer()
         if (!player.getState(CHitData::STATE_DEAD)) {
             player.callEvent(CObject::EO_FALL);
         }
-        player.set(EXTRA_FALLHEIGHT, 0);
+        player.set(lgck::EXTRA_FALLHEIGHT, 0);
     } else {
         if (player.getState(CHitData::STATE_FALL) && !bFall) {
             if (!player.getState(CHitData::STATE_DEAD)) {
@@ -749,11 +822,11 @@ bool CGame::managePlayer()
                 player.crash();
                 CProto & proto = m_arrProto[player.m_nProto];
                 if (proto.m_nMaxFall &&
-                        player.get(EXTRA_FALLHEIGHT) > proto.m_nMaxFall) {
+                        player.get(lgck::EXTRA_FALLHEIGHT) > proto.m_nMaxFall) {
                     killPlayer(player);
                 }
             }
-            player.get(EXTRA_FALLHEIGHT) = 0;
+            player.get(lgck::EXTRA_FALLHEIGHT) = 0;
         }
     }
     player.setState(CHitData::STATE_FALL, bFall);
@@ -761,13 +834,13 @@ bool CGame::managePlayer()
     /////////////////////////////////////////////////////////////////
     // handle death sequence
     if (player.getState(CHitData::STATE_DEAD)
-        && !player.get(EXTRA_DEATHINDICATOR)) {
-        player.set(EXTRA_DEATHINDICATOR, DI_ANIMATION);
+        && !player.get(lgck::EXTRA_DEATHINDICATOR)) {
+        player.set(lgck::EXTRA_DEATHINDICATOR, DI_ANIMATION);
         player.unMap();
         player.callEvent(CObject::EO_DEATH);
         if (!player.tryAnimation(CObject::AS_DEAD + player.m_nAim)) {
-            qDebug("player death animation failed (aim=0x%x)", player.m_nAim);
-            player.set(EXTRA_DEATHINDICATOR, DI_REMOVAL);
+            CLuaVM::debugv("player death animation failed (aim=0x%x)", player.m_nAim);
+            player.set(lgck::EXTRA_DEATHINDICATOR, DI_REMOVAL);
         }
     }
 
@@ -775,15 +848,15 @@ bool CGame::managePlayer()
     // Control Player movements (while alive)
     if (!(player.m_nStateFlag & CHitData::STATE_DEAD)) {
         // ZKey is not repeating
-        if (m_keys[lgck::Key::Z]) {
-            m_keys[lgck::Key::Z] = 0;
+        if (isJoyActionOn(lgck::Input::Action)) {
+            clearActionKey(lgck::Input::Action);
             playerZKey();
         }
         if (!bFall && player.m_nProto > 0) {
             CProto & proto = m_arrProto[player.m_nProto];
             if (((!proto.m_nMoveSpeed) ||
                  (var("ticks") % proto.m_nMoveSpeed == 0))
-                    && !(player.get(EXTRA_FLAGS) & CHitData::FLAG_TELEPORT)) {
+                    && !(player.get(lgck::EXTRA_FLAGS) & CHitData::FLAG_TELEPORT)) {
                 managePlayerMovements(player);
             }
         }
@@ -791,7 +864,7 @@ bool CGame::managePlayer()
 
     /////////////////////////////////////////////////////////////////
     // Manage Player Jumping
-    if (player.get(EXTRA_PATHDIR) != -1 && gravity()) {
+    if (player.get(lgck::EXTRA_PATHDIR) != INVALID && gravity()) {
         player.managePath();
     }
 
@@ -808,7 +881,7 @@ bool CGame::managePlayer()
             player.move(DOWN);
             player.map();
             player.autoCenter(DOWN);
-            ++player.get(EXTRA_FALLHEIGHT);
+            ++player.get(lgck::EXTRA_FALLHEIGHT);
         }
     }
 
@@ -823,7 +896,7 @@ bool CGame::managePlayer()
 
 bool CGame::playerZKey()
 {
-    if (svar("playerEntry") == -1)
+    if (svar("playerEntry") == INVALID)
         return false;
     CActor & player = getPlayer();
     if (player.m_nY<0)
@@ -886,13 +959,13 @@ bool CGame::centerOnPlayer(CActor & player)
 
 void CGame::managePlyTimerOutCounter(CActor & player)
 {
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     // Check hit - Dec TimeOutDelay
     if (!player.getState(CHitData::STATE_BEGINNING)) {
-        if (player.get(EXTRA_TIMEOUT) == 0) {
+        if (player.get(lgck::EXTRA_TIMEOUT) == 0) {
             player.setState(CHitData::STATE_HIT, false);
         } else {
-           player.get(EXTRA_TIMEOUT)--;
+           player.get(lgck::EXTRA_TIMEOUT)--;
         }
     }
 
@@ -903,7 +976,7 @@ void CGame::managePlyTimerOutCounter(CActor & player)
 
 void CGame::managePlayerJump()
 {
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     CActor & player = getPlayer();
     const CProto & proto = player.proto();
     if (gravity()) {
@@ -950,13 +1023,13 @@ void CGame::managePlayerJump()
 
         case JM_GIANA:
             if (joyState & JOY_UP) {
-                player.tryPath(CObject::PS_JUMP_UP, -1);
+                player.tryPath(CObject::PS_JUMP_UP, INVALID);
             }
             break;
 
         case JM_MIXED:
             if (joyState & JOY_JUMP) {
-                player.tryPath(CObject::PS_JUMP_UP, -1);
+                player.tryPath(CObject::PS_JUMP_UP, INVALID);
             }
             break;
         }
@@ -965,18 +1038,18 @@ void CGame::managePlayerJump()
 
 void CGame::managePlayerMovements(CActor & player)
 {
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     bool lookup = false;
     // vla3 disallows control of movement during paths and fall
     CProto & proto = m_arrProto[player.m_nProto];
     if (proto.m_nJumpMode == JM_VLA3 &&
-            (player.get(EXTRA_PATHDIR) != -1 || player.getState(CHitData::STATE_FALL))) {
+            (player.get(lgck::EXTRA_PATHDIR) != INVALID || player.getState(CHitData::STATE_FALL))) {
         return;
     }
     if (joyState){// && player.m_pathDir == INVALID) {
         // manage player jump
         int nNewAim = INVALID;
-        if (player.get(EXTRA_PATHDIR) == INVALID) {
+        if (player.get(lgck::EXTRA_PATHDIR) == INVALID) {
             if (joyState & JOY_DOWN) {
                 nNewAim = DOWN;
             }
@@ -993,14 +1066,14 @@ void CGame::managePlayerMovements(CActor & player)
         }
         // activate other animation sequences
         if ( (nNewAim != INVALID) && (player.m_nAim != nNewAim
-           || player.get(EXTRA_ANIMSEQ) == CObject::AS_DEFAULT) ) {
+           || player.get(lgck::EXTRA_ANIMSEQ) == CObject::AS_DEFAULT) ) {
             player.m_nAim = nNewAim;
             player.tryAnimation(CObject::AS_MOVE + nNewAim);
         } else {
-            if (player.m_nAim != HERE && player.get(EXTRA_ANIMSEQ) == INVALID
-                    && player.get(EXTRA_PATHDIR) == INVALID) {
+            if (player.m_nAim != HERE && player.get(lgck::EXTRA_ANIMSEQ) == INVALID
+                    && player.get(lgck::EXTRA_PATHDIR) == INVALID) {
                 int animSeq = CObject::AS_MOVE + player.m_nAim;
-                if (player.get(EXTRA_ANIMSEQ) != animSeq) {
+                if (player.get(lgck::EXTRA_ANIMSEQ) != animSeq) {
                     player.tryAnimation(animSeq);
                 }
             }
@@ -1009,8 +1082,9 @@ void CGame::managePlayerMovements(CActor & player)
         int & my = m_my;
         CFrame & frame = * m_arrFrames.getFrame( player );
         if (joyState & JOY_UP
-                && player.get(EXTRA_PATHDIR) == -1) {
-            CActor t_player = player;
+                && player.get(lgck::EXTRA_PATHDIR) == INVALID) {
+            CActor t_player;
+            t_player.copyFrom(player);
             t_player.move(UP);
             if (player.canMove(UP, false) &&
                     !t_player.canFall()) {
@@ -1034,7 +1108,7 @@ void CGame::managePlayerMovements(CActor & player)
         player.setState(CHitData::STATE_LOOKUP, lookup);
 
         if (joyState & JOY_DOWN
-                && player.get(EXTRA_PATHDIR) == -1) {
+                && player.get(lgck::EXTRA_PATHDIR) == INVALID) {
             if (player.canMove(DOWN, false)) {
                 player.unMap();
                 player.move(DOWN);
@@ -1059,7 +1133,8 @@ void CGame::managePlayerMovements(CActor & player)
                 player.autoCenter(LEFT);
                 player.callEvent(CObject::EO_MOVE);
             }  else {
-                CActor t_player = player;
+                CActor t_player;
+                t_player.copyFrom(player);
                 t_player.move(UP);
                 if (player.m_nY !=0 &&
                         player.canMove(UP, false) &&
@@ -1084,7 +1159,8 @@ void CGame::managePlayerMovements(CActor & player)
                 player.autoCenter(RIGHT);
                 player.callEvent(CObject::EO_MOVE);
             } else {
-                CActor t_player = player;
+                CActor t_player;
+                t_player.copyFrom(player);
                 t_player.move(UP);
                 player.autoCenter(RIGHT);
                 if (player.m_nY !=0 &&
@@ -1105,11 +1181,17 @@ void CGame::managePlayerMovements(CActor & player)
 bool CGame::managePlayerFiring(CActor & player)
 {
     // Manage Player Firing
-    UINT32 joyState = getJoyState();
+    uint32_t joyState = getJoyState();
     if (joyState & JOY_FIRE)  {
         player.setState(CHitData::STATE_FIRING, true);
     }  else  {
         player.setState(CHitData::STATE_FIRING, false);
+    }
+    // if a bulletProto was specified in properties
+    // and bullet is enabled
+    if (player.proto().m_nProtoBuddy &&
+            player.proto().m_bulletOptions & CProto::BULLET_ENABLED) {
+        callStaticHandler("firePlayerBullet", svar("playerEntry"));
     }
     player.callEvent(CObject::EO_FIRE);
     return true;
@@ -1122,11 +1204,16 @@ void CGame::callTrigger (const int nKey)
         for (int i = 0; i < scene.getSize(); ++i) {
             CActor & entry = scene[i];
             CProto & proto =  m_arrProto [entry.m_nProto];
-            if (!proto.getOption(CProto::OPTION_NO_TRIGGER) &&
+            if (!proto.getOption(CProto::OPTION_NO_TRIGGER_FLIP) &&
                 (entry.m_nTriggerKey & TRIGGER_KEYS) == nKey) {
                 entry.unMap();
                 entry.m_nTriggerKey ^= entry.m_nActionMask & TRIGGER_MASK;
-                entry.callEvent(CObject::EO_TRIGGER );
+                entry.callEvent(CObject::EO_TRIGGER);
+                if (entry.m_nActionMask & TRIGGER_DEATH_FLIP) {
+                    entry.m_nActionMask ^= TRIGGER_DEATH_FLIP;
+                    entry.callEvent(CObject::EO_DEATH);
+                    entry.kill();
+                }
                 entry.map();
             }
         }
@@ -1141,7 +1228,7 @@ void CGame::triggerPlayerHitState()
     if (!player.tryAnimation(CObject::AS_HURT + player.m_nAim )) {
         // the hurt animation didn't work ! :(
     }
-    player.set(EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
+    player.set(lgck::EXTRA_TIMEOUT, var("CONST_TIMEOUT"));
 }
 
 int CGame::manageKeyEvents()
@@ -1236,12 +1323,12 @@ bool CGame::initSettings()
     // find points
     if (m_points) {
         delete m_points;
-        m_points = NULL;
+        m_points = nullptr;
     }
 
     if (settings[PARAM_POINTS].value[0] == ':') {
-        qDebug("points internal");
-        CFileWrap file;
+        CLuaVM::debugv("points internal");
+        FILEWRAP file;
         if (file.open(settings[PARAM_POINTS].value.c_str() )) {
             m_points = new CFrameSet;
             m_points->setName("points.obl5");
@@ -1256,12 +1343,13 @@ bool CGame::initSettings()
     }
 
     if (!m_points) {
-        qDebug("`%s` not found", settings[PARAM_POINTS].value.c_str());
+        CLuaVM::debugv("`%s` not found", settings[PARAM_POINTS].value.c_str());
         m_lastError = "`points` not found";
         return false;
     }
 
-    var("pointsOBL") = m_imageManager->add( m_points );
+    var("pointsOBL_frameSet") = m_arrFrames.add(m_points);
+    var("pointsOBL_texture") = m_imageManager->add(m_points);
     return true;
 }
 
@@ -1269,9 +1357,15 @@ bool CGame::initSettings()
 
 void CGame::removePointsOBL()
 {
-    if (var("pointsOBL")) {
-        m_imageManager->removeAt( var("pointsOBL") );
-        var("pointsOBL") = 0;
+    if (var("pointsOBL_texture")) {
+        m_imageManager->removeAt( var("pointsOBL_texture") );
+        var("pointsOBL_texture") = 0;
+        m_arrFrames.removeAt(var("pointsOBL_frameSet"));
+        var("pointsOBL_frameSet") = 0;
+        if (m_points) {
+            delete m_points;
+            m_points = nullptr;
+        }
     }
 }
 
@@ -1285,21 +1379,21 @@ void CGame::setVitals(int hp, int lives, int score)
 bool CGame::initLevelTest( int level,  int skill,  bool initSound)
 {
     // Intialize the game settings
-    qDebug("init settings");
+    CLuaVM::debugv("init settings");
 
     if (!initSettings()) {
         return false;
     }
 
-    qDebug("init sound");
-    // Load sound resources
+    CLuaVM::debugv("init sound");
+    // Load sound re/sources
     if (initSound) {
         initSounds();
     }
 
     setSkill(skill);
 
-    qDebug("init level");
+    CLuaVM::debugv("init level");
 
     // Initialize the level
     if (!initLevel( level )) {
@@ -1317,10 +1411,10 @@ bool CGame::initLevelTest( int level,  int skill,  bool initSound)
 void CGame::addToHP(int hp)
 {
     CActor & player = getPlayer();
-    player.get(EXTRA_HP) = std::max(0, player.get(EXTRA_HP) + hp);
-    player.get(EXTRA_HP) = std::min((int)player.get(EXTRA_HP), (int) MAX_HP);
+    player.get(lgck::EXTRA_HP) = std::max(0, player.get(lgck::EXTRA_HP) + hp);
+    player.get(lgck::EXTRA_HP) = std::min((int)player.get(lgck::EXTRA_HP), (int) MAX_HP);
     setDisplayState( true, std::max(getDisplayAlpha(), 0x80) );
-    if (!player.get(EXTRA_HP)) {
+    if (!player.get(lgck::EXTRA_HP)) {
         killPlayer(player);
     }
 }
@@ -1402,7 +1496,10 @@ bool CGame::isEndLevelMeet()
 
 void CGame::postInitLevel()
 {
-    qDebug("postInitLevel\n");
+    CLuaVM::debugv("postInitLevel\n");
+
+    // clear countdowns
+    m_countdowns->removeAll();
 
     // invoke onCreate event
     callLvEvent(CLevel::EL_CREATE);
@@ -1417,7 +1514,7 @@ void CGame::postInitLevel()
         callLvEvent(CLevel::EL_RESTART);
     }
 
-    qDebug("postInitLevel completed\n");
+    CLuaVM::debugv("postInitLevel completed\n");
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -1430,8 +1527,8 @@ CInventory *CGame::getInventory(const char *name)
 
 void CGame::triggerMouseEvent(int x, int y, int button)
 {
-    int offsetX;
-    int offsetY;
+    int offsetX = 0;
+    int offsetY = 0;
     graphics()->getOffset(offsetX, offsetY);
     x -= offsetX;
     y -= offsetY;
@@ -1439,7 +1536,7 @@ void CGame::triggerMouseEvent(int x, int y, int button)
     if (x >= 0 && x <= m_screenLen &&
         y >= 0 && x <= m_screenHei ) {
         int target = scene.whoIs( x + m_mx, y + m_my);
-        if (target != -1) {
+        if (target != INVALID) {
             CActor & entry = scene[target];
             switch( button) {
             case BUTTON_LEFT:
@@ -1516,29 +1613,17 @@ void CGame::generateRuntimeLua(std::string & s)
     char tmp[512];
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         CProto & proto = m_arrProto[n];
-        char name[strlen(proto.m_szName)+1];
-        strcpy(name, proto.m_szName);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
-        sprintf(tmp, "OBJECT_%-40s = %d;\n", name, n);
+        std::string name = proto.m_szName;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
+        sprintf(tmp, "OBJECT_%-40s = %d;\n", name.c_str(), n);
         s += std::string(tmp);
     }
 
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         CProto & proto = m_arrProto[n];
-        char name[strlen(proto.m_szName)+1];
-        strcpy(name, proto.m_szName);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
-        sprintf(tmp, "SPRITE_%-40s = %d;\n", name, n);
+        std::string name = proto.m_szName;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
+        sprintf(tmp, "SPRITE_%-40s = %d;\n", name.c_str(), n);
         s += std::string(tmp);
     }
 
@@ -1546,17 +1631,9 @@ void CGame::generateRuntimeLua(std::string & s)
 
     for (int n = 0; n < CGame::MAX_CLASSES; ++n) {
         if (!m_className[n].empty()) {
-            const char *r = m_className[n].c_str();
-            char name[strlen(r)+1];
-            strcpy(name, r);
-            toUpper(name);
-            for (unsigned int i = 0; i < strlen(name); ++i) {
-                if (!isalnum(name[i])) {
-                    name[i] = '_';
-                }
-            }
-
-            sprintf(tmp, "CLASS_%-40s = 0x%.2x;\n",  name, n);
+            std::string name = m_className[n];
+            transform(name.begin(), name.end(), name.begin(), upperClean);
+            sprintf(tmp, "CLASS_%-40s = 0x%.2x;\n",  name.c_str(), n);
             s += std::string(tmp);
         }
     }
@@ -1564,18 +1641,9 @@ void CGame::generateRuntimeLua(std::string & s)
     s += "\n-- IMAGE SETS\n\n" ;
 
     for (int n=0; n < m_arrFrames.getSize(); ++n) {
-
-        const char *r = m_arrFrames[n]->getName();
-        char name[strlen(r)+1];
-        strcpy(name, r);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
-
-        sprintf(tmp, "IMAGES_%-40s = 0x%.2x;\n",  name, n);
+        std::string name = m_arrFrames[n]->getName();
+        transform(name.begin(), name.end(), name.begin(), upperClean);
+        sprintf(tmp, "IMAGES_%-40s = 0x%.2x;\n",  name.c_str(), n);
         s += std::string(tmp);
     }
 
@@ -1592,7 +1660,7 @@ void CGame::generateRuntimeLua(std::string & s)
         {"FULLSCREEN", (int) var("FULLSCREEN") },
         {"CONST_TIMEOUT", (int) var("CONST_TIMEOUT") },
         {"SKILL", static_cast<int>(svar("skill")) },
-        { NULL, 0 }
+        { nullptr, 0 }
     };
 
     s += "-- GENERAL GAME SETTINGS (deprecated)\n";
@@ -1659,10 +1727,10 @@ bool CGame::loadScript( const char *scriptName )
     char path[strlen(fmt) + strlen(scriptName) +1];
     sprintf(path, fmt, scriptName);
 
-    CFileWrap file;
+    FILEWRAP file;
     bool result = file.open(path);
     if (!result) {
-        qDebug("-- loading internal:%s\n", scriptName);
+        CLuaVM::debugv("-- loading internal:%s\n", scriptName);
         sprintf(path, ":/scripts/%s", scriptName);
         result = file.open(path);
     }
@@ -1681,7 +1749,7 @@ bool CGame::loadScript( const char *scriptName )
         const char fmt[] = "-- failed to load `%s`\n";
         sprintf( tmp, fmt , scriptName);
         m_lua.debug(tmp);
-        qDebug(fmt, tmp);
+        CLuaVM::debugv(fmt, tmp);
     }
     return result;
 }
@@ -1692,10 +1760,10 @@ bool CGame::readScript( const char *scriptName, std::string &out )
     char path[strlen(fmt) + strlen(scriptName) +1];
     sprintf(path, fmt, scriptName);
 
-    CFileWrap file;
+    FILEWRAP file;
     bool result = file.open(path);
     if (!result) {
-        qDebug("-- loading internal:%s\n", scriptName);
+        CLuaVM::debugv("-- loading internal:%s\n", scriptName);
         sprintf(path, ":/scripts/%s", scriptName);
         result = file.open(path);
     }
@@ -1710,9 +1778,9 @@ bool CGame::readScript( const char *scriptName, std::string &out )
     } else {
         char tmp[128];
         const char fmt2[] = "-- failed to load `%s`\n";
-        sprintf( tmp, fmt2, scriptName);
+        sprintf(tmp, fmt2, scriptName);
         m_lua.debug(tmp);
-        qDebug(fmt2, tmp);
+        CLuaVM::debugv(fmt2, tmp);
     }
     return result;
 }
@@ -1758,31 +1826,44 @@ void CGame::callGameEvent(int eventId)
 
 void CGame::callObjEvent(int objId, int eventId)
 {
-    CScene & scene = *(m_sFW);
-    int proto = scene[objId].m_nProto;
+    CActor & actor = m_sFW->get(objId);
+#ifdef TRACKMSG
+    if (eventId != CObject::EO_HANDLER
+            && eventId != CObject::EO_FIRE) {
+        qDebug("callObjEvent() objId: %d event %d [%s]", objId, eventId, CProtoArray::getEventName(eventId));
+        actor.debug();
+    }
+#endif
+    int proto = actor.m_nProto;
     if (proto <= 0) {
-        qDebug("execObjEvent() invalid call rejected: objId: %d, proto: 0x%.4x, event: 0x%x", objId, proto, eventId);
+        CLuaVM::debugv("callObjEvent() invalid call rejected: objId: %d, proto: 0x%.4x, event: 0x%x",
+                       objId,
+                       proto,
+                       eventId);
         return ;
     }
 
-    CObject & object = m_arrProto.getObject(scene[objId].m_nProto);
+    CObject & object = m_arrProto.getObject(actor.m_nProto);
     const char* luaCode = object.getEvent(eventId);
     if (luaCode[0]) {
-        CScene & scene = *(m_sFW);
-        CActor & entry = scene[objId];
         char fnName [255];
-        sprintf(fnName, "event_obj_%d_%s", entry.m_nProto, CProtoArray::getEventName(eventId));
-        // the function name
-        lua_getglobal(m_lua.getState(), fnName);
-        // the first argument
-        lua_pushnumber(m_lua.getState(), objId);
-        // the second argument
-        lua_pushnumber(m_lua.getState(), var("ticks"));
-        // do the call (2 arguments, 1 result)
-        int status = lua_pcall(m_lua.getState(), 2, 0, 0);
-        if ( status != 0) {
-            m_lua.reportErrors(status);
-        }
+        sprintf(fnName, "event_obj_%d_%s", actor.m_nProto, CProtoArray::getEventName(eventId));
+        callStaticHandler(fnName, objId);
+    }
+}
+
+void CGame::callStaticHandler(const char *fnName, int objId)
+{
+    // the function name
+    lua_getglobal(m_lua.getState(), fnName);
+    // the first argument
+    lua_pushnumber(m_lua.getState(), objId);
+    // the second argument
+    lua_pushnumber(m_lua.getState(), var("ticks"));
+    // do the call (2 arguments, 1 result)
+    int status = lua_pcall(m_lua.getState(), 2, 0, 0);
+    if ( status != 0) {
+        m_lua.reportErrors(status, fnName);
     }
 }
 
@@ -1792,7 +1873,7 @@ int CGame::call(const char *fnName)
     lua_getglobal(L, fnName);
     int status = lua_pcall(L, 0, 1, 0);
     if ( status != 0) {
-        m_lua.reportErrors(status);
+        m_lua.reportErrors(status, fnName);
         lua_pop(L, 1);
         return EVENT_ERROR;
     } else {
@@ -1810,7 +1891,7 @@ void CGame::error(const char *fnName, int argc)
     char tmp[256];
     sprintf(tmp, "-- error: %s(...) requires %d args.",
             fnName, argc);
-    m_lua.debug(tmp);
+    m_lua.error(tmp);
 }
 
 CGame &CGame::getGame()
@@ -1820,26 +1901,26 @@ CGame &CGame::getGame()
 
 void CGame::attach(IImageManager *im)
 {
-    qDebug(im? "attaching IImageManager" : "detaching IImageManager");
+    CLuaVM::debugv(im? "attaching IImageManager" : "detaching IImageManager");
     m_imageManager = im;
     cacheImages();
 }
 
 void CGame::attach(IGraphics *gr)
 {
-    qDebug(gr? "attaching IGraphics" : "detaching IGraphics");
+    CLuaVM::debugv(gr? "attaching IGraphics" : "detaching IGraphics");
     m_graphics = gr;
 }
 
 void CGame::attach(IMusic *mu)
 {
-    qDebug(mu? "attaching IMusic" : "detaching IMusic");
+    CLuaVM::debugv(mu? "attaching IMusic" : "detaching IMusic");
     m_music = mu;
 }
 
 void CGame::attach(ISound *sn)
 {
-    qDebug(sn? "attaching ISound" : "detaching ISound");
+    CLuaVM::debugv(sn? "attaching ISound" : "detaching ISound");
     m_sound = sn;
 }
 
@@ -1858,7 +1939,7 @@ IDisplayManager * CGame::displays()
     if (m_graphics) {
         return m_graphics->displayManager();
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1868,12 +1949,14 @@ int & CGame::counter(const char*s)
 }
 
 bool CGame::playSound(const char *name)
-{\
+{
     CSnd *snd = m_arrSounds[name];
     if (snd) {
         m_sound->play(snd->getUID());
+    } else {
+        CLuaVM::debugv("invalid requested sound: %s", name);
     }
-    return snd != NULL;
+    return snd != nullptr;
 }
 
 bool CGame::playSound(int index)
@@ -1881,8 +1964,10 @@ bool CGame::playSound(int index)
     CSnd *snd = m_arrSounds[index];
     if (snd) {
         m_sound->play(snd->getUID());
+    } else {
+        CLuaVM::debugv("invalid requested sound: %d", index);
     }
-    return snd != NULL;
+    return snd != nullptr;
 }
 
 ISound * CGame::sound()
@@ -1925,7 +2010,7 @@ void CGame::setEngineState(unsigned int state)
 
 int CGame::runEngine()
 {
-    unsigned long long now;
+    uint64_t now;
     switch(var("engineState")) {
     case ES_TIMEOUT:
     case ES_INTRO:
@@ -1953,17 +2038,17 @@ void CGame::updateScreen()
     case ES_TIMEOUT:
         level = m_arrLevels[getLevel()];
         char text[32];
-        graphics()->clear(CGame::bgr2rgb(strtol(level->getSetting("introBkColor"), NULL, 16)));
+        graphics()->clear(CGame::bgr2rgb(strtol(level->getSetting("introBkColor"), nullptr, 16)));
         if (svar("WarpTo") == INVALID) {
             sprintf(text, "Level %.2d", getLevel() + 1);
         } else {
             sprintf(text, "Warp to Level %.2d", getLevel() + 1);
         }
         if (var("engineState") == ES_TIMEOUT) {
-            strcpy(text, "Ran out of time");
+            strncpy(text, "Ran out of time", sizeof(text));
         }
         displays()->drawText(-1,-1,text, 0, 15,
-                             CGame::bgr2rgb(strtol(level->getSetting("introTextColor"), NULL, 16)));
+                             CGame::bgr2rgb(strtol(level->getSetting("introTextColor"), nullptr, 16)));
         callLvEvent(CLevel::EL_INTRO_DRAW);
         break;
     default:
@@ -1976,7 +2061,7 @@ void CGame::saveGame(IFile & file)
 {
     // main headers
     file.write("LGCK",4);
-    unsigned int version = getVersion();
+    unsigned int version = getEngineVersion();
     unsigned int uuid = 0;
     unsigned int size;
     file.write(&version, sizeof(version));
@@ -1995,10 +2080,7 @@ void CGame::saveGame(IFile & file)
     for(auto kv : m_counters) {
         std::string key = kv.first;
         int val = kv.second;
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
         file << key;
-//        qDebug("%s %d", tmp, val);
         file.write(&val, sizeof(int));
     }
 
@@ -2010,10 +2092,7 @@ void CGame::saveGame(IFile & file)
     for(auto kv : m_vars) {
         const std::string key = kv.first;
         unsigned long long val = kv.second;
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
         file << key;
-  //      qDebug("%s %llu", tmp, val);
         file.write(&val, sizeof(unsigned long long));
     }
 
@@ -2058,7 +2137,7 @@ void CGame::loadGame(IFile &file)
     std::string fileName;
     std::string path;
     file.read(&version,4);
-    ASSERT(version == static_cast<unsigned int>(getVersion()));
+    ASSERT(version == getEngineVersion());
     file.read(&uuid, 4);
     file >> fileName;
     file >> path;
@@ -2072,29 +2151,25 @@ void CGame::loadGame(IFile &file)
     // Read Counters
     file.read(&size, sizeof(size));
     m_counters.clear();
-    qDebug("Counters: %d", size);
+    CLuaVM::debugv("Counters: %d", size);
     for (unsigned int i=0; i < size; ++i) {
         std::string key;
         file >> key;
         int val = 0;
         file.read(&val, sizeof(val));
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
-        counter(tmp) = val;
+        counter(key.c_str()) = val;
     }
 
     // Read Variables
     file.read(&size, sizeof(size));
-    qDebug("Vars: %d", size);
+    CLuaVM::debugv("Vars: %d", size);
     m_vars.clear();
     for (unsigned int i=0; i < size; ++i) {
         std::string key;
         file >> key;
         unsigned long long val = 0;
         file.read(&val, sizeof(val));
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
-        var(tmp) = val;
+        var(key.c_str()) = val;
     }
 
     // Read inventory table
@@ -2128,16 +2203,14 @@ void CGame::loadGame(IFile &file)
 
     // load strv
     file.read(&size, sizeof(size));
-    qDebug("Strings: %d", size);
+    CLuaVM::debugv("Strings: %d", size);
     m_strings.clear();
     for (unsigned int i=0; i < size; ++i) {
         std::string key;
         file >> key;
         std::string val;
         file >> val;
-        char tmp[key.length()+1];
-        strcpy(tmp, key.c_str());
-        strv(tmp) = val.c_str();
+        strv(key.c_str()) = val.c_str();
     }
 
     // load snapshot
@@ -2190,25 +2263,121 @@ void CGame::remap()
 
 bool CGame::initFonts()
 {
-    qDebug("initFont()");
-    if (m_font) {
-        // TODO: revisit this later when fontwiz will be operational
-        qDebug("Font already initialized");
-        return true;
-    }
-    const char *fontName = ":/res/Tuffy_bold.fnt";
-    CFileWrap file;
-    if (file.open(fontName)) {
-        m_font = new CFont;
-        m_font->read(file);
-        file.close();
-        int textureId = m_imageManager->add("Arial", m_font);
-        qDebug("textureId: %u", textureId);
-        m_font->setTextureId(textureId);
-        return true;
-    } else {
-        m_font = NULL;
-        qDebug("can't read %s", fontName);
+    CLuaVM::debugv("initFont()");
+    CFontManager * fonts = getFonts();
+    if (!fonts) {
+        CLuaVM::debugv("font manager not created");
         return false;
     }
+
+    for (int i=0; i < fonts->getSize(); ++i) {
+         CFont *font = fonts->at(i);
+         unsigned int tex = font->textureId();
+         if (tex) {
+             CLuaVM::debugv("Font %d already initialized %u", i, tex);
+         } else {
+             CLuaVM::debugv("adding font: %d", i);
+             int textureId = m_imageManager->add(fonts->nameAt(i), font);
+             CLuaVM::debugv("textureId: %u", textureId);
+             font->setTextureId(textureId);
+         }
+    }
+    return true;
+}
+
+void CGame::setJoyButton(lgck::Button::JoyButton button, char value)
+{
+    m_buttons[button] = value;
+}
+
+const char * CGame::keys()
+{
+    return m_keys;
+}
+
+void CGame::copyDefaultJoyStateMap()
+{
+    memcpy(&m_joyStateMap, &m_defaultJoyStateMap, sizeof(m_joyStateMap));
+}
+
+CGame::JoyStateEntry & CGame::joyStateEntry(int i)
+{
+    return m_joyStateMap[i];
+}
+
+const char * CGame::buttonText(int i)
+{
+    return i >= 0 ? gamePadButtons[i] : "";
+}
+
+int CGame::findButtonText(const char *text)
+{
+    for (int i=0; i < lgck::Button::Count; ++i) {
+        if (strcmp(gamePadButtons[i], text) == 0) {
+            return i;
+        }
+    }
+    return CGame::INVALID;
+}
+
+
+CLuaVM & CGame::luaVM()
+{
+    return m_lua;
+}
+
+uint64_t CGame::startTime()
+{
+    return m_startTime;
+}
+
+CScene *CGame::_fw()
+{
+    return m_sFW;
+}
+
+CScene *CGame::_bk()
+{
+    return m_sBK;
+}
+
+bool CGame::exportJoyStateMap(IFile & file)
+{
+    uint32_t version = getEngineVersion();
+    file.write(SIGNATURE_JOYSTATEMAP, 4);
+    file.write(&version, sizeof(uint32_t));
+    file.write(&REVISION_JOYSTATEMAP, sizeof(uint32_t));
+    file.write(m_joyStateMap, sizeof(m_joyStateMap));
+    return true;
+}
+
+bool CGame::importJoyStateMap(IFile & file)
+{
+    uint32_t version = 0;
+    uint32_t revision = -1;
+    char signature[4];
+    file.read(signature, 4);
+    if (memcmp(signature, SIGNATURE_JOYSTATEMAP, 4)==0) {
+        file.read(&version, sizeof(int32_t));
+        file.read(&revision, sizeof(uint32_t));
+        if (version == getEngineVersion()) {
+            file.read(m_joyStateMap, sizeof(m_joyStateMap));
+            return true;
+        } else {
+            m_lastError = "JoyState version is wrong";
+        }
+    } else {
+        m_lastError = "JoyState signature is wrong";
+    }
+    return false;
+}
+
+void CGame::resetAllCounters()
+{
+    m_counters.clear();
+}
+
+CCountdown * CGame::countdowns()
+{
+    return m_countdowns;
 }

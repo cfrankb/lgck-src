@@ -117,9 +117,19 @@ void CScene::forget()
     m_size = 0;
 }
 
+CActor & CScene::get(int i) const
+{
+    return * m_actors[i];
+}
+
 CActor & CScene::operator [] (int i) const
 {
-    return *(m_actors [ i ]);
+    return get(i);
+}
+
+CLevelEntry & CScene::atIndex (int i) const
+{
+    return *(dynamic_cast<CLevelEntry*>(m_actors [ i ]));
 }
 
 void CScene::setOwner(CGame *game, bool bk)
@@ -136,7 +146,7 @@ int CScene::getSize() const
 int CScene::findPlayerEntry()
 {
     for (int i = 0; i < m_size; ++i) {
-        if (m_actors [ i ]->proto().m_nClass == CLASS_PLAYER_OBJECT) {
+        if (m_actors [ i ]->proto().isPlayer()) {
             return i;
         }
     }
@@ -189,11 +199,10 @@ int CScene::whoIs(int x, int y)
     int target = -1;
     for (int n = 0; n < m_size; ++n) {
         CActor &entry = *(m_actors[n]);
-        CFrameSet & filter = * game.m_arrFrames[entry.m_nFrameSet];
-        CFrame * pFrame = filter[entry.m_nFrameNo];
+        CFrame & frame = game.toFrame(entry);
         if (entry.m_nProto && (entry.m_nX<= x) && (entry.m_nY<= y) &&
-                (entry.m_nX+ pFrame->m_nLen) > x &&
-                (entry.m_nY+ pFrame->m_nHei) > y ) {
+                (entry.m_nX+ frame.m_nLen) > x &&
+                (entry.m_nY+ frame.m_nHei) > y ) {
             target = n;
         }
     }
@@ -212,19 +221,19 @@ const CScene & CScene::operator = (const CLayer & layer)
 void CScene::map()
 {
     CGame & game = *m_game;
-    CMap & rmap = (*game.m_map);
+    CMap & rmap = game.map();
     for (int n = 0; n < m_size; ++ n) {
         CActor & entry = *(m_actors [n]);
-        CFrame *frame = game.m_arrFrames.getFrame(entry);
+        CFrame & frame = game.toFrame(entry);
         const CProto & proto = game.m_arrProto[entry.m_nProto];
         if (proto.m_nClass) {
             if (m_bk) {
-                Size sx = rmap.size(frame);
+                Size sx = rmap.size(& frame);
                 Pos p = rmap.toMap(entry.m_nX, entry.m_nY);
                 for (int y = 0; y < sx.hei; ++y) {
                     for (int x = 0; x < sx.len; ++ x) {
                         CMapEntry & map = rmap.at(p.x + x, p.y + y);
-                        if ( proto.m_bNoSmartMap || frame->map(x,y) ) {
+                        if ( proto.m_bNoSmartMap || frame.map(x,y) ) {
                             map.m_nBkClass = proto.m_nClass;
                         }
                     }
@@ -236,7 +245,7 @@ void CScene::map()
     }
 }
 
-int CScene::findBySeed(UINT32 seed)
+int CScene::findBySeed(uint32_t seed)
 {
     for (int n = 0; n < m_size; ++ n) {
         if ( (m_actors[n]->m_seed == seed)
@@ -260,9 +269,7 @@ void CScene::notifyAll(int eventId)
             entry.callEvent(eventId);
         }
     }
-
 }
-
 
 void CScene::manageAuto()
 {
@@ -271,10 +278,10 @@ void CScene::manageAuto()
     int ticks = game.getTickCount();
     for (int i=0; i < m_size; ++i) {
         CActor & entry = *(m_actors[i]);
-        if ( (!(entry.m_nTriggerKey & CGame::TRIGGER_FROZEN))
+        if ( (!(entry.m_nTriggerKey & TRIGGER_FROZEN))
                 && entry.isActive()) {
             const CProto & proto = game.m_arrProto[entry.m_nProto];
-            CFrame *pFrame = game.m_arrFrames.getFrame(entry);
+            CFrame & frame = game.toFrame(entry);
             int nTicksT = ticks + i * 20 + (i % 20);
             bool autoEvent = false;
             // AutoFire
@@ -305,12 +312,12 @@ void CScene::manageAuto()
                         break;
 
                     case CGame::RIGHT:
-                        bullet.m_nX += pFrame->m_nLen;
+                        bullet.m_nX += frame.m_nLen;
                         bullet.move();
                         break;
 
                     case CGame::DOWN:
-                        bullet.m_nY += pFrame->m_nHei;
+                        bullet.m_nY += frame.m_nHei;
                         bullet.move();
                         break;
 
@@ -329,8 +336,8 @@ void CScene::manageAuto()
                     entry.m_nProto = proto.m_nAutoProto;
 
                     if (!entry.tryAnimation(CObject::AS_DEFAULT)) {
-                        entry.set(EXTRA_ANIMPTR, 0);
-                        entry.set(EXTRA_ANIMSEQ, -1);
+                        entry.set(lgck::EXTRA_ANIMPTR, 0);
+                        entry.set(lgck::EXTRA_ANIMSEQ, -1);
                     }
 
                     entry.map();
@@ -405,7 +412,6 @@ void CScene::write(IFile &file)
 
 const CScene &CScene::operator =(const CScene &s)
 {
-    qDebug("const CScene &CScene::operator =(const CScene &s)");
     forget();
     delete [] m_actors;
     m_size = s.m_size;
@@ -419,4 +425,43 @@ const CScene &CScene::operator =(const CScene &s)
     m_game = s.m_game;
     m_seed = s.m_seed;
     return *this;
+}
+
+bool CScene::isTarget(CActor * actor, int targetGroup, int typeId)
+{
+    switch (targetGroup) {
+    case GROUP_CLASS:
+        return actor->proto().m_nClass == typeId;
+        break;
+    case GROUP_ALL_MONSTERS:
+        return actor->isMonster();
+        break;
+    case GROUP_PROTOTYPE:
+        return actor->m_nProto == typeId;
+        break;
+    case GROUP_ALL:
+        return true;
+    default:
+        return false;
+    }
+}
+
+void CScene::freezeAll(int targetGroup, int typeId)
+{
+    for (int i=1; i < m_size; ++i) {
+        CActor * actor = m_actors[i];
+        if (isTarget(actor, targetGroup, typeId)) {
+            actor->freeze();
+        }
+    }
+}
+
+void CScene::unfreezeAll(int targetGroup, int typeId)
+{
+    for (int i=1; i < m_size; ++i) {
+        CActor * actor = m_actors[i];
+        if (isTarget(actor, targetGroup, typeId)) {
+            actor->freeze();
+        }
+    }
 }

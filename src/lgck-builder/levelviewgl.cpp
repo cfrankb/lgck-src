@@ -30,10 +30,12 @@
 #include "Path.h"
 #include "PathBlock.h"
 #include "qtgui/cheat.h"
-#include "implementers/opengl/gr_qtopengl.h"
-#include "implementers/opengl/im_qtopengl.h"
+#include "implementers/opengl/gr_opengl.h"
+#include "implementers/opengl/im_opengl.h"
 #include "inputs/qt/kt_qt.h"
 #include <QDebug>
+#include "fontmanager.h"
+#include "Font.h"
 
 // doc.qt.io/qt-5/qopenglwidget.html#paintGL
 // http://guillaume.belz.free.fr/doku.php?id=opengl_dans_qt5
@@ -43,33 +45,27 @@
 CLevelViewGL::CLevelViewGL(QWidget* parent, CGame *game):
     QOpenGLWidget(parent)
 {
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
     m_gridSize = 32;
     m_showGrid = true;
     m_gridColor = 0x60c0b0a0;
     m_hasFocus = false;
-    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
     m_game = game;
-    QSurfaceFormat format;
-    format.setDepthBufferSize(24);
-    format.setStencilBufferSize(8);
-    format.setMajorVersion( 2 );
-    format.setMinorVersion( 0 );
-    //format.setSamples(1);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    QSurfaceFormat::setDefaultFormat(format);
+    m_triggerFontSize = 16;
+    m_mouseEvent.x = m_mouseEvent.y = m_mouseEvent.buttons = -1;
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(this, SIGNAL(versionCheck()),
             parent->parent(), SLOT(checkVersion()));
-
 }
 
 CLevelViewGL::~CLevelViewGL()
 {
+    m_timer.stop();
     if (m_game) {
         makeCurrent();
-        m_game->attach((IGraphics*) NULL);
+        m_game->attach(static_cast<IGraphics*>(nullptr));
         delete m_game->graphics();
-        m_game->attach((IImageManager*)NULL);
+        m_game->attach(static_cast<IImageManager*>(nullptr));
         delete m_game->cache();
     }
 }
@@ -80,10 +76,10 @@ void CLevelViewGL::initializeGL()
     initializeOpenGLFunctions();
     if (m_game) {
         CGROpenGL * gr = new CGROpenGL(m_game);
-        m_game->attach((IGraphics*)gr);
+        m_game->attach(static_cast<IGraphics*>(gr));
         m_game->attach(gr->cache());
     } else {
-        qWarning("Game object not set. Implementors not attached");
+        qFatal("Game object not set. Implementors not attached");
     }
     // set refresh rate
     m_timer.setInterval(1000 / TICK_MAX_RATE);
@@ -98,13 +94,24 @@ void CLevelViewGL::initializeGL()
 void CLevelViewGL::paintGL()
 {
     static bool drawing = false;
-    if (!drawing) {     
+    if (!drawing) {
         drawing = true;
         QOpenGLWidget::paintGL();
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         drawBackground();
         drawing = false;
     }
+    if (m_game && isGameMode()) {
+        m_game->triggerMouseEvent(m_mouseEvent.x, m_mouseEvent.y, m_mouseEvent.buttons);
+    }
+    m_mouseEvent.x = m_mouseEvent.y = m_mouseEvent.buttons = -1;
+}
+
+void CLevelViewGL::mouseClick(int x, int y, Qt::MouseButtons buttons)
+{
+    m_mouseEvent.x = x;
+    m_mouseEvent.y = y;
+    m_mouseEvent.buttons = buttons;
 }
 
 void CLevelViewGL::resizeGL(int w, int h)
@@ -147,7 +154,6 @@ void CLevelViewGL::drawSelection()
 void CLevelViewGL::drawCheckers()
 {
     QSize sz = size();
-    //qDebug("w=%d, h=%d", sz.width(), sz.height());
     int gridSize = 32;
     for (int y=0; y * gridSize < sz.height(); ++y) {
         for (int x=0; x * gridSize < sz.width(); ++x) {
@@ -222,17 +228,39 @@ bool CLevelViewGL::isGameMode()
     return gameMode;
 }
 
+void CLevelViewGL::uint2color(uint32_t rgba, Color & out)
+{
+    uint8_t blue = rgba & 0xff;
+    uint8_t green = (rgba & 0xff00) >> 8;
+    uint8_t red = (rgba >> 16) & 0xff;
+    uint8_t alpha = rgba >> 24;
+    out = {
+        red, green, blue, alpha
+    };
+}
+
+void CLevelViewGL::uint2rgba(uint32_t rgba, float &red, float &green, float &blue, float &alpha)
+{
+    Color t;
+    uint2color(rgba, t);
+    blue = t.blue / 255.0f;
+    green = t.green / 255.0f;
+    red = t.red / 255.0f;
+    alpha = t.alpha / 255.0f;
+}
+
 void CLevelViewGL::drawScreen()
 {
-    CLevel & level = * (*m_game)[m_game->m_nCurrLevel];
-    int mx = 0;//horizontalScrollBar()->value();
-    int my = 0;//verticalScrollBar()->value();
+    CLevel & level = m_game->getCurrentLevel();
+    int mx = 0;
+    int my = 0;
     emit scrollStatusResync(mx, my);
 
     QSize sz = size();
     int w = std::min(sz.width(), (int) (MAX_PIXEL - mx));
     int h = std::min(sz.height(), (int)(MAX_PIXEL - my));
 
+    float red, green, blue, alpha;
     // draw background
     if (w > 0 && h > 0) {
         int x1 = 0;
@@ -240,16 +268,15 @@ void CLevelViewGL::drawScreen()
         int y1 = sz.height() - h;
         int y2 = sz.height();
         // Color: #RRGGBB
-        int bkColor = strtol(level.getSetting("bkcolor"), NULL, 16);
-        float blue = (bkColor & 0xff);
-        float green = (bkColor & 0xff00) >> 8;
-        float red = (bkColor >> 16) & 0xff;
-        glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+        uint32_t bkColor = 0xff000000 | strtoul(level.getSetting("bkcolor"), nullptr, 16);
+        uint2rgba(bkColor, red, green, blue, alpha);
+        glColor4f(red, green, blue, alpha);
         glRectf(x1, y1, x2, y2);
     }
 
     CIMOpengl * im = (CIMOpengl *)m_game->cache();
     if (!im) {
+        qWarning("image cache not set.");
         return;
     }
 
@@ -258,32 +285,40 @@ void CLevelViewGL::drawScreen()
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     CLayer & layer = * level.getCurrentLayer();
-    int colorMod = strtol(level.getSetting("colorMod"), NULL, 16);
-    float blue = (colorMod & 0xff);// << 16;
-    float green = (colorMod & 0xff00) >> 8;
-    float red = (colorMod >> 16) & 0xff;
-    glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+    uint32_t colorMod = 0xff000000 | strtoul(level.getSetting("colorMod"), nullptr, 16);
+    uint2rgba(colorMod, red, green, blue, alpha);
+    glColor4f(red, green, blue, alpha);
 
+    CFont *font = m_game->getFonts()->at(0);
+    if (!font) {
+        qWarning("Font[0] is not set.");
+    }
+    font->FaceSize(m_triggerFontSize);
+    Color fontColor;
+    uint2color(m_triggerKeyColor, fontColor);
+    Color shadowColor = { 0, 0, 0, 255};
+
+    // draw sprites
     for (int i=0; i < layer.getSize(); ++i) {
         CLevelEntry & entry = layer[i] ;
-        CFrameSet & filter = * m_game->m_arrFrames [entry.m_nFrameSet];
-        CFrame *pFrame = filter[entry.m_nFrameNo];
+        CFrameSet & filter = m_game->toFrameSet(entry.m_nFrameSet);
+        CFrame & frame = m_game->toFrame(entry);
         int x = entry.m_nX - mx;
         int y = entry.m_nY - my;
-        if (!( (x + pFrame->m_nLen <= 0) ||
+        if (!( (x + frame.m_nLen <= 0) ||
             (x >= w) ||
-            (y + pFrame->m_nHei <= 0) ||
-            (y >= h)) ) {
+            (y + frame.m_nHei <= 0) ||
+            (y >= h)) && (entry.m_nActionMask & m_skillFilters)) {
             unsigned int texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo);
-            if (entry.m_nTriggerKey & CGame::TRIGGER_HIDDEN){
+            if (entry.m_nTriggerKey & TRIGGER_HIDDEN){
                 if (!im->hasInverse( entry.m_nFrameSet )) {
                     im->cacheInverse( entry.m_nFrameSet, & filter);
                 }
                 texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo, true);
             }
             glBindTexture(GL_TEXTURE_2D, texture);
-            int ix = pow2roundup(pFrame->m_nLen);
-            int iy = pow2roundup(pFrame->m_nHei);
+            int ix = pow2roundup(frame.m_nLen);
+            int iy = pow2roundup(frame.m_nHei);
             int x1 = x;
             int x2 = x + ix;
             int y1 = sz.height() - y;
@@ -294,6 +329,14 @@ void CLevelViewGL::drawScreen()
                 glTexCoord2f(1.0f, 1.0f); glVertex3f(x2, y1, 0.0);
                 glTexCoord2f(1.0f, 0.0); glVertex3f(x2, y2, 0.0);
             glEnd();
+            // draw trigger keys
+            if (m_showTriggerKey && entry.m_nTriggerKey & TRIGGER_KEYS) {
+                char key[3] = {0,0,0};
+                sprintf(key, "%.2d", entry.m_nTriggerKey & TRIGGER_KEYS);
+                m_game->graphics()->render(*font, key, x + 2, y + 2, shadowColor);
+                m_game->graphics()->render(*font, key, x, y, fontColor);
+                glColor4f(red, green, blue, alpha);
+            }
         }
     }
     glDisable(GL_TEXTURE_2D);
@@ -306,8 +349,8 @@ void CLevelViewGL::drawScreen()
 void CLevelViewGL::drawGrid()
 {
     QSize sz = size();
-    int mx = 0;//horizontalScrollBar()->value();
-    int my = 0;//verticalScrollBar()->value();
+    int mx = 0;
+    int my = 0;
     emit scrollStatusResync(mx, my);
     int w = std::min(sz.width(), (int) (MAX_PIXEL - mx));
     int h = std::min(sz.height(), (int) (MAX_PIXEL - my));
@@ -315,11 +358,9 @@ void CLevelViewGL::drawGrid()
     glLineWidth(0.5f);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    float gr_red = (m_gridColor & 0xff) / 255.0f;
-    float gr_green = ((m_gridColor >> 8) & 0xff ) / 255.0f;
-    float gr_blue = ((m_gridColor >> 16) & 0xff) / 255.0f;
-    float gr_alpha = (m_gridColor >> 24) ;
-    glColor4f(gr_red, gr_green, gr_blue, gr_alpha / 255.0f);
+    float red, green, blue, alpha;
+    uint2rgba(m_gridColor, red, green, blue, alpha);
+    glColor4f(red, green, blue, alpha);
 
     for (int x = m_gridSize - mx ; x < w; x+= m_gridSize) {
         glBegin(GL_LINES);
@@ -338,9 +379,9 @@ void CLevelViewGL::drawGrid()
 void CLevelViewGL::drawItemRect()
 {
     QSize sz = size();
-    if (m_game && m_game->m_nLevels) {
+    if (m_game && m_game->getSize()) {
         CGame & gf = *m_game;
-        CLevel & level = *(gf[gf.m_nCurrLevel]);
+        CLevel & level = m_game->getCurrentLevel();
         CLayer & layer = * level.getCurrentLayer();
         float red = (rand() & 255) / 255.0f;
         float green = (rand() & 255) / 255.0f;
@@ -350,8 +391,7 @@ void CLevelViewGL::drawItemRect()
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (int i=0; i < layer.getSelectionSize(); ++i) {
             CLevelEntry & entry = layer.getSelection(i);
-            CFrameSet & filter = * gf.m_arrFrames [entry.m_nFrameSet];
-            CFrame * pFrame = filter [entry.m_nFrameNo];
+            CFrame & frame = gf.toFrame(entry);
             int x = entry.m_nX - level.m_mx;
             int y = entry.m_nY - level.m_my;
             if ((x >= 0) &&
@@ -359,9 +399,9 @@ void CLevelViewGL::drawItemRect()
                 (x < sz.width()) &&
                 (y < sz.height())) {
                 int x1 = x;
-                int x2 = x + pFrame->m_nLen;
+                int x2 = x + frame.m_nLen;
                 int y1 = sz.height() - y;
-                int y2 = sz.height() - y -pFrame->m_nHei;
+                int y2 = sz.height() - y -frame.m_nHei;
                 glBegin(GL_LINE_LOOP);
                     glColor3f(red, green, blue);
                     glVertex3f(x1, y2, 0.0);
@@ -387,19 +427,25 @@ void CLevelViewGL::setGridSize(int size)
 
 void CLevelViewGL::setGridColor(const QString & gridColor)
 {
-    m_gridColor = 0x60000000 | strtol(q2c(gridColor), NULL, 16);
+    m_gridColor = 0x60000000 | strtoul(q2c(gridColor), nullptr, 16);
 }
 
-void CLevelViewGL::sceneUpdated()
+void CLevelViewGL::setTriggerKeyColor(const QString & color)
 {
-//    qDebug("IN CLevelView::sceneUpdated()");
-    update();
-  //  qDebug("OUT CLevelView::sceneUpdated()");
+    m_triggerKeyColor = 0xff000000 | strtoul(q2c(color), nullptr, 16);
 }
 
-
-void CLevelViewGL::needRefresh()
+void CLevelViewGL::showTriggerKey(bool state)
 {
-    //qDebug("need refresh");
-    m_refresh = true;
+    m_showTriggerKey = state;
+}
+
+void CLevelViewGL::setTriggerFontSize(int size)
+{
+    m_triggerFontSize = size;
+}
+
+void CLevelViewGL::setSkillFilters(int flags)
+{
+    m_skillFilters = flags;
 }

@@ -40,7 +40,7 @@ if ((proto.fireRate == 0 ) or (ticks % proto.fireRate == 0)) and testJoyState( J
             bullet:moveBy(- bullet:width(), 0)
         elseif aim == UP then
             bullet:moveBy(0, - bullet:height())
-        end if
+        end
         bullet:map();
         bullet:setOwner( sprite );
 

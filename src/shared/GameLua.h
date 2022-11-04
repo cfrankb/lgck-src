@@ -1,6 +1,6 @@
 /*
     LGCK Builder Runtime
-    Copyright (C) 1999, 2017  Francois Blanchette
+    Copyright (C) 1999, 2020  Francois Blanchette
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "../shared/LuaVM.h"
 
 typedef struct  {
     const char *fnName;
@@ -51,10 +52,13 @@ luaFn ( display_remove )
 luaFn ( display_setAlpha )
 luaFn ( display_setColor )
 luaFn ( display_setExpireTime )
+luaFn ( display_setFlagXY )
+luaFn ( display_setFont )
 luaFn ( display_setFontSize )
 luaFn ( display_setImage )
 luaFn ( display_setShadowColor )
 luaFn ( display_setShadowOffset )
+luaFn ( display_setTemplate )
 luaFn ( display_setText )
 luaFn ( display_setType )
 luaFn ( display_setVisible )
@@ -203,6 +207,7 @@ luaFn ( sprite_tryPath )
 luaFn ( sprite_unFreeze )
 luaFn ( sprite_unMap )
 luaFn ( sprite_unmarkAsGoal )
+luaFn ( spriteIdFromUuid )
 luaFn ( ss_animate )
 luaFn ( ss_autoCenter )
 luaFn ( ss_clear )
@@ -237,6 +242,12 @@ luaFn ( var_get )
 luaFn ( var_set )
 luaFn ( warpTo )
 luaFn ( XOR )
+luaFn ( display_setSource )
+luaFn ( countdown_set )
+luaFn ( countdown_cycle )
+luaFn ( countdown_clear )
+luaFn ( countdown_start )
+luaFn ( countdown_stop )
 
 static FUNCTION exports [] = {
     fn ( addToHP )
@@ -265,10 +276,13 @@ static FUNCTION exports [] = {
     fn ( display_setAlpha )
     fn ( display_setColor )
     fn ( display_setExpireTime )
+    fn ( display_setFlagXY )
+    fn ( display_setFont )
     fn ( display_setFontSize )
     fn ( display_setImage )
     fn ( display_setShadowColor )
     fn ( display_setShadowOffset )
+    fn ( display_setTemplate )
     fn ( display_setText )
     fn ( display_setType )
     fn ( display_setVisible )
@@ -417,6 +431,7 @@ static FUNCTION exports [] = {
     fn ( sprite_unFreeze )
     fn ( sprite_unMap )
     fn ( sprite_unmarkAsGoal )
+    fn ( spriteIdFromUuid )
     fn ( ss_animate )
     fn ( ss_autoCenter )
     fn ( ss_clear )
@@ -451,6 +466,12 @@ static FUNCTION exports [] = {
     fn ( var_set )
     fn ( warpTo )
     fn ( XOR )
+    fn ( display_setSource )
+    fn ( countdown_set )
+    fn ( countdown_cycle )
+    fn ( countdown_clear )
+    fn ( countdown_start )
+    fn ( countdown_stop )
     alias ( "activateSprite", sprite_activate )
     alias ( "addDisplayC", display_new )
     alias ( "addElement", element_new )
@@ -524,5 +545,5 @@ static FUNCTION exports [] = {
     alias ( "tryPath", sprite_tryPath )
     alias ( "unFreezeSprite", sprite_unFreeze )
     alias ( "unMapSprite", sprite_unMap )
-    { NULL, 0 }
+    { nullptr, 0 }
 };

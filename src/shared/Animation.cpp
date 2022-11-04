@@ -33,18 +33,18 @@ CAnimation::~CAnimation()
 
 void CAnimation::read(IFile &file)
 {
-    file.read(&m_size, sizeof(INT16));
-    file.read(&m_speed, sizeof(INT16));
-    file.read(&m_options, sizeof(UINT16));
-    file.read(m_imageIds, m_size * sizeof(INT16));
+    file.read(&m_size, sizeof(uint16_t));
+    file.read(&m_speed, sizeof(uint16_t));
+    file.read(&m_options, sizeof(uint16_t));
+    file.read(m_imageIds, m_size * sizeof(uint16_t));
 }
 
 void CAnimation::write(IFile &file)
 {    
-    file.write(&m_size, sizeof(INT16));
-    file.write(&m_speed, sizeof(INT16));
-    file.write(&m_options, sizeof(UINT16));
-    file.write(m_imageIds, m_size * sizeof(INT16));
+    file.write(&m_size, sizeof(uint16_t));
+    file.write(&m_speed, sizeof(uint16_t));
+    file.write(&m_options, sizeof(uint16_t));
+    file.write(m_imageIds, m_size * sizeof(uint16_t));
 }
 
 void CAnimation::removeAt(int i)
@@ -73,7 +73,7 @@ void CAnimation::add (int imageId)
     ++m_size;
 }
 
-INT16 CAnimation::operator [] (int i) const
+int16_t CAnimation::operator [] (int i) const
 {
     return m_imageIds[i];
 }
@@ -93,7 +93,7 @@ int CAnimation::getSpeed() const
     return m_speed;
 }
 
-UINT16 CAnimation::getOptions() const
+uint16_t CAnimation::getOptions() const
 {
     return m_options;
 }
@@ -103,7 +103,7 @@ void CAnimation::setSpeed(int speed)
     m_speed = speed;
 }
 
-void CAnimation::setOptions(UINT16 options)
+void CAnimation::setOptions(uint16_t options)
 {
     m_options = options;
 }

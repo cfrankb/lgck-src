@@ -85,5 +85,6 @@ void CWPreviewDock::setTitleTemplate(const QString &s)
 
 void CWPreviewDock::newDockedLocation(Qt::DockWidgetArea area)
 {
+    Q_UNUSED(area);
     m_widget->update();
 }

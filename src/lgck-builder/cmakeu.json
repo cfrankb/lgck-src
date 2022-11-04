@@ -1,57 +1,77 @@
 {
     "project": "lgck_builder",
-    "cmake_minimum_required": "VERSION 2.6",
-    "include" : ["FindFreetype"],
+    "cmake_minimum_required": "VERSION 3.10",
+    "include" : ["CMakePackageConfigHelpers"],
+    "find_library" : [
+        "SDL_MIXER_LIBRARY NAMES SDL2_mixer HINTS ENV SDLMIXERDIR ENV SDLDIR PATH_SUFFIXES lib REQUIRED"
+    ],
     "find_package" : [
-        "PkgConfig REQUIRED",
-        "Qt5Widgets REQUIRED",
-        "Qt5Core REQUIRED",
-        "Qt5OpenGL REQUIRED",
-        "Qt5Network REQUIRED",
-        "PNG REQUIRED",
-        "OpenGL REQUIRED",
-        "Freetype REQUIRED"
+#        "Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui OpenGL Widgets Network Gamepad",
+        "Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui OpenGL Widgets Network",
+        "SDL2 REQUIRED",
+        "OpenGL REQUIRED"
     ],
     "include_directories": [
-        "${FREETYPE_INCLUDE_DIRS}",
-        "${Qt5Widgets_INCLUDE_DIRS}",
-        "${Qt5Networks_INCLUDE_DIRS}",
-        "${Qt5OpenGL_INCLUDE_DIRS}",
+        # TODO: review this line
+        #"~/Qt/5.15.0/gcc_64/include",
         "${QT_INCLUDES}",
-        "${CMAKE_CURRENT_BINARY_DIR}",
         "../shared",
         "./"
     ],
-    "add_definitions" : ["${QT_DEFINITIONS}", "-DUSE_QFILE=1"],
+    "add_definitions" : [
+        "${QT_DEFINITIONS}",
+        "-DUSE_QFILE=1",
+        "-DLGCK_QT=1",
+        #"-DLGCK_GAMEPAD=1",
+        "-D_GLIBCXX_USE_CXX11_ABI=0"
+    ],
     "set" : { 
-        "CMAKE_CXX_FLAGS" : ["\"${CMAKE_CXX_FLAGS} -std=c++0x -O3 -fPIE\""],
-        "CMAKE_INCLUDE_CURRENT_DIR": ["ON"],
-        "CMAKE_AUTOMOC": ["ON"],
+        "QT_MIN_VERSION" : "5.15.0",
+        "CMAKE_CXX_STANDARD" : "17",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CXX_FLAGS" : "\"${CMAKE_CXX_FLAGS} -std=c++0x -O3 -fPIE\"",
+        "CMAKE_INCLUDE_CURRENT_DIR": "ON",
+        "CMAKE_AUTOMOC": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        #"CMAKE_LIBRARY_PATH" : [
+            # TODO: review this line
+            #"~/Qt/5.15.0/gcc_64/lib/",
+            #"~/Qt/5.15.0/gcc_64/lib/cmake",
+            #"${CMAKE_LIBRARY_PATH}", "/opt/local/lib"
+        #],
         "lgckb_SRCS" : [
             "*.cpp",
             "../shared/*.cpp",
-            "../shared/implementers/*.cpp",
-            "../shared/inputs/*.cpp",
-            "../shared/inputs/qt/*.cpp"
+            "../shared/implementers/opengl/*.cpp",
+            #"../shared/implementers/sdl/*.cpp",
+            "../shared/implementers/sdl/mu_sdl.cpp",
+            "../shared/implementers/sdl/sn_sdl.cpp",
+            "../shared/interfaces/*.cpp",
+            "../shared/inputs/qt/*.cpp",
+            "../shared/qtgui/*.cpp"
         ],
-        "lgckb_ui_files": ["*.ui"],
-        "lgckb_MOC_HEADERS" : ["*.h:Q_OBJECT"],
-        "lgckb_RCS" : ["lgck-builder.qrc"]
+        "lgckb_ui_files": "*.ui",
+        "lgckb_MOC_HEADERS" : "*.h:Q_OBJECT",
+        "lgckb_RCS" : "lgck-builder.qrc"
     },
     "QT5_AUTOMOC" : "${lgckb_SRCS}",
     "QT5_WRAP_UI" : "lgckb_SRCS ${lgckb_ui_files}",
     "QT5_WRAP_CPP" : "lgckb_MOC_OUTFILES ${lgckb_MOC_HEADERS}",
     "QT5_ADD_RESOURCES" : "lgckb_RC_SRCS ${lgckb_RCS}",
-    "qt5_use_modules" : "app Core Gui Widgets OpenGL",
+#    "qt5_use_modules" : "app Core Gui Widgets OpenGL Network Gamepad",
+    "qt5_use_modules" : "app Core Gui Widgets OpenGL Network",
     "add_executable" : "lgck-builder ${lgckb_SRCS} ${lgckb_MOC_OUTFILES} ${lgckb_MOC_HEADERS} ${lgckb_RC_SRCS}",
-    "target_link_libraries" : "lgck-builder Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} z ftgl SDL SDL_mixer lua5.1 png qt5scintilla2",
-    "__elements" : ["project", 
+#    "target_link_libraries" : "lgck-builder Qt5::Gamepad Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL ${SDL2mixer_LIBRARIES} lua5.2",
+    "target_link_libraries" : "lgck-builder Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network Qt5::Gui ${OPENGL_LIBRARIES} z SDL2 ${SDL_MIXER_LIBRARY} lua5.2",
+    "__elements" : [
         "cmake_minimum_required",
+        "project",
         "include",
-        "find_package", 
-        "include_directories", 
-        "add_definitions", 
         "set",
+        "find_package",
+        "find_library",
+        "include_directories",
+        "add_definitions",
         "QT5_WRAP_UI",
         "QT5_ADD_RESOURCES",
         "add_executable",

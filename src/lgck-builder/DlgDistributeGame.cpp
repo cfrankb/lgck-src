@@ -1,3 +1,20 @@
+/*
+    LGCK Builder Runtime
+    Copyright (C) 1999, 2020  Francois Blanchette
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "DlgDistributeGame.h"
 #include <QFileDialog>
 #include "ui_DlgDistributeGame.h"
@@ -52,13 +69,13 @@ CDlgDistributeGame::~CDlgDistributeGame()
 void CDlgDistributeGame::on_btnRuntime_clicked()
 {
 #ifdef Q_OS_WIN32
-    const char fileFilter[] = "Runtime executables (lgck-runtime*.exe)";
+    const QString fileFilter = tr("Runtime executables (lgck-runtime*.exe)");
 #else
-    const char fileFilter[] = "Runtime executables (lgck-runtime*)";
+    const QString fileFilter = tr("Runtime executables (lgck-runtime*)");
 #endif
     QString runtime;
     getRuntime(runtime);
-    runtime = QFileDialog::getOpenFileName(this, tr("Select LGCK Runtime"), runtime, tr(fileFilter));
+    runtime = QFileDialog::getOpenFileName(this, tr("Select LGCK Runtime"), runtime, fileFilter);
     if (!runtime.isEmpty()) {
         ui->eRuntime->setText(runtime);
     }
@@ -66,10 +83,10 @@ void CDlgDistributeGame::on_btnRuntime_clicked()
 
 void CDlgDistributeGame::on_btnSFX_clicked()
 {
-    const char fileFilter[] = "7z SFX modules (*.sfx)";
+    const QString fileFilter = tr("7z SFX modules (*.sfx)");
     QString sfx;
     getSFX(sfx);
-    sfx = QFileDialog::getOpenFileName(this, tr("Select 7z SFX module"), sfx, tr(fileFilter));
+    sfx = QFileDialog::getOpenFileName(this, tr("Select 7z SFX module"), sfx, fileFilter);
     if (!sfx.isEmpty()) {
         ui->eSFX->setText(sfx);
     }

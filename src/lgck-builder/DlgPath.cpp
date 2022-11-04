@@ -55,7 +55,7 @@ CDlgPath::CDlgPath(QWidget *parent) :
     ui(new Ui::CDlgPath)
 {
     ui->setupUi(this);
-    m_path = (void*) new CPath;
+    m_path = new CPath;
 }
 
 CDlgPath::~CDlgPath()
@@ -82,13 +82,10 @@ void CDlgPath::load(void *p)
     CPath *d = (CPath *)m_path;
 
     *d = *s;
-
-    //qDebug("CDlgPath::load() >> path size: %d", d->getSize());
     for (int i=0; i < d->getSize(); ++i) {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIcon(item, (*d)[i]);
         ui->treeWidget->addTopLevelItem(item);
-    //    qDebug(">> item added");
     }
 }
 
@@ -114,7 +111,7 @@ void CDlgPath::on_btnAdd_clicked()
     dlg->load(-1);
 
     if (dlg->exec()) {
-        char aim = -1;
+        uint8_t aim = 0xff;
         dlg->save(aim);
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         updateIcon(item, aim);
@@ -135,12 +132,8 @@ void CDlgPath::on_btnDelete_clicked()
     if (i != -1) {
         QAbstractItemModel * model =  ui->treeWidget->model();
         model->removeRow( index.row() );
-        //path.debug();
         path.removeAt(i);
-        //qDebug("path removeAt(%d)", i);
-        //path.debug();
     }
-
     updateButtons();
 }
 
@@ -180,56 +173,25 @@ void CDlgPath::updateIcon(QTreeWidgetItem *item, int aim)
         i = 4;
     }
 
-    CFileWrap file;
-
-    QIcon icon;
-    if (file.open(q2c(QString(":/images/%1").arg(m_iconNames[i])))) {
-
-        int size = file.getSize();
-        UINT8 *png = new UINT8 [ size ];
-        file.read(png, size);
-        file.close();
-
-        QImage img;
-        if (!img.loadFromData( png, size )) {
-            qDebug("failed to load png\n");
-        }
-
-        QPixmap pm = QPixmap::fromImage(img);
-        icon.addPixmap(pm, QIcon::Normal, QIcon::On);
-
-        delete [] png;
-    } else {
-        qDebug("failed to load resource icon: %s\n", q2c(m_iconNames[i]));
+    QIcon icon = QPixmap(QString(":/images/%1").arg(m_iconNames[i]));
+    if (icon.isNull()) {
+        qWarning("failed to load resource icon: %s\n", q2c(m_iconNames[i]));
     }
-
     item->setIcon(0, icon);
     item->setText(0, m_iconText[i]);
 }
 
 void CDlgPath::on_btnRaw_clicked()
 {
-    QString tmp;
-    QString s;
-    CPath & path = * ((CPath*) m_path);
-
-    for (int i=0; i < path.getSize(); ++i) {
-
-        if (i) {
-            s += " ";
-        }
-
-        tmp.sprintf("%2.2x", path[i]);
-        s += tmp.mid(0,2);
-    }
-
+    CPath & path = *m_path;
+    QString s = path.toHex().c_str();
     bool ok = false;
 
     QString result = QInputDialog::getText(this, QString(""),
             tr("Edit path"), QLineEdit::Normal,
             s, &ok);
 
-    if (ok) {
+   if (ok) {
         CPath tmp;
 
         // remove trailing white spaces
@@ -237,7 +199,7 @@ void CDlgPath::on_btnRaw_clicked()
 
         // decode the string
         for (int k=0; k < result.length(); k +=3) {
-            char aim = strtol(q2c(result.mid(k, 2)), NULL, 16);
+            char aim = strtol(q2c(result.mid(k, 2)), nullptr, 16);
 //            qDebug("%s = %2.2x ", q2c(result.mid(k, 2)), aim);
             if (CPath::isValidAim(aim)) {
                 tmp.add(aim);
@@ -270,14 +232,9 @@ void CDlgPath::on_btnDuplicate_clicked()
     if (i != -1) {
         QAbstractItemModel * model =  ui->treeWidget->model();
         model->insertRow(i);
-//        model->removeRow( index.row() );
-//        path.debug();
         QTreeWidgetItem *item = ui->treeWidget->topLevelItem( i ) ;
         int aim = path[i];
         path.insertAt(i, aim);
         updateIcon(item, path[i]);
-        //path.removeAt(i);
-//        qDebug("path removeAt(%d)", i);
-//        path.debug();
     }
 }

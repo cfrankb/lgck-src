@@ -33,12 +33,12 @@ CStringTable::~CStringTable()
     if (m_strings) {
         delete [] m_strings;
     }
-    m_strings = NULL;
+    m_strings = nullptr;
 }
 
-void CStringTable::read(IFile &file)
+bool CStringTable::read(IFile &file)
 {
-    file.read(&m_size, sizeof(UINT32));
+    file.read(&m_size, sizeof(uint32_t));
     if (m_strings) {
         delete [] m_strings;
     }
@@ -47,14 +47,16 @@ void CStringTable::read(IFile &file)
     for (int i=0; i<m_size; ++i) {
         file >> m_strings[i];
     }
+    return true;
 }
 
-void CStringTable::write(IFile &file)
+bool CStringTable::write(IFile &file)
 {
-    file.write(&m_size, sizeof(UINT32));
+    file.write(&m_size, sizeof(uint32_t));
     for (int i=0; i<m_size; ++i) {
         file << m_strings[i];
     }
+    return true;
 }
 
 const char * CStringTable::operator [] (int i)

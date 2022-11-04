@@ -400,8 +400,8 @@ void MainWindow::reloadSettings()
     settings.beginGroup("FavColors");
     const CWPalette * wpal = m_pixelBox->getFavPalette();
     for (int i=0; i < 256; ++i) {
-
-        QString col = settings.value(QString().sprintf("color_%d", i), "0").toString();
+        const QString name = QString::asprintf("color_%d", i);
+        QString col = settings.value(name, "0").toString();
         colors[i] = col.toUInt(&ok, 16) | 0xff000000;
     }
     settings.endGroup();
@@ -456,14 +456,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
         settings.setValue("showTransparency", m_view->showTransparency());
         settings.setValue("tool", m_view->tool());
         settings.setValue("penSize", m_view->penSize());
-        QString bkColor;
-        settings.setValue("bkColor", bkColor.sprintf("%.6x", m_view->bkColor()));
-        QString gridColor;
-        settings.setValue("gridColor", gridColor.sprintf("%.6x", m_view->gridColor()));
-        QString borderColor;
-        settings.setValue("borderColor", borderColor.sprintf("%.6x", m_view->borderColor()));
-        QString penColor;
-        settings.setValue("penColor", penColor.sprintf("%.6x", m_view->penColor()));
+        const QString bkColor = QString::asprintf("%.6x", m_view->bkColor());
+        settings.setValue("bkColor", bkColor);
+        const QString gridColor = QString::asprintf("%.6x", m_view->gridColor());
+        settings.setValue("gridColor", gridColor);
+        const QString borderColor = QString::asprintf("%.6x", m_view->borderColor());
+        settings.setValue("borderColor", borderColor);
+        const QString penColor = QString::asprintf("%.6x", m_view->penColor());
+        settings.setValue("penColor", penColor);
         settings.setValue("lastOpenFilter", m_lastOpenFilter);
         settings.setValue("alpha", m_view->alpha());
         settings.setValue("lastWidth", m_lastWidth);
@@ -489,7 +489,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
             const CWPalette * wpal = m_pixelBox->getFavPalette();
             const uint* pal = wpal->palette();
             for (int i=0; i < 256; ++i) {
-                settings.setValue(QString().sprintf("color_%d", i), penColor.sprintf("%.6x", pal[i] & 0xffffff));
+                const QString name = QString::asprintf("color_%d", i);
+                const QString value = QString::asprintf("%.6x", pal[i] & 0xffffff);
+                settings.setValue(name, value);
             }
         settings.endGroup();
         settings.beginGroup("UI_Components");
@@ -673,8 +675,7 @@ bool MainWindow::saveAs(char *outFormat)
 
 void MainWindow::warningMessage(const QString message)
 {
-    QMessageBox msgBox(QMessageBox::Warning, m_appName, message, 0, this);
-    msgBox.exec();
+    QMessageBox::warning(this, m_appName, message);
 }
 
 void MainWindow::setDocument(const QString fileName)
@@ -1106,14 +1107,14 @@ void MainWindow::initStatusBar()
     int label0Size = 500;
 
     m_labels = new QLabel* [3];
-    m_labels[0] = new QLabel("", ui->statusBar, 0);
+    m_labels[0] = new QLabel("", ui->statusBar);
     ui->statusBar->addWidget(m_labels[0], label0Size);
 
-    m_labels[2] = new QLabel("", ui->statusBar, 0);
+    m_labels[2] = new QLabel("", ui->statusBar);
     ui->statusBar->addWidget(m_labels[2], 150);
     m_labels[2]->setAlignment(Qt::AlignRight);
 
-    m_labels[1] = new QLabel("", ui->statusBar, 0);
+    m_labels[1] = new QLabel("", ui->statusBar);
     m_labels[1]->setAlignment(Qt::AlignRight);
     ui->statusBar->addWidget(m_labels[1], 640 - label0Size);        
 }
@@ -1540,7 +1541,7 @@ void MainWindow::on_action1600_triggered()
     emit zoomChanged(16);
 }
 
-void MainWindow::updateColorButton(const UINT32 color)
+void MainWindow::updateColorButton(const uint32_t color)
 {
     int red = color & 0xff;
     int green = color >> 8 & 0xff;
@@ -1607,7 +1608,7 @@ void MainWindow::on_actionCut_triggered()
 {
     CFrame *frame = m_doc.getCurrent();
     if (frame){
-        UINT8 *png;
+        uint8_t *png;
         int pngSize;
         frame->toPng(png, pngSize);
 
@@ -1632,7 +1633,7 @@ void MainWindow::on_actionCopy_triggered()
 {    
     CFrame *frame = m_doc.getCurrent();
     if (frame){
-        UINT8 *png;
+        uint8_t *png;
         int pngSize;
         frame->toPng(png, pngSize);
 
@@ -1659,7 +1660,7 @@ void MainWindow::on_actionPaste_triggered()
         w += (8 - (w & 7)) & 7;
         int h = size.height();
         h += (8 - (h & 7)) & 7;
-        img.convertToFormat(QImage::Format_RGB32,Qt::AutoColor);
+        img = img.convertToFormat(QImage::Format_RGB32,Qt::AutoColor);
         CFrame *frame = m_doc.getCurrent();
         if (frame) {
             frame->push();
@@ -1674,7 +1675,7 @@ void MainWindow::on_actionPaste_triggered()
 
         for (int y=0; y < size.height(); ++y) {
             const uchar *bits = img.constScanLine(y);
-            memcpy(& frame->at(0,y), bits, size.width() * sizeof(UINT32));
+            memcpy(& frame->at(0,y), bits, size.width() * sizeof(uint32_t));
         }
 
         frame->abgr2argb();
@@ -1722,7 +1723,7 @@ void MainWindow::on_actionAppend_image_triggered()
         m_lastWidth = dlg->getWidth();
         m_lastHeight = dlg->getHeight();
         set.add(frame);
-        emit frameChanged(m_doc.getCurrent());
+        emit frameChanged(frame);
         m_doc.setDirty(true);
         m_doc.setCurrentIndex(m_doc.getSize()-1);
         updateStatus();

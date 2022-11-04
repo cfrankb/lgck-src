@@ -25,7 +25,6 @@
 #include <string.h>
 #include <libgen.h>
 #include <ctype.h>
-#include "FileWrap.h"
 #include "Folders.h"
 #include "ss_version.h"
 #include "GameFile.h"
@@ -41,6 +40,16 @@
 #include "GameEvents.h"
 #include "../shared/helper.h"
 #include "displayconfig.h"
+#include "fontmanager.h"
+#include "LuaVM.h"
+
+#ifdef USE_QFILE
+    #define FILEWRAP QFileWrap
+    #include "../shared/qtgui/qfilewrap.h"
+#else
+    #define FILEWRAP CFileWrap
+    #include "../shared/FileWrap.h"
+#endif
 
 CSettings::SETTING CGameFile::m_gameDefaults[] =
 {
@@ -76,6 +85,7 @@ CSettings::SETTING CGameFile::m_gameDefaults[] =
     { "hp", "32", 32},
     { "lives_max", "99", 99},
     { "hp_max", "255", 255},
+    { "skill_filter", "15", SKILL_FLAG_ALL},
     { "", "", 0}
 };
 
@@ -108,9 +118,10 @@ CGameFile::CGameFile()
     m_strings = new CStringTable;
     m_events = new CGameEvents;
     m_settings = new CSettings;
-    m_imageManager = NULL;
+    m_imageManager = nullptr;
     m_displayConfig = new CDisplayConfig;
     m_displayConfig->reset();
+    m_fontManager = new CFontManager;
     // ImageManager must be created before Init();
     init();
     parseClassList();
@@ -123,11 +134,11 @@ CGameFile::~CGameFile()
     delete m_events;
     delete m_settings;
     delete m_displayConfig;
+    delete m_fontManager;
 }
 
 void CGameFile::parseClassList()
 {
-    //qDebug("parseClassList()");
     typedef struct
     {
         int id;
@@ -183,7 +194,7 @@ void CGameFile::init()
 
     m_fileName = "";
     m_nLevels = 0;
-    m_arrLevels = NULL;
+    m_arrLevels = nullptr;
     m_nCurrLevel = 0;
 
     // Add the default frames set
@@ -198,7 +209,7 @@ void CGameFile::init()
     }
 
     // Add the default Proto-object
-    m_arrProto.add ( CProto ("(blank)"));
+    m_arrProto.add(CProto("(blank)"));
 
     // reset default settings
     m_settings->copySettings( m_gameDefaults );
@@ -215,13 +226,11 @@ void CGameFile::initDefaultSounds()
 
     for (int i=0; !m_defaultSounds[i].name.empty(); ++i) {
         if (!m_defaultSounds[i].src.empty()) {
-            //QString fileName;
             int len = m_defaultSounds[i].src.size() + 16;
             char tmp[len];
             sprintf(tmp, ":/res/%s", m_defaultSounds[i].src.c_str());
-            //fileName = tmp;
 
-            CFileWrap file;
+            FILEWRAP file;
             if (file.open(tmp)) {
                 char *data = new char[file.getSize()];
                 int size = file.getSize();
@@ -229,11 +238,10 @@ void CGameFile::initDefaultSounds()
                 file.close();
                 m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), data, size));
             } else {
-                //qDebug("can't find snd: `%s`\n", q2c(fileName));
-                m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), NULL, 0));
+                m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), nullptr, 0));
             }
         } else {
-            m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), NULL, 0));
+            m_arrSounds.add(new CSnd(m_defaultSounds[i].name.c_str(), nullptr, 0));
         }
     }
 }
@@ -245,11 +253,11 @@ void CGameFile::forget ()
     m_arrFrames.forget();
     m_arrProto.forget();
 
-    if (m_nLevels) {
-        while (m_nLevels) {
-            delete m_arrLevels[0];
-            removeLevel (0);
+    if (m_arrLevels) {
+        for (int i = 0; i < m_nLevels; ++i) {
+            delete m_arrLevels[i];
         }
+        m_nLevels = 0;
         delete [] m_arrLevels;
     }
 
@@ -335,7 +343,7 @@ void CGameFile::addLevel(CLevel *level)
 
 void CGameFile::insertLevel (int n, CLevel *level)
 {
-    addLevel (NULL);
+    addLevel (nullptr);
 
     for (int i=m_nLevels-1; i > n ; --i) {
         m_arrLevels [i] = m_arrLevels [i-1];
@@ -354,13 +362,13 @@ CLevel * CGameFile::getLevel(int n)
     return m_arrLevels[n];
 }
 
-int CGameFile::whoIs(CLevel & level, int x, int y)
+int CGameFile::whoIs(CLevel & level, int x, int y, int skillFilters)
 {
     int nTarget = -1;
 
     CLayer *layer = level.getCurrentLayer();
     if (!layer) {
-        qDebug("layer is null\n");
+        CLuaVM::debugv("layer is null\n");
     } else {
         for (int n=0; n < layer->getSize(); ++n) {
             CLevelEntry &entry = (*layer)[n];
@@ -368,7 +376,8 @@ int CGameFile::whoIs(CLevel & level, int x, int y)
             CFrame * pFrame = frameSet[entry.m_nFrameNo];
             if ((entry.m_nX<= x) && (entry.m_nY<= y) &&
                 (entry.m_nX+ pFrame->m_nLen) > x &&
-                (entry.m_nY+ pFrame->m_nHei) > y )
+                (entry.m_nY+ pFrame->m_nHei) > y &&
+                (entry.m_nActionMask & skillFilters))
                 nTarget = n;
         }
     }
@@ -418,13 +427,31 @@ void CGameFile::killProto(int nProto)
 /////////////////////////////////////////////////////////////////////////////
 // file i/o
 
+int CGameFile::addFrameSet(CFrameSet *pFrameSet)
+{
+    return m_arrFrames.add(pFrameSet);
+}
+
 bool CGameFile::read(const char *filepath)
 {
-    qDebug("reading ...\n");
+    CLuaVM::debugv("reading ...\n");
+    FILEWRAP gameFile;
+    if (!gameFile.open(filepath ? filepath : m_fileName.c_str(), "rb")) {
+        CLuaVM::debugv("Failed to read: %s", filepath);
+        CLuaVM::error("Read gamefile failed");
+        return false;
+    }
+
+    return read(gameFile);
+}
+
+bool CGameFile::read(IFile & file)
+{
     CFolders fs;
-    if (fs.open(filepath ? filepath:m_fileName.c_str(), false)) {
+
+    if (fs.open(&file, false)) {
         forget();
-        CFileWrap & file = fs.getFile();
+        IFile & file = fs.getFile();
 
         // version.dat
 
@@ -437,8 +464,9 @@ bool CGameFile::read(const char *filepath)
             file.read(&version, sizeof(VERSION));
         }
 
-        if (version.id > ((unsigned)SS_LGCK_VERSION)) {
-            qDebug("Unsupported version of LGCK: 0x%.8x\n", version.id);            
+        uint32_t engineVersion = getEngineVersion();
+        if (version.id > engineVersion) {
+            CLuaVM::debugv("Unsupported version of LGCK: 0x%.8x\n", version.id);
             const char msg[] = "Unsupported version of LGCK: 0x%.8x\nYou'll need to upgrade to use this file!";
             int len = strlen(msg) + 16;
             char tmp[len];
@@ -446,7 +474,7 @@ bool CGameFile::read(const char *filepath)
             m_lastError = tmp;
             return false;
         } else {
-            qDebug("Version: 0x%.8x\n", version.id);
+            CLuaVM::debugv("Version: 0x%.8x\n", version.id);
         }
 
         if (!version.game_uid) {
@@ -457,8 +485,8 @@ bool CGameFile::read(const char *filepath)
 
         CFolder *obl = fs["obldata"];
         if (!obl) {
-            qDebug("missing `obldata` folder\n");
-            m_lastError = "damaged database:\nmissing `obldata` folder";
+            CLuaVM::debugv("missing `obldata` folder\n");
+            m_lastError = "damaged database: missing `obldata` folder";
             return false;
         }
 
@@ -472,13 +500,13 @@ bool CGameFile::read(const char *filepath)
                 m_lastError = "failed to read FrameSet";
                 return false;
             }
-            m_arrFrames.add(pFrameSet);
+            addFrameSet(pFrameSet);
         }
 
         // Proto
         CFolder::CFileEntry * proto = fs.checkOut("proto.dat");
         if (!proto) {
-            qDebug("missing `./proto.dat`\n");
+            CLuaVM::debugv("missing `./proto.dat`\n");
             m_lastError = "damaged database:\nmissing `./proto.dat`";
             return false;
         }
@@ -491,7 +519,7 @@ bool CGameFile::read(const char *filepath)
         // scripts
         CFolder *levels = fs["scripts"];
         if (!levels) {
-            qDebug("missing `scripts` folder\n");
+            CLuaVM::debugv("missing `scripts` folder\n");
             m_lastError = "damaged database:\nmissing `scripts` folder";
             return false;
         }
@@ -509,7 +537,7 @@ bool CGameFile::read(const char *filepath)
         // sounds
         CFolder *sounds = fs["sounds"];
         if (!sounds) {
-            qDebug("missing `sounds` folder\n");
+            CLuaVM::debugv("missing `sounds` folder\n");
             m_lastError = "damaged database:\nmissing `sounds` folder";
             return false;
         }
@@ -523,7 +551,6 @@ bool CGameFile::read(const char *filepath)
                 char *data = new char [  entry->getSize() ];
                 file.read( data, entry->getSize());
                 CSnd * snd = new CSnd(entry->getName(), data, entry->getSize());
-             //   qDebug("Sound:%s", entry->getName());
                 m_arrSounds.add(snd);
             }
         }
@@ -532,7 +559,7 @@ bool CGameFile::read(const char *filepath)
         m_settings->copySettings(m_gameDefaults);
         CFolder::CFileEntry * lgck_cfg = fs.checkOut("lgck.cfg");
         if (!lgck_cfg) {
-            qDebug("missing `./lgck.cfg`\n");
+            CLuaVM::debugv("missing `./lgck.cfg`\n");
             m_lastError = "missing `./lgck.cfg`";
             return false;
         }
@@ -552,7 +579,7 @@ bool CGameFile::read(const char *filepath)
         } else {
             // clear the event array to prevent spill over
             m_events->forget();
-            qDebug("no game events defined\n");
+            CLuaVM::debugv("no game events defined\n");
         }
 
         // strings
@@ -563,7 +590,7 @@ bool CGameFile::read(const char *filepath)
         } else {
             // clear the string array to prevent spill over
             m_strings->forget();
-            qDebug("no strings defined\n");
+            CLuaVM::debugv("no strings defined\n");
         }
 
         // paths
@@ -574,7 +601,7 @@ bool CGameFile::read(const char *filepath)
         } else {
             // clear the string array to prevent spill over
             m_paths->forget();
-            qDebug("no paths defined\n");
+            CLuaVM::debugv("no paths defined\n");
         }
 
         // displayconf
@@ -583,16 +610,27 @@ bool CGameFile::read(const char *filepath)
             file.seek(displayConf->getOffset());
             m_displayConfig->read(file);
         } else {
-            qDebug("Warning: missing `displayConf`. Using defaults.\n");
+            CLuaVM::debugv("Warning: missing `displayConf`. Using defaults.\n");
             m_displayConfig->reset();
         }
 
-        qDebug("read done ;) \n");
+        // fonts
+        CFolder::CFileEntry * fonts = fs.checkOut("fonts");
+        if (fonts) {
+            file.seek(fonts->getOffset());
+            m_fontManager->read(file);
+        } else {
+            CLuaVM::debugv("Warning: missing `fonts`. Using defaults.\n");
+            m_fontManager->reset();
+        }
+
+      //  CLuaVM::debugv("FS[0] %s", m_arrFrames[0]->tag("UUID").c_str());
+        CLuaVM::debugv("read done ;) \n");
         return true;
     }
 
     const char *msg = "can't open `%s`";
-    qDebug(msg, m_fileName.c_str());
+    CLuaVM::debugv(msg, m_fileName.c_str());
     char tmp[strlen(msg) + m_fileName.length() + 1];
     sprintf(tmp, msg, m_fileName.c_str());
     m_lastError = tmp;//QString("can't open `%1`").arg(m_fileName);
@@ -602,19 +640,25 @@ bool CGameFile::read(const char *filepath)
 bool CGameFile::write(const char *filepath)
 {
     //qDebug("Writing to `%s`\n", q2c(m_fileName));
+    FILEWRAP gameFile;
+    if (!gameFile.open(filepath ? filepath:m_fileName.c_str(), "rb+")){
+        CLuaVM::debugv("Failed to write: %s", filepath);
+        CLuaVM::error("Write gamefile failed");
+        return false;
+    }
+    return write(gameFile);
+}
+
+bool CGameFile::write(IFile & file)
+{
     CFolders fs;
-    if (fs.open(filepath ? filepath: m_fileName.c_str(), true)) {
-        CFileWrap & file = fs.getFile();
+    if (fs.open(&file, true)) {
+        IFile & file = fs.getFile();
         CFolder & root = fs.addFolder("");
         int aSize, bSize;
 
         // proto.dat
-        bSize = fs.getSize();
-        file.seek(bSize);
-        m_arrProto.write(file);
-        aSize = file.getSize();
-        root.addFile("proto.dat", bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, m_arrProto, root, "proto.dat");
 
         // lgck.cfg
         std::string t;
@@ -625,33 +669,18 @@ bool CGameFile::write(const char *filepath)
         fs += t.length();
 
         // events
-        bSize = fs.getSize();
-        file.seek(fs.getSize());
-        m_events->write(file);
-        aSize = file.getSize();
-        root.addFile("events",  bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_events, root, "events");
 
         // strings
-        bSize = fs.getSize();
-        file.seek(fs.getSize());
-        m_strings->write(file);
-        aSize = file.getSize();
-        root.addFile("strings",  bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_strings, root, "strings");
 
         // paths
-        bSize = fs.getSize();
-        file.seek(fs.getSize());
-        m_paths->write(file);
-        aSize = file.getSize();
-        root.addFile("paths",  bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_paths, root, "paths");
 
         // version.dat
         VERSION version;
         memset(&version, 0, sizeof(VERSION));
-        version.id = SS_LGCK_VERSION;
+        version.id = getEngineVersion();
         version.game_uid = ::rand();
 
         bSize = fs.getSize();
@@ -663,53 +692,34 @@ bool CGameFile::write(const char *filepath)
 
         CFolder & snd = fs.addFolder("sounds");
         for (int i=0; i < m_arrSounds.getSize(); ++i){
-            int bSize = fs.getSize();
-            file.seek(bSize);
-            if (m_arrSounds[i]->getSize()) {
-                file.write( m_arrSounds[i]->getData(), m_arrSounds[i]->getSize());
-            }
-            int aSize = file.getSize();
-            snd.addFile(m_arrSounds[i]->getName(), bSize, aSize - bSize);
-            fs += (aSize - bSize);
+            CSnd * noise = m_arrSounds[i];
+            fs.writeFile(file, *noise, snd, noise->getName());
         }
 
         CFolder & obl = fs.addFolder("obldata");
         for (int i=0; i < m_arrFrames.getSize(); ++i) {
             CFrameSet * filter = m_arrFrames[i];
-            int bSize = fs.getSize();
-            file.seek(bSize);
-            filter->write(file);
-            int aSize = file.getSize();
-            obl.addFile(filter->getName(), bSize, aSize - bSize);
-            fs += (aSize - bSize);
+            fs.writeFile(file, *filter, obl, filter->getName());
         }
 
         CFolder & levels = fs.addFolder("scripts");
         for (int i = 0; i < getSize(); ++i) {
-            int bSize = fs.getSize();
-            file.seek(bSize);
-            m_arrLevels[i]->write(file);
-            int aSize = file.getSize();
-
             char levelName[16];
-            sprintf(levelName, "level%d", i+1);
-            //QString levelName = QString().arg(i + 1);
-            levels.addFile(levelName, bSize, aSize - bSize);
-            fs += (aSize - bSize);
+            sprintf(levelName, "level%d", i + 1);
+            fs.writeFile(file, *(m_arrLevels[i]), levels, levelName);
         }
 
         // displayconf
-        bSize = fs.getSize();
-        file.seek(bSize);
-        m_displayConfig->write(file);
-        aSize = file.getSize();
-        root.addFile("displayConf.dat", bSize, aSize - bSize);
-        fs += (aSize - bSize);
+        fs.writeFile(file, *m_displayConfig, root, "displayConf.dat");
+
+        // fonts
+        fs.writeFile(file, *m_fontManager, root, "fonts");
 
         fs.writeFileIndex ( );
         fs.writeFolderIndex( );
         fs.writeHeader( );
-//        qDebug("writing done\n");
+
+//      qDebug("writing done\n");
         return true;
     }
 
@@ -718,7 +728,7 @@ bool CGameFile::write(const char *filepath)
     return false;
 }
 
-unsigned int CGameFile::getVersion()
+uint32_t CGameFile::getEngineVersion()
 {
     return SS_LGCK_VERSION;
 }
@@ -758,16 +768,10 @@ CONST_DATA * CGameFile::getSpriteList()
     CONST_DATA * data = new CONST_DATA[m_arrProto.getSize()+1];
     for (int n = 0; n < m_arrProto.getSize(); ++n) {
         const CProto & proto = m_arrProto[n];
-        char name[strlen(proto.m_szName)+1];
-        strcpy(name, proto.m_szName);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
+        std::string name = proto.m_szName;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
         data[n].name = proto.m_szName;
-        data[n].value = "SPRITE_" + std::string(name);
+        data[n].value = "SPRITE_" + name;
     }
     return data;
 }
@@ -785,16 +789,10 @@ CONST_DATA * CGameFile::getClassList()
     for (int n = 0, i =0; n < CGameFile::MAX_CLASSES; ++n) {
         if (!m_className[n].empty()) {
             const char *r = m_className[n].c_str();
-            char name[strlen(r)+1];
-            strcpy(name, r);
-            toUpper(name);
-            for (unsigned int i = 0; i < strlen(name); ++i) {
-                if (!isalnum(name[i])) {
-                    name[i] = '_';
-                }
-            }
+            std::string name = r;
+            transform(name.begin(), name.end(), name.begin(), upperClean);
             data[i].name = r;
-            data[i].value = "CLASS_" + std::string(name);
+            data[i].value = "CLASS_" + name;
             ++i;
         }
     }
@@ -806,16 +804,10 @@ CONST_DATA * CGameFile::getImageList()
     CONST_DATA * data = new CONST_DATA[m_arrFrames.getSize()+1];
     for (int n=0; n < m_arrFrames.getSize(); ++n) {
         const char *r = m_arrFrames[n]->getName();
-        char name[strlen(r)+1];
-        strcpy(name, r);
-        toUpper(name);
-        for (unsigned int i = 0; i < strlen(name); ++i) {
-            if (!isalnum(name[i])) {
-                name[i] = '_';
-            }
-        }
+        std::string name = r;
+        transform(name.begin(), name.end(), name.begin(), upperClean);
         data[n].name = r;
-        data[n].value = "IMAGES_" + std::string(name);
+        data[n].value = "IMAGES_" + name;
     }
     return data;
 }
@@ -839,7 +831,18 @@ int CGameFile::getLevelByUUID(const char *uuid)
             return i;
         }
     }
-    return -1;
+    return INVALID;
+}
+
+int CGameFile::getLevelByTitle(const char *title)
+{
+    for (int i=0; i < m_nLevels; ++i) {
+        CLevel *level = m_arrLevels[i];
+        if (std::string(level->getSetting("title")) == title) {
+            return i;
+        }
+    }
+    return INVALID;
 }
 
 CDisplayConfig * CGameFile::getDisplayConfig()
@@ -848,7 +851,7 @@ CDisplayConfig * CGameFile::getDisplayConfig()
 }
 
 int *CGameFile::countFrameSetUses()
-{;
+{
     int count = m_arrFrames.getSize();
     int * countFrameSetUses = new int[count];
     memset(countFrameSetUses, 0, sizeof(int)*count);
@@ -858,4 +861,54 @@ int *CGameFile::countFrameSetUses()
         ++countFrameSetUses[proto.m_nFrameSet];
     }
     return countFrameSetUses;
+}
+
+CFontManager * CGameFile::getFonts()
+{
+    return m_fontManager;
+}
+
+CFrame & CGameFile::toFrame(int frameSet, int frameNo)
+{
+    return *(m_arrFrames.getFrame(frameSet, frameNo));
+}
+
+CFrame & CGameFile::toFrame(CLevelEntry & entry)
+{
+    return *(m_arrFrames.getFrame(entry));
+}
+
+CFrame & CGameFile::toFrame(CActor & actor)
+{
+    return *(m_arrFrames.getFrame(* dynamic_cast<CLevelEntry*>(&actor)));
+}
+
+CFrame & CGameFile::toFrame(CProto & proto)
+{
+    return *(m_arrFrames.getFrame(proto.m_nFrameSet, proto.m_nFrameNo));
+}
+
+CFrameSet & CGameFile::toFrameSet(int frameSet)
+{
+    return *(m_arrFrames[frameSet]);
+}
+
+CFrameArray & CGameFile::frames()
+{
+    return m_arrFrames;
+}
+
+CLevel & CGameFile::getLevelObject(int i)
+{
+    return * m_arrLevels[i];
+}
+
+CLevel & CGameFile::getCurrentLevel()
+{
+    return getLevelObject(m_nCurrLevel);
+}
+
+CProto & CGameFile::toProto(int protoId)
+{
+    return m_arrProto[protoId];
 }
