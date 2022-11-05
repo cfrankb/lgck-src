@@ -24,10 +24,6 @@ dependancies are met. This is explained in BUILD.txt
    http://www.microsoft.com/en-us/download/confirmation.aspx?id=8109
 
 
-## There is also an appImage binary compatible with most linux distribution available.
-
-   https://sourceforge.net/projects/lgck/files/
-
 Each lgck version should have at least one of each. Maybe more in some
 cases. If one of the package is missing for a given version, please look at
 the previous version where it can be found.
