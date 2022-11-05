@@ -12,18 +12,17 @@ dependancies are met. This is explained in BUILD.txt
    https://github.com/cfrankb/lgck-data/
    https://sourceforge.net/projects/lgck/files/Resources/
 
-## The windows installer for users that want to run it on windows (or wine. 
-   works very well under wine too) (lgck-setup.exe)
+## The windows installer 
+
+   for users that want to run it on windows (or wine, 
+   works very well under wine too)
 
    https://sourceforge.net/projects/lgck/files/
 
    Required DirectX Runtime June 2010
+   
    http://www.microsoft.com/en-us/download/confirmation.aspx?id=8109
 
-   This the best way to test LGCK for the first time even on Linux. Granted
-   that applications running under wine are slower than native linux applications
-   you can still do an evaluation and then proceed to download the source and 
-   compile it.
 
 ## There is also an appImage binary compatible with most linux distribution available.
 
