@@ -19,7 +19,7 @@
 #ifndef X__DOTARRAY__
 #define X__DOTARRAY__
 
-#include "../shared/stdafx.h"
+#include <stdint.h>
 
 class Dot {
 

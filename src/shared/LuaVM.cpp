@@ -22,7 +22,6 @@
 #include <string>
 #include <stdio.h>
 #include "LuaVM.h"
-#include "FileWrap.h"
 
 std::unordered_map<int, CLuaVM::CallbackFct> CLuaVM::m_callback;
 

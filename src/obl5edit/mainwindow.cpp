@@ -46,6 +46,7 @@
 #include "DlgAlpha.h"
 #include "../shared/Frame.h"
 #include "../shared/ss_version.h"
+#include "../shared/FileWrap.h"
 
 //http://stackoverflow.com/questions/3542718/installing-opengl-for-qt
 char MainWindow::m_appName[] = "Object Block Editor";

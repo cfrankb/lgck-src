@@ -19,6 +19,7 @@
 #include <QFile>
 #include "OBL5File.h"
 #include "../shared/Frame.h"
+#include "../shared/FileWrap.h"
 
 //#define q2c(__qstring__) (const char*) __qstring__.toAscii().constData()
 #define q2c(__qstring__) (const char*) __qstring__.toLatin1().data()

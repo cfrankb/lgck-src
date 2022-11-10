@@ -22,7 +22,6 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_2_0>
 #include <QTimer>
-#include "stdafx.h"
 #include "DotArray.h"
 
 class CFrame;

@@ -17,7 +17,6 @@
 */
 #include "DlgAlpha.h"
 #include "ui_DlgAlpha.h"
-#include "../shared/stdafx.h"
 #include "../shared/FileWrap.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"

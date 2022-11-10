@@ -30,10 +30,7 @@
 #include "DotArray.h"
 #include "CRC.h"
 #include "IFile.h"
-#include "FileWrap.h"
 #include "helper.h"
-//#include "LuaVM.h"
-#include "../shared/stdafx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFrame

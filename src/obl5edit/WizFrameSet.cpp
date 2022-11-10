@@ -15,7 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "../shared/stdafx.h"
 #include "WizFrameSet.h"
 #include "ui_WizFrameSet.h"
 #include "../shared/FrameSet.h"

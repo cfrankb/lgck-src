@@ -19,7 +19,6 @@
 #ifndef CPREVIEWWIDGET_H
 #define CPREVIEWWIDGET_H
 
-#include "stdafx.h"
 #include "Frame.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_2_0>

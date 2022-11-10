@@ -17,7 +17,6 @@
 */
 
 #include "framewidget.h"
-#include "stdafx.h"
 #include "Frame.h"
 #include "Tools.h"
 #include <QDebug>

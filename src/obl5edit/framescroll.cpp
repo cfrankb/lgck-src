@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "OBL5File.h"
 #include "Frame.h"
 #include "framescroll.h"
 #include "framewidget.h"

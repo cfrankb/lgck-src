@@ -24,7 +24,6 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include "WFrameSet.h"
-#include "../shared/stdafx.h"
 #include "../shared/FrameSet.h"
 #include "../shared/Frame.h"
 #include "DlgGoto.h"

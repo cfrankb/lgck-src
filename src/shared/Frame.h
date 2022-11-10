@@ -28,7 +28,7 @@ class CSS3Map;
 class CUndo;
 class IFile;
 
-#include "../shared/stdafx.h"
+#include <stdint.h>
 
 // Frame.h : header file
 //

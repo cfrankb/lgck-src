@@ -17,7 +17,6 @@
 */
 #include "stdafx.h"
 #include "PngMagic.h"
-#include "FileWrap.h"
 #include "Frame.h"
 #include "FrameSet.h"
 #include <zlib.h>
@@ -26,6 +25,7 @@
 #include <cstdio>
 #include <cmath>
 #include "CRC.h"
+#include "IFile.h"
 
 /* These describe the color_type field in png_info. */
 /* color type masks */
@@ -64,11 +64,9 @@ uint8_t CPngMagic::PaethPredictor(uint8_t a, uint8_t b, uint8_t c)
 
 bool CPngMagic::parsePNG(CFrameSet &set, IFile &file)
 {
-//    int size = 0;
     CCRC crc;
     int pos = 8;
     int fileSize = file.getSize();
-    //printf("fileSize: %d\n", fileSize);
 
     file.seek( 8 );
     int chunkSize;

@@ -18,7 +18,6 @@
 
 #include "DlgAbout.h"
 #include "ui_DlgAbout.h"
-#include "../shared/stdafx.h"
 #include <QDesktopServices>
 #include <QUrl>
 #include "../shared/FileWrap.h"

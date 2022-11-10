@@ -17,7 +17,6 @@
 */
 
 #include "WPalette.h"
-#include "../shared/stdafx.h"
 #include "../shared/Frame.h"
 #include <QMouseEvent>
 #include <QPixmap>

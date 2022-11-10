@@ -19,7 +19,6 @@
 #include "PixelBoxDock.h"
 #include "ui_PixelBoxDock.h"
 #include <QColorDialog>
-#include "../shared/stdafx.h"
 #include "../shared/Frame.h"
 
 

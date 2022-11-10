@@ -18,10 +18,8 @@
 
 #include "DlgGoto.h"
 #include "ui_DlgGoto.h"
-#include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include <QTreeWidgetItem>
-//#define q2c(__qstring__) (const char*) __qstring__.toAscii().constData()
 
 CDlgGoto::CDlgGoto(QWidget *parent) :
     QDialog(parent),
