@@ -27,8 +27,8 @@
 #include <zlib.h>
 #include "Layer.h"
 #include "helper.h"
-#include "../shared/FileWrap.h"
 #include "LuaVM.h"
+#include "IFile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CLevel

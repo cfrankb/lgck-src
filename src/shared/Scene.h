@@ -21,7 +21,6 @@
 
 #include "Actor.h"
 #include "ISurface.h"
-#include "../shared/stdafx.h"
 
 class CLayer;
 class CGame;

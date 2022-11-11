@@ -17,7 +17,6 @@
 */
 #include "displayconfig.h"
 #include <string.h>
-#include "stdafx.h"
 #include "Display.h"
 #include "IFile.h"
 #include "LuaVM.h"

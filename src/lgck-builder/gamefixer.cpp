@@ -17,7 +17,6 @@
 */
 #include "gamefixer.h"
 #include "Game.h"
-#include "FileWrap.h"
 #include "vlamits3.h"
 #include "Level.h"
 #include "Layer.h"

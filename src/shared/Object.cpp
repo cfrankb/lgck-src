@@ -16,9 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include "Object.h"
-#include "ProtoArray.h"
 #include "Path.h"
 #include <zlib.h>
 #include <cstring>
@@ -334,9 +332,11 @@ void CObject::writePaths(IFile &file)
 
 void CObject::debug()
 {
+    /*
     CObject & obj = *this;
     for (int j=0; j < obj.getPathCount(); ++j) {
         CPath & path = obj.getPath(j);
         qDebug("Path %d %s [size: %d] %s", j, obj.getPathName(j), path.getSize(), path.toHex().c_str());
     }
+    */
 }

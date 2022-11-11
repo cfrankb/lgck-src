@@ -18,7 +18,6 @@
 
 #include "DlgLayer.h"
 #include "ui_DlgLayer.h"
-#include "stdafx.h"
 #include "../shared/Layer.h"
 
 QString CDlgLayer::m_ratios [] =

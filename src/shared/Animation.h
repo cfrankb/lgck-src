@@ -20,8 +20,7 @@
 #define ANIMATION_H
 
 class IFile;
-#include "stdafx.h"
-
+#include <stdint.h>
 class CAnimation
 {
 public:

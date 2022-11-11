@@ -18,9 +18,7 @@
 
 #include "DlgPathDir.h"
 #include "ui_DlgPathDir.h"
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
-#include "../shared/FileWrap.h"
 #include "../shared/qtgui/cheat.h"
 
 QString CDlgPathDir::m_iconNames[] = {

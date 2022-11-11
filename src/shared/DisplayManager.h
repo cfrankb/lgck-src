@@ -20,7 +20,6 @@
 
 #include "../shared/interfaces/IDisplayManager.h"
 #include "Display.h"
-#include "Color.h"
 
 class CGame;
 class CIMSfml;

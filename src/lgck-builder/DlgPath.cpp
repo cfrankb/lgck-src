@@ -20,10 +20,8 @@
 #include "ui_DlgPath.h"
 #include "DlgPathDir.h"
 #include <QInputDialog>
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/Path.h"
-#include "../shared/FileWrap.h"
 #include "../shared/qtgui/cheat.h"
 
 QString CDlgPath::m_iconNames[] = {

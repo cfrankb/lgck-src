@@ -44,7 +44,6 @@ class QSettings;
 #include <QElapsedTimer>
 #include <QMainWindow>
 #include <QGLFunctions>
-#include "../shared/stdafx.h"
 #include "../shared/Game.h"
 
 namespace Ui

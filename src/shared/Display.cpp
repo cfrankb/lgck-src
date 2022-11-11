@@ -15,13 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "FileWrap.h"
 #include "Display.h"
 #include <cstdlib>
 #include <cstring>
-#include "stdafx.h"
-#include "FileWrap.h"
 #include "LuaVM.h"
+#include "../shared/IFile.h"
 
 /////////////////////////////////////////////////////////////////////
 // CDisplay

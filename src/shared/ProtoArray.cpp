@@ -19,18 +19,14 @@
 // ProtoArray.cpp : implementation file
 //
 
-#include "stdafx.h"
 #include <cstring>
 #include <string>
 #include "ProtoArray.h"
 #include "LevelEntry.h"
 #include <zlib.h>
-#include "vlamits3.h"
-#include "Game.h"
 #include "../shared/IFile.h"
-#include "../shared/FileWrap.h"
 #include "../shared/ProtoIndex.h"
-#include "helper.h"
+#include "LuaVM.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CProtoArray

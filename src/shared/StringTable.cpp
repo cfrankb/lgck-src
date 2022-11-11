@@ -16,10 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include "StringTable.h"
 #include "IFile.h"
-#include "LevelEntry.h"
 
 CStringTable::CStringTable()
 {

@@ -16,13 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../shared/stdafx.h"
 #include "DlgAnimation.h"
 #include "ui_DlgAnimation.h"
 #include "../shared/Animation.h"
 #include "../shared/Object.h"
-#include "../shared/FileWrap.h"
-#include "../shared/qtgui/qthelper.h"
 #include <QMessageBox>
 
 QString CDlgAnimation::m_sequences[] =

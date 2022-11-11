@@ -22,7 +22,6 @@
 #include <QDialog>
 #include <QTreeWidgetItem>
 #include <QModelIndex>
-#include "WAnimation.h"
 
 class CPath;
 class CGameFile;

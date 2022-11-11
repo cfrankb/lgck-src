@@ -19,10 +19,8 @@
 #ifndef OBL5FILE_H
 #define OBL5FILE_H
 
-#include "../shared/stdafx.h"
 #include "../shared/FrameSet.h"
-#include "../shared/FileWrap.h"
-
+#include <QString>
 class CFrame;
 
 class COBL5File

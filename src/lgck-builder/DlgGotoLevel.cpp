@@ -18,7 +18,6 @@
 
 #include "DlgGotoLevel.h"
 #include "ui_DlgGotoLevel.h"
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/Level.h"
 #include "../shared/Layer.h"

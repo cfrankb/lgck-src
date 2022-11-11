@@ -18,7 +18,6 @@
 #include "levelscroll.h"
 #include "levelviewgl.h"
 #include <QScrollBar>
-#include "stdafx.h"
 #include "Game.h"
 #include <QMouseEvent>
 #include <algorithm>

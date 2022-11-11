@@ -15,15 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "stdafx.h"
 #include <cstring>
 #include <string>
-#include "ProtoArray.h"
-#include "LevelEntry.h"
 #include "vlamits3.h"
 #include "Game.h"
 #include "../shared/IFile.h"
-#include "../shared/FileWrap.h"
 #include "helper.h"
 
 /////////////////////////////////////////////////////////////////////////////

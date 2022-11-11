@@ -24,7 +24,6 @@
 #include "DlgFrameSet.h"
 #include <QMessageBox>
 #include <QMenu>
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/vlamits3.h"
 #include "../shared/Animation.h"

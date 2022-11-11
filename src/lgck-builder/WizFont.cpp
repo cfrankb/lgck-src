@@ -21,7 +21,6 @@
 #include <QPainter>
 #include <QFontDatabase>
 #include "Font.h"
-#include "FileWrap.h"
 
 char CWizFont::m_text[] = "abcdefghijklmnopqrstuvwxyz" \
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \

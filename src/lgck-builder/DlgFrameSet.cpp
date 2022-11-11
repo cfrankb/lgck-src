@@ -24,10 +24,8 @@
 #include <QStringList>
 #include <QProcess>
 #include <QTemporaryFile>
-#include "../shared/stdafx.h"
 #include "../shared/FrameSet.h"
 #include "../shared/qtgui/cheat.h"
-#include "../shared/FileWrap.h"
 #include "launcher.h"
 #include "../shared/qtgui/qfilewrap.h"
 

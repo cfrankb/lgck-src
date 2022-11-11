@@ -35,9 +35,7 @@
 #include <QFlags>
 #include <QSysInfo>
 #include <QToolButton>
-#include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
-#include "../shared/FileWrap.h"
 #include "../shared/Level.h"
 #include "../shared/Layer.h"
 #include "../shared/StringTable.h"
@@ -62,13 +60,11 @@
 #include "DlgAbout.h"
 #include "DlgAppSettings.h"
 #include "DlgLayer.h"
-#include "DlgSkill.h"
 #include "DlgSource.h"
 #include "DlgObject.h"
 #include "DlgFrameSet.h"
 #include "DlgTestLevel.h"
 #include "DlgExportSprite.h"
-#include "WSpriteList.h"
 #include "WEditEvents.h"
 #include "WizFrameSet.h"
 #include "WizGame.h"

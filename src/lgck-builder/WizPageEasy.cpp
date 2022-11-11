@@ -17,7 +17,6 @@
 */
 
 #include "WizPageEasy.h"
-#include "WizSprite.h"
 #include <QVariant>
 
 CWizPageEasy::CWizPageEasy(QWidget *parent) :

@@ -17,7 +17,6 @@
 */
 #include "WizFrameSet.h"
 #include "ui_WizFrameSet.h"
-#include "stdafx.h"
 #include "FrameSet.h"
 #include "../shared/qtgui/cheat.h"
 

@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "IGraphics.h"
-#include "stdafx.h"
 #include "LevelEntry.h"
 #include "Frame.h"
 #include "Game.h"

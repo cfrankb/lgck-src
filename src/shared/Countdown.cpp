@@ -17,7 +17,6 @@
 */
 #include "Countdown.h"
 #include "IFile.h"
-#include "helper.h"
 #include "Game.h"
 #include "stdafx.h"
 #include <vector>

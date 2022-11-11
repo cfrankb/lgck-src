@@ -21,7 +21,6 @@
 #include "ui_DlgEntry.h"
 #include <QStandardItemModel>
 #include <QInputDialog>
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/Frame.h"
 #include "../shared/StringTable.h"

@@ -18,13 +18,10 @@
 
 #include "ToolBoxDock.h"
 #include "ui_ToolBoxDock.h"
-#include "../shared/stdafx.h"
 #include "../shared/Game.h"
-#include "../shared/FileWrap.h"
 #include "../shared/Frame.h"
 #include "../shared/interfaces/IImageManager.h"
 #include "../shared/Level.h"
-#include "../shared/Layer.h"
 #include "../shared/GameEvents.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"
@@ -40,7 +37,6 @@
 #include <QtCore/QVariant>
 #include "DlgObject.h"
 #include "DlgSource.h"
-#include "DlgEditLevel.h"
 #include "DlgFrameSet.h"
 #include "WizSprite.h"
 #include "Snd.h"

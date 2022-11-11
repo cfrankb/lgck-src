@@ -17,8 +17,6 @@
 */
 
 #include <QApplication>
-#include "../shared/stdafx.h"
-#include "../shared/Credits.h"
 #include "../shared/qtgui/qthelper.h"
 #include "mainwindow.h"
 #include "DlgSelect.h"

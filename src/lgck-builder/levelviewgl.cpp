@@ -19,16 +19,12 @@
 #include <algorithm>
 #include <QKeyEvent>
 #include <QMimeData>
-#include "stdafx.h"
 #include "levelviewgl.h"
 #include "Game.h"
 #include "Level.h"
 #include "Layer.h"
 #include "FrameSet.h"
 #include "Frame.h"
-#include "Const.h"
-#include "Path.h"
-#include "PathBlock.h"
 #include "qtgui/cheat.h"
 #include "implementers/opengl/gr_opengl.h"
 #include "implementers/opengl/im_opengl.h"

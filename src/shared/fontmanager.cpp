@@ -15,11 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <cstring>
 #include "fontmanager.h"
-#include "string.h"
 #include "../shared/Font.h"
 #include "../shared/LuaVM.h"
-#include "stdafx.h"
 #ifdef USE_QFILE
     #define FILEWRAP QFileWrap
     #include "../shared/qtgui/qfilewrap.h"

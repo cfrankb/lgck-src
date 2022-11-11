@@ -17,10 +17,8 @@
 */
 
 #include "WFrameSet.h"
-#include "../shared/stdafx.h"
 #include "../shared/FrameSet.h"
 #include "../shared/Frame.h"
-#include "../shared/FileWrap.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"
 #include "DlgGotoLevel.h"

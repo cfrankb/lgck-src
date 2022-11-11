@@ -26,7 +26,6 @@
 #include "displayconfig.h"
 #include "fontmanager.h"
 
-#include "../shared/stdafx.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"
 #include "GameFile.h"

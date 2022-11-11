@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include "Path.h"
 #include "../shared/IFile.h"
 #include <cstring>
@@ -155,7 +154,7 @@ void CPath::setOptions(int options)
 
 void CPath::debug()
 {
-    qDebug("[size %d] %s", m_size, toHex().c_str());
+    //qDebug("[size %d] %s", m_size, toHex().c_str());
 }
 
 bool CPath::isValidAim(uint8_t aim)

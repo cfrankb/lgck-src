@@ -18,16 +18,10 @@
 
 #include "../shared/stdafx.h"
 #include "../shared/Frame.h"
-#include "../shared/FrameSet.h"
 #include "im_sdl.h"
 #include "gr_sdl.h"
 #include "DisplayManager.h"
 #include "Game.h"
-#include "Proto.h"
-#include "Scene.h"
-#include "Layer.h"
-#include "Inventory.h"
-#include "Level.h"
 #include <SDL2/SDL.h>
 #include "Font.h"
 

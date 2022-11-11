@@ -25,14 +25,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <cstring>
-#include "../shared/Folders.h"
 #include "../shared/Game.h"
 #include "../shared/vlamits3.h"
 #include "../shared/Inventory.h"
 #include "../shared/inventoryTable.h"
 #include "../shared/Map.h"
 #include "../shared/Scene.h"
-#include "../shared/Selection.h"
 #include "../shared/Snd.h"
 #include "../shared/Frame.h"
 #include "../shared/Level.h"

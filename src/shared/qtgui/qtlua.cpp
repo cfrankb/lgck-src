@@ -20,7 +20,6 @@
 #include "qtlua.h"
 #include <string>
 #include <unordered_map>
-#include "FileWrap.h"
 #include <QLabel>
 #include <QLineEdit>
 #include <QWizardPage>

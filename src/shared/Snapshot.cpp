@@ -21,7 +21,6 @@
 #include "Game.h"
 #include "Level.h"
 #include "IFile.h"
-#include "Map.h"
 #include "displayconfig.h"
 #include "Countdown.h"
 

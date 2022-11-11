@@ -19,7 +19,6 @@
 // FrameArray.cpp : implementation file
 //
 
-#include "stdafx.h"
 #include <cstring>
 #include "FrameArray.h"
 #include "LevelEntry.h"

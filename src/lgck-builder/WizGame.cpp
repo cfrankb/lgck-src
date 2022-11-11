@@ -18,7 +18,6 @@
 
 #include "WizGame.h"
 #include "ui_WizGame.h"
-#include "../shared/stdafx.h"
 #include "../shared/Game.h"
 #include "../shared/qtgui/cheat.h"
 #include <QStringList>

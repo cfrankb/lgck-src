@@ -20,7 +20,7 @@
 #define MAP_H
 
 #include <unordered_map>
-#include "stdafx.h"
+#include <stdint.h>
 
 class CFrame;
 

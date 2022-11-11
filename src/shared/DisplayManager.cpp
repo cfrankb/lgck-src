@@ -17,13 +17,11 @@
 */
 
 #include "compat/asprintf.h"
-#include "stdafx.h"
 #include "DisplayManager.h"
 #include "Game.h"
 #include "Frame.h"
 #include "interfaces/IGraphics.h"
 #include "interfaces/IImageManager.h"
-#include "FileWrap.h"
 #include "Font.h"
 #include "fontmanager.h"
 #include "Actor.h"

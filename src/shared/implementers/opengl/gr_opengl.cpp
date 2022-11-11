@@ -19,7 +19,6 @@
 #include "../shared/stdafx.h"
 #include "im_opengl.h"
 #include "../shared/Frame.h"
-#include "../shared/FrameSet.h"
 
 #ifdef LGCK_QT
     #include <QGLWidget>

@@ -17,7 +17,6 @@
 */
 #include "DlgExportSprite.h"
 #include "ui_DlgExportSprite.h"
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/Frame.h"
 #include "../shared/qtgui/cheat.h"

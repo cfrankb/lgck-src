@@ -20,7 +20,7 @@
 #define SN_SDL_H
 
 #include <unordered_map>
-
+#include "../shared/interfaces/ISound.h"
 class ISound;
 
 struct Mix_Chunk;

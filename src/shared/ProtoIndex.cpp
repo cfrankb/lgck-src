@@ -16,16 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "../shared/ProtoIndex.h"
-#include "stdafx.h"
 #include <cstring>
 #include <string>
 #include "ProtoArray.h"
-#include "LevelEntry.h"
 #include "vlamits3.h"
-#include "Game.h"
-#include "../shared/IFile.h"
-#include "../shared/FileWrap.h"
-#include "helper.h"
 
 /////////////////////////////////////////////////////////////////////
 // CProtoIndex

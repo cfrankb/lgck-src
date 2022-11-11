@@ -15,10 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "stdafx.h"
 #include "WizScript.h"
 #include "ui_WizScript.h"
-#include "FileWrap.h"
 #include "GameFile.h"
 #include "qtgui/cheat.h"
 #include "qtgui/qthelper.h"

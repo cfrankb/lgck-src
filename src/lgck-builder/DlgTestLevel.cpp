@@ -18,7 +18,6 @@
 #include "DlgTestLevel.h"
 #include "ui_DlgTestLevel.h"
 
-#include "../shared/stdafx.h"
 #include "Layer.h"
 #include "Level.h"
 #include "LevelEntry.h"

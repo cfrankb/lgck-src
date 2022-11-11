@@ -17,7 +17,6 @@
 */
 
 #include "WSpriteList.h"
-#include "../shared/stdafx.h"
 #include <QApplication>
 
 CWSpriteList::CWSpriteList(QWidget *parent)

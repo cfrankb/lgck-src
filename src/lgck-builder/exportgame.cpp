@@ -25,13 +25,11 @@
 #include <QProcess>
 #include <QFileDialog>
 #include <QApplication>
-#include "stdafx.h"
 #include "helper.h"
 #include "DlgDistributeGame.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qfilewrap.h"
 #include "../shared/GameFile.h"
-#include "FileWrap.h"
 #include "Level.h"
 
 CExportGame::CExportGame()

@@ -19,7 +19,6 @@
 // Game.cpp : implementation file
 //
 
-#include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,13 +34,13 @@
 #include "PathBlock.h"
 #include "../shared/interfaces/IImageManager.h"
 #include "Level.h"
-#include "Tasks.h"
 #include "../shared/Layer.h"
 #include "GameEvents.h"
 #include "../shared/helper.h"
 #include "displayconfig.h"
 #include "fontmanager.h"
 #include "LuaVM.h"
+#include "../shared/Actor.h"
 
 #ifdef USE_QFILE
     #define FILEWRAP QFileWrap

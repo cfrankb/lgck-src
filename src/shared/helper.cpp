@@ -22,7 +22,6 @@
 #include <string>
 #include <list>
 #include <zlib.h>
-//#include "FileWrap.h"
 #ifdef USE_QFILE
     #define FILEWRAP QFileWrap
     #include "../shared/qtgui/qfilewrap.h"

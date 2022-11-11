@@ -21,11 +21,9 @@
 #include <QFileInfo>
 #include <QTreeWidgetItem>
 #include "ui_WizSprite.h"
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/vlamits3.h"
 #include "../shared/Snd.h"
-#include "../shared/FileWrap.h"
 #include "../shared/Frame.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"

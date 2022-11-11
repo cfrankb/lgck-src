@@ -16,9 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include <cstdio>
-#include "../shared/interfaces/ISound.h"
+
 #include "sn_sdl.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>

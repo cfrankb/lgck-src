@@ -15,11 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "stdafx.h"
 #include "Game.h"
 #include "Attacker.h"
-#include "vlamits3.h"
-#include "Snd.h"
 #include "Frame.h"
 #include "Extra.h"
 #include  <stdlib.h>

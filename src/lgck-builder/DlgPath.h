@@ -44,17 +44,12 @@ public:
 
 protected:
     void changeEvent(QEvent *e);
-
-//    void addToPath(char aim, bool visualOnly);
-
     void updateIcon(QTreeWidgetItem *item, int aim);
-
     CPath *m_path;
 
     enum {
         MAX_ICONS = 5
     };
-    //QIcon m_icons[MAX_ICONS];
     static QString m_iconNames[];
     static QString m_iconText[];
     static int m_iconValues[];

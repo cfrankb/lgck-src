@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../shared/stdafx.h"
 #include "im_opengl.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"

@@ -18,7 +18,6 @@
 
 #include "stdafx.h"
 #include "Layer.h"
-#include "Level.h"
 #include "LevelEntry.h"
 #include <cstdio>
 #include <zlib.h>

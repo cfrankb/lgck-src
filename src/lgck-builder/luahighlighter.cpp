@@ -66,7 +66,6 @@
 ****************************************************************************/
 
 #include "luahighlighter.h"
-#include "FileWrap.h"
 #include "../shared/qtgui/qfilewrap.h"
 
 

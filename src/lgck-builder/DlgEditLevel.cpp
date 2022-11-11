@@ -24,11 +24,9 @@
 #include "DlgEditLevel.h"
 #include "DlgSource.h"
 #include "ui_DlgEditLevel.h"
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/Game.h"
 #include "../shared/Level.h"
-#include "../shared/Settings.h"
 #include "../shared/qtgui/cheat.h"
 
 CDlgEditLevel::CDlgEditLevel(QWidget *parent) :
