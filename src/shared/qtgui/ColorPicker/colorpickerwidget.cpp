@@ -19,6 +19,8 @@ This file is part of colorPickerWidget.
 */
 
 #include "colorpickerwidget.h"
+#include <QScreen>
+#include <QGuiApplication>
 
 ColorPickerWidget::ColorPickerWidget(QWidget *parent)
     : QWidget(parent)
@@ -53,7 +55,7 @@ void ColorPickerWidget::pickMode()
     if(ecran!=0) {
         delete ecran;
     }
-    ecran = new CScreen;
+    ecran = new CScreen();
     connect( ecran, SIGNAL(colorSelected(QColor)), colorTriangle, SLOT(setColor(QColor)) );
 }
 
