@@ -104,10 +104,6 @@ void CWPalette::mousePressEvent ( QMouseEvent * event )
             m_mouse.rButton = true;
         break;
 
-        case Qt::MidButton:
-            m_mouse.mButton = true;
-        break;
-
         default:
         break;
     }
@@ -146,10 +142,6 @@ void CWPalette::mouseReleaseEvent ( QMouseEvent * event )
 
         case Qt::RightButton:
             m_mouse.rButton = false;
-        break;
-
-        case Qt::MidButton:
-            m_mouse.mButton = false;
         break;
 
         default:

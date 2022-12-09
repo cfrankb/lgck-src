@@ -98,7 +98,6 @@ void CPreviewScroll::mousePressEvent(QMouseEvent * event)
         break;
 
     case Qt::RightButton:
-    case Qt::MidButton:
         m_mouse.rButton = true;
         break;
     default:
