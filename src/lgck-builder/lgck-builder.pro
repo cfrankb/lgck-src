@@ -9,6 +9,10 @@
 #QMAKE_EXTRA_TARGETS += build_nr
 #PRE_TARGETDEPS += build_nr
 
+# You can make your code fail to compile if it uses deprecated APIs.
+# In order to do so, uncomment the following line.
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
 #win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
 win32:INCLUDEPATH   += ../../../redist/include
