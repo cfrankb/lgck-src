@@ -18,26 +18,30 @@
 #include "helper.h"
 #include "../shared/qtgui/cheat.h"
 #include <QString>
+#include <memory>
 
-const char *txt2wiki(QString & in, char *out)
+const char *txt2wiki(QString &in, char *out)
 {
-    char v[in.length()+1];
+    auto v = new char[in.length() + 1];
     strcpy(v, q2c(in));
     char *s = v;
     char *t = out;
     char *p = t;
     bool trim_s = true;
     bool code_b = false;
-    while (*s) {
+    while (*s)
+    {
         char c = *s;
-        if (c=='=' && s[1]=='{') {
+        if (c == '=' && s[1] == '{')
+        {
             code_b = true;
             strcpy(p, "<code lua>");
             p += 10;
             s += 2;
             continue;
         }
-        if (c=='=' && s[1]=='}') {
+        if (c == '=' && s[1] == '}')
+        {
             code_b = false;
             strcpy(p, "</code>");
             p += 7;
@@ -45,22 +49,25 @@ const char *txt2wiki(QString & in, char *out)
             continue;
         }
         ++s;
-        if (c=='\n') {
+        if (c == '\n')
+        {
             trim_s = true;
-            if (code_b){
+            if (code_b)
+            {
                 *p++ = '\n';
-              //  *p++ = ' ';
-              //  *p++ = ' ';
+                //  *p++ = ' ';
+                //  *p++ = ' ';
                 continue;
             }
         }
-        if ((c == ' ' || c == '\t')
-            && trim_s && !code_b) {
+        if ((c == ' ' || c == '\t') && trim_s && !code_b)
+        {
             continue;
         }
         trim_s = false;
         *p++ = c;
     }
     *p = 0;
+    delete[] v;
     return t;
 }

@@ -20,15 +20,13 @@
 #include "ui_tabwidget.h"
 #include <QMessageBox>
 #include <QAbstractItemView>
-#include "stdafx.h"
 #include "DlgFunction.h"
 #include "DlgClass.h"
 #include "DlgSection.h"
 #include "../shared/qtgui/cheat.h"
 
-TabWidget::TabWidget(QWidget *parent) :
-    QTabWidget(parent),
-    m_ui(new Ui::TabWidget)
+TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent),
+                                        m_ui(new Ui::TabWidget)
 {
     m_ui->setupUi(this);
     m_db = NULL;
@@ -52,14 +50,15 @@ TabWidget::TabWidget(QWidget *parent) :
         ":/images/yellow.png",
         ":/images/na.png",
         ":/images/cpp.png",
-        ":/images/lua.png"
-    };
+        ":/images/lua.png"};
 
-    for (unsigned int i=0; i < sizeof(images)/sizeof(QString); ++i) {
+    for (unsigned int i = 0; i < sizeof(images) / sizeof(QString); ++i)
+    {
         CFileWrap file;
         unsigned char *png = NULL;
         int size = 0;
-        if (file.open(images[i])) {
+        if (file.open(images[i]))
+        {
 
             size = file.getSize();
             png = new unsigned char[size];
@@ -67,15 +66,17 @@ TabWidget::TabWidget(QWidget *parent) :
             file.close();
 
             QImage img;
-            if (!img.loadFromData( png, size )) {
+            if (!img.loadFromData(png, size))
+            {
                 qDebug("failed to load png\n");
             }
-            delete [] png;
+            delete[] png;
             QPixmap pm = QPixmap::fromImage(img);
 
-            m_icons[i].addPixmap( pm, QIcon::Normal, QIcon::On);
-
-        } else {
+            m_icons[i].addPixmap(pm, QIcon::Normal, QIcon::On);
+        }
+        else
+        {
             qDebug("failed to read ``%s``", q2c(images[i]));
         }
     }
@@ -89,7 +90,8 @@ TabWidget::~TabWidget()
 void TabWidget::changeEvent(QEvent *e)
 {
     QTabWidget::changeEvent(e);
-    switch (e->type()) {
+    switch (e->type())
+    {
     case QEvent::LanguageChange:
         m_ui->retranslateUi(this);
         break;
@@ -105,7 +107,8 @@ void TabWidget::init(CDatabase *db)
     int count;
     count = m_ui->treeFn->model()->rowCount();
     m_ui->treeFn->model()->removeRows(0, count);
-    for (int i = 0; i < db->m_functions.getSize() ; ++i) {
+    for (int i = 0; i < db->m_functions.getSize(); ++i)
+    {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         format(item, db->m_functions[i]);
         m_ui->treeFn->addTopLevelItem(item);
@@ -113,7 +116,8 @@ void TabWidget::init(CDatabase *db)
 
     count = m_ui->treeClass->model()->rowCount();
     m_ui->treeClass->model()->removeRows(0, count);
-    for (int i = 0; i < db->m_classes.getSize() ; ++i) {
+    for (int i = 0; i < db->m_classes.getSize(); ++i)
+    {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         item->setIcon(0, m_icons[1]);
         item->setText(0, db->m_classes[i]->name());
@@ -122,7 +126,8 @@ void TabWidget::init(CDatabase *db)
 
     count = m_ui->treeSection->model()->rowCount();
     m_ui->treeSection->model()->removeRows(0, count);
-    for (int i = 0; i < db->m_sections.getSize() ; ++i) {
+    for (int i = 0; i < db->m_sections.getSize(); ++i)
+    {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         item->setIcon(0, m_icons[1]);
         item->setText(0, db->m_sections[i].name);
@@ -133,24 +138,23 @@ void TabWidget::init(CDatabase *db)
 ///////////////////////////////////////////////////////////////////
 // tab1 - functions
 
-void TabWidget::format (QTreeWidgetItem * item, CFunction & fn)
+void TabWidget::format(QTreeWidgetItem *item, CFunction &fn)
 {
     int icon_states[] = {
-      ICON_YELLOW,
-      ICON_BLUE,
-      ICON_RED,
-      ICON_GREY
-    };
+        ICON_YELLOW,
+        ICON_BLUE,
+        ICON_RED,
+        ICON_GREY};
 
     int icon_langs[] = {
-      ICON_NA,
-      ICON_CPP,
-      ICON_LUA
-    };
+        ICON_NA,
+        ICON_CPP,
+        ICON_LUA};
 
-  //  QString name;
+    //  QString name;
     QString ret;
-    switch (fn.Out().getSize()) {
+    switch (fn.Out().getSize())
+    {
     case 0:
         ret = "void";
         break;
@@ -170,28 +174,28 @@ void TabWidget::format (QTreeWidgetItem * item, CFunction & fn)
     item->setText(2, fn.name);
 }
 
-
-
 void TabWidget::on_btnAdd_clicked()
 {
-    CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
+    CDlgFunction *d = new CDlgFunction((QWidget *)parent());
     CFunction fn;
     d->load(&fn);
     d->setWindowTitle(tr("New Function"));
 
-    if (d->exec() == QDialog::Accepted) {
+    if (d->exec() == QDialog::Accepted)
+    {
         d->save(&fn);
-        int pos = m_db->m_functions.add( fn, true );
+        int pos = m_db->m_functions.add(fn, true);
 
-        QAbstractItemModel * model =  m_ui->treeFn->model();
-        if (!model) {
+        QAbstractItemModel *model = m_ui->treeFn->model();
+        if (!model)
+        {
             qDebug("model is null\n");
         }
 
         model->insertRow(pos);
 
-        QTreeWidgetItem * item = m_ui->treeFn->topLevelItem( pos );
-        m_ui->treeFn->setCurrentItem( item );
+        QTreeWidgetItem *item = m_ui->treeFn->topLevelItem(pos);
+        m_ui->treeFn->setCurrentItem(item);
 
         format(item, fn);
 
@@ -203,14 +207,15 @@ void TabWidget::on_btnAdd_clicked()
 
 void TabWidget::on_btnDelete_clicked()
 {
-    QMessageBox::StandardButton ret = QMessageBox::warning(this, "",  tr("Delete the current function?"),
+    QMessageBox::StandardButton ret = QMessageBox::warning(this, "", tr("Delete the current function?"),
                                                            QMessageBox::Ok | QMessageBox::Cancel);
-    if (ret == QMessageBox::Ok) {
+    if (ret == QMessageBox::Ok)
+    {
 
         QModelIndex index = m_ui->treeFn->currentIndex();
-        m_db->m_functions.removeAt( index.row() );
-        QAbstractItemModel * model =  m_ui->treeFn->model();
-        model->removeRow( index.row() );
+        m_db->m_functions.removeAt(index.row());
+        QAbstractItemModel *model = m_ui->treeFn->model();
+        model->removeRow(index.row());
         m_db->setDirty(true);
     }
 }
@@ -219,28 +224,31 @@ void TabWidget::on_treeFn_doubleClicked(QModelIndex index)
 {
     CFunction fn;
     fn.copy(m_db->m_functions[index.row()]);
-    CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
-    d->load( &fn );
+    CDlgFunction *d = new CDlgFunction((QWidget *)parent());
+    d->load(&fn);
     d->setWindowTitle(tr("Edit Function"));
 
-    if (d->exec() == QDialog::Accepted) {
-        d->save(& fn);
+    if (d->exec() == QDialog::Accepted)
+    {
+        d->save(&fn);
 
-        m_db->m_functions.removeAt( index.row() );
+        m_db->m_functions.removeAt(index.row());
         int pos = m_db->m_functions.add(fn, true);
 
-        QAbstractItemModel * model =  m_ui->treeFn->model();
-        if (!model) {
+        QAbstractItemModel *model = m_ui->treeFn->model();
+        if (!model)
+        {
             qDebug("model is null\n");
         }
 
-        if (pos != index.row()) {
-            model->removeRow( index.row() );
+        if (pos != index.row())
+        {
+            model->removeRow(index.row());
             model->insertRow(pos);
         }
 
-        QTreeWidgetItem * item = m_ui->treeFn->topLevelItem( pos );
-        m_ui->treeFn->setCurrentItem( item );
+        QTreeWidgetItem *item = m_ui->treeFn->topLevelItem(pos);
+        m_ui->treeFn->setCurrentItem(item);
 
         format(item, fn);
         m_db->setDirty(true);
@@ -254,27 +262,31 @@ void TabWidget::on_treeFn_doubleClicked(QModelIndex index)
 
 void TabWidget::on_btnAddClass_clicked()
 {
-    CDlgClass *d = new CDlgClass((QWidget*)parent());
-    CClass * cl = new CClass;
+    CDlgClass *d = new CDlgClass((QWidget *)parent());
+    CClass *cl = new CClass;
     d->load(m_db, cl);
     d->setWindowTitle(tr("New Class"));
-    if (d->exec() == QDialog::Accepted) {
-        d->save( cl);
-        int pos = m_db->m_classes.add( cl, true );
+    if (d->exec() == QDialog::Accepted)
+    {
+        d->save(cl);
+        int pos = m_db->m_classes.add(cl, true);
 
-        QAbstractItemModel * model =  m_ui->treeClass->model();
-        if (!model) {
+        QAbstractItemModel *model = m_ui->treeClass->model();
+        if (!model)
+        {
             qDebug("model is null\n");
         }
 
         model->insertRow(pos);
 
-        QTreeWidgetItem * item = m_ui->treeClass->topLevelItem( pos );
-        m_ui->treeClass->setCurrentItem( item );
+        QTreeWidgetItem *item = m_ui->treeClass->topLevelItem(pos);
+        m_ui->treeClass->setCurrentItem(item);
         item->setText(0, cl->name());
 
         m_db->setDirty(true);
-    } else {
+    }
+    else
+    {
         delete cl;
     }
 
@@ -282,17 +294,19 @@ void TabWidget::on_btnAddClass_clicked()
 }
 
 void TabWidget::on_btnDeleteClass_clicked()
-{    
+{
     QModelIndex index = m_ui->treeClass->currentIndex();
-    if (index.row() != -1) {
+    if (index.row() != -1)
+    {
         QMessageBox::StandardButton ret =
-                QMessageBox::warning(this, "",  tr("Delete the current class?"),
-                                     QMessageBox::Ok | QMessageBox::Cancel);
-        if (ret == QMessageBox::Ok) {
-            CClass * cl = m_db->m_classes.removeAt( index.row() );
+            QMessageBox::warning(this, "", tr("Delete the current class?"),
+                                 QMessageBox::Ok | QMessageBox::Cancel);
+        if (ret == QMessageBox::Ok)
+        {
+            CClass *cl = m_db->m_classes.removeAt(index.row());
             delete cl;
-            QAbstractItemModel * model =  m_ui->treeClass->model();
-            model->removeRow( index.row() );
+            QAbstractItemModel *model = m_ui->treeClass->model();
+            model->removeRow(index.row());
             m_db->setDirty(true);
         }
     }
@@ -300,31 +314,34 @@ void TabWidget::on_btnDeleteClass_clicked()
 
 void TabWidget::on_treeClass_doubleClicked(QModelIndex index)
 {
-    CDlgClass *d = new CDlgClass ( (QWidget*) parent());
-    d->load( m_db, m_db->m_classes[index.row()] );
+    CDlgClass *d = new CDlgClass((QWidget *)parent());
+    d->load(m_db, m_db->m_classes[index.row()]);
     d->setWindowTitle(tr("Edit Class"));
 
-    if (d->exec() == QDialog::Accepted) {
+    if (d->exec() == QDialog::Accepted)
+    {
 
-        CClass * cl = m_db->m_classes[index.row()];
-        d->save( m_db->m_classes[index.row()]);
+        CClass *cl = m_db->m_classes[index.row()];
+        d->save(m_db->m_classes[index.row()]);
 
-        cl = m_db->m_classes.removeAt( index.row() );
+        cl = m_db->m_classes.removeAt(index.row());
         int pos = m_db->m_classes.add(cl, true);
 
-        QAbstractItemModel * model =  m_ui->treeClass->model();
-        if (!model) {
+        QAbstractItemModel *model = m_ui->treeClass->model();
+        if (!model)
+        {
             qDebug("model is null\n");
         }
 
-        if (pos != index.row()) {
-            model->removeRow( index.row() );
+        if (pos != index.row())
+        {
+            model->removeRow(index.row());
             model->insertRow(pos);
         }
 
-        QTreeWidgetItem * item = m_ui->treeClass->topLevelItem( pos );
-        m_ui->treeClass->setCurrentItem( item );
-        item->setText( 0, cl->name() );
+        QTreeWidgetItem *item = m_ui->treeClass->topLevelItem(pos);
+        m_ui->treeClass->setCurrentItem(item);
+        item->setText(0, cl->name());
 
         m_db->setDirty(true);
     }
@@ -335,15 +352,16 @@ void TabWidget::on_treeClass_doubleClicked(QModelIndex index)
 
 void TabWidget::on_treeSection_doubleClicked(QModelIndex index)
 {
-    CDlgSection *d = new CDlgSection ( (QWidget*) parent());
+    CDlgSection *d = new CDlgSection((QWidget *)parent());
     d->setWindowTitle(tr("Edit Section"));
-    d->load(m_db->m_sections[ index.row() ]);
-    if (d->exec() == QDialog::Accepted) {
-        d->save(m_db->m_sections[ index.row() ]);
+    d->load(m_db->m_sections[index.row()]);
+    if (d->exec() == QDialog::Accepted)
+    {
+        d->save(m_db->m_sections[index.row()]);
 
-        QTreeWidgetItem * item = m_ui->treeSection->topLevelItem( index.row() );
-        m_ui->treeSection->setCurrentItem( item );
-        item->setText( 0, m_db->m_sections[ index.row() ].name );
+        QTreeWidgetItem *item = m_ui->treeSection->topLevelItem(index.row());
+        m_ui->treeSection->setCurrentItem(item);
+        item->setText(0, m_db->m_sections[index.row()].name);
 
         m_db->setDirty(true);
     }
@@ -353,9 +371,10 @@ void TabWidget::on_treeSection_doubleClicked(QModelIndex index)
 
 void TabWidget::on_btnAddSection_clicked()
 {
-    CDlgSection *d = new CDlgSection ( (QWidget*) parent());
+    CDlgSection *d = new CDlgSection((QWidget *)parent());
     d->setWindowTitle(tr("Create New Section"));
-    if (d->exec() == QDialog::Accepted) {
+    if (d->exec() == QDialog::Accepted)
+    {
         Section s;
         d->save(s);
 
@@ -363,8 +382,8 @@ void TabWidget::on_btnAddSection_clicked()
 
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         m_ui->treeSection->addTopLevelItem(item);
-        m_ui->treeSection->setCurrentItem( item );
-        item->setText( 0, s.name );
+        m_ui->treeSection->setCurrentItem(item);
+        item->setText(0, s.name);
 
         m_db->setDirty(true);
     }
@@ -373,15 +392,17 @@ void TabWidget::on_btnAddSection_clicked()
 
 void TabWidget::on_btnDeleteSection_clicked()
 {
-    QModelIndex index = m_ui->treeSection->currentIndex();    
-    if (index.row() != -1) {
+    QModelIndex index = m_ui->treeSection->currentIndex();
+    if (index.row() != -1)
+    {
         QMessageBox::StandardButton ret =
-                QMessageBox::warning(this, "",  tr("Delete the current section?"),
-                                     QMessageBox::Ok | QMessageBox::Cancel);
-        if (ret == QMessageBox::Ok) {
-            m_db->m_sections.removeAt( index.row() );
-            QAbstractItemModel * model =  m_ui->treeSection->model();
-            model->removeRow( index.row() );
+            QMessageBox::warning(this, "", tr("Delete the current section?"),
+                                 QMessageBox::Ok | QMessageBox::Cancel);
+        if (ret == QMessageBox::Ok)
+        {
+            m_db->m_sections.removeAt(index.row());
+            QAbstractItemModel *model = m_ui->treeSection->model();
+            model->removeRow(index.row());
             m_db->setDirty(true);
         }
     }

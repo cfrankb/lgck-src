@@ -22,25 +22,32 @@
 #include <inttypes.h>
 #include <sys/time.h>
 
-// 
+//
 // Select the target QT or GCC
-// 
+//
 
-#define microtime(___time) struct timeval tm_time; \
+#define microtime(___time)           \
+    struct timeval tm_time;          \
     gettimeofday(&tm_time, nullptr); \
     *___time = tm_time.tv_usec / 1000 + tm_time.tv_sec * 1000;
 
 #ifdef USE_QFILE
-    #include <QDebug>
-    #define ASSERT Q_ASSERT
+#include <QDebug>
+#define ASSERT Q_ASSERT
 #else
-    #include <assert.h>
-    #define qDebug(expr,...) printf(expr,##__VA_ARGS__);puts("");
-    #define Q_UNUSED(expr) do { (void)(expr); } while (0)
-    #define ASSERT assert
+#include <assert.h>
+#define qDebug(expr, ...)        \
+    printf(expr, ##__VA_ARGS__); \
+    puts("");
+
+#define Q_UNUSED(expr) \
+    do                 \
+    {                  \
+        (void)(expr);  \
+    } while (0)
+#define ASSERT assert
 #endif
 
 #define UNUSED(x) (void)x;
-#define LONGUINT long unsigned int
 
 #endif

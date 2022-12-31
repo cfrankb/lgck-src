@@ -21,6 +21,7 @@
 #include "Level.h"
 #include "Layer.h"
 #include <vector>
+#include <cassert>
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qfilewrap.h"
 
@@ -38,7 +39,7 @@ CGameFixer::CGameFixer()
 
 void CGameFixer::setGame(CGame *game)
 {
-    ASSERT(game);
+    assert(game);
     m_game = game;
 }
 

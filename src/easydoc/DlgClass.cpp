@@ -18,7 +18,6 @@
 
 #include "DlgClass.h"
 #include "ui_DlgClass.h"
-#include "stdafx.h"
 #include "DlgFunction.h"
 #include "DlgParam.h"
 #include "DlgSource.h"
@@ -26,16 +25,16 @@
 #include "const.h"
 #include <QSettings>
 
-CDlgClass::CDlgClass(QWidget *parent) :
-    QDialog(parent),
-    m_ui(new Ui::CDlgClass)
+CDlgClass::CDlgClass(QWidget *parent) : QDialog(parent),
+                                        m_ui(new Ui::CDlgClass)
 {
     m_ui->setupUi(this);
     m_db = NULL;
     m_cl = NULL;
     QSettings settings;
     bool largeFont = settings.value("largeFont", false).toBool();
-    if (largeFont) {
+    if (largeFont)
+    {
         QFont font("Courier", 16);
         font.setBold(true);
         m_ui->eDescription->setFont(font);
@@ -53,7 +52,8 @@ CDlgClass::~CDlgClass()
 void CDlgClass::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);
-    switch (e->type()) {
+    switch (e->type())
+    {
     case QEvent::LanguageChange:
         m_ui->retranslateUi(this);
         break;
@@ -76,14 +76,15 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
         ":/images/yellow.png",
         ":/images/na.png",
         ":/images/cpp.png",
-        ":/images/lua.png"
-    };
+        ":/images/lua.png"};
 
-    for (unsigned int i=0; i < sizeof(images)/sizeof(QString); ++i) {
+    for (unsigned int i = 0; i < sizeof(images) / sizeof(QString); ++i)
+    {
         CFileWrap file;
         unsigned char *png = NULL;
         int size = 0;
-        if (file.open(images[i])) {
+        if (file.open(images[i]))
+        {
 
             size = file.getSize();
             png = new unsigned char[size];
@@ -91,15 +92,17 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
             file.close();
 
             QImage img;
-            if (!img.loadFromData( png, size )) {
+            if (!img.loadFromData(png, size))
+            {
                 qDebug("failed to load png\n");
             }
-            delete [] png;
+            delete[] png;
             QPixmap pm = QPixmap::fromImage(img);
 
-            m_icons[i].addPixmap( pm, QIcon::Normal, QIcon::On);
-
-        } else {
+            m_icons[i].addPixmap(pm, QIcon::Normal, QIcon::On);
+        }
+        else
+        {
             qDebug("failed to read ``%s``", q2c(images[i]));
         }
     }
@@ -114,7 +117,8 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
     m_ui->treeFn->setRootIsDecorated(false);
     m_ui->treeFn->setAlternatingRowColors(true);
 
-    for (int i = 0; i < cl->methods().getSize() ; ++i) {
+    for (int i = 0; i < cl->methods().getSize(); ++i)
+    {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         format(item, cl->methods()[i]);
         m_ui->treeFn->addTopLevelItem(item);
@@ -129,7 +133,8 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
     m_ui->treeVar->setRootIsDecorated(false);
     m_ui->treeVar->setAlternatingRowColors(true);
 
-    for (int i = 0; i < cl->variables().getSize() ; ++i) {
+    for (int i = 0; i < cl->variables().getSize(); ++i)
+    {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         format(item, cl->variables()[i]);
         m_ui->treeVar->addTopLevelItem(item);
@@ -140,7 +145,6 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
 
     // class description
     m_ui->eDescription->setPlainText(cl->desc());
-
 }
 
 void CDlgClass::save(CClass *cl)
@@ -152,23 +156,22 @@ void CDlgClass::save(CClass *cl)
     cl->desc() = m_ui->eDescription->toPlainText();
 }
 
-void CDlgClass::format (QTreeWidgetItem * item, CFunction & fn)
+void CDlgClass::format(QTreeWidgetItem *item, CFunction &fn)
 {
     int icon_states[] = {
-      ICON_YELLOW,
-      ICON_BLUE,
-      ICON_RED,
-      ICON_GREY
-    };
+        ICON_YELLOW,
+        ICON_BLUE,
+        ICON_RED,
+        ICON_GREY};
 
     int icon_langs[] = {
-      ICON_NA,
-      ICON_CPP,
-      ICON_LUA
-    };
+        ICON_NA,
+        ICON_CPP,
+        ICON_LUA};
 
     QString ret;
-    switch (fn.Out().getSize()) {
+    switch (fn.Out().getSize())
+    {
     case 0:
         ret = "void";
         break;
@@ -188,14 +191,14 @@ void CDlgClass::format (QTreeWidgetItem * item, CFunction & fn)
     item->setText(2, fn.name);
 }
 
-void CDlgClass::format (QTreeWidgetItem * item, Param & var)
+void CDlgClass::format(QTreeWidgetItem *item, Param &var)
 {
     item->setIcon(0, m_icons[0]);
     item->setText(0, var.type);
     item->setText(1, var.name);
 }
 
-void CDlgClass::initFn(CFunction & fn)
+void CDlgClass::initFn(CFunction &fn)
 {
     fn.In(0).forget();
     fn.Out().forget();
@@ -205,25 +208,27 @@ void CDlgClass::initFn(CFunction & fn)
 
 void CDlgClass::on_btnAdd_clicked()
 {
-    CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
+    CDlgFunction *d = new CDlgFunction((QWidget *)parent());
     CFunction fn;
-    //initFn(fn);
+    // initFn(fn);
     d->load(&fn);
     d->setWindowTitle(tr("new method"));
 
-    if (d->exec() == QDialog::Accepted) {
+    if (d->exec() == QDialog::Accepted)
+    {
         d->save(&fn);
-        int pos = m_cl->methods().add( fn, true );
+        int pos = m_cl->methods().add(fn, true);
 
-        QAbstractItemModel * model =  m_ui->treeFn->model();
-        if (!model) {
+        QAbstractItemModel *model = m_ui->treeFn->model();
+        if (!model)
+        {
             qDebug("model is null\n");
         }
 
         model->insertRow(pos);
 
-        QTreeWidgetItem * item = m_ui->treeFn->topLevelItem( pos );
-        m_ui->treeFn->setCurrentItem( item );
+        QTreeWidgetItem *item = m_ui->treeFn->topLevelItem(pos);
+        m_ui->treeFn->setCurrentItem(item);
 
         format(item, fn);
         m_db->setDirty(true);
@@ -235,40 +240,44 @@ void CDlgClass::on_btnAdd_clicked()
 void CDlgClass::on_btnDelete_clicked()
 {
     QModelIndex index = m_ui->treeFn->currentIndex();
-    if (index.row() != -1) {
-        m_cl->methods().removeAt( index.row() );
-        QAbstractItemModel * model =  m_ui->treeFn->model();
-        model->removeRow( index.row() );
+    if (index.row() != -1)
+    {
+        m_cl->methods().removeAt(index.row());
+        QAbstractItemModel *model = m_ui->treeFn->model();
+        model->removeRow(index.row());
         m_db->setDirty(true);
     }
 }
 
 void CDlgClass::on_treeFn_doubleClicked(QModelIndex index)
-{    
+{
     CFunction fn;
     fn.copy(m_cl->methods()[index.row()]);
-    CDlgFunction *d = new CDlgFunction ( (QWidget*) parent());
-    d->load( &fn );
+    CDlgFunction *d = new CDlgFunction((QWidget *)parent());
+    d->load(&fn);
     d->setWindowTitle(tr("edit function"));
 
-    if (d->exec() == QDialog::Accepted) {
-        d->save(& fn);
+    if (d->exec() == QDialog::Accepted)
+    {
+        d->save(&fn);
 
-        m_cl->methods().removeAt( index.row() );
+        m_cl->methods().removeAt(index.row());
         int pos = m_cl->methods().add(fn, true);
 
-        QAbstractItemModel * model =  m_ui->treeFn->model();
-        if (!model) {
+        QAbstractItemModel *model = m_ui->treeFn->model();
+        if (!model)
+        {
             qDebug("model is null\n");
         }
 
-        if (pos != index.row()) {
-            model->removeRow( index.row() );
+        if (pos != index.row())
+        {
+            model->removeRow(index.row());
             model->insertRow(pos);
         }
 
-        QTreeWidgetItem * item = m_ui->treeFn->topLevelItem( pos );
-        m_ui->treeFn->setCurrentItem( item );
+        QTreeWidgetItem *item = m_ui->treeFn->topLevelItem(pos);
+        m_ui->treeFn->setCurrentItem(item);
 
         format(item, fn);
         m_db->setDirty(true);
@@ -282,17 +291,18 @@ void CDlgClass::on_treeFn_doubleClicked(QModelIndex index)
 
 void CDlgClass::on_treeVar_doubleClicked(QModelIndex index)
 {
-    Param & var = m_cl->variables()[index.row()];
-    CDlgParam *d = new CDlgParam ( (QWidget*) parent());
-    d->load( &var );
+    Param &var = m_cl->variables()[index.row()];
+    CDlgParam *d = new CDlgParam((QWidget *)parent());
+    d->load(&var);
     d->setWindowTitle(tr("edit variable"));
 
-    if (d->exec() == QDialog::Accepted) {
-        d->save(& var);
+    if (d->exec() == QDialog::Accepted)
+    {
+        d->save(&var);
 
-        m_cl->variables()[ index.row() ] = var;
+        m_cl->variables()[index.row()] = var;
 
-        QTreeWidgetItem * item = m_ui->treeVar->topLevelItem( index.row() );
+        QTreeWidgetItem *item = m_ui->treeVar->topLevelItem(index.row());
         format(item, var);
         m_db->setDirty(true);
     }
@@ -302,24 +312,26 @@ void CDlgClass::on_treeVar_doubleClicked(QModelIndex index)
 
 void CDlgClass::on_btnAddVar_clicked()
 {
-    CDlgParam *d = new CDlgParam ( (QWidget*) parent());
+    CDlgParam *d = new CDlgParam((QWidget *)parent());
     Param var;
     d->load(&var);
     d->setWindowTitle(tr("new variable"));
 
-    if (d->exec() == QDialog::Accepted) {
+    if (d->exec() == QDialog::Accepted)
+    {
         d->save(&var);
-        m_cl->variables().add( var);
+        m_cl->variables().add(var);
 
-        QAbstractItemModel * model =  m_ui->treeVar->model();
-        if (!model) {
+        QAbstractItemModel *model = m_ui->treeVar->model();
+        if (!model)
+        {
             qDebug("model is null\n");
         }
 
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         format(item, var);
         m_ui->treeVar->addTopLevelItem(item);
-        m_ui->treeVar->setCurrentItem( item );
+        m_ui->treeVar->setCurrentItem(item);
         m_db->setDirty(true);
     }
 
@@ -329,69 +341,80 @@ void CDlgClass::on_btnAddVar_clicked()
 void CDlgClass::on_btnDeleteVar_clicked()
 {
     QModelIndex index = m_ui->treeVar->currentIndex();
-    if (index.row() != -1) {
-        m_cl->variables().removeAt( index.row() );
-        QAbstractItemModel * model =  m_ui->treeVar->model();
-        model->removeRow( index.row() );
+    if (index.row() != -1)
+    {
+        m_cl->variables().removeAt(index.row());
+        QAbstractItemModel *model = m_ui->treeVar->model();
+        model->removeRow(index.row());
         m_db->setDirty(true);
     }
 }
 
 void CDlgClass::on_btnAddVarM_clicked()
 {
-    CDlgSource *d = new CDlgSource((QWidget*)this);
+    CDlgSource *d = new CDlgSource((QWidget *)this);
     d->setWindowTitle(tr("Add Variable Batch"));
-    if (d->exec()) {
-       QString s = d->getText();
-       char *buf = new char[strlen(q2c(s)) + 1];
-       strcpy(buf, q2c(s));
-       char *p = buf;
+    if (d->exec())
+    {
+        QString s = d->getText();
+        char *buf = new char[strlen(q2c(s)) + 1];
+        strcpy(buf, q2c(s));
+        char *p = buf;
 
-       while (*p) {
-           int sx = 0;
-           for (char *pe = p; *pe && *pe != '\n'; ++pe, ++sx);
-           char tmp[sx + 1];
-           memcpy(tmp, p, sx);
-           tmp[sx] = 0;
-           p += sx;
-           if (*p) {
-               ++p;
-           }
+        while (*p)
+        {
+            int sx = 0;
+            for (char *pe = p; *pe && *pe != '\n'; ++pe, ++sx)
+                ;
+            auto tmp = new char[sx + 1];
+            memcpy(tmp, p, sx);
+            tmp[sx] = 0;
+            p += sx;
+            if (*p)
+            {
+                ++p;
+            }
 
-           //qDebug("line `%s`\n", tmp);
+            // qDebug("line `%s`\n", tmp);
 
-           char *ps = tmp;
-           while (*ps && *ps ==' ') {
-               ++ps;
-           }
+            char *ps = tmp;
+            while (*ps && *ps == ' ')
+            {
+                ++ps;
+            }
 
-           char *pe = ps;
-           while (*pe && *pe != ' ') {
-               ++pe;
-           }
+            char *pe = ps;
+            while (*pe && *pe != ' ')
+            {
+                ++pe;
+            }
 
-           char c = *pe;
-           *pe = 0;
+            char c = *pe;
+            *pe = 0;
 
-           Param var;
-           var.type = ps;
-           if (c) {
-               var.name = QString(pe + 1).trimmed();
-           }
+            Param var;
+            var.type = ps;
+            if (c)
+            {
+                var.name = QString(pe + 1).trimmed();
+            }
 
-           m_cl->variables().add( var);
-           QAbstractItemModel * model =  m_ui->treeVar->model();
-           if (!model) {
-               qDebug("model is null\n");
-           }
+            m_cl->variables().add(var);
+            QAbstractItemModel *model = m_ui->treeVar->model();
+            if (!model)
+            {
+                qDebug("model is null\n");
+            }
 
-           QTreeWidgetItem *item = new QTreeWidgetItem(0);
-           format(item, var);
-           m_ui->treeVar->addTopLevelItem(item);
-           m_ui->treeVar->setCurrentItem( item );
-           m_db->setDirty(true);
-       }
+            QTreeWidgetItem *item = new QTreeWidgetItem(0);
+            format(item, var);
+            m_ui->treeVar->addTopLevelItem(item);
+            m_ui->treeVar->setCurrentItem(item);
+            m_db->setDirty(true);
 
-       delete [] buf;
+            delete[] tmp;
+        }
+
+        delete[] buf;
     }
 }

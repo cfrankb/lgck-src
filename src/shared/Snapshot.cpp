@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Snapshot.h"
-#include "stdafx.h"
+#include <cassert>
 #include "Scene.h"
 #include "Game.h"
 #include "Level.h"
@@ -41,23 +41,28 @@ CSnapshot::~CSnapshot()
 void CSnapshot::forget()
 {
     m_vars.clear();
-    if (m_bk) {
+    if (m_bk)
+    {
         delete m_bk;
         m_bk = nullptr;
     }
-    if (m_fw) {
+    if (m_fw)
+    {
         delete m_fw;
         m_fw = nullptr;
     }
-    if (m_layers) {
+    if (m_layers)
+    {
         delete m_layers;
         m_layers = nullptr;
     }
-    if (m_displayConf) {
+    if (m_displayConf)
+    {
         delete m_displayConf;
         m_displayConf = nullptr;
     }
-    if (m_countdown) {
+    if (m_countdown)
+    {
         delete m_countdown;
         m_countdown = nullptr;
     }
@@ -67,13 +72,14 @@ void CSnapshot::forget()
 void CSnapshot::read(IFile &file)
 {
     forget();
-    unsigned int version =0;
+    unsigned int version = 0;
     file.read(&version, sizeof(version));
-    ASSERT(version == VERSION);
+    assert(version == VERSION);
 
     char has_data = 0;
     file.read(&has_data, 1);
-    if (has_data) {
+    if (has_data)
+    {
         m_fw = new CScene;
         m_fw->read(file);
         m_bk = new CScene;
@@ -86,8 +92,8 @@ void CSnapshot::read(IFile &file)
         m_countdown->read(file);
     }
     // TODO: load vars
-    //m_vars["__mx"] = game.m_mx;
-    //m_vars["__my"] = game.m_my;
+    // m_vars["__mx"] = game.m_mx;
+    // m_vars["__my"] = game.m_my;
 }
 
 void CSnapshot::write(IFile &file)
@@ -95,7 +101,8 @@ void CSnapshot::write(IFile &file)
     unsigned int version = VERSION;
     file.write(&version, sizeof(version));
     char has_data = 0;
-    if (m_fw) {
+    if (m_fw)
+    {
         has_data = 1;
         file.write(&has_data, 1);
         m_fw->write(file);
@@ -103,7 +110,9 @@ void CSnapshot::write(IFile &file)
         m_layers->write(file);
         m_displayConf->write(file);
         m_countdown->write(file);
-    } else {
+    }
+    else
+    {
         file.write(&has_data, 1);
     }
     // TODO: save vars
@@ -111,11 +120,10 @@ void CSnapshot::write(IFile &file)
 
 bool CSnapshot::has_snapshot()
 {
-    return m_bk != nullptr && m_fw != nullptr
-            && m_layers != nullptr;
+    return m_bk != nullptr && m_fw != nullptr && m_layers != nullptr;
 }
 
-void CSnapshot::take(CGame & game)
+void CSnapshot::take(CGame &game)
 {
     forget();
     m_fw = new CScene;
@@ -129,13 +137,14 @@ void CSnapshot::take(CGame & game)
     m_vars["__my"] = game._my();
     m_vars["__levelTriggerCalled"] = game.var("__levelTriggerCalled");
     m_countdown = new CCountdown;
-    *m_countdown = * game.countdowns();
+    *m_countdown = *game.countdowns();
     game.saveDisplays(m_displayConf);
 }
 
-bool CSnapshot::reload(CGame & game)
+bool CSnapshot::reload(CGame &game)
 {
-    if (has_snapshot()) {
+    if (has_snapshot())
+    {
         *(game._fw()) = *m_fw;
         *(game._bk()) = *m_bk;
         *(game.layers()) = *m_layers;
@@ -145,9 +154,11 @@ bool CSnapshot::reload(CGame & game)
         game.restoreDisplays(m_displayConf);
         // reMap collision map
         game.remap();
-        * game.countdowns() = * m_countdown;
+        *game.countdowns() = *m_countdown;
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }

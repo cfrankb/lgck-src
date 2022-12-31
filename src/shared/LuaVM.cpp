@@ -17,10 +17,10 @@
 */
 
 #include "compat/asprintf.h"
-#include "stdafx.h"
 #include <cstring>
 #include <string>
 #include <stdio.h>
+#include <cassert>
 #include "LuaVM.h"
 
 std::unordered_map<int, CLuaVM::CallbackFct> CLuaVM::m_callback;
@@ -37,7 +37,7 @@ void CLuaVM::registerString(const char *name, const char *value)
     lua_setglobal(m_luaState, name);
 }
 
-void CLuaVM::registerBool(const char* name, bool value)
+void CLuaVM::registerBool(const char *name, bool value)
 {
     lua_pushboolean(m_luaState, value);
     lua_setglobal(m_luaState, name);
@@ -45,46 +45,54 @@ void CLuaVM::registerBool(const char* name, bool value)
 
 void CLuaVM::reportErrors(int status, const char *fnName)
 {
-    if (status) {
-        const char *s =  lua_tostring(m_luaState, -1);
+    if (status)
+    {
+        const char *s = lua_tostring(m_luaState, -1);
         char *t = nullptr;
         const char *fmt = fnName ? "-- [%d] %s in %s\n" : "-- [%d] %s\n";
-        if (asprintf(&t, fmt, status, s, fnName) == -1) {
-            qDebug("allocation error with asprintf().");
-        } else {
+        if (asprintf(&t, fmt, status, s, fnName) == -1)
+        {
+            puts("allocation error with asprintf().");
+        }
+        else
+        {
             error(t);
             free(t);
         }
-        qDebug(fmt, status, s, fnName);
+        printf(fmt, status, s, fnName);
         lua_pop(m_luaState, 1); // remove error message
     }
 }
 
 void CLuaVM::debug(const char *s)
 {
-    if (s && m_callback[Debug]) {
+    if (s && m_callback[Debug])
+    {
         m_callback[Debug](s);
     }
 }
 
 void CLuaVM::error(const char *s)
 {
-    if (s && m_callback[Error]) {
+    if (s && m_callback[Error])
+    {
         m_callback[Error](s);
     }
 }
 
 void CLuaVM::debugv(const char *fmt, ...)
 {
-    ASSERT(fmt);
+    assert(fmt);
     char *s = nullptr;
     va_list args;
     va_start(args, fmt);
-    if (vasprintf(&s, fmt, args) == -1) {
-        qDebug("debugv() had an allocation error with vasprintf().");
+    if (vasprintf(&s, fmt, args) == -1)
+    {
+        puts("debugv() had an allocation error with vasprintf().");
     }
-    if (s) {
-        debug(static_cast<const char*>(s));
+    if (s)
+    {
+        debug(static_cast<const char *>(s));
         free(s);
     }
 }
@@ -95,9 +103,11 @@ void CLuaVM::debugv(const char *fmt, ...)
 int CLuaVM::debug(lua_State *L)
 {
     int argc = lua_gettop(L);
-    for (int n=1; n <= argc; ++n) {
+    for (int n = 1; n <= argc; ++n)
+    {
         const char *s = lua_tostring(L, n);
-        if (s && m_callback[Debug]) {
+        if (s && m_callback[Debug])
+        {
             m_callback[Debug](s);
         }
     }
@@ -120,13 +130,15 @@ CLuaVM::CLuaVM()
     registerFn("debug", debug);
 }
 
-CLuaVM::~CLuaVM() {
-    if (m_luaState) {
+CLuaVM::~CLuaVM()
+{
+    if (m_luaState)
+    {
         m_luaState = nullptr;
     }
 }
 
-lua_State * CLuaVM::getState()
+lua_State *CLuaVM::getState()
 {
     return m_luaState;
 }
@@ -134,11 +146,11 @@ lua_State * CLuaVM::getState()
 int CLuaVM::exec(const char *luaCode)
 {
     int status = luaL_dostring(m_luaState, luaCode);
-    reportErrors( status );
+    reportErrors(status);
     return status;
 }
 
-void CLuaVM::registerFn(const char * fnName, lua_CFunction fn)
+void CLuaVM::registerFn(const char *fnName, lua_CFunction fn)
 {
     lua_register(m_luaState, fnName, fn);
 }

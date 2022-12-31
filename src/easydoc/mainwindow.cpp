@@ -16,13 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSettings>
 #include <QMessageBox>
 #include <QResizeEvent>
-#include "stdafx.h"
 #include "DlgAbout.h"
 #include "tabwidget.h"
 #include <QFileDialog>
@@ -41,13 +39,17 @@ MainWindow::MainWindow(QWidget *parent)
     QString s;
     QString appVersion;
     int version = SS_LGCK_VERSION;
-    for (int i=0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i)
+    {
         s = QString("%1").arg(version % 256);
         version /= 256;
-        if (i) {
-            appVersion = s + "." + appVersion  ;
-        } else {
-            appVersion = s + appVersion ;
+        if (i)
+        {
+            appVersion = s + "." + appVersion;
+        }
+        else
+        {
+            appVersion = s + appVersion;
         }
     }
 
@@ -73,21 +75,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (maybeSave()) {
+    if (maybeSave())
+    {
         event->accept();
-    } else {
+    }
+    else
+    {
         event->ignore();
     }
 }
 
 bool MainWindow::maybeSave()
 {
-    if (m_doc.isDirty()) {
+    if (m_doc.isDirty())
+    {
         QMessageBox::StandardButton ret = QMessageBox::warning(this, tr(m_appName),
-                     tr("The document has been modified.\n"
-                        "Do you want to save your changes?"),
-                     QMessageBox::Save | QMessageBox::Discard
-                     | QMessageBox::Cancel);
+                                                               tr("The document has been modified.\n"
+                                                                  "Do you want to save your changes?"),
+                                                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         if (ret == QMessageBox::Save)
             return save();
         else if (ret == QMessageBox::Cancel)
@@ -96,18 +101,22 @@ bool MainWindow::maybeSave()
     return true;
 }
 
-void MainWindow::open(const QString & fileNameNew)
+void MainWindow::open(const QString &fileNameNew)
 {
-    if (maybeSave()) {
+    if (maybeSave())
+    {
         QString fileName = fileNameNew;
-        if (fileName.isEmpty()) {
+        if (fileName.isEmpty())
+        {
             fileName = QFileDialog::getOpenFileName(this, "", fileName, tr(m_fileFilter));
         }
 
-        if (!fileName.isEmpty()) {
+        if (!fileName.isEmpty())
+        {
             QString oldFileName = m_doc.getFileName();
             m_doc.setFileName(fileName);
-            if (!m_doc.read())  {
+            if (!m_doc.read())
+            {
                 warningMessage(tr("cannot open file:\n") + m_doc.getLastError());
                 m_doc.setFileName(oldFileName);
                 // update fileList
@@ -119,7 +128,7 @@ void MainWindow::open(const QString & fileNameNew)
 
             updateTitle();
             updateRecentFileActions();
-            reloadRecentFileActions();            
+            reloadRecentFileActions();
         }
     }
 
@@ -130,38 +139,47 @@ bool MainWindow::save()
 {
     QString oldFileName = m_doc.getFileName();
 
-    if (m_doc.isUntitled()) {
+    if (m_doc.isUntitled())
+    {
         if (!saveAs())
             return false;
     }
 
-    if (!m_doc.write() || !updateTitle())  {
+    if (!m_doc.write() || !updateTitle())
+    {
         warningMessage(tr("Can't write file"));
         m_doc.setFileName(oldFileName);
         return false;
     }
 
-    if (m_saveHTML) {
+    if (m_saveHTML)
+    {
         CFileWrap file;
         QString fileName = m_doc.getFileName();
         const char EDOC[] = ".edoc";
-        if (fileName.toLower().endsWith(EDOC)) {
+        if (fileName.toLower().endsWith(EDOC))
+        {
             fileName = fileName.mid(0, fileName.length() - strlen(EDOC));
         }
         const char HTML[] = ".html";
-        if (!fileName.toLower().endsWith(HTML)) {
+        if (!fileName.toLower().endsWith(HTML))
+        {
             fileName += HTML;
         }
-        if (file.open(fileName, QIODevice::WriteOnly)) {
+        if (file.open(fileName, QIODevice::WriteOnly))
+        {
             m_doc.dump(file);
             file.close();
-        }  else {
+        }
+        else
+        {
             // write error
-            warningMessage( QString(tr("can't write to %1")).arg(fileName) );
+            warningMessage(QString(tr("can't write to %1")).arg(fileName));
         }
     }
 
-    if (m_saveWiki) {
+    if (m_saveWiki)
+    {
         on_actionWiki_triggered();
     }
 
@@ -176,7 +194,8 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), m_doc.getFileName(), tr(m_fileFilter));
     if (fileName.isEmpty())
         return false;
-    if (!fileName.toLower().endsWith(".edoc")) {
+    if (!fileName.toLower().endsWith(".edoc"))
+    {
         fileName += ".edoc";
     }
 
@@ -198,14 +217,17 @@ bool MainWindow::updateTitle()
 {
     QString file;
 
-    if (m_doc.getFileName().isEmpty()) {
+    if (m_doc.getFileName().isEmpty())
+    {
         file = tr("untitled");
-    } else {
+    }
+    else
+    {
         file = QFileInfo(m_doc.getFileName()).fileName();
     }
 
     m_doc.setDirty(false);
-    setWindowTitle(tr("%1[*] - %2").arg( file  )  .arg(tr(m_appName)));
+    setWindowTitle(tr("%1[*] - %2").arg(file).arg(tr(m_appName)));
 
     return true;
 }
@@ -215,7 +237,8 @@ void MainWindow::initFileMenu()
     // gray out the open recent `nothin' yet`
     ui->actionNothing_yet->setEnabled(false);
 
-    for (int i = 0; i < MaxRecentFiles; i++) {
+    for (int i = 0; i < MaxRecentFiles; i++)
+    {
         m_recentFileActs[i] = new QAction(this);
         m_recentFileActs[i]->setVisible(false);
         ui->menuRecent_files->addAction(m_recentFileActs[i]);
@@ -230,14 +253,14 @@ void MainWindow::initFileMenu()
     ui->action_quit->setMenuRole(QAction::QuitRole);
 }
 
-
 void MainWindow::reloadRecentFileActions()
 {
     QSettings settings;
     QStringList files = settings.value("recentFileList").toStringList();
     int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
 
-    for (int i = 0; i < numRecentFiles; ++i) {
+    for (int i = 0; i < numRecentFiles; ++i)
+    {
         QString text = tr("&%1 %2").arg(i + 1).arg(QFileInfo(files[i]).fileName());
         m_recentFileActs[i]->setText(text);
         m_recentFileActs[i]->setData(files[i]);
@@ -256,7 +279,8 @@ void MainWindow::updateRecentFileActions()
     QStringList files = settings.value("recentFileList").toStringList();
     QString fileName = m_doc.getFileName();
     files.removeAll(fileName);
-    if (!fileName.isEmpty()) {
+    if (!fileName.isEmpty())
+    {
         files.prepend(fileName);
         while (files.size() > MaxRecentFiles)
             files.removeLast();
@@ -268,7 +292,8 @@ void MainWindow::updateRecentFileActions()
 void MainWindow::openRecentFile()
 {
     QAction *action = qobject_cast<QAction *>(sender());
-    if (action) {
+    if (action)
+    {
         open(action->data().toString());
     }
 }
@@ -280,12 +305,13 @@ void MainWindow::on_action_open_triggered()
 
 void MainWindow::on_action_save_triggered()
 {
-   save();
+    save();
 }
 
 void MainWindow::on_actionSave_as_triggered()
 {
-   if (saveAs()) {
+    if (saveAs())
+    {
         save();
     }
 }
@@ -294,17 +320,22 @@ void MainWindow::on_actionHTML_triggered()
 {
     QString fileFilter = tr("html documents (*.html)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export as HTML document..."), g_fileNameHTML, fileFilter);
-    if (!fileName.isEmpty()) {
+    if (!fileName.isEmpty())
+    {
         CFileWrap file;
-        if (!fileName.toLower().endsWith(".html")) {
+        if (!fileName.toLower().endsWith(".html"))
+        {
             fileName += ".html";
         }
-        if (file.open(fileName, QIODevice::WriteOnly)) {
+        if (file.open(fileName, QIODevice::WriteOnly))
+        {
             m_doc.dump(file);
             file.close();
-        }  else {
+        }
+        else
+        {
             // write error
-            warningMessage( QString(tr("can't write to %1")).arg(fileName) );
+            warningMessage(QString(tr("can't write to %1")).arg(fileName));
         }
     }
 }
@@ -319,7 +350,8 @@ void MainWindow::on_action_About_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
-    if (maybeSave()) {
+    if (maybeSave())
+    {
         m_doc.setFileName("");
         m_doc.setDirty(false);
         m_doc.removeAll();
@@ -332,17 +364,22 @@ void MainWindow::on_actionFunctionList_triggered()
 {
     QString fileFilter = tr("text files (*.txt)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Function List..."), "", fileFilter);
-    if (!fileName.isEmpty()) {
-        if (!fileName.toLower().endsWith(".txt")) {
+    if (!fileName.isEmpty())
+    {
+        if (!fileName.toLower().endsWith(".txt"))
+        {
             fileName += ".txt";
         }
         CFileWrap file;
-        if (file.open(fileName, QIODevice::WriteOnly)) {
+        if (file.open(fileName, QIODevice::WriteOnly))
+        {
             m_doc.exportList(file);
             file.close();
-        }  else {
+        }
+        else
+        {
             // write error
-            warningMessage( QString(tr("can't write to %1")).arg(fileName) );
+            warningMessage(QString(tr("can't write to %1")).arg(fileName));
         }
         g_fileNameHTML = fileName;
     }
@@ -357,7 +394,8 @@ void MainWindow::on_actionWiki_triggered()
     QSettings settings;
     QString folder = settings.value("wikiFolder", "").toString();
     folder = QFileDialog::getExistingDirectory(this, "Export Wiki to folder...", folder);
-    if (!folder.isEmpty()) {
+    if (!folder.isEmpty())
+    {
         QStringList fileList;
         m_doc.exportWiki(folder + "/", fileList);
         settings.setValue("wikiFolder", folder);
@@ -368,7 +406,8 @@ void MainWindow::on_actionWiki_triggered()
 void MainWindow::exportWiki(const char *path)
 {
     QString folder = path;
-    if (folder[folder.length()-1].toLatin1()!='/') {
+    if (folder[folder.length() - 1].toLatin1() != '/')
+    {
         folder += "/";
     }
     QStringList fileList;
@@ -379,20 +418,24 @@ void MainWindow::on_actionGameLua_triggered()
 {
     QString fileFilter = tr("GameLua.h (GameLua.h)");
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import..."), "", fileFilter);
-    if (!fileName.isEmpty()) {
+    if (!fileName.isEmpty())
+    {
         CFileWrap file;
-        if (file.open(fileName, QIODevice::ReadOnly)) {
+        if (file.open(fileName, QIODevice::ReadOnly))
+        {
             int size = file.getSize();
-            char *buf = new char[size+1];
-            buf[size]=0;
+            char *buf = new char[size + 1];
+            buf[size] = 0;
             file.read(buf, size);
             file.close();
             m_doc.importGameLua(buf);
-            delete [] buf;
+            delete[] buf;
             m_tabs->init(&m_doc);
-        }  else {
+        }
+        else
+        {
             // read error
-            warningMessage( QString(tr("can't read %1")).arg(fileName) );
+            warningMessage(QString(tr("can't read %1")).arg(fileName));
         }
     }
 }
@@ -421,7 +464,7 @@ void MainWindow::initToolbar()
 {
     ui->toolBar->setObjectName("mainToolbar");
     ui->toolBar->setWindowTitle(tr("Main"));
-    ui->toolBar->setIconSize( QSize(16,16) );
+    ui->toolBar->setIconSize(QSize(16, 16));
     ui->toolBar->addAction(ui->actionNew);
     ui->toolBar->addAction(ui->action_open);
     ui->toolBar->addAction(ui->action_save);

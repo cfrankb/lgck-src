@@ -19,18 +19,20 @@
 // Frame.cpp : implementation file
 //
 
-#include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
 #include <zlib.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include "Frame.h"
 #include "FrameSet.h"
 #include "DotArray.h"
 #include "CRC.h"
 #include "IFile.h"
 #include "helper.h"
+#include "win32patch.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFrame
@@ -158,7 +160,7 @@ void CFrame::write(IFile &file)
 
     if ((m_nLen > 0) && (m_nHei > 0))
     {
-        LONGUINT nDestLen;
+        ulong nDestLen;
         uint8_t *pDest;
         int err = compressData((uint8_t *)m_rgb, 4 * m_nLen * m_nHei, &pDest, nDestLen);
         if (err != Z_OK)
@@ -209,16 +211,16 @@ bool CFrame::read(IFile &file, int version)
             uint8_t *pSrc = new uint8_t[nSrcLen];
             file.read(pSrc, nSrcLen);
 
-            LONGUINT nDestLen = m_nLen * m_nHei * 4;
+            ulong nDestLen = m_nLen * m_nHei * 4;
 
             // create a new bitmap
             m_rgb = new uint32_t[m_nLen * m_nHei];
 
             int err = uncompress(
                 (uint8_t *)m_rgb,
-                (LONGUINT *)&nDestLen,
+                (ulong *)&nDestLen,
                 (uint8_t *)pSrc,
-                (LONGUINT)nSrcLen);
+                (ulong)nSrcLen);
 
             delete[] pSrc;
 
@@ -335,7 +337,7 @@ void CFrame::toPng(uint8_t *&png, int &totalSize, uint8_t *obl5data, int obl5siz
 
     // compress the data ....................................
     int scanLine = m_nLen * 4;
-    LONGUINT dataSize = (scanLine + 1) * m_nHei;
+    ulong dataSize = (scanLine + 1) * m_nHei;
     uint8_t *data = new uint8_t[dataSize];
     for (int y = 0; y < m_nHei; ++y)
     {
@@ -345,7 +347,7 @@ void CFrame::toPng(uint8_t *&png, int &totalSize, uint8_t *obl5data, int obl5siz
     }
 
     uint8_t *cData;
-    LONGUINT cDataSize;
+    ulong cDataSize;
     int err = compressData(data, dataSize, &cData, cDataSize);
     if (err != Z_OK)
     {
@@ -962,7 +964,7 @@ void CFrame::enlarge()
 
 void CFrame::shiftUP()
 {
-    uint32_t t[m_nLen];
+    auto t = new uint32_t[m_nLen];
 
     // copy first line to buffer
     memcpy(t, m_rgb, sizeof(uint32_t) * m_nLen);
@@ -975,11 +977,13 @@ void CFrame::shiftUP()
 
     // copy first line to last
     memcpy(&at(0, m_nHei - 1), t, sizeof(uint32_t) * m_nLen);
+
+    delete[] t;
 }
 
 void CFrame::shiftDOWN()
 {
-    uint32_t t[m_nLen];
+    auto t = new uint32_t[m_nLen];
 
     // copy first line to buffer
     memcpy(t, &at(0, m_nHei - 1), sizeof(uint32_t) * m_nLen);
@@ -992,6 +996,8 @@ void CFrame::shiftDOWN()
 
     // copy first line to last
     memcpy(m_rgb, t, sizeof(uint32_t) * m_nLen);
+
+    delete[] t;
 }
 
 void CFrame::shiftLEFT()

@@ -22,19 +22,17 @@
 #include <algorithm>
 #include <QResizeEvent>
 #include <QAbstractButton>
-#include "../shared/stdafx.h"
 #include "../shared/GameFile.h"
 #include "../shared/qtgui/cheat.h"
 #include "DlgSource.h"
 
-CWEditEvents::CWEditEvents(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::CWEditEvents)
+CWEditEvents::CWEditEvents(QWidget *parent) : QDockWidget(parent),
+                                              ui(new Ui::CWEditEvents)
 {
     ui->setupUi(this);
     m_game = nullptr;
     m_proto = -1;
-    m_event = -1;    
+    m_event = -1;
     m_events = new QString[CProtoArray::getEventCount()];
     ui->eSource->setFocus();
 }
@@ -42,13 +40,13 @@ CWEditEvents::CWEditEvents(QWidget *parent) :
 CWEditEvents::~CWEditEvents()
 {
     delete ui;
-    delete [] m_events;
+    delete[] m_events;
 }
 
-void CWEditEvents::resizeEvent (QResizeEvent *event)
+void CWEditEvents::resizeEvent(QResizeEvent *event)
 {
     QSize sizeDlg = event->size();
-    ui->eSource->resize(sizeDlg.width() - 4, sizeDlg.height() );
+    ui->eSource->resize(sizeDlg.width() - 4, sizeDlg.height());
 }
 
 void CWEditEvents::setGameFile(CGameFile *game)
@@ -58,29 +56,37 @@ void CWEditEvents::setGameFile(CGameFile *game)
 
 void CWEditEvents::setProto(int proto, int event)
 {
-    if (event == -1) {
+    if (event == -1)
+    {
         event = 0;
     }
 
-    if (proto != -1) {
-        if (proto != m_proto) {
-            if (m_proto != -1) {
+    if (proto != -1)
+    {
+        if (proto != m_proto)
+        {
+            if (m_proto != -1)
+            {
                 commitEvents();
             }
-            CObject & object = m_game->m_arrProto.getObject(proto);
-            for (int i=0; i < CProtoArray::getEventCount(); ++i) {
-                m_events[i] = QString(object.getEvent( i )).trimmed();
+            CObject &object = m_game->m_arrProto.getObject(proto);
+            for (int i = 0; i < CProtoArray::getEventCount(); ++i)
+            {
+                m_events[i] = QString(object.getEvent(i)).trimmed();
             }
-        } else {
-            if (event != m_event && m_event != -1) {
-                m_events[ m_event ] = ui->eSource->toPlainText().trimmed();
-                CObject & object = m_game->m_arrProto.getObject(proto);
-                object.setEvent( event, q2c(m_events[event]));
+        }
+        else
+        {
+            if (event != m_event && m_event != -1)
+            {
+                m_events[m_event] = ui->eSource->toPlainText().trimmed();
+                CObject &object = m_game->m_arrProto.getObject(proto);
+                object.setEvent(event, q2c(m_events[event]));
                 emit eventModified();
             }
         }
     }
-    m_proto = proto;   
+    m_proto = proto;
     m_event = event;
     reload();
 }
@@ -93,25 +99,32 @@ void CWEditEvents::setEvent(int event)
 
 void CWEditEvents::reload()
 {
-    if (m_events [ m_event ].isEmpty()) {
-        ui->eSource->setPlainText( "" );
-    } else {
-        ui->eSource->setPlainText( m_events [ m_event ] + "\n");
+    if (m_events[m_event].isEmpty())
+    {
+        ui->eSource->setPlainText("");
+    }
+    else
+    {
+        ui->eSource->setPlainText(m_events[m_event] + "\n");
     }
     ui->eSource->setFocus();
 }
 
 void CWEditEvents::commitEvents()
 {
-    if (m_event != -1) {
-        m_events[ m_event ] = ui->eSource->toPlainText().trimmed();
+    if (m_event != -1)
+    {
+        m_events[m_event] = ui->eSource->toPlainText().trimmed();
     }
-    if (m_proto != -1) {
-        CObject & object = m_game->m_arrProto.getObject(m_proto);
-        for (int i=0; i < CProtoArray::getEventCount(); ++i) {
-            if (m_events[i] != QString(object.getEvent( i )).trimmed()) {
-                object.setEvent( i, q2c(m_events[i]));
-                m_game->setDirty( true );
+    if (m_proto != -1)
+    {
+        CObject &object = m_game->m_arrProto.getObject(m_proto);
+        for (int i = 0; i < CProtoArray::getEventCount(); ++i)
+        {
+            if (m_events[i] != QString(object.getEvent(i)).trimmed())
+            {
+                object.setEvent(i, q2c(m_events[i]));
+                m_game->setDirty(true);
                 emit eventModified();
             }
         }
@@ -120,9 +133,12 @@ void CWEditEvents::commitEvents()
 
 void CWEditEvents::deleteSprite(int sprite)
 {
-    if (sprite > m_proto) {
-        -- m_proto;
-    } else if (sprite == m_proto) {
+    if (sprite > m_proto)
+    {
+        --m_proto;
+    }
+    else if (sprite == m_proto)
+    {
         m_proto = -1;
         m_event = -1;
         emit viewModeChanged();
@@ -142,7 +158,7 @@ void CWEditEvents::setFont(const QFont &font)
     CDlgSource::setFont(font);
 }
 
-void CWEditEvents::setOptions(COptionGroup & options)
+void CWEditEvents::setOptions(COptionGroup &options)
 {
     ui->eSource->setOptions(options);
     CDlgSource::setOptions(options);

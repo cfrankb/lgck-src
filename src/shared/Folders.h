@@ -19,7 +19,6 @@
 #ifndef FOLDERS_H
 #define FOLDERS_H
 
-#include "stdafx.h"
 #include <string>
 
 class ISerial;
@@ -34,18 +33,21 @@ public:
     class CFileEntry
     {
     public:
-        CFileEntry(){m_offset = -1 ; m_size = 0;}
-        const char * getName() { return m_name.c_str(); }
+        CFileEntry()
+        {
+            m_offset = -1;
+            m_size = 0;
+        }
+        const char *getName() { return m_name.c_str(); }
         int getOffset() { return m_offset; }
         int getSize() { return m_size; }
 
     protected:
-        bool writeFileIndex (IFile &file);
-        bool readFileIndex (IFile &file);
-        CFileEntry & operator = (CFileEntry & s) ;
+        bool writeFileIndex(IFile &file);
+        bool readFileIndex(IFile &file);
+        CFileEntry &operator=(CFileEntry &s);
 
     protected:
-
         std::string m_name;
         int m_offset;
         int m_size;
@@ -53,39 +55,40 @@ public:
         friend class CFolder;
     };
 
-    enum {
-        MAX_NAME           = 12,
-        MAX_FILENAME       = 32,
-        MAX_FILES          = 10,
+    enum
+    {
+        MAX_NAME = 12,
+        MAX_FILENAME = 32,
+        MAX_FILES = 10,
         FILELIST_HEADER_SIZE = 8,
         FILELIST_ENTRY_SIZE = MAX_FILENAME + 8,
-        GROW_BY             = 5
+        GROW_BY = 5
     };
 
-    const char * getName() { return m_name.c_str(); }
-    void setName(const char *name) { m_name = name;}
-    const CFolder & operator = (CFolder & s);
-    CFolder::CFileEntry * operator [] (const char * fileName);
-    CFolder::CFileEntry * operator [] (int i);
+    const char *getName() { return m_name.c_str(); }
+    void setName(const char *name) { m_name = name; }
+    const CFolder &operator=(CFolder &s);
+    CFolder::CFileEntry *operator[](const char *fileName);
+    CFolder::CFileEntry *operator[](int i);
     int getSize() { return m_size; }
 
-    CFileEntry & addFile(const char * name, int offset, int size=-1);
+    CFileEntry &addFile(const char *name, int offset, int size = -1);
 
 protected:
     std::string m_name;
     int m_offset;
     int m_size;
     int m_max;
-    CFileEntry *m_files ;
+    CFileEntry *m_files;
 
     bool writeFolderIndex(IFile &file);
     bool readFolderIndex(IFile &file);
-    bool writeFileIndex(IFile & file);
-    bool readFileIndex(IFile & file);
+    bool writeFileIndex(IFile &file);
+    bool readFileIndex(IFile &file);
     int getOffset() { return m_offset; }
-    void setOffset(int offset) { m_offset = offset;}
+    void setOffset(int offset) { m_offset = offset; }
 
-friend class CFolders;
+    friend class CFolders;
 };
 
 class CFolders
@@ -95,15 +98,19 @@ public:
     CFolders();
     ~CFolders();
 
-    IFile & getFile() { return *m_file; }
+    IFile &getFile() { return *m_file; }
     int getSize() { return m_fileSize; }
 
-    CFolder * operator [] (const char* name);
-    int operator += (const int size) { m_fileSize += size; return m_fileSize; }
-    bool open(IFile *file, bool create=false);
+    CFolder *operator[](const char *name);
+    int operator+=(const int size)
+    {
+        m_fileSize += size;
+        return m_fileSize;
+    }
+    bool open(IFile *file, bool create = false);
 
-    CFolder & addFolder(const char* name, int offset = -1);
-    void addFile(CFolder & folder, const char * srcfileName, const char * fileName);
+    CFolder &addFolder(const char *name, int offset = -1);
+    void addFile(CFolder &folder, const char *srcfileName, const char *fileName);
 
     bool writeHeader();
     bool readHeader();
@@ -111,12 +118,11 @@ public:
     bool readFolderIndex();
     bool writeFileIndex();
     bool readFileIndex();
-    bool writeFile(IFile &file, ISerial & serial, CFolder &folder, const char *name);
+    bool writeFile(IFile &file, ISerial &serial, CFolder &folder, const char *name);
 
-    CFolder::CFileEntry * checkOut(const char *filePath);
+    CFolder::CFileEntry *checkOut(const char *filePath);
 
 protected:
-
     IFile *m_file;
 
     int m_version;
@@ -125,11 +131,12 @@ protected:
     int m_size;
     int m_max;
 
-    enum {
-        HEADER_SIZE         = 16,
-        INDEX_HEADER_SIZE   =  8,
-        FOLDER_ENTRY_SIZE   = CFolder::MAX_FILENAME + 4, //16,
-        GROWBY              = 5
+    enum
+    {
+        HEADER_SIZE = 16,
+        INDEX_HEADER_SIZE = 8,
+        FOLDER_ENTRY_SIZE = CFolder::MAX_FILENAME + 4, // 16,
+        GROWBY = 5
     };
 
     CFolder *m_folders;

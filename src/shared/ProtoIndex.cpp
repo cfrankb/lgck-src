@@ -18,8 +18,10 @@
 #include "../shared/ProtoIndex.h"
 #include <cstring>
 #include <string>
+#include <algorithm>
 #include "ProtoArray.h"
 #include "vlamits3.h"
+#include "helper.h"
 
 /////////////////////////////////////////////////////////////////////
 // CProtoIndex
@@ -30,8 +32,7 @@ std::string CProtoIndex::m_arrFilters[] = {
     "Objects",
     "Player",
     "Monsters",
-    "Bullets"
-};
+    "Bullets"};
 
 const char *CProtoIndex::getFilterName(int i)
 {
@@ -40,7 +41,7 @@ const char *CProtoIndex::getFilterName(int i)
 
 int CProtoIndex::getFilterCount()
 {
-    return sizeof(m_arrFilters)/sizeof(std::string);
+    return sizeof(m_arrFilters) / sizeof(std::string);
 }
 
 CProtoIndex::CProtoIndex(CProtoArray *parent, int custom)
@@ -54,7 +55,8 @@ CProtoIndex::CProtoIndex(CProtoArray *parent, int custom)
 
 void CProtoIndex::forget()
 {
-    if (m_index) {
+    if (m_index)
+    {
         delete m_index;
         m_index = nullptr;
     }
@@ -68,10 +70,11 @@ CProtoIndex::~CProtoIndex()
 
 bool CProtoIndex::isAccepted(int protoId)
 {
-    CProto & proto = (*m_protoArray) [protoId];
-    int pClass =  proto.m_nClass ;
+    CProto &proto = (*m_protoArray)[protoId];
+    int pClass = proto.m_nClass;
 
-    switch (m_custom) {
+    switch (m_custom)
+    {
     case FILTER_NONE:
         return protoId != 0;
 
@@ -85,11 +88,10 @@ bool CProtoIndex::isAccepted(int protoId)
         return pClass == 0x1f;
 
     case FILTER_MONSTER:
-        return pClass >= 0x20 && pClass <= 0x40 ;
+        return pClass >= 0x20 && pClass <= 0x40;
 
     case FILTER_BULLET:
-        return pClass == CLASS_PLAYER_BULLET
-                || pClass == CLASS_CREATURE_BULLET;
+        return pClass == CLASS_PLAYER_BULLET || pClass == CLASS_CREATURE_BULLET;
     }
 
     return false;
@@ -98,9 +100,11 @@ bool CProtoIndex::isAccepted(int protoId)
 void CProtoIndex::init()
 {
     forget();
-    m_index = new int [ m_protoArray->getSize() ] ;
-    for (int j = 0; j < m_protoArray->getSize(); ++j) {
-        if (isAccepted(j) && matchString(j)) {
+    m_index = new int[m_protoArray->getSize()];
+    for (int j = 0; j < m_protoArray->getSize(); ++j)
+    {
+        if (isAccepted(j) && matchString(j))
+        {
             insert(j);
         }
     }
@@ -113,49 +117,62 @@ int CProtoIndex::findPos(int protoId)
     int min = 0;
     int max = m_size - 1;
     const char *newName = m_protoArray->getObject(protoId).proto().getName();
-    while (max >= min) {
+    while (max >= min)
+    {
         i = min + (max - min) / 2;
-        int result = strcasecmp( m_protoArray->getObject(m_index[i]).proto().getName(), newName );
-        if (result <= 0) {
+        int result = istrcmp(m_protoArray->getObject(m_index[i]).proto().getName(), newName);
+        if (result <= 0)
+        {
             min = i + 1;
-        } else {
+        }
+        else
+        {
             max = i - 1;
         }
     }
 
-    if (m_size && (strcasecmp( m_protoArray->getObject(m_index[i]).proto().getName(), newName) <= 0)) {
+    if (m_size && (istrcmp(m_protoArray->getObject(m_index[i]).proto().getName(), newName) <= 0))
+    {
         ++i;
     }
     return i;
 }
 
 // find the position for a given protoId
-int CProtoIndex::findProto (int protoId)
+int CProtoIndex::findProto(int protoId)
 {
-    for (int i=0; i< m_size; ++i) {
-        if (m_index[i]==protoId) {
+    for (int i = 0; i < m_size; ++i)
+    {
+        if (m_index[i] == protoId)
+        {
             return i;
         }
     }
     return -1;
 }
 
-void CProtoIndex::removeIndex (int pos )
+void CProtoIndex::removeIndex(int pos)
 {
-    for (int k = pos ; k < m_size - 1; ++k) {
+    for (int k = pos; k < m_size - 1; ++k)
+    {
         m_index[k] = m_index[k + 1];
     }
     --m_size;
 }
 
-void CProtoIndex::removeFromIndex (int protoId)
+void CProtoIndex::removeFromIndex(int protoId)
 {
-    for (int k=0; k < m_size; ++k) {
-        if (m_index[k] > protoId) {
-            -- m_index[k];
-        } else {
-            if (m_index[k] == protoId) {
-                removeIndex ( k );
+    for (int k = 0; k < m_size; ++k)
+    {
+        if (m_index[k] > protoId)
+        {
+            --m_index[k];
+        }
+        else
+        {
+            if (m_index[k] == protoId)
+            {
+                removeIndex(k);
                 --k;
             }
         }
@@ -164,8 +181,9 @@ void CProtoIndex::removeFromIndex (int protoId)
 
 int CProtoIndex::insert(int protoId)
 {
-    int i = findPos( protoId );
-    for (int k = m_size ; k > i; --k) {
+    int i = findPos(protoId);
+    for (int k = m_size; k > i; --k)
+    {
         m_index[k] = m_index[k - 1];
     }
     m_index[i] = protoId;
@@ -176,13 +194,14 @@ int CProtoIndex::insert(int protoId)
 
 void CProtoIndex::resizeIndex(int newSize)
 {
-    int *t = new int [ newSize ] ;
+    int *t = new int[newSize];
 
-    for (int i = 0; i < m_size; ++i) {
-        t[i] = m_index[i] ;
+    for (int i = 0; i < m_size; ++i)
+    {
+        t[i] = m_index[i];
     }
 
-    delete [] m_index;
+    delete[] m_index;
     m_index = t;
 }
 
@@ -191,7 +210,7 @@ int CProtoIndex::getSize()
     return m_size;
 }
 
-int CProtoIndex::operator [] (int i)
+int CProtoIndex::operator[](int i)
 {
     return m_index[i];
 }
@@ -203,14 +222,14 @@ void CProtoIndex::setTextFilter(const char *search)
     m_search = tmp;
 }
 
-bool CProtoIndex::matchString(int protoId) {
-    if (m_search.length() != 0) {
-        CProto & proto = (*m_protoArray) [protoId];
+bool CProtoIndex::matchString(int protoId)
+{
+    if (m_search.length() != 0)
+    {
+        CProto &proto = (*m_protoArray)[protoId];
         std::string tmp = proto.m_szName;
         transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
         return tmp.find(m_search) != std::string::npos;
     }
     return true;
 }
-
-

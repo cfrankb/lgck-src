@@ -22,35 +22,35 @@
 class IFile;
 class CProto;
 
-#include "stdafx.h"
-
 // LevelEntry.h : header file
 //
 
 /////////////////////////////////////////////////////////////////////////////
-// CLevelEntry 
+// CLevelEntry
 
-constexpr uint8_t TRIGGER_KEYS    = 0x1f;
+#include <stdint.h>
+
+constexpr uint8_t TRIGGER_KEYS = 0x1f;
 constexpr uint8_t TRIGGER_DEATH_FLIP = 0x10;
-constexpr uint8_t TRIGGER_GOAL    = 0x20;
-constexpr uint8_t TRIGGER_FROZEN  = 0x40;
-constexpr uint8_t TRIGGER_HIDDEN  = 0x80;
-constexpr uint8_t TRIGGER_MASK    = 0xe0; // flipmask
+constexpr uint8_t TRIGGER_GOAL = 0x20;
+constexpr uint8_t TRIGGER_FROZEN = 0x40;
+constexpr uint8_t TRIGGER_HIDDEN = 0x80;
+constexpr uint8_t TRIGGER_MASK = 0xe0; // flipmask
 
 constexpr uint8_t DIFFICULTY_NORMAL = 0x01;
 constexpr uint8_t DIFFICULTY_NIGHTMARE = 0x02;
-constexpr uint8_t DIFFICULTY_HELL   = 0x04;
+constexpr uint8_t DIFFICULTY_HELL = 0x04;
 constexpr uint8_t DIFFICULTY_INSANE = 0x08;
 constexpr uint8_t DIFFICULTY_ALL = 0xf;
 
-class CLevelEntry 
+class CLevelEntry
 {
     // Construction
 public:
-    CLevelEntry (int imageSet, int imageNo, int x, int y, bool show);
-    CLevelEntry (const CLevelEntry & entry);
-    CLevelEntry (const CProto & proto);
-    CLevelEntry (int x, int y);
+    CLevelEntry(int imageSet, int imageNo, int x, int y, bool show);
+    CLevelEntry(const CLevelEntry &entry);
+    CLevelEntry(const CProto &proto);
+    CLevelEntry(int x, int y);
     CLevelEntry();
 
     // Attributes
@@ -66,18 +66,18 @@ public:
 
     // Operations
 public:
-    void moveTo (CLevelEntry &entry);
-    void moveTo (int x, int y);
-    void moveBy (int byX, int byY);
-    CLevelEntry & operator = (const CLevelEntry & src);
+    void moveTo(CLevelEntry &entry);
+    void moveTo(int x, int y);
+    void moveBy(int byX, int byY);
+    CLevelEntry &operator=(const CLevelEntry &src);
 
     // Implementation
 public:
     ~CLevelEntry();
-    void read (IFile &file);
-    void write (IFile & file);
-    bool operator != (CLevelEntry & s);
-    bool operator == (CLevelEntry & s);
+    void read(IFile &file);
+    void write(IFile &file);
+    bool operator!=(CLevelEntry &s);
+    bool operator==(CLevelEntry &s);
 
     uint8_t m_nAim;
     uint8_t m_nStateFlag; // user by player at runtime
@@ -99,7 +99,7 @@ public:
     // 40              frozen
     // 80              hidden
 
-    int16_t m_nProto;     // sprite type id
+    int16_t m_nProto; // sprite type id
     uint16_t m_path;
     uint16_t m_playback;
 };

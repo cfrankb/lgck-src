@@ -20,13 +20,14 @@
 //
 #include <cstring>
 #include <cstdio>
-#include "stdafx.h"
+#include <stdint.h>
 #include "FrameSet.h"
 #include "Frame.h"
 #include <zlib.h>
 #include "IFile.h"
 #include "PngMagic.h"
 #include "helper.h"
+#include "win32patch.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFrameSet
@@ -100,9 +101,9 @@ void CFrameSet::write0x501(IFile &file)
         ptr += 4 * frame->m_nLen * frame->m_nHei;
     }
 
-    LONGUINT destSize;
+    ulong destSize;
     uint8_t *dest;
-    int err = compressData((uint8_t *)buffer, (LONGUINT)totalSize, &dest, destSize);
+    int err = compressData((uint8_t *)buffer, (ulong)totalSize, &dest, destSize);
     if (err != Z_OK)
     {
         // CLuaVM::debugv("CFrameSet::write0x501 error: %d", err);
@@ -216,9 +217,9 @@ bool CFrameSet::read0x501(IFile &file, int size)
 
     int err = uncompress(
         (uint8_t *)buffer,
-        (LONGUINT *)&totalSize,
+        (ulong *)&totalSize,
         (uint8_t *)srcBuffer,
-        (LONGUINT)srcSize);
+        (ulong)srcSize);
 
     if (err)
     {
@@ -706,16 +707,16 @@ bool CFrameSet::extract(IFile &file, char *out_format)
             }
             else
             {
-                LONGUINT nSrcLen = 0;
+                ulong nSrcLen = 0;
                 file.read(&nSrcLen, 4);
                 uint8_t *pSrc = new uint8_t[nSrcLen];
                 file.read(pSrc, nSrcLen);
-                LONGUINT nDestLen = frame->m_nLen * frame->m_nHei;
+                ulong nDestLen = frame->m_nLen * frame->m_nHei;
                 int err = uncompress(
                     (uint8_t *)bitmap,
-                    (LONGUINT *)&nDestLen,
+                    (ulong *)&nDestLen,
                     (uint8_t *)pSrc,
-                    (LONGUINT)nSrcLen);
+                    (ulong)nSrcLen);
                 if (err)
                 {
                     m_lastError = "CFrameSet::extract zlib error";
@@ -905,8 +906,8 @@ void CFrameSet::toPng(unsigned char *&data, int &size)
 {
     if (m_size > 1)
     {
-        short xx[m_size];
-        short yy[m_size];
+        auto xx = new short[m_size];
+        auto yy = new short[m_size];
         int width = 0;
         int height = 0;
         for (int i = 0; i < m_size; ++i)
@@ -915,7 +916,6 @@ void CFrameSet::toPng(unsigned char *&data, int &size)
             height = std::max(height, m_arrFrames[i]->m_nHei);
             xx[i] = m_arrFrames[i]->m_nLen;
             yy[i] = m_arrFrames[i]->m_nHei;
-            ;
         }
 
         CFrame *frame = new CFrame(width, height);
@@ -953,6 +953,8 @@ void CFrameSet::toPng(unsigned char *&data, int &size)
         frame->toPng(data, size, buf, t_size);
         delete frame;
         delete[] buf;
+        delete[] xx;
+        delete[] yy;
     }
     else
     {

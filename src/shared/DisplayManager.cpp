@@ -40,41 +40,45 @@ CDisplayManager::CDisplayManager(CGame *game, IImageManager *im, IGraphics *gm)
     m_imageManager = im;
     m_graphics = gm;
 
-    m_displays = new CDisplay[ GROWBY ];
+    m_displays = new CDisplay[GROWBY];
     m_size = 0;
     m_max = GROWBY;
 }
 
 CDisplayManager::~CDisplayManager()
 {
-    if (m_displays) {
-        delete [] m_displays;
+    if (m_displays)
+    {
+        delete[] m_displays;
     }
 }
 
-CDisplay & CDisplayManager::add(CDisplay & display)
+CDisplay &CDisplayManager::add(CDisplay &display)
 {
     int j = indexOf(display.name());
-    if (j == NOT_FOUND) {
-        if (m_size == m_max) {
+    if (j == NOT_FOUND)
+    {
+        if (m_size == m_max)
+        {
             m_max += GROWBY;
-            CDisplay *t = new CDisplay [ m_max ];
-            for (int i=0; i < m_size; ++i) {
+            CDisplay *t = new CDisplay[m_max];
+            for (int i = 0; i < m_size; ++i)
+            {
                 t[i] = m_displays[i];
             }
-            delete [] m_displays;
+            delete[] m_displays;
             m_displays = t;
         }
-        ++ m_size;
+        ++m_size;
         j = m_size - 1;
     }
     m_displays[j] = display;
     return m_displays[j];
 }
 
-CDisplay & CDisplayManager::add(const char *name, int x, int y, int type)
+CDisplay &CDisplayManager::add(const char *name, int x, int y, int type)
 {
-    CDisplay display (name, x, y, type);
+    CDisplay display(name, x, y, type);
     return add(display);
 }
 
@@ -85,42 +89,47 @@ void CDisplayManager::removeAll()
 
 void CDisplayManager::removeAt(int i)
 {
-    for (; i < m_size - 2; ++i) {
-        m_displays [i] = m_displays [i + 1];
+    for (; i < m_size - 2; ++i)
+    {
+        m_displays[i] = m_displays[i + 1];
     }
 }
 
-CDisplay & CDisplayManager::operator [] (int i)
+CDisplay &CDisplayManager::operator[](int i)
 {
-    return m_displays [ i ] ;
+    return m_displays[i];
 }
 
-CDisplay & CDisplayManager::operator [] (const char * name)
+CDisplay &CDisplayManager::operator[](const char *name)
 {
     return get(name);
 }
 
-CDisplay & CDisplayManager::get(const char * name)
+CDisplay &CDisplayManager::get(const char *name)
 {
-    for (int i=0; i < m_size; ++i) {
-        if (std::string(m_displays[i].name()) == name) {
-            return m_displays [ i ];
+    for (int i = 0; i < m_size; ++i)
+    {
+        if (std::string(m_displays[i].name()) == name)
+        {
+            return m_displays[i];
         }
     }
-    return m_displays [ 0 ];
+    return m_displays[0];
 }
 
 int CDisplayManager::findDisplay(const char *name)
 {
-    for (int i=0; i < m_size; ++i) {
-        if (std::string(m_displays[i].name()) == name) {
-            return  i ;
+    for (int i = 0; i < m_size; ++i)
+    {
+        if (std::string(m_displays[i].name()) == name)
+        {
+            return i;
         }
     }
     return -1;
 }
 
-void CDisplayManager::drawImage(CDisplay & display)
+void CDisplayManager::drawImage(CDisplay &display)
 {
     int screenLen;
     int screenHei;
@@ -129,9 +138,11 @@ void CDisplayManager::drawImage(CDisplay & display)
     m_graphics->getScreenSize(screenLen, screenHei);
     int flagX = display.flagX();
     int flagY = display.flagY();
-    if (flagX || flagY) {
-        CFrame & frame = m_game->toFrame(display.imageSet(), display.imageNo());
-        switch (flagX) {
+    if (flagX || flagY)
+    {
+        CFrame &frame = m_game->toFrame(display.imageSet(), display.imageNo());
+        switch (flagX)
+        {
         case CDisplay::FLAG_X_ALIGN_LEFT:
             x = 0;
             break;
@@ -141,7 +152,8 @@ void CDisplayManager::drawImage(CDisplay & display)
         case CDisplay::FLAG_X_ALIGN_CENTER:
             x = (screenLen - frame.m_nLen) / 2;
         }
-        switch (flagY) {
+        switch (flagY)
+        {
         case CDisplay::FLAG_Y_ALIGN_TOP:
             y = 0;
             break;
@@ -155,7 +167,7 @@ void CDisplayManager::drawImage(CDisplay & display)
     m_graphics->ss_paintImage(x, y, display.imageSet(), display.imageNo());
 }
 
-int CDisplayManager::computeY(CDisplay & display, int sy)
+int CDisplayManager::computeY(CDisplay &display, int sy)
 {
     int flagY = display.flagY();
     int screenLen;
@@ -163,18 +175,26 @@ int CDisplayManager::computeY(CDisplay & display, int sy)
     m_graphics->getScreenSize(screenLen, screenHei);
 
     int y = display.y();
-    if (y < 0) {
-        if ( y != -1) {
+    if (y < 0)
+    {
+        if (y != -1)
+        {
             y = screenHei - display.y();
-        } else {
-            if (y == -1) {
-                y = (screenHei - sy ) / 2;
-            } else {
+        }
+        else
+        {
+            if (y == -1)
+            {
+                y = (screenHei - sy) / 2;
+            }
+            else
+            {
                 y = screenHei - y;
             }
         }
     }
-    switch (flagY) {
+    switch (flagY)
+    {
     case CDisplay::FLAG_Y_ALIGN_TOP:
         y = 0;
         break;
@@ -187,26 +207,34 @@ int CDisplayManager::computeY(CDisplay & display, int sy)
     return y;
 }
 
-int CDisplayManager::computeX(CDisplay & display, int sx)
+int CDisplayManager::computeX(CDisplay &display, int sx)
 {
     int flagX = display.flagX();
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
     int x = display.x();
-    if (x < 0) {
-        if ( x != -1) {
+    if (x < 0)
+    {
+        if (x != -1)
+        {
             x = screenLen + display.x();
-        } else {
-            if (x == -1) {
+        }
+        else
+        {
+            if (x == -1)
+            {
                 x = (screenLen - sx) / 2;
-            } else {
+            }
+            else
+            {
                 x = screenLen - x;
             }
         }
     }
 
-    switch (flagX) {
+    switch (flagX)
+    {
     case CDisplay::FLAG_X_ALIGN_LEFT:
         x = 0;
         break;
@@ -219,63 +247,68 @@ int CDisplayManager::computeX(CDisplay & display, int sx)
     return x;
 }
 
-void CDisplayManager::drawText(CDisplay & display)
+void CDisplayManager::drawText(CDisplay &display)
 {
     CFont *font = m_game->getFonts()->at(display.font());
-    if (!font) {
+    if (!font)
+    {
         CLuaVM::debugv("warning: invalid fontID: %d", display.font());
         font = m_game->getFonts()->at(0);
     }
     font->FaceSize(display.size());
 
-    std::list<std::string> & lines = display.lines();
+    std::list<std::string> &lines = display.lines();
     int dy = display.size();
     int sy = dy * lines.size();
     int y = computeY(display, sy);
 
     std::list<std::string>::iterator it;
-    for (it = lines.begin(); it != lines.end(); ++it) {
+    for (it = lines.begin(); it != lines.end(); ++it)
+    {
         int sx = font->Advance(it->c_str());
         int x = computeX(display, sx);
-        if (display.shadow()) {
+        if (display.shadow())
+        {
             Color color = {(uint8_t)display.shadowR(), (uint8_t)display.shadowG(), (uint8_t)display.shadowB(), (uint8_t)display.shadowA()};
             m_graphics->render(*font, it->c_str(), x + display.shadowX(), y + display.shadowY(), color);
         }
 
-        Color color = { (uint8_t)display.red(), (uint8_t)display.green(), (uint8_t)display.blue(), (uint8_t)display.alpha()};
+        Color color = {(uint8_t)display.red(), (uint8_t)display.green(), (uint8_t)display.blue(), (uint8_t)display.alpha()};
         m_graphics->render(*font, it->c_str(), x, y, color);
         y += dy;
     }
 }
 
-void CDisplayManager::drawLives(CDisplay & display)
+void CDisplayManager::drawLives(CDisplay &display)
 {
     char *tmp = nullptr;
-    if (asprintf(&tmp, display.templateStr(), m_game->getLives()) == -1) {
-        qDebug("asprintf alloc failure in CDisplayManager::drawLives");
+    if (asprintf(&tmp, display.templateStr(), m_game->getLives()) == -1)
+    {
+        puts("asprintf alloc failure in CDisplayManager::drawLives");
     }
     display.setText(tmp, CDisplay::DISPLAY_SAME);
     free(tmp);
     drawText(display);
 }
 
-void CDisplayManager::drawCounter(CDisplay & display)
+void CDisplayManager::drawCounter(CDisplay &display)
 {
     char *tmp = nullptr;
-    if (asprintf(&tmp, display.templateStr(), m_game->counter(display.source())) == -1) {
-        qDebug("asprintf alloc failure in CDisplayManager::drawLives");
+    if (asprintf(&tmp, display.templateStr(), m_game->counter(display.source())) == -1)
+    {
+        puts("asprintf alloc failure in CDisplayManager::drawLives");
     }
     display.setText(tmp, CDisplay::DISPLAY_SAME);
     free(tmp);
     drawText(display);
 }
 
-const char* CDisplayManager::signature()
+const char *CDisplayManager::signature()
 {
     return "dm-opengl";
 }
 
-CDisplay & CDisplayManager::getAt(int i)
+CDisplay &CDisplayManager::getAt(int i)
 {
     return m_displays[i];
 }
@@ -287,13 +320,15 @@ int CDisplayManager::getSize()
 
 bool CDisplayManager::isValidIndex(int i)
 {
-    return i>=0 && i < m_size;
+    return i >= 0 && i < m_size;
 }
 
 void CDisplayManager::draw()
 {
-    for (int i=0; i < m_size; ++i) {
-        if (m_displays[i].visible()) {
+    for (int i = 0; i < m_size; ++i)
+    {
+        if (m_displays[i].visible())
+        {
             drawDisplay(m_displays[i]);
         }
     }
@@ -303,15 +338,21 @@ void CDisplayManager::draw()
 int CDisplayManager::display_sizeText(int displayId, const char *text)
 {
     CFont *font = m_game->getFonts()->find(DEFAULT_FONT);
-    if (isValidIndex(displayId)) {
-        CDisplay & display = m_displays[displayId];
+    if (isValidIndex(displayId))
+    {
+        CDisplay &display = m_displays[displayId];
         font->FaceSize(display.size());
-        if (text){
+        if (text)
+        {
             return font->Advance(text);
-        } else {
+        }
+        else
+        {
             return font->Advance(display.text());
         }
-    } else {
+    }
+    else
+    {
         return -1;
     }
 }
@@ -331,8 +372,10 @@ void CDisplayManager::drawText(int x, int y, const char *text, int fontID, int f
 
 int CDisplayManager::indexOf(const char *name)
 {
-    for (int i=0; i < m_size; ++i) {
-        if (std::string(m_displays[i].name()) == name) {
+    for (int i = 0; i < m_size; ++i)
+    {
+        if (std::string(m_displays[i].name()) == name)
+        {
             return i;
         }
     }
@@ -344,20 +387,21 @@ void CDisplayManager::drawHP()
     int screenLen;
     int screenHei;
     m_graphics->getScreenSize(screenLen, screenHei);
-    CActor & player = m_game->getPlayer();
+    CActor &player = m_game->getPlayer();
     int sy = 16;
     int sx = player.getHP() * 2;
 
-    CDisplay & display = get("healthbar");
+    CDisplay &display = get("healthbar");
     int x = computeX(display, sx);
     int y = computeY(display, sy);
 
     uint8_t a = m_game->getDisplayAlpha();
-    if (a) {
+    if (a)
+    {
         int topY = m_graphics->isFlipped() ? y - sy : screenHei - y;
         int bottomY = m_graphics->isFlipped() ? y : screenHei - y - sy;
-        m_graphics->paint(x,topY, x + sx, bottomY, display.rgb() + (a << 24));
-        m_graphics->paint(x,topY, x + sx, bottomY, 0xffffff + (a << 24), false);
+        m_graphics->paint(x, topY, x + sx, bottomY, display.rgb() + (a << 24));
+        m_graphics->paint(x, topY, x + sx, bottomY, 0xffffff + (a << 24), false);
     }
 }
 
@@ -368,13 +412,16 @@ void CDisplayManager::drawInventory()
     m_graphics->getScreenSize(screenLen, screenHei);
     const CInventory *inventory = m_game->getInventory();
     int i = 0;
-    for (int j=0; inventory && (j < inventory->getSize()); ++j) {
-        if ((*inventory)[j] != 0) {
+    for (int j = 0; inventory && (j < inventory->getSize()); ++j)
+    {
+        if ((*inventory)[j] != 0)
+        {
             CProto proto = m_game->m_arrProto[(*inventory)[j]];
-            if (!proto.getOption(CProto::OPTION_INVENTORY_HIDDEN)) {
+            if (!proto.getOption(CProto::OPTION_INVENTORY_HIDDEN))
+            {
                 int imageSet = proto.m_nFrameSet;
                 int imageNo = proto.m_nFrameNo;
-                CFrame & frame = m_game->toFrame(imageSet, imageNo);
+                CFrame &frame = m_game->toFrame(imageSet, imageNo);
                 int x = screenLen - frame.m_nLen - 4;
                 int y = 32 * (i + 1) + 4;
                 m_graphics->ss_paintImage(x, y, imageSet, imageNo);
@@ -384,17 +431,22 @@ void CDisplayManager::drawInventory()
     }
 }
 
-void CDisplayManager::drawDisplay(CDisplay & display)
+void CDisplayManager::drawDisplay(CDisplay &display)
 {
     char *tmp = nullptr;
     int score;
 
-    switch (display.type()) {
+    switch (display.type())
+    {
     case CDisplay::DISPLAY_TIME_LEFT:
-        if (m_game->getTimeLeft()  > 0) {
-            if (asprintf(&tmp, display.templateStr(), m_game->getTimeLeft())==-1) {
-                qDebug("malloc failure in CDisplayManager::drawDisplay(CDisplay & display)");
-            } else {
+        if (m_game->getTimeLeft() > 0)
+        {
+            if (asprintf(&tmp, display.templateStr(), m_game->getTimeLeft()) == -1)
+            {
+                puts("malloc failure in CDisplayManager::drawDisplay(CDisplay & display)");
+            }
+            else
+            {
                 display.setText(tmp, CDisplay::DISPLAY_SAME);
                 free(tmp);
                 drawText(display);
@@ -408,7 +460,7 @@ void CDisplayManager::drawDisplay(CDisplay & display)
 
     case CDisplay::DISPLAY_DEBUGX:
         // TODO: DEPRECATED fix this function
-        //display.setText(m_game->m_lua.getDebugText(), CDisplay::DISPLAY_SAME);
+        // display.setText(m_game->m_lua.getDebugText(), CDisplay::DISPLAY_SAME);
         drawText(display);
         break;
 
@@ -418,9 +470,12 @@ void CDisplayManager::drawDisplay(CDisplay & display)
 
     case CDisplay::DISPLAY_SCORE:
         score = m_game->getScore();
-        if (asprintf(&tmp, display.templateStr(), score) == -1) {
-            qDebug("malloc failure in CDisplayManager::drawDisplay(CDisplay & display)");
-        } else {
+        if (asprintf(&tmp, display.templateStr(), score) == -1)
+        {
+            puts("malloc failure in CDisplayManager::drawDisplay(CDisplay & display)");
+        }
+        else
+        {
             display.setText(tmp, CDisplay::DISPLAY_SAME);
             free(tmp);
             drawText(display);

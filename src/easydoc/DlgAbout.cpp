@@ -18,16 +18,14 @@
 
 #include "DlgAbout.h"
 #include "ui_DlgAbout.h"
-#include "../shared/stdafx.h"
 #include <QDesktopServices>
 #include <QUrl>
-#include "../shared/FileWrap.h"
+#include "FileWrap.h"
 #include "../shared/Credits.h"
 #include "../shared/ss_version.h"
 
-CDlgAbout::CDlgAbout(QWidget *parent) :
-    QDialog(parent),
-    m_ui(new Ui::CDlgAbout)
+CDlgAbout::CDlgAbout(QWidget *parent) : QDialog(parent),
+                                        m_ui(new Ui::CDlgAbout)
 {
     m_ui->setupUi(this);
 
@@ -35,13 +33,17 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     QString s;
     QString ver;
     int version = SS_LGCK_VERSION;
-    for (int i=0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i)
+    {
         s = QString("%1").arg(version % 256);
         version /= 256;
-        if (i) {
-            ver =  s + "." + ver  ;
-        } else {
-            ver = s + ver ;
+        if (i)
+        {
+            ver = s + "." + ver;
+        }
+        else
+        {
+            ver = s + ver;
         }
     }
     ver = "<b>" + tr("Version ") + ver + "</b>";
@@ -50,29 +52,31 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
 
     // license GPL
     CFileWrap file;
-    if (file.open(":/res/gpl.txt")) {
+    if (file.open(":/res/gpl.txt"))
+    {
         int size = file.getSize();
-        char *buf = new char[ size + 1 ];
-        buf [size ] = 0;
+        char *buf = new char[size + 1];
+        buf[size] = 0;
         file.read(buf, size);
         file.close();
-        m_ui->eLicense->setPlainText( buf );
-        delete [] buf;
+        m_ui->eLicense->setPlainText(buf);
+        delete[] buf;
     }
-    m_ui->eLicense->setReadOnly( true );
+    m_ui->eLicense->setReadOnly(true);
 
     // legal text
 
-    if (file.open(":/res/license.txt")) {
+    if (file.open(":/res/license.txt"))
+    {
         int size = file.getSize();
-        char *buf = new char[ size + 1 ];
-        buf [size ] = 0;
+        char *buf = new char[size + 1];
+        buf[size] = 0;
         file.read(buf, size);
         file.close();
-        m_ui->eLegal->setPlainText( buf );
-        delete [] buf;
+        m_ui->eLegal->setPlainText(buf);
+        delete[] buf;
     }
-    m_ui->eLegal->setReadOnly( true );
+    m_ui->eLegal->setReadOnly(true);
 
     // team
     m_ui->treeTeam->setColumnCount(2);
@@ -82,7 +86,8 @@ CDlgAbout::CDlgAbout(QWidget *parent) :
     m_ui->treeTeam->setRootIsDecorated(false);
     m_ui->treeTeam->setAlternatingRowColors(true);
 
-    for (int i = 0; team[i].name; ++i) {
+    for (int i = 0; team[i].name; ++i)
+    {
         QTreeWidgetItem *item = new QTreeWidgetItem(0);
         item->setText(0, team[i].name);
         item->setText(1, team[i].job);
@@ -98,7 +103,8 @@ CDlgAbout::~CDlgAbout()
 void CDlgAbout::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);
-    switch (e->type()) {
+    switch (e->type())
+    {
     case QEvent::LanguageChange:
         m_ui->retranslateUi(this);
         break;
@@ -107,10 +113,10 @@ void CDlgAbout::changeEvent(QEvent *e)
     }
 }
 
-void CDlgAbout::setGLInfo(const QString & vendor,
-               const QString & renderer,
-               const QString & version,
-               const QString & extensions)
+void CDlgAbout::setGLInfo(const QString &vendor,
+                          const QString &renderer,
+                          const QString &version,
+                          const QString &extensions)
 {
     m_ui->sOpenGLRenderer->setText(renderer);
     m_ui->sOpenGLVendor->setText(vendor);
@@ -118,7 +124,8 @@ void CDlgAbout::setGLInfo(const QString & vendor,
     QRegExp rx("(\\ )");
     QStringList extList = extensions.split(rx);
     for (QStringList::iterator it = extList.begin();
-        it != extList.end(); ++it) {
+         it != extList.end(); ++it)
+    {
         QString current = *it;
         m_ui->cbExtensions->addItem(current);
     }

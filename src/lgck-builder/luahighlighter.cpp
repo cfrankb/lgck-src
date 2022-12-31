@@ -68,9 +68,8 @@
 #include "luahighlighter.h"
 #include "../shared/qtgui/qfilewrap.h"
 
-
-const QBrush orange = QBrush(QColor(255,165,0));
-const QBrush darkOrange = QBrush(QColor(0xa3,0x5a,0x00));
+const QBrush orange = QBrush(QColor(255, 165, 0));
+const QBrush darkOrange = QBrush(QColor(0xa3, 0x5a, 0x00));
 
 CLuaHighlighter::CLuaHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
@@ -121,9 +120,10 @@ CLuaHighlighter::CLuaHighlighter(QTextDocument *parent)
     commentEndExpression = QRegularExpression(QStringLiteral("[--]{0,1}\\]\\]"));
 }
 
-void CLuaHighlighter::applyRule(const QStringList & words, const QTextCharFormat & format)
+void CLuaHighlighter::applyRule(const QStringList &words, const QTextCharFormat &format)
 {
-    for (const QString &pattern : words) {
+    for (const QString &pattern : words)
+    {
         HighlightingRule rule;
         rule.pattern = QRegularExpression("\\b" + pattern + "\\b");
         rule.format = format;
@@ -133,9 +133,11 @@ void CLuaHighlighter::applyRule(const QStringList & words, const QTextCharFormat
 
 void CLuaHighlighter::highlightBlock(const QString &text)
 {
-    for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
+    for (const HighlightingRule &rule : qAsConst(highlightingRules))
+    {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
-        while (matchIterator.hasNext()) {
+        while (matchIterator.hasNext())
+        {
             QRegularExpressionMatch match = matchIterator.next();
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
         }
@@ -146,16 +148,19 @@ void CLuaHighlighter::highlightBlock(const QString &text)
     if (previousBlockState() != 1)
         startIndex = text.indexOf(commentStartExpression);
 
-    while (startIndex >= 0) {
+    while (startIndex >= 0)
+    {
         QRegularExpressionMatch match = commentEndExpression.match(text, startIndex);
         int endIndex = match.capturedStart();
         int commentLength = 0;
-        if (endIndex == -1) {
+        if (endIndex == -1)
+        {
             setCurrentBlockState(1);
             commentLength = text.length() - startIndex;
-        } else {
-            commentLength = endIndex - startIndex
-                            + match.capturedLength();
+        }
+        else
+        {
+            commentLength = endIndex - startIndex + match.capturedLength();
         }
         setFormat(startIndex, commentLength, multiLineCommentFormat);
         startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);
@@ -166,13 +171,15 @@ QStringList CLuaHighlighter::fromFile(const char *fileName)
 {
     QString fct;
     QFileWrap file;
-    if (file.open(fileName)) {
+    if (file.open(fileName))
+    {
         int size = file.getSize();
-        char tmp[ size + 1];
-        tmp[size]=0;
+        auto tmp = new char[size + 1];
+        tmp[size] = 0;
         file.read(tmp, size);
         file.close();
         fct = tmp;
+        delete[] tmp;
     }
     return fct.split("\n");
 }
@@ -184,8 +191,9 @@ QStringList CLuaHighlighter::constants()
 
 QStringList CLuaHighlighter::keywords()
 {
-    return QString("and break do else elseif end false for function if "\
-                   "in local nil not or repeat return then true until while setmetatable").split(" ");
+    return QString("and break do else elseif end false for function if "
+                   "in local nil not or repeat return then true until while setmetatable")
+        .split(" ");
 }
 
 QStringList CLuaHighlighter::classes()

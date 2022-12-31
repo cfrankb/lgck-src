@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Params.h"
-#include "stdafx.h"
 #include "../shared/qtgui/cheat.h"
 
 CParams::CParams()
@@ -28,36 +27,40 @@ CParams::CParams()
 
 CParams::~CParams()
 {
-    if (m_params) {
-        delete [] m_params;
+    if (m_params)
+    {
+        delete[] m_params;
     }
 }
 
-Param & CParams::operator [] (int i)
+Param &CParams::operator[](int i)
 {
     return m_params[i];
 }
 
-int CParams::add(Param & p)
+int CParams::add(Param &p)
 {
-    if (m_size == m_max) {
+    if (m_size == m_max)
+    {
         m_max += MAX_PARAMS;
         Param *t = new Param[m_max];
-        for (int i=0; i < m_size; ++i) {
+        for (int i = 0; i < m_size; ++i)
+        {
             t[i] = m_params[i];
         }
-        delete [] m_params;
+        delete[] m_params;
         m_params = t;
     }
 
-    m_params [ m_size ] = p;
+    m_params[m_size] = p;
     return m_size++;
 }
 
 void CParams::removeAt(int i)
 {
-    for (int j=i; j < m_size - 1; ++j) {
-        m_params [ j ] = m_params [ j + 1 ];
+    for (int j = i; j < m_size - 1; ++j)
+    {
+        m_params[j] = m_params[j + 1];
     }
     --m_size;
 }
@@ -72,30 +75,35 @@ void CParams::forget()
     m_size = 0;
 }
 
-void CParams::read(CFileWrap & file, int version)
+void CParams::read(CFileWrap &file, int version)
 {
     m_size = 0;
     int size;
     file >> size;
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i)
+    {
         Param p;
         file >> p.name;
         file >> p.type;
         file >> p.desc;
-        if (version > 1) {
+        if (version > 1)
+        {
             file >> p.flags;
-        } else {
+        }
+        else
+        {
             p.flags = 0;
         }
         add(p);
     }
 }
 
-void CParams::write(CFileWrap & file)
+void CParams::write(CFileWrap &file)
 {
     file << m_size;
-    for (int i = 0; i < m_size; ++i) {
-        Param & p = m_params[i];
+    for (int i = 0; i < m_size; ++i)
+    {
+        Param &p = m_params[i];
         file << p.name.trimmed();
         file << p.type.trimmed();
         file << p.desc.trimmed();
@@ -106,7 +114,8 @@ void CParams::write(CFileWrap & file)
 void CParams::debug()
 {
     qDebug("\n");
-    for (int i=0; i < m_size; ++i) {
+    for (int i = 0; i < m_size; ++i)
+    {
         qDebug("%d> %s %s",
                i,
                q2c(m_params[i].type),
@@ -115,10 +124,11 @@ void CParams::debug()
     qDebug("\n");
 }
 
-const CParams & CParams::operator = (CParams & s)
+const CParams &CParams::operator=(CParams &s)
 {
     forget();
-    for (int i=0; i<s.getSize(); ++i) {
+    for (int i = 0; i < s.getSize(); ++i)
+    {
         add(s[i]);
     }
 
