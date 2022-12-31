@@ -1,0 +1,112 @@
+name: Linux Release
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'continuous-integration'
+      - 'cross-platform'
+      - 'build-ci'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - 'master'
+      - 'continuous-integration'
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  SOURCE_DIR: ${{ github.workspace }}
+  QT_VERSION: 5.15.2
+  ARTIFACT: 'LgckBuilder-x86_64.AppImage'
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: desktop
+          arch: gcc_64
+          dir: ${{ runner.temp }}
+          modules: qtcore qtwidgets qtgui #qtcharts qt3d
+          setup-python: false
+
+      - name: Create build directory
+        run: |
+          mkdir ${{ runner.temp }}/build
+          mkdir ${{ runner.temp }}/build/easydoc
+          mkdir ${{ runner.temp }}/build/obl5edit
+          mkdir ${{ runner.temp }}/build/lgck-builder
+          mkdir ${{ env.SOURCE_DIR }}/setup
+
+      - name: Copy setup files
+        run: |
+          rm ${{ env.SOURCE_DIR }}/distro/setup/portable.txt
+          cp -r ${{ env.SOURCE_DIR }}/distro/setup ${{ env.SOURCE_DIR }}
+
+      - name: Install build dependency
+        working-directory: ${{ runner.temp }}
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y liblua5.2-dev liblua5.2-0 libsdl2-dev libsdl2-mixer-dev zlib1g-dev
+
+      - name: Build Lgck builder
+        working-directory: ${{ runner.temp }}/build/lgck-builder
+        run: |
+          qmake -r ${{ env.SOURCE_DIR }}/src/lgck-builder/lgck-builder.pro
+          make
+          ls -l
+          cp lgck-builder ${{ env.SOURCE_DIR }}/setup
+
+      - name: Build Easydoc
+        working-directory: ${{ runner.temp }}/build/easydoc
+        run: |
+          qmake -r ${{ env.SOURCE_DIR }}/src/easydoc/easydoc.pro
+          make
+          ls -l
+          cp easydoc ${{ env.SOURCE_DIR }}/setup
+
+      - name: Build Obl5edit
+        working-directory: ${{ runner.temp }}/build/obl5edit
+        run: |
+          qmake -r ${{ env.SOURCE_DIR }}/src/obl5edit/obl5edit.pro
+          make
+          ls -l
+          cp obl5edit ${{ env.SOURCE_DIR }}/setup
+
+      - name: AppImage
+        working-directory: ${{ env.SOURCE_DIR }}/setup
+        run: |
+          wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          chmod +x deploy.AppImage
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/5.15.2/gcc_64/lib/
+          ls ${{ env.SOURCE_DIR }}
+          rm ${{ env.SOURCE_DIR }}/distro/linux/easydoc.desktop
+          rm ${{ env.SOURCE_DIR }}/distro/linux/obl5edit.desktop
+          cp ${{ env.SOURCE_DIR }}/distro/linux/* .
+          ls -l
+          ./deploy.AppImage ${{ env.SOURCE_DIR }}/setup/lgck-builder.desktop -appimage -no-translations -qmldir=${{ env.SOURCE_DIR }}/setup -extra-plugins=renderers
+          ls -l
+          mkdir -p ${{ env.SOURCE_DIR }}/build/release
+          chmod +x lgck-builder*.AppImage
+          mv lgck-builder*.AppImage ${{ env.SOURCE_DIR }}/build/release          
+          ls -l ${{ env.SOURCE_DIR }}/build/release
+
+      - name: Linux artefact
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.SOURCE_DIR }}/build/release

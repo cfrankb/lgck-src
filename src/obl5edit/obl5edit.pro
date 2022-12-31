@@ -4,26 +4,25 @@
 #
 #-------------------------------------------------
 
-win32:CONFIG += static
+#win32:CONFIG += static
 QT       += core gui opengl
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 TARGET = obl5edit
 TEMPLATE = app
 INCLUDEPATH += ../shared/qtgui/ColorPicker
 INCLUDEPATH += ../shared
-win32:INCLUDEPATH += ../../../redist/include
+win32:INCLUDEPATH += ../headers
 RESOURCES +=  obl5edit.qrc
 win32:RC_FILE = obl5edit.rc
 OTHER_FILES +=  TODO
 DEFINES += USE_QFILE=1
 win32:DEFINES += MAKE_WIN32
-win32:LIBS += -L../../../redist/lib -lz -llua54
-unix:LIBS += -lz -llua5.2
+win32:LIBS += -L"../libs" -lzlib
+unix:LIBS += -lz
 QMAKE_CXXFLAGS_RELEASE += -std=c++0x -O3
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
 QMAKE_LFLAGS_WINDOWS += -Wl,--dynamicbase -Wl,--nxcompat
@@ -59,7 +58,6 @@ SOURCES += mainwindow.cpp \
     previewwidget.cpp \
     previewscroll.cpp \
     ../shared/helper.cpp \
-    ../shared/LuaVM.cpp \
     ../shared/qtgui/qfilewrap.cpp
 
 HEADERS  += mainwindow.h \
@@ -92,7 +90,6 @@ HEADERS  += mainwindow.h \
     framewidget.h \
     previewwidget.h \
     previewscroll.h \
-    ../shared/LuaVM.h \
     ../shared/qtgui/qfilewrap.h
 
 FORMS    += mainwindow.ui \

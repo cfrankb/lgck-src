@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include "Tasks.h"
 #include <cstring>
+#include <cassert>
 #include "IFile.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -27,17 +27,16 @@
 CTask::CTask()
 {
     m_ticks = 0;
-    m_task = 0 ;
+    m_task = 0;
     m_script = "";
 }
 
-void CTask::read(IFile & file, int version)
+void CTask::read(IFile &file, int version)
 {
-    Q_UNUSED(version);
     file.read(&m_ticks, sizeof(m_ticks));
     file.read(&m_task, sizeof(m_task));
     file >> m_script;
-    m_actor.read(file,0);
+    m_actor.read(file, 0);
 }
 
 void CTask::write(IFile &file)
@@ -55,26 +54,29 @@ CTasks::CTasks()
 {
     m_size = 0;
     m_max = GROWBY;
-    m_tasks = new CTask* [m_max];
+    m_tasks = new CTask *[m_max];
 }
 
 CTasks::~CTasks()
 {
     forget();
-    if (m_tasks) {
-        delete [] m_tasks;
+    if (m_tasks)
+    {
+        delete[] m_tasks;
     }
 }
 
 void CTasks::add(CTask *task)
 {
-    if (m_size == m_max) {
+    if (m_size == m_max)
+    {
         m_max += GROWBY;
-        CTask **t = new CTask * [m_max];
-        for (int i=0; i< m_size; ++i) {
+        CTask **t = new CTask *[m_max];
+        for (int i = 0; i < m_size; ++i)
+        {
             t[i] = m_tasks[i];
         }
-        delete [] m_tasks;
+        delete[] m_tasks;
         m_tasks = t;
     }
 
@@ -85,13 +87,14 @@ void CTasks::add(CTask *task)
 void CTasks::removeAt(int i)
 {
     delete m_tasks[i];
-    for (int j=i; j < m_size -1; ++j) {
+    for (int j = i; j < m_size - 1; ++j)
+    {
         m_tasks[j] = m_tasks[j + 1];
     }
     --m_size;
 }
 
-CTask * CTasks::operator [] (int i)
+CTask *CTasks::operator[](int i)
 {
     return m_tasks[i];
 }
@@ -103,16 +106,17 @@ int CTasks::getSize()
 
 void CTasks::forget()
 {
-    for (int i=0; i< m_size; ++i) {
+    for (int i = 0; i < m_size; ++i)
+    {
         delete m_tasks[i];
         m_tasks[i] = nullptr;
     }
     m_size = 0;
 }
 
-void CTasks::createTask(CActor & actor)
+void CTasks::createTask(CActor &actor)
 {
-    CTask * task = new CTask;
+    CTask *task = new CTask;
     task->m_actor = actor;
     task->m_task = CTask::TASK_SPAWN;
     add(task);
@@ -120,14 +124,14 @@ void CTasks::createTask(CActor & actor)
 
 void CTasks::read(IFile &file, int ver)
 {
-    Q_UNUSED(ver);
     int version = 0;
     file.read(&version, sizeof(version));
-    ASSERT(version==VERSION);
+    assert(version == VERSION);
     int size = 0;
     file.read(&size, sizeof(m_size));
     forget();
-    for (int i=0; i< size; ++i) {
+    for (int i = 0; i < size; ++i)
+    {
         CTask *task = new CTask;
         task->read(file, version);
         add(task);
@@ -139,8 +143,9 @@ void CTasks::write(IFile &file)
     int version = VERSION;
     file.write(&version, sizeof(version));
     file.write(&m_size, sizeof(m_size));
-    for (int i=0; i< m_size; ++i) {
-        CTask * t = m_tasks[i];
+    for (int i = 0; i < m_size; ++i)
+    {
+        CTask *t = m_tasks[i];
         t->write(file);
     }
 }

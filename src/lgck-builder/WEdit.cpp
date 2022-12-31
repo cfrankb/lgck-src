@@ -75,7 +75,6 @@
 #include <QTextEdit>
 #include <QPainter>
 #include "luahighlighter.h"
-#include "../shared/stdafx.h"
 #include "../shared/FileWrap.h"
 #include "optiongroup.h"
 #include "../shared/qtgui/qfilewrap.h"
@@ -83,8 +82,7 @@
 const QColor highlightColor = QColor(Qt::yellow);
 const QColor indentationBackgroundColor = QColor(Qt::lightGray);
 
-CWEdit::CWEdit(QWidget *parent) :
-    QPlainTextEdit(parent)
+CWEdit::CWEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
     setFontSize(10);
 
@@ -133,12 +131,13 @@ void CWEdit::enableHighlight(bool state)
 void CWEdit::enableWhiteSpace(bool state)
 {
     QTextOption option;
-    if (state) {
+    if (state)
+    {
         option.setFlags(
-                    QTextOption::ShowLineAndParagraphSeparators
-                    | QTextOption::ShowTabsAndSpaces
-                    | QTextOption::IncludeTrailingSpaces);
-    } else {
+            QTextOption::ShowLineAndParagraphSeparators | QTextOption::ShowTabsAndSpaces | QTextOption::IncludeTrailingSpaces);
+    }
+    else
+    {
         option.setFlags(option.flags());
     }
     document()->setDefaultTextOption(option);
@@ -154,12 +153,14 @@ QStringList CWEdit::fromFile(const char *fileName)
 {
     QString fct;
     QFileWrap file;
-    if (file.open(fileName)) {
+    if (file.open(fileName))
+    {
         int size = file.getSize();
-        char tmp[ size + 1];
-        tmp[size]=0;
+        auto tmp = new char[size + 1];
+        tmp[size] = 0;
         file.read(tmp, size);
         file.close();
+        delete[] tmp;
         fct = tmp;
     }
     return fct.split("\n");
@@ -180,14 +181,14 @@ QCompleter *CWEdit::completer() const
     return m_completer;
 }
 
-CWEdit::~CWEdit() {
-
+CWEdit::~CWEdit()
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // autocomplete
 
-void CWEdit::insertCompletion( QString completion )
+void CWEdit::insertCompletion(QString completion)
 {
     if (m_completer->widget() != this || !m_enableAutocomplete)
         return;
@@ -215,28 +216,31 @@ void CWEdit::focusInEvent(QFocusEvent *e)
 
 void CWEdit::keyPressEvent(QKeyEvent *e)
 {
-    if (!m_enableAutocomplete) {
+    if (!m_enableAutocomplete)
+    {
         QPlainTextEdit::keyPressEvent(e);
         return;
     }
 
-    if (m_completer && m_completer->popup()->isVisible()) {
+    if (m_completer && m_completer->popup()->isVisible())
+    {
         // The following keys are forwarded by the completer to the widget
-       switch (e->key()) {
-       case Qt::Key_Enter:
-       case Qt::Key_Return:
-       case Qt::Key_Escape:
-       case Qt::Key_Tab:
-       case Qt::Key_Backtab:
+        switch (e->key())
+        {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Escape:
+        case Qt::Key_Tab:
+        case Qt::Key_Backtab:
             e->ignore();
             return; // let the completer do default behavior
-       default:
-           break;
-       }
+        default:
+            break;
+        }
     }
 
     const bool isShortcut = (e->modifiers().testFlag(Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
-    if (!m_completer || !isShortcut) // do not process the shortcut when we have a completer
+    if (!m_completer || !isShortcut)                                                                 // do not process the shortcut when we have a completer
         QPlainTextEdit::keyPressEvent(e);
 
     const bool ctrlOrShift = e->modifiers().testFlag(Qt::ControlModifier) ||
@@ -248,19 +252,19 @@ void CWEdit::keyPressEvent(QKeyEvent *e)
     const bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
     QString completionPrefix = textUnderCursor();
 
-    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 3
-                      || eow.contains(e->text().right(1)))) {
+    if (!isShortcut && (hasModifier || e->text().isEmpty() || completionPrefix.length() < 3 || eow.contains(e->text().right(1))))
+    {
         m_completer->popup()->hide();
         return;
     }
 
-    if (completionPrefix != m_completer->completionPrefix()) {
+    if (completionPrefix != m_completer->completionPrefix())
+    {
         m_completer->setCompletionPrefix(completionPrefix);
         m_completer->popup()->setCurrentIndex(m_completer->completionModel()->index(0, 0));
     }
     QRect cr = cursorRect();
-    cr.setWidth(m_completer->popup()->sizeHintForColumn(0)
-                + m_completer->popup()->verticalScrollBar()->sizeHint().width());
+    cr.setWidth(m_completer->popup()->sizeHintForColumn(0) + m_completer->popup()->verticalScrollBar()->sizeHint().width());
     m_completer->complete(cr); // popup it up!
 }
 
@@ -271,7 +275,8 @@ int CWEdit::lineNumberAreaWidth()
 {
     int digits = 1;
     int max = qMax(1, blockCount());
-    while (max >= 10) {
+    while (max >= 10)
+    {
         max /= 10;
         ++digits;
     }
@@ -307,12 +312,14 @@ void CWEdit::resizeEvent(QResizeEvent *e)
 
 void CWEdit::highlightCurrentLine()
 {
-    if (!m_enableHighlight) {
+    if (!m_enableHighlight)
+    {
         return;
     }
 
     QList<QTextEdit::ExtraSelection> extraSelections;
-    if (!isReadOnly()) {
+    if (!isReadOnly())
+    {
         QTextEdit::ExtraSelection selection;
         QColor lineColor = highlightColor.lighter(160);
 
@@ -336,8 +343,10 @@ void CWEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
 
-    while (block.isValid() && top <= event->rect().bottom()) {
-        if (block.isVisible() && bottom >= event->rect().top()) {
+    while (block.isValid() && top <= event->rect().bottom())
+    {
+        if (block.isVisible() && bottom >= event->rect().top())
+        {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(Qt::black);
             painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
@@ -354,7 +363,7 @@ void CWEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
 ///////////////////////////////////////////////////////////////////////////////
 // options
 
-void CWEdit::setOptions(COptionGroup & options)
+void CWEdit::setOptions(COptionGroup &options)
 {
     constexpr char ENABLE_AUTO_COMPLETE[] = "enableAutocomplete";
     constexpr char ENABLE_HIGHLIGHT[] = "enableHighlight";
@@ -371,7 +380,7 @@ void CWEdit::setFontSize(int size)
     QPlainTextEdit::setFont(QFont("Courier", size, QFont::DemiBold));
 }
 
-void CWEdit::setFont(const QFont & font)
+void CWEdit::setFont(const QFont &font)
 {
     QPlainTextEdit::setFont(font);
 }

@@ -19,12 +19,10 @@
 // SndArray.cpp : implementation file
 //
 
-#include "stdafx.h"
 #include "SndArray.h"
 #include "Snd.h"
 #include <cstring>
 #include <cstdlib>
-#include <unistd.h>
 #include "IFile.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -34,13 +32,13 @@ CSndArray::CSndArray()
 {
     m_nMax = GROWBY;
     m_nSize = 0;
-    m_arrSnds = new CSnd* [m_nMax];
+    m_arrSnds = new CSnd *[m_nMax];
 }
 
 CSndArray::~CSndArray()
 {
     forget();
-    delete [] m_arrSnds;
+    delete[] m_arrSnds;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -53,11 +51,13 @@ int CSndArray::getSize()
 
 void CSndArray::forget()
 {
-    for (int i=0; i < m_nSize; ++i) {
-        if (m_arrSnds[i]) {
+    for (int i = 0; i < m_nSize; ++i)
+    {
+        if (m_arrSnds[i])
+        {
             delete m_arrSnds[i];
             m_arrSnds[i] = nullptr;
-         }
+        }
     }
     m_nSize = 0;
 }
@@ -65,48 +65,57 @@ void CSndArray::forget()
 void CSndArray::removeAt(int n)
 {
     // TODO: check this function again
-    for (int i=n; i<m_nSize-1; i++) {
-        m_arrSnds [i] = m_arrSnds[i+1];
+    for (int i = n; i < m_nSize - 1; i++)
+    {
+        m_arrSnds[i] = m_arrSnds[i + 1];
     }
 
     --m_nSize;
     m_arrSnds[m_nSize] = nullptr;
 }
 
-void CSndArray::add(CSnd * pSnd)
+void CSndArray::add(CSnd *pSnd)
 {
-    if (m_nSize== m_nMax) {
+    if (m_nSize == m_nMax)
+    {
         m_nMax += GROWBY;
-        CSnd **t = new CSnd* [m_nMax];
-        for (int i=0; i < m_nSize; i++) {
+        CSnd **t = new CSnd *[m_nMax];
+        for (int i = 0; i < m_nSize; i++)
+        {
             t[i] = m_arrSnds[i];
         }
 
-        for (int i=0; i < m_nSize; i++) {
+        for (int i = 0; i < m_nSize; i++)
+        {
             m_arrSnds[i] = nullptr;
         }
-        delete [] m_arrSnds;
+        delete[] m_arrSnds;
         m_arrSnds = t;
     }
 
-    m_arrSnds [m_nSize] = pSnd;
+    m_arrSnds[m_nSize] = pSnd;
     m_nSize++;
 }
 
-CSnd * CSndArray::operator [](int n)
+CSnd *CSndArray::operator[](int n)
 {
-    if (n < 0 || n >= m_nSize) {
+    if (n < 0 || n >= m_nSize)
+    {
         return nullptr;
-    } else {
+    }
+    else
+    {
         return m_arrSnds[n];
     }
 }
 
-CSnd * CSndArray::operator [](const char *name)
+CSnd *CSndArray::operator[](const char *name)
 {
-    for (int n = 0; n < m_nSize; ++n) {
-        CSnd * snd = m_arrSnds[n];
-        if (!strcmp(name,snd->getName())) {
+    for (int n = 0; n < m_nSize; ++n)
+    {
+        CSnd *snd = m_arrSnds[n];
+        if (!strcmp(name, snd->getName()))
+        {
             return snd;
         }
     }
@@ -120,8 +129,10 @@ bool CSndArray::hasSound(int i)
 
 bool CSndArray::hasSound(const char *name)
 {
-    for (int i = 0; i < m_nSize; ++i) {
-        if (!strcmp(name,m_arrSnds[i]->getName())) {
+    for (int i = 0; i < m_nSize; ++i)
+    {
+        if (!strcmp(name, m_arrSnds[i]->getName()))
+        {
             return true;
         }
     }
@@ -130,9 +141,9 @@ bool CSndArray::hasSound(const char *name)
 
 void CSndArray::debug()
 {
-    //for (int i=0; i< m_nSize; ++i) {
-        //CSnd & snd = * m_arrSnds[i];
-        //qDebug("snd %d = %s", i, snd.getName());
+    // for (int i=0; i< m_nSize; ++i) {
+    // CSnd & snd = * m_arrSnds[i];
+    // qDebug("snd %d = %s", i, snd.getName());
     //}
 }
 
@@ -144,19 +155,19 @@ CSnd::CSnd()
     init();
 }
 
-CSnd::CSnd(const CSnd & snd)
+CSnd::CSnd(const CSnd &snd)
 {
     init();
     copy(snd);
 }
 
-CSnd::CSnd(const CSnd * snd)
+CSnd::CSnd(const CSnd *snd)
 {
     init();
     copy(*snd);
 }
 
-CSnd::CSnd(const char* name, char *data, int size)
+CSnd::CSnd(const char *name, char *data, int size)
 {
     init();
     m_name = name;
@@ -166,8 +177,9 @@ CSnd::CSnd(const char* name, char *data, int size)
 
 CSnd::~CSnd()
 {
-    if (m_data) {
-        delete [] m_data;
+    if (m_data)
+    {
+        delete[] m_data;
         m_data = nullptr;
     }
 
@@ -204,15 +216,16 @@ unsigned int CSnd::getUID() const
     return m_uid;
 }
 
-void CSnd::setName(const char* name)
+void CSnd::setName(const char *name)
 {
     m_name = name;
 }
 
 void CSnd::replace(char *data, int size)
 {
-    if (m_data) {
-        delete [] m_data;
+    if (m_data)
+    {
+        delete[] m_data;
     }
 
     m_data = data;
@@ -220,21 +233,23 @@ void CSnd::replace(char *data, int size)
     m_uid = rand();
 }
 
-CSnd & CSnd::operator =(const CSnd & src)
+CSnd &CSnd::operator=(const CSnd &src)
 {
     return copy(src);
 }
 
-CSnd & CSnd::copy(const CSnd & src)
+CSnd &CSnd::copy(const CSnd &src)
 {
-    if (m_data) {
-        delete [] m_data;
+    if (m_data)
+    {
+        delete[] m_data;
         m_data = nullptr;
     }
 
     m_size = src.getSize();
-    if (m_size) {
-        m_data = new char [ m_size ];
+    if (m_size)
+    {
+        m_data = new char[m_size];
         memcpy(m_data, src.getData(), m_size);
     }
 
@@ -242,21 +257,25 @@ CSnd & CSnd::copy(const CSnd & src)
     return *this;
 }
 
-bool CSnd::operator !=(const CSnd &src)
+bool CSnd::operator!=(const CSnd &src)
 {
-    if (m_size != src.getSize()){
+    if (m_size != src.getSize())
+    {
         return true;
     }
 
-    if ( (!m_data  || !src.getData()) && (m_data != src.getData())) {
+    if ((!m_data || !src.getData()) && (m_data != src.getData()))
+    {
         return true;
     }
 
-    if ( m_data && src.getData() && memcmp(m_data, src.getData(), m_size)) {
+    if (m_data && src.getData() && memcmp(m_data, src.getData(), m_size))
+    {
         return true;
     }
 
-    if (m_name != src.getName()) {
+    if (m_name != src.getName())
+    {
         return true;
     }
     return false;
@@ -264,22 +283,23 @@ bool CSnd::operator !=(const CSnd &src)
 
 void CSnd::debug()
 {
-    if (m_data) {
+    if (m_data)
+    {
         char t[5];
         t[4] = 0;
         memcpy(t, m_data, 4);
     }
 }
 
-bool CSnd::read(IFile & file)
+bool CSnd::read(IFile &file)
 {
-    UNUSED(file);
     return true;
 }
 
-bool CSnd::write(IFile & file)
+bool CSnd::write(IFile &file)
 {
-    if (getSize()) {
+    if (getSize())
+    {
         file.write(getData(), getSize());
     }
     return true;

@@ -4,28 +4,19 @@
 #
 #-------------------------------------------------
 
-#build_nr.commands = python ../tools/buildcount.py
-#build_nr.depends = FORCE
-#QMAKE_EXTRA_TARGETS += build_nr
-#PRE_TARGETDEPS += build_nr
-
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
-DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-#win32:CONFIG        += static static-libgcc
 win32:CONFIG        += no_lflags_merge
-win32:INCLUDEPATH   += ../../../redist/include
+win32:INCLUDEPATH   += ../headers
 INCLUDEPATH         += ../shared
-unix:INCLUDEPATH    += /usr/include/x86_64-linux-gnu/qt5 \
-                       /usr/include/qt
 win32:RC_FILE       = lgck-builder.rc
-#win32:DEFINES       += STATIC
-#win32:DEFINES       += QT_STATIC_BUILD
 unix:DEFINES        += MAKE_LINUX=1
+win32:DEFINES       += MAKE_WIN32
 DEFINES             += USE_QFILE=1
 DEFINES             += LGCK_QT=1
-#DEFINES             += LGCK_GAMEPAD=1
+#DEFINES            += LGCK_GAMEPAD=1
 QT                  += core gui opengl network gamepad
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET              = lgck-builder
@@ -35,7 +26,7 @@ QMAKE_CXXFLAGS_DEBUG += -std=c++0x -g3
 QMAKE_LFLAGS_WINDOWS += -Wl,--dynamicbase -Wl,--nxcompat
 RESOURCES           += lgck-builder.qrc
 
-win32:QMAKE_LIBDIR    += ../../../redist/lib
+win32:QMAKE_LIBDIR  += ../libs
 
 CONFIG( debug, debug|release ) {
     # debug
@@ -52,10 +43,10 @@ unix:LIBS += \
 
 win32:LIBS += \
     -llua \
-    -lmingw32 \
+    #-lmingw32 \
     -lSDL2_mixer \
     -lSDL2 \
-    -lz \
+    -lzlib \
     -lopengl32
 
 SOURCES += \
@@ -63,7 +54,6 @@ SOURCES += \
     ../shared/Animation.cpp \
     ../shared/Attacker.cpp \
     ../shared/Countdown.cpp \
-#    ../shared/Credit.cpp \
     ../shared/compat/asprintf.cpp \
     ../shared/Display.cpp \
     ../shared/displayconfig.cpp \
@@ -116,6 +106,7 @@ SOURCES += \
     ../shared/SndArray.cpp \
     ../shared/StringTable.cpp \
     ../shared/Tasks.cpp \
+    ../shared/microtime.cpp \
     DlgAbout.cpp \
     DlgAnimation.cpp \
     DlgAppSettings.cpp \
@@ -178,7 +169,6 @@ HEADERS += \
     ../shared/Attacker.h \
     ../shared/compat/asprintf.h \
     ../shared/Countdown.h \
-#    ../shared/Credit.h \
     ../shared/Credits.h \
     ../shared/Display.h \
     ../shared/displayconfig.h \
@@ -242,6 +232,7 @@ HEADERS += \
     ../shared/StringTable.h \
     ../shared/Tasks.h \
     ../shared/vlamits3.h \
+    ../shared/microtime.h \
     DlgAbout.h \
     DlgAnimation.h \
     DlgAppSettings.h \

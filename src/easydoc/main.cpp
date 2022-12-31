@@ -18,7 +18,6 @@
 
 #include <QApplication>
 #include <QDir>
-#include "stdafx.h"
 #include "mainwindow.h"
 #include "../shared/qtgui/cheat.h"
 #include <QSettings>
@@ -28,45 +27,63 @@ int main(int argc, char *argv[])
     QString src;
     QString target;
 
-    enum {
+    enum
+    {
         OPTION_NONE,
         OPTION_OUTPUT
     };
     int flag = OPTION_NONE;
     bool quiet = false;
 
-    for (int i=1; i < argc; ++i) {
-        if (argv[i][0]=='-') {\
-            if (flag) {
+    for (int i = 1; i < argc; ++i)
+    {
+        if (argv[i][0] == '-')
+        {
+            if (flag)
+            {
                 qDebug("error: flag to a flag`%s`???", argv[i]);
                 break;
             }
-            if (strcmp(argv[i], "-o")==0) {
+            if (strcmp(argv[i], "-o") == 0)
+            {
                 flag = OPTION_OUTPUT;
                 continue;
             }
-            if (strcmp(argv[i], "-q")==0) {
+            if (strcmp(argv[i], "-q") == 0)
+            {
                 quiet = true;
                 continue;
             }
             qDebug("error: invalid option `%s`", argv[i]);
             break;
-        } else {
-            if (flag) {
+        }
+        else
+        {
+            if (flag)
+            {
                 flag = false;
-                if (!QDir(argv[i]).exists()) {
+                if (!QDir(argv[i]).exists())
+                {
                     qDebug("target doesn't exists: %s", argv[i]);
                     continue;
                 }
-                if (target.isEmpty()){
+                if (target.isEmpty())
+                {
                     target = argv[i];
-                } else {
+                }
+                else
+                {
                     qDebug("cannot redefine target to `%s`", argv[i]);
                 }
-            } else {
-                if (src.isEmpty()){
+            }
+            else
+            {
+                if (src.isEmpty())
+                {
                     src = argv[i];
-                } else {
+                }
+                else
+                {
                     qDebug("cannot redefine src to `%s`", argv[i]);
                 }
             }
@@ -76,7 +93,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QFileInfo fi(app.applicationDirPath());
     QString portable = QApplication::applicationDirPath() + "/portable.txt";
-    if(fi.isDir() && fi.isWritable() && QFileInfo::exists(portable)) {
+    if (fi.isDir() && fi.isWritable() && QFileInfo::exists(portable))
+    {
         // make this app portable
         qDebug("app dir: %s", q2c(app.applicationDirPath()));
         QSettings::setDefaultFormat(QSettings::IniFormat);
@@ -84,16 +102,19 @@ int main(int argc, char *argv[])
     }
 
     MainWindow w;
-    if (!src.isEmpty()) {
+    if (!src.isEmpty())
+    {
         w.open(src);
     }
 
     if (!src.isEmpty() &&
-       !target.isEmpty()) {
+        !target.isEmpty())
+    {
         w.exportWiki(q2c(target));
     }
 
-    if (!quiet) {
+    if (!quiet)
+    {
         w.show();
         return app.exec();
     }

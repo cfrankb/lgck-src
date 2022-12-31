@@ -18,8 +18,9 @@
 #include "Countdown.h"
 #include "IFile.h"
 #include "Game.h"
-#include "stdafx.h"
 #include <vector>
+// #include "stdafx.h"
+#include "microtime.h"
 
 CCountdown::CCountdown()
 {
@@ -28,15 +29,15 @@ CCountdown::CCountdown()
 
 CCountdown::~CCountdown()
 {
-
 }
 
-bool CCountdown::read(IFile & file)
+bool CCountdown::read(IFile &file)
 {
     forget();
     int32_t count = 0;
     file.read(&count, sizeof(int32_t));
-    for (int i=0; i < count; ++i) {
+    for (int i = 0; i < count; ++i)
+    {
         std::string key;
         file >> key;
         CCountdownEntry entry;
@@ -46,13 +47,14 @@ bool CCountdown::read(IFile & file)
     return true;
 }
 
-bool CCountdown::write(IFile & file)
+bool CCountdown::write(IFile &file)
 {
     int32_t count = m_countdown.size();
     file.write(&count, sizeof(int32_t));
-    for(auto kv : m_countdown) {
+    for (auto kv : m_countdown)
+    {
         std::string key = kv.first;
-        CCountdownEntry & entry = kv.second;
+        CCountdownEntry &entry = kv.second;
         file << kv.first;
         entry.write(file);
     }
@@ -66,41 +68,48 @@ void CCountdown::forget()
 
 void CCountdown::cycle()
 {
-    if (m_toClear) {
+    if (m_toClear)
+    {
         forget();
         m_toClear = false;
     }
     std::vector<std::string> d;
-    uint64_t now = 0;
-    microtime(&now);
-    for(auto kv : m_countdown) {
+    uint64_t now = microtime();
+    for (auto kv : m_countdown)
+    {
         std::string key = kv.first;
-        //CLuaVM::debugv("countdown key: %s", key.c_str());
-        CCountdownEntry & entry = kv.second;
-        if (entry.isRunning() && now > entry.nextSecond()) {
-            int & count = CGame::getGame().counter(key.c_str());
-            if (count) {
-                -- count;
+        // CLuaVM::debugv("countdown key: %s", key.c_str());
+        CCountdownEntry &entry = kv.second;
+        if (entry.isRunning() && now > entry.nextSecond())
+        {
+            int &count = CGame::getGame().counter(key.c_str());
+            if (count)
+            {
+                --count;
                 entry.setNextSecond(now + 1000);
-            } else {
+            }
+            else
+            {
                 entry.stop();
-                if (!entry.m_payload.empty()) {
+                if (!entry.m_payload.empty())
+                {
                     CGame::luaVM().exec(entry.m_payload.c_str());
                 }
                 // TODO: remove entry
                 d.push_back(key.c_str());
-                //CLuaVM::debugv("countdown key to be deleted: %s", key.c_str());
+                // CLuaVM::debugv("countdown key to be deleted: %s", key.c_str());
             }
         }
     }
-    for(std::string i : d) {
+    for (std::string i : d)
+    {
         m_countdown.erase(i);
         CGame::getGame().m_counters.erase(i);
         CLuaVM::debugv("countdown deleted: %s", i.c_str());
     }
 }
 
-CCountdownEntry &CCountdown::operator [](const char *name)
+CCountdownEntry &CCountdown::operator[](const char *name)
 {
     return get(name);
 }
@@ -110,21 +119,21 @@ CCountdownEntry &CCountdown::get(const char *name)
     return m_countdown[name];
 }
 
-CCountdownEntry & CCountdown::add(const char *name, int timeInSeconds, uint64_t nextSecond, const char *payload)
+CCountdownEntry &CCountdown::add(const char *name, int timeInSeconds, uint64_t nextSecond, const char *payload)
 {
-    if (timeInSeconds != -1) {
+    if (timeInSeconds != -1)
+    {
         CGame::getGame().counter(name) = timeInSeconds;
     }
-    if (nextSecond == 0) {
-        uint64_t now;
-        microtime(&now);
+    if (nextSecond == 0)
+    {
+        uint64_t now = microtime();
         nextSecond = now + 1000;
     }
-    m_countdown[name] = CCountdownEntry {
+    m_countdown[name] = CCountdownEntry{
         payload ? payload : "",
         nextSecond,
-        false
-    };
+        false};
     return m_countdown[name];
 }
 

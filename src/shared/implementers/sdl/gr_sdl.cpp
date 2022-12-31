@@ -16,7 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../shared/stdafx.h"
+// #include "../shared/stdafx.h"
+#include <cassert>
 #include "../shared/Frame.h"
 #include "im_sdl.h"
 #include "gr_sdl.h"
@@ -30,20 +31,22 @@ CGRSdl::CGRSdl()
     m_game = nullptr;
 }
 
-bool CGRSdl::init(CGame *game, int w, int h, const char*title)
+bool CGRSdl::init(CGame *game, int w, int h, const char *title)
 {
     m_game = game;
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
-        printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return false;
     }
-    m_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN );
-    if (!m_window) {
+    m_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+    if (!m_window)
+    {
         CLuaVM::debugv("SDL_CreateWindow failed");
         return false;
     }
     queryDriver();
-    m_renderer = SDL_CreateRenderer( m_window, -1, SDL_RENDERER_SOFTWARE );
+    m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_SOFTWARE);
     m_imageManager = new CIMSdl();
     m_imageManager->setRenderer(m_renderer);
     m_displayManager = new CDisplayManager(game, m_imageManager, this);
@@ -51,7 +54,7 @@ bool CGRSdl::init(CGame *game, int w, int h, const char*title)
     return true;
 }
 
-const char* CGRSdl::lastError()
+const char *CGRSdl::lastError()
 {
     return m_lastError.c_str();
 }
@@ -60,38 +63,38 @@ CGRSdl::~CGRSdl()
 {
     delete m_displayManager;
 
-    //Destroy window
-    SDL_DestroyWindow( m_window );
+    // Destroy window
+    SDL_DestroyWindow(m_window);
 
-    //Destroy renderer
-    SDL_DestroyRenderer( m_renderer );
+    // Destroy renderer
+    SDL_DestroyRenderer(m_renderer);
 
-    //Quit SDL subsystems
-   // SDL_Quit();
+    // Quit SDL subsystems
+    // SDL_Quit();
 }
 
-const char* CGRSdl::signature()
+const char *CGRSdl::signature()
 {
     return "graphik-sdl2";
 }
 
-void CGRSdl::getScreenSize(int & len, int & hei)
+void CGRSdl::getScreenSize(int &len, int &hei)
 {
     SDL_GetRendererOutputSize(m_renderer, &len, &hei);
-    //SDL_GetWindowSize(m_window, &len, &hei);
+    // SDL_GetWindowSize(m_window, &len, &hei);
 }
 
 void CGRSdl::clear(unsigned int red, unsigned int green, unsigned int blue)
 {
     // Set Color
     SDL_SetRenderDrawColor(
-                m_renderer,
-                red,
-                green,
-                blue,
-                0xff);
+        m_renderer,
+        red,
+        green,
+        blue,
+        0xff);
     // Clear screen
-    SDL_RenderClear( m_renderer );
+    SDL_RenderClear(m_renderer);
 }
 
 void CGRSdl::clear(unsigned int rgb)
@@ -114,18 +117,21 @@ void CGRSdl::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
     SDL_Rect rect;
     rect.x = x1;
     rect.y = y1;
-    rect.w = x2-x1;
-    rect.h = y2-y1;
-    if (fill) {
+    rect.w = x2 - x1;
+    rect.h = y2 - y1;
+    if (fill)
+    {
         SDL_RenderFillRect(m_renderer, &rect);
-    } else {
+    }
+    else
+    {
         SDL_RenderDrawRect(m_renderer, &rect);
     }
 }
 
 void CGRSdl::paintImage(int x1, int y1, int frameSet, int frameNo)
 {
-    CFrame & frame = m_game->toFrame(frameSet, frameNo);
+    CFrame &frame = m_game->toFrame(frameSet, frameNo);
     int len;
     int hei;
     getScreenSize(len, hei);
@@ -136,15 +142,15 @@ void CGRSdl::paintImage(int x1, int y1, int frameSet, int frameNo)
     sRect.h = frame.m_nHei;
     SDL_Rect dRect;
     dRect.x = x1;
-    dRect.y = hei-y1;
+    dRect.y = hei - y1;
     dRect.w = frame.m_nLen;
     dRect.h = frame.m_nHei;
-    SDL_Texture * texture = m_imageManager->texture(id_texture);
+    SDL_Texture *texture = m_imageManager->texture(id_texture);
     SDL_SetTextureColorMod(
-                texture,
-                m_colorMod.red,
-                m_colorMod.green,
-                m_colorMod.blue);
+        texture,
+        m_colorMod.red,
+        m_colorMod.green,
+        m_colorMod.blue);
     SDL_RenderCopy(
         m_renderer,
         texture,
@@ -152,9 +158,9 @@ void CGRSdl::paintImage(int x1, int y1, int frameSet, int frameNo)
         &dRect);
 }
 
-IDisplayManager* CGRSdl::displayManager()
+IDisplayManager *CGRSdl::displayManager()
 {
-    return static_cast<IDisplayManager*>(m_displayManager);
+    return static_cast<IDisplayManager *>(m_displayManager);
 }
 
 void CGRSdl::ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
@@ -167,7 +173,7 @@ void CGRSdl::ss_paintImage(int x1, int y1, int frameSet, int frameNo)
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
-    paintImage(x1,screenHei - y1, frameSet, frameNo);
+    paintImage(x1, screenHei - y1, frameSet, frameNo);
 }
 
 IImageManager *CGRSdl::CGRSdl::cache()
@@ -177,28 +183,33 @@ IImageManager *CGRSdl::CGRSdl::cache()
 
 void CGRSdl::update()
 {
-    SDL_RenderPresent( m_renderer );
+    SDL_RenderPresent(m_renderer);
 }
 
 void CGRSdl::queryDriver()
 {
     int count = SDL_GetNumRenderDrivers();
     CLuaVM::debugv("driver count: %d", count);
-    for (int i=0; i < count ; ++i) {
+    for (int i = 0; i < count; ++i)
+    {
         SDL_RendererInfo info;
         int result = SDL_GetRenderDriverInfo(i, &info);
-        Q_UNUSED(result);
+        // Q_UNUSED(result);
         std::string flags;
-        if (info.flags & SDL_RENDERER_SOFTWARE) {
+        if (info.flags & SDL_RENDERER_SOFTWARE)
+        {
             flags += "SDL_RENDERER_SOFTWARE ";
         }
-        if (info.flags & SDL_RENDERER_ACCELERATED) {
+        if (info.flags & SDL_RENDERER_ACCELERATED)
+        {
             flags += "SDL_RENDERER_ACCELERATED ";
         }
-        if (info.flags & SDL_RENDERER_PRESENTVSYNC) {
+        if (info.flags & SDL_RENDERER_PRESENTVSYNC)
+        {
             flags += "SDL_RENDERER_PRESENTVSYNC ";
         }
-        if (info.flags & SDL_RENDERER_TARGETTEXTURE) {
+        if (info.flags & SDL_RENDERER_TARGETTEXTURE)
+        {
             flags += "SDL_RENDERER_TARGETTEXTURE ";
         }
         CLuaVM::debugv("driver %s", info.name);
@@ -211,18 +222,20 @@ void CGRSdl::render(CFont &font, const char *text, int x, int y, const Color &co
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
-    SDL_Texture * texture = m_imageManager->texture(font.textureId());
-    ASSERT(texture);
+    SDL_Texture *texture = m_imageManager->texture(font.textureId());
+    assert(texture);
     SDL_SetTextureColorMod(
-                texture,
-                color.red,
-                color.green,
-                color.blue);
+        texture,
+        color.red,
+        color.green,
+        color.blue);
     float xx = x;
-    for (int i=0; text[i]; ++i) {
+    for (int i = 0; text[i]; ++i)
+    {
         char id = text[i];
-        CFont::Glyph & glyph = font[id];
-        if (id == ' ' || !glyph.width) {
+        CFont::Glyph &glyph = font[id];
+        if (id == ' ' || !glyph.width)
+        {
             xx += glyph.width * font.scale();
             continue;
         }
@@ -230,14 +243,12 @@ void CGRSdl::render(CFont &font, const char *text, int x, int y, const Color &co
             glyph.x,
             glyph.y,
             glyph.width,
-            font.scaleY()
-        };
+            font.scaleY()};
         SDL_Rect dRect = {
             (int)xx,
             y,
-            (int) (font.scale() * glyph.width),
-            (int) (font.scale() * font.scaleY())
-        };
+            (int)(font.scale() * glyph.width),
+            (int)(font.scale() * font.scaleY())};
         SDL_RenderCopy(
             m_renderer,
             texture,

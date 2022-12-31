@@ -18,10 +18,10 @@
 #include "Font.h"
 #include "IFile.h"
 #include <cstring>
-#include "stdafx.h"
 #include "helper.h"
 #include "LuaVM.h"
 #include <zlib.h>
+#include <cassert>
 
 #define SIGNATURE "LGCKFONT"
 
@@ -39,13 +39,14 @@ CFont::~CFont()
 
 void CFont::forget()
 {
-    if (m_pixels) {
-        delete [] m_pixels;
-        m_pixels= nullptr;
+    if (m_pixels)
+    {
+        delete[] m_pixels;
+        m_pixels = nullptr;
     }
     m_width = 0;
     m_height = 0;
-  //  m_text = "";
+    //  m_text = "";
     m_glyphs.clear();
     m_props.clear();
     m_textureId = 0;
@@ -53,23 +54,24 @@ void CFont::forget()
 
 void CFont::setPixmap(const char *glyphs, unsigned int *pixmap, int width, int height)
 {
-    if (m_pixels) {
-        delete [] m_pixels;
-        m_pixels= nullptr;
+    if (m_pixels)
+    {
+        delete[] m_pixels;
+        m_pixels = nullptr;
     }
-    m_pixels = new unsigned int[width*height];
+    m_pixels = new unsigned int[width * height];
     m_width = width;
     m_height = height;
     m_text = glyphs;
-    memcpy(m_pixels, pixmap, width*height*sizeof(int));
+    memcpy(m_pixels, pixmap, width * height * sizeof(int));
 }
 
-void CFont::addGlyph(char id, CFont::Glyph & glyph)
+void CFont::addGlyph(char id, CFont::Glyph &glyph)
 {
     m_glyphs[id] = glyph;
 }
 
-CFont::Glyph & CFont::operator [](int i)
+CFont::Glyph &CFont::operator[](int i)
 {
     return m_glyphs[i];
 }
@@ -79,7 +81,7 @@ int CFont::getSize()
     return m_glyphs.size();
 }
 
-bool CFont::write(IFile & file)
+bool CFont::write(IFile &file)
 {
     // header
     int version = VERSION_2;
@@ -95,9 +97,10 @@ bool CFont::write(IFile & file)
     // glyphs
     int size = m_glyphs.size();
     file.write(&size, 2);
-    for(auto kv : m_glyphs) {
+    for (auto kv : m_glyphs)
+    {
         char key = kv.first;
-        Glyph & glyph = kv.second;
+        Glyph &glyph = kv.second;
         file.write(&key, 1);
         file.write(&glyph.x, 2);
         file.write(&glyph.y, 2);
@@ -107,31 +110,33 @@ bool CFont::write(IFile & file)
     // props
     size = m_props.size();
     file.write(&size, 2);
-    for(auto kv : m_props) {
+    for (auto kv : m_props)
+    {
         file << kv.first;
         file << kv.second;
     }
     // pixels
     unsigned char *out_data;
     unsigned long out_size;
-    compressData(reinterpret_cast<unsigned char*>(m_pixels), m_width * m_height * sizeof(unsigned int), &out_data, out_size);
+    compressData(reinterpret_cast<unsigned char *>(m_pixels), m_width * m_height * sizeof(unsigned int), &out_data, out_size);
     file.write(&out_size, 4);
     file.write(out_data, out_size);
-    delete [] out_data;
+    delete[] out_data;
     return true;
 }
 
-bool CFont::read(IFile & file)
+bool CFont::read(IFile &file)
 {
     forget();
     char signature[8];
     int version = 0;
     // header
     file.read(signature, 8);
-    ASSERT(!memcmp(signature, SIGNATURE,8));
+    assert(!memcmp(signature, SIGNATURE, 8));
     file.read(&version, 4);
-    //ASSERT(version==VERSION);
-    if (version != VERSION_1 && version != VERSION_2) {
+    // ASSERT(version==VERSION);
+    if (version != VERSION_1 && version != VERSION_2)
+    {
         CLuaVM::debugv("invalid version: %d", version);
         return false;
     }
@@ -146,7 +151,8 @@ bool CFont::read(IFile & file)
     // glyphs
     int size = 0;
     file.read(&size, 2);
-    for (int i=0; i < size;++i) {
+    for (int i = 0; i < size; ++i)
+    {
         Glyph glyph;
         char id;
         file.read(&id, 1);
@@ -159,30 +165,35 @@ bool CFont::read(IFile & file)
     }
     // props
     file.read(&size, 2);
-    for (int i=0; i < size;++i) {
+    for (int i = 0; i < size; ++i)
+    {
         std::string key;
         std::string val;
         file >> key;
         file >> val;
-        m_props[key]=val;
+        m_props[key] = val;
     }
     // pixels
     int h = pow2roundup(m_height);
     m_height = h;
-    m_pixels = new unsigned int[m_width*h];
+    m_pixels = new unsigned int[m_width * h];
     unsigned long totalSize = m_width * m_height * sizeof(unsigned int);
-    if (version == VERSION_1) {
+    if (version == VERSION_1)
+    {
         file.read(m_pixels, totalSize);
-    } else if (version == VERSION_2) {
+    }
+    else if (version == VERSION_2)
+    {
         unsigned long tmpSize = 0;
         file.read(&tmpSize, 4);
         unsigned char *tmp = new unsigned char[tmpSize];
         file.read(tmp, tmpSize);
-        int err = uncompress(reinterpret_cast<unsigned char*>(m_pixels),
+        int err = uncompress(reinterpret_cast<unsigned char *>(m_pixels),
                              &totalSize,
                              tmp,
                              tmpSize);
-        if (err) {
+        if (err)
+        {
             CLuaVM::debugv("CFont::Read err=%d\n", err);
             return false;
         }
@@ -214,7 +225,7 @@ unsigned int *CFont::pixels()
 
 void CFont::FaceSize(int size)
 {
-    ASSERT(m_pxRef);
+    assert(m_pxRef);
     m_face = size;
     m_scale = (float)size / (float)m_pxRef * fixup();
 }
@@ -222,10 +233,12 @@ void CFont::FaceSize(int size)
 int CFont::Advance(const char *text)
 {
     float width = 0;
-    for (int i=0; text[i]; ++i) {
+    for (int i = 0; text[i]; ++i)
+    {
         char id = text[i];
-        Glyph & glyph = m_glyphs[id];
-        if (id == ' ') {
+        Glyph &glyph = m_glyphs[id];
+        if (id == ' ')
+        {
             glyph.width = scaleX() * 0.60;
         }
         width += glyph.width * m_scale;
@@ -268,7 +281,7 @@ float CFont::fixup()
     return 0.80;
 }
 
-CFont &CFont::operator = (CFont & s)
+CFont &CFont::operator=(CFont &s)
 {
     m_glyphs = s.m_glyphs;
     m_props = s.m_props;
@@ -282,12 +295,14 @@ CFont &CFont::operator = (CFont & s)
     m_face = s.m_face;
     m_textureId = s.m_textureId;
     int h = pow2roundup(m_height);
-    m_pixels = new unsigned int[m_width*h];
-    if (s.pixels()) {
+    m_pixels = new unsigned int[m_width * h];
+    if (s.pixels())
+    {
         memcpy(m_pixels, s.pixels(), m_width * m_height * 4);
-    } else {
+    }
+    else
+    {
         memset(m_pixels, 0, m_width * m_height * 4);
     }
-    return * this;
+    return *this;
 }
-

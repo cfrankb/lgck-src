@@ -16,22 +16,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../shared/stdafx.h"
+// #include "../shared/stdafx.h"
 #include "im_opengl.h"
 #include "../shared/Frame.h"
+#include <cassert>
 
 #ifdef LGCK_QT
-    #include <QGLWidget>
+#include <QGLWidget>
 #endif
 #ifdef __APPLE__
-    #include <OpenGL/gl.h>
-    #include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #else
-    #ifdef _WIN32
-      #include <windows.h>
-    #endif
-    #include <GL/gl.h>
-    #include <GL/glu.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <GL/gl.h>
+#include <GL/glu.h>
 #endif
 
 #include "im_opengl.h"
@@ -63,12 +64,12 @@ CGROpenGL::~CGROpenGL()
     delete m_displayManager;
 }
 
-const char* CGROpenGL::signature()
+const char *CGROpenGL::signature()
 {
     return "graphik-opengl";
 }
 
-void CGROpenGL::getScreenSize(int & len, int & hei)
+void CGROpenGL::getScreenSize(int &len, int &hei)
 {
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
@@ -95,16 +96,19 @@ void CGROpenGL::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fi
     unsigned int green = (rgba >> 8) & 0xff;
     unsigned int blue = (rgba >> 16) & 0xff;
     unsigned int alpha = (rgba >> 24) & 0xff;
-    if (fill) {
+    if (fill)
+    {
         glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
         glRectf(x1, y1, x2, y2);
-    } else {
+    }
+    else
+    {
         glBegin(GL_LINE_LOOP);
-            glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
-            glVertex2f(x1, y1);
-            glVertex2f(x2, y1);
-            glVertex2f(x2, y2);
-            glVertex2f(x1, y2);
+        glColor4f(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
+        glVertex2f(x1, y1);
+        glVertex2f(x2, y1);
+        glVertex2f(x2, y2);
+        glVertex2f(x1, y2);
         glEnd();
     }
 }
@@ -112,27 +116,31 @@ void CGROpenGL::paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fi
 void CGROpenGL::paintImage(int x1, int y1, int frameSet, int frameNo)
 {
     glEnable(GL_TEXTURE_2D);
-    glEnable (GL_BLEND);
+    glEnable(GL_BLEND);
     glDisable(GL_MULTISAMPLE);
     glColor4f(m_colorMod.red / 255.0f, m_colorMod.green / 255.0f, m_colorMod.blue / 255.0f, 1.0f);
     unsigned int texture = m_imageManager->getImage(frameSet, frameNo);
-    CFrame & frame = m_game->toFrame(frameSet, frameNo);
+    CFrame &frame = m_game->toFrame(frameSet, frameNo);
     glBindTexture(GL_TEXTURE_2D, texture);
     int ix = pow2roundup(frame.m_nLen);
     int iy = pow2roundup(frame.m_nHei);
     int x2 = x1 + ix;
     int y2 = y1 - iy;
     glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(x1, y2, 0.0);
-        glTexCoord2f(0.0, 1.0f); glVertex3f(x1, y1, 0.0);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(x2, y1, 0.0);
-        glTexCoord2f(1.0f, 0.0); glVertex3f(x2, y2, 0.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(x1, y2, 0.0);
+    glTexCoord2f(0.0, 1.0f);
+    glVertex3f(x1, y1, 0.0);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x2, y1, 0.0);
+    glTexCoord2f(1.0f, 0.0);
+    glVertex3f(x2, y2, 0.0);
     glEnd();
 }
 
-IDisplayManager* CGROpenGL::displayManager()
+IDisplayManager *CGROpenGL::displayManager()
 {
-    return (IDisplayManager*) m_displayManager;
+    return (IDisplayManager *)m_displayManager;
 }
 
 void CGROpenGL::ss_paint(int x1, int y1, int x2, int y2, unsigned int rgba, bool fill)
@@ -148,12 +156,12 @@ void CGROpenGL::ss_paintImage(int x1, int y1, int frameSet, int frameNo)
     int screenLen;
     int screenHei;
     getScreenSize(screenLen, screenHei);
-    paintImage(x1,screenHei - y1, frameSet, frameNo);
+    paintImage(x1, screenHei - y1, frameSet, frameNo);
 }
 
 IImageManager *CGROpenGL::CGROpenGL::cache()
 {
-    return (IImageManager *) m_imageManager;
+    return (IImageManager *)m_imageManager;
 }
 
 void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color &color)
@@ -162,16 +170,21 @@ void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color 
     int screenHei;
     getScreenSize(screenLen, screenHei);
     unsigned int texture = font.textureId();
-    ASSERT(texture);
+    assert(texture);
 
-    glEnable(GL_TEXTURE_2D); GLDEBUG();
-    glEnable (GL_BLEND); GLDEBUG();
-    glBindTexture(GL_TEXTURE_2D, texture); GLDEBUG();
+    glEnable(GL_TEXTURE_2D);
+    GLDEBUG();
+    glEnable(GL_BLEND);
+    GLDEBUG();
+    glBindTexture(GL_TEXTURE_2D, texture);
+    GLDEBUG();
     float xx = x;
-    for (int i=0; text[i]; ++i) {
+    for (int i = 0; text[i]; ++i)
+    {
         char id = text[i];
-        CFont::Glyph & glyph = font[id];
-        if (id == ' ' || !glyph.width) {
+        CFont::Glyph &glyph = font[id];
+        if (id == ' ' || !glyph.width)
+        {
             xx += glyph.width * font.scale();
             continue;
         }
@@ -184,16 +197,21 @@ void CGROpenGL::render(CFont &font, const char *text, int x, int y, const Color 
         float h = pow2roundup(font.height());
 
         float a1 = ((float)glyph.x) / w;
-        float b1 = 1.0-((float)glyph.y) / h;
-        float a2 = (((float)glyph.x + glyph.width))/ w;
-        float b2 = 1.0-((((float)glyph.y + font.scaleY())) / h);
+        float b1 = 1.0 - ((float)glyph.y) / h;
+        float a2 = (((float)glyph.x + glyph.width)) / w;
+        float b2 = 1.0 - ((((float)glyph.y + font.scaleY())) / h);
 
         glBegin(GL_QUADS);
-            glColor4f(color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f); GLDEBUG();
-            glTexCoord2f(a1, b2); glVertex3f(x1, y2, 0.0);
-            glTexCoord2f(a1, b1); glVertex3f(x1, y1, 0.0);
-            glTexCoord2f(a2, b1); glVertex3f(x2, y1, 0.0);
-            glTexCoord2f(a2, b2); glVertex3f(x2, y2, 0.0);
+        glColor4f(color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f);
+        GLDEBUG();
+        glTexCoord2f(a1, b2);
+        glVertex3f(x1, y2, 0.0);
+        glTexCoord2f(a1, b1);
+        glVertex3f(x1, y1, 0.0);
+        glTexCoord2f(a2, b1);
+        glVertex3f(x2, y1, 0.0);
+        glTexCoord2f(a2, b2);
+        glVertex3f(x2, y2, 0.0);
         glEnd();
 
         xx += glyph.width * font.scale();

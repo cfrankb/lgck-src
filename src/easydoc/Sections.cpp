@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include "Functions.h"
 #include "Sections.h"
 
@@ -24,50 +23,54 @@ CSections::CSections()
 {
     m_sMax = GROWBY;
     m_sCount = 0;
-    m_sections = new Section [ m_sMax ];
+    m_sections = new Section[m_sMax];
 }
 
 CSections::~CSections()
 {
-    if (m_sections) {
-        delete [] m_sections;
+    if (m_sections)
+    {
+        delete[] m_sections;
     }
 }
 
-Section & CSections::operator [] (int i)
+Section &CSections::operator[](int i)
 {
     return m_sections[i];
 }
 
-int CSections::add (Section & section)
+int CSections::add(Section &section)
 {
     m_sections[m_sCount] = section;
-    ++ m_sCount;
+    ++m_sCount;
     return m_sCount - 1;
 }
 
-bool CSections::read(CFileWrap & file, int version)
+bool CSections::read(CFileWrap &file, int version)
 {
     m_sCount = 0;
-    if (version >= 3) {
+    if (version >= 3)
+    {
         int count;
         file >> count;
-        for (int i = 0; i < count; ++i) {
-            Section & s = m_sections[i];
+        for (int i = 0; i < count; ++i)
+        {
+            Section &s = m_sections[i];
             file >> s.name;
             file >> s.content;
-            ++ m_sCount;
+            ++m_sCount;
         }
     }
 
     return true;
 }
 
-bool CSections::write(CFileWrap & file)
+bool CSections::write(CFileWrap &file)
 {
     file << m_sCount;
-    for (int i = 0; i < m_sCount; ++i) {
-        Section & s = m_sections[i];
+    for (int i = 0; i < m_sCount; ++i)
+    {
+        Section &s = m_sections[i];
         file << s.name;
         file << s.content;
     }
@@ -75,19 +78,21 @@ bool CSections::write(CFileWrap & file)
     return true;
 }
 
-void CSections::dump(CFileWrap & file)
+void CSections::dump(CFileWrap &file)
 {
-    for (int i = 0; i < m_sCount; ++i) {
+    for (int i = 0; i < m_sCount; ++i)
+    {
 
-        Section & s = m_sections[i];
+        Section &s = m_sections[i];
 
-        file &= QString ("*** %1\n\n%2\n\n\n\n").arg(s.name).arg(s.content);
+        file &= QString("*** %1\n\n%2\n\n\n\n").arg(s.name).arg(s.content);
     }
 }
 
 void CSections::removeAt(int i)
 {
-    for (; i < m_sCount - 1 ; ++i) {
+    for (; i < m_sCount - 1; ++i)
+    {
         m_sections[i] = m_sections[i + 1];
     }
     --m_sCount;

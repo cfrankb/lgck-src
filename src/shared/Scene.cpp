@@ -16,15 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
 #include "Scene.h"
+#include <cstring>
+#include <cassert>
 #include "Game.h"
 #include "Map.h"
 #include "Frame.h"
 #include "../shared/Layer.h"
 #include "IFile.h"
 #include "Extra.h"
-#include <cstring>
 
 char CScene::m_signature[] = "SCNX";
 
@@ -38,62 +38,73 @@ CScene::CScene()
 
 CScene::~CScene()
 {
-    if (m_actors) {
+    if (m_actors)
+    {
         forget();
-        delete [] m_actors;
+        delete[] m_actors;
     }
 }
 
-int CScene::add(const CLevelEntry & entry, bool toSpawn)
+int CScene::add(const CLevelEntry &entry, bool toSpawn)
 {
-    if (m_size == m_max) {
+    if (m_size == m_max)
+    {
         m_max += GROWBY;
-        CActor ** t = new CActor* [ m_max ];
-        for (int i = 0; i < m_size; ++i) {
+        CActor **t = new CActor *[m_max];
+        for (int i = 0; i < m_size; ++i)
+        {
             t[i] = m_actors[i];
         }
-        delete [] m_actors;
+        delete[] m_actors;
         m_actors = t;
     }
-    CActor * t = new CActor(entry);
+    CActor *t = new CActor(entry);
     t->m_id = m_size;
     t->m_seed = m_seed++;
     m_actors[m_size] = t;
     ++m_size;
-    if (toSpawn) {
+    if (toSpawn)
+    {
         t->spawn();
     }
     return t->m_id;
 }
 
-int CScene::add(CActor & actor, bool toSpawn)
-{   
+int CScene::add(CActor &actor, bool toSpawn)
+{
     bool bFound = false;
     int n;
-    for (n = 1; n < m_size && !bFound; ++n) {
+    for (n = 1; n < m_size && !bFound; ++n)
+    {
         bFound = m_actors[n]->m_nProto == 0;
     }
-    if (!bFound) {
+    if (!bFound)
+    {
         n = m_size;
-        if (m_size==m_max) {
+        if (m_size == m_max)
+        {
             m_max += GROWBY;
-            CActor ** t = new CActor* [ m_max ];
-            for (int i=0; i < m_size; ++i) {
+            CActor **t = new CActor *[m_max];
+            for (int i = 0; i < m_size; ++i)
+            {
                 t[i] = m_actors[i];
             }
-            delete [] m_actors;
+            delete[] m_actors;
             m_actors = t;
         }
         m_actors[n] = new CActor;
         ++m_size;
-    } else {
+    }
+    else
+    {
         --n;
     }
     CActor &t = *(m_actors[n]);
     t = actor;
     t.m_id = n;
     t.m_seed = m_seed++;
-    if (toSpawn) {
+    if (toSpawn)
+    {
         t.spawn();
     }
     return n;
@@ -101,7 +112,8 @@ int CScene::add(CActor & actor, bool toSpawn)
 
 void CScene::removeAt(int i)
 {
-    for (int j=i; j < m_size -1; ++j) {
+    for (int j = i; j < m_size - 1; ++j)
+    {
         m_actors[j] = m_actors[j + 1];
     }
     --m_size;
@@ -109,25 +121,26 @@ void CScene::removeAt(int i)
 
 void CScene::forget()
 {
-    for (int i=0; i < m_size; ++i) {
+    for (int i = 0; i < m_size; ++i)
+    {
         delete m_actors[i];
     }
     m_size = 0;
 }
 
-CActor & CScene::get(int i) const
+CActor &CScene::get(int i) const
 {
-    return * m_actors[i];
+    return *m_actors[i];
 }
 
-CActor & CScene::operator [] (int i) const
+CActor &CScene::operator[](int i) const
 {
     return get(i);
 }
 
-CLevelEntry & CScene::atIndex (int i) const
+CLevelEntry &CScene::atIndex(int i) const
 {
-    return *(dynamic_cast<CLevelEntry*>(m_actors [ i ]));
+    return *(dynamic_cast<CLevelEntry *>(m_actors[i]));
 }
 
 void CScene::setOwner(CGame *game, bool bk)
@@ -143,8 +156,10 @@ int CScene::getSize() const
 
 int CScene::findPlayerEntry()
 {
-    for (int i = 0; i < m_size; ++i) {
-        if (m_actors [ i ]->proto().isPlayer()) {
+    for (int i = 0; i < m_size; ++i)
+    {
+        if (m_actors[i]->proto().isPlayer())
+        {
             return i;
         }
     }
@@ -152,14 +167,19 @@ int CScene::findPlayerEntry()
     return -1;
 }
 
-void CScene::hideSystemObject (bool bHide)
+void CScene::hideSystemObject(bool bHide)
 {
-    for (int n = 0; n < m_size; ++n) {
-        CActor & actor = *(m_actors[n]);
-        if (actor.proto().getOption(CProto::OPTION_INVISIBLE)) {
-            if ( bHide ) {
+    for (int n = 0; n < m_size; ++n)
+    {
+        CActor &actor = *(m_actors[n]);
+        if (actor.proto().getOption(CProto::OPTION_INVISIBLE))
+        {
+            if (bHide)
+            {
                 actor.m_nFrameNo |= 0x8000;
-            } else {
+            }
+            else
+            {
                 actor.m_nFrameNo &= 0x7fff;
             }
         }
@@ -169,8 +189,10 @@ void CScene::hideSystemObject (bool bHide)
 int CScene::countGoals()
 {
     int goals = 0;
-    for (int i=0; i < m_size; ++i) {
-        if (m_actors[i]->isGoal()) {
+    for (int i = 0; i < m_size; ++i)
+    {
+        if (m_actors[i]->isGoal())
+        {
             ++goals;
         }
     }
@@ -179,38 +201,43 @@ int CScene::countGoals()
 
 void CScene::animate()
 {
-    for (int i=0; i < m_size; ++i) {
+    for (int i = 0; i < m_size; ++i)
+    {
         m_actors[i]->animate();
     }
 }
 
 void CScene::doManage()
 {
-    for (int n = 0; n < m_size; ++n) {
+    for (int n = 0; n < m_size; ++n)
+    {
         m_actors[n]->doManage();
     } // for n
 }
 
 int CScene::whoIs(int x, int y)
 {
-    CGame & game = *m_game;
+    CGame &game = *m_game;
     int target = -1;
-    for (int n = 0; n < m_size; ++n) {
+    for (int n = 0; n < m_size; ++n)
+    {
         CActor &entry = *(m_actors[n]);
-        CFrame & frame = game.toFrame(entry);
-        if (entry.m_nProto && (entry.m_nX<= x) && (entry.m_nY<= y) &&
-                (entry.m_nX+ frame.m_nLen) > x &&
-                (entry.m_nY+ frame.m_nHei) > y ) {
+        CFrame &frame = game.toFrame(entry);
+        if (entry.m_nProto && (entry.m_nX <= x) && (entry.m_nY <= y) &&
+            (entry.m_nX + frame.m_nLen) > x &&
+            (entry.m_nY + frame.m_nHei) > y)
+        {
             target = n;
         }
     }
     return target;
 }
 
-const CScene & CScene::operator = (const CLayer & layer)
+const CScene &CScene::operator=(const CLayer &layer)
 {
     forget();
-    for (int i = 0; i < layer.getSize(); ++i) {
+    for (int i = 0; i < layer.getSize(); ++i)
+    {
         add(CActor(layer[i]));
     }
     return *this;
@@ -218,25 +245,33 @@ const CScene & CScene::operator = (const CLayer & layer)
 
 void CScene::map()
 {
-    CGame & game = *m_game;
-    CMap & rmap = game.map();
-    for (int n = 0; n < m_size; ++ n) {
-        CActor & entry = *(m_actors [n]);
-        CFrame & frame = game.toFrame(entry);
-        const CProto & proto = game.m_arrProto[entry.m_nProto];
-        if (proto.m_nClass) {
-            if (m_bk) {
-                Size sx = rmap.size(& frame);
+    CGame &game = *m_game;
+    CMap &rmap = game.map();
+    for (int n = 0; n < m_size; ++n)
+    {
+        CActor &entry = *(m_actors[n]);
+        CFrame &frame = game.toFrame(entry);
+        const CProto &proto = game.m_arrProto[entry.m_nProto];
+        if (proto.m_nClass)
+        {
+            if (m_bk)
+            {
+                Size sx = rmap.size(&frame);
                 Pos p = rmap.toMap(entry.m_nX, entry.m_nY);
-                for (int y = 0; y < sx.hei; ++y) {
-                    for (int x = 0; x < sx.len; ++ x) {
-                        CMapEntry & map = rmap.at(p.x + x, p.y + y);
-                        if ( proto.m_bNoSmartMap || frame.map(x,y) ) {
+                for (int y = 0; y < sx.hei; ++y)
+                {
+                    for (int x = 0; x < sx.len; ++x)
+                    {
+                        CMapEntry &map = rmap.at(p.x + x, p.y + y);
+                        if (proto.m_bNoSmartMap || frame.map(x, y))
+                        {
                             map.m_nBkClass = proto.m_nClass;
                         }
                     }
                 }
-            } else {
+            }
+            else
+            {
                 entry.map();
             }
         }
@@ -245,9 +280,10 @@ void CScene::map()
 
 int CScene::findBySeed(uint32_t seed)
 {
-    for (int n = 0; n < m_size; ++ n) {
-        if ( (m_actors[n]->m_seed == seed)
-                && (m_actors[n]->proto() != 0)) {
+    for (int n = 0; n < m_size; ++n)
+    {
+        if ((m_actors[n]->m_seed == seed) && (m_actors[n]->proto() != 0))
+        {
             return n;
         }
     }
@@ -261,9 +297,11 @@ void CScene::notifyClosure()
 
 void CScene::notifyAll(int eventId)
 {
-    for (int i=0; i < m_size; ++i) {
-        CActor & entry = *(m_actors[i]);
-        if (entry.m_nProto > 0) {
+    for (int i = 0; i < m_size; ++i)
+    {
+        CActor &entry = *(m_actors[i]);
+        if (entry.m_nProto > 0)
+        {
             entry.callEvent(eventId);
         }
     }
@@ -271,23 +309,26 @@ void CScene::notifyAll(int eventId)
 
 void CScene::manageAuto()
 {
-    CGame & game = *m_game;
+    CGame &game = *m_game;
     int nRateFactor;
     int ticks = game.getTickCount();
-    for (int i=0; i < m_size; ++i) {
-        CActor & entry = *(m_actors[i]);
-        if ( (!(entry.m_nTriggerKey & TRIGGER_FROZEN))
-                && entry.isActive()) {
-            const CProto & proto = game.m_arrProto[entry.m_nProto];
-            CFrame & frame = game.toFrame(entry);
+    for (int i = 0; i < m_size; ++i)
+    {
+        CActor &entry = *(m_actors[i]);
+        if ((!(entry.m_nTriggerKey & TRIGGER_FROZEN)) && entry.isActive())
+        {
+            const CProto &proto = game.m_arrProto[entry.m_nProto];
+            CFrame &frame = game.toFrame(entry);
             int nTicksT = ticks + i * 20 + (i % 20);
             bool autoEvent = false;
             // AutoFire
-            if (entry.isVisible()) {
-                nRateFactor = proto.m_nAutoBulletTime *20 ;
-                if ((proto.m_nAutoBullet!=0) &&
+            if (entry.isVisible())
+            {
+                nRateFactor = proto.m_nAutoBulletTime * 20;
+                if ((proto.m_nAutoBullet != 0) &&
                     (nRateFactor &&
-                     (nTicksT % nRateFactor)==0)) {
+                     (nTicksT % nRateFactor) == 0))
+                {
 
                     entry.callEvent(CObject::EO_FIRE);
                     autoEvent = true;
@@ -301,10 +342,12 @@ void CScene::manageAuto()
 
                     // TODO: check this again
 
-                    switch (bullet.m_nAim) {
+                    switch (bullet.m_nAim)
+                    {
                     case CGame::UP:
                     case CGame::LEFT:
-                        if (bullet.canMove(bullet.m_nAim)) {
+                        if (bullet.canMove(bullet.m_nAim))
+                        {
                             bullet.move();
                         }
                         break;
@@ -318,14 +361,14 @@ void CScene::manageAuto()
                         bullet.m_nY += frame.m_nHei;
                         bullet.move();
                         break;
-
                     }
                     add(bullet);
                 }
 
                 // ChangeTo
-                nRateFactor = proto.m_nAutoProtoTime *20 ;
-                if (nRateFactor && (nTicksT % nRateFactor)==0) {
+                nRateFactor = proto.m_nAutoProtoTime * 20;
+                if (nRateFactor && (nTicksT % nRateFactor) == 0)
+                {
                     CProto newProto = game.m_arrProto[proto.m_nAutoProto];
                     autoEvent = true;
                     entry.unMap();
@@ -333,7 +376,8 @@ void CScene::manageAuto()
                     entry.m_nFrameNo = newProto.m_nFrameNo;
                     entry.m_nProto = proto.m_nAutoProto;
 
-                    if (!entry.tryAnimation(CObject::AS_DEFAULT)) {
+                    if (!entry.tryAnimation(CObject::AS_DEFAULT))
+                    {
                         entry.set(lgck::EXTRA_ANIMPTR, 0);
                         entry.set(lgck::EXTRA_ANIMSEQ, -1);
                     }
@@ -342,12 +386,14 @@ void CScene::manageAuto()
                 }
 
                 // AutoSound
-                nRateFactor = proto.m_nAutoSoundTime *20 ;
-                if 	(nRateFactor &&
-                         (nTicksT % nRateFactor)==0)  {
+                nRateFactor = proto.m_nAutoSoundTime * 20;
+                if (nRateFactor &&
+                    (nTicksT % nRateFactor) == 0)
+                {
                     autoEvent = true;
                     int nSound = proto.m_nAutoSound;
-                    if (nSound) {
+                    if (nSound)
+                    {
                         game.playSound(nSound);
                     }
                 }
@@ -355,67 +401,74 @@ void CScene::manageAuto()
             } // if IsVisible
 
             // AutoTrigger
-            if (proto.m_bAutoTrigger) {
-                nRateFactor = proto.m_nAutoTriggerTime *20 ;
+            if (proto.m_bAutoTrigger)
+            {
+                nRateFactor = proto.m_nAutoTriggerTime * 20;
                 if (nRateFactor &&
-                         (nTicksT % nRateFactor)==0) {
+                    (nTicksT % nRateFactor) == 0)
+                {
                     autoEvent = true;
                     entry.callTrigger();
                 }
             }
 
-            if (autoEvent) {
+            if (autoEvent)
+            {
                 entry.callEvent(CObject::EO_AUTO);
             }
         }
     }
 }
 
-void CScene::read(IFile & file)
+void CScene::read(IFile &file)
 {
     int version = 0;
     int size = 0;
-    char signature[strlen(m_signature)];
+    auto signature = new char[strlen(m_signature)];
     file.read(signature, strlen(m_signature));
-    ASSERT(!memcmp(signature, m_signature, strlen(m_signature)));
-    file.read(&version,4);
-    ASSERT(version==VERSION);
+    assert(!memcmp(signature, m_signature, strlen(m_signature)));
+    file.read(&version, 4);
+    assert(version == VERSION);
     file.read(&size, 4);
     forget();
     file.read(&m_seed, sizeof(m_seed));
     file.read(&m_bk, sizeof(m_bk));
-    delete [] m_actors;
-    m_actors = new CActor*[size];
+    delete[] m_actors;
+    m_actors = new CActor *[size];
     m_size = size;
     m_max = size;
-    for (int i=0; i < size; ++i) {
+    for (int i = 0; i < size; ++i)
+    {
         m_actors[i] = new CActor();
-        m_actors[i]->read(file,version);
+        m_actors[i]->read(file, version);
     }
+    delete[] signature;
 }
 
 void CScene::write(IFile &file)
 {
     int version = VERSION;
     file.write(m_signature, strlen(m_signature));
-    file.write(&version,4);
+    file.write(&version, 4);
     file.write(&m_size, 4);
     file.write(&m_seed, sizeof(m_seed));
     file.write(&m_bk, sizeof(m_bk));
-    for (int i=0; i < m_size; ++i) {
-        CActor * actor = m_actors[i];
+    for (int i = 0; i < m_size; ++i)
+    {
+        CActor *actor = m_actors[i];
         actor->write(file);
     }
 }
 
-const CScene &CScene::operator =(const CScene &s)
+const CScene &CScene::operator=(const CScene &s)
 {
     forget();
-    delete [] m_actors;
+    delete[] m_actors;
     m_size = s.m_size;
     m_max = m_size;
-    m_actors = new CActor*[m_size];
-    for (int i=0; i < m_size; ++i) {
+    m_actors = new CActor *[m_size];
+    for (int i = 0; i < m_size; ++i)
+    {
         m_actors[i] = new CActor();
         *m_actors[i] = s[i];
     }
@@ -425,9 +478,10 @@ const CScene &CScene::operator =(const CScene &s)
     return *this;
 }
 
-bool CScene::isTarget(CActor * actor, int targetGroup, int typeId)
+bool CScene::isTarget(CActor *actor, int targetGroup, int typeId)
 {
-    switch (targetGroup) {
+    switch (targetGroup)
+    {
     case GROUP_CLASS:
         return actor->proto().m_nClass == typeId;
         break;
@@ -446,9 +500,11 @@ bool CScene::isTarget(CActor * actor, int targetGroup, int typeId)
 
 void CScene::freezeAll(int targetGroup, int typeId)
 {
-    for (int i=1; i < m_size; ++i) {
-        CActor * actor = m_actors[i];
-        if (isTarget(actor, targetGroup, typeId)) {
+    for (int i = 1; i < m_size; ++i)
+    {
+        CActor *actor = m_actors[i];
+        if (isTarget(actor, targetGroup, typeId))
+        {
             actor->freeze();
         }
     }
@@ -456,9 +512,11 @@ void CScene::freezeAll(int targetGroup, int typeId)
 
 void CScene::unfreezeAll(int targetGroup, int typeId)
 {
-    for (int i=1; i < m_size; ++i) {
-        CActor * actor = m_actors[i];
-        if (isTarget(actor, targetGroup, typeId)) {
+    for (int i = 1; i < m_size; ++i)
+    {
+        CActor *actor = m_actors[i];
+        if (isTarget(actor, targetGroup, typeId))
+        {
             actor->freeze();
         }
     }
