@@ -85,7 +85,7 @@ public:
     void moveTo(const int x, const int y);
     void move(const int aim);
     void move();
-    void read(IFile &file, int version);
+    void read(IFile &file, int);
     void setHP(int hp);
     int setState(int nState, bool bOn);
     void setTag(int flag, bool bit = true);

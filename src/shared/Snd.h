@@ -40,7 +40,7 @@ public:
     bool operator != (const CSnd & src);
     CSnd & operator = (const CSnd & src);
     void debug();
-    virtual bool read(IFile & file);
+    virtual bool read(IFile &);
     virtual bool write(IFile & file);
 
 protected:

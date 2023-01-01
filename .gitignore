@@ -3,6 +3,7 @@
 *-Release/*
 src/*-Debug/*
 src/*-Release/*
+src/*build-lgck-builder-*-Profile/
 *debug/
 *.user
 *.

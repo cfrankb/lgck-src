@@ -39,14 +39,17 @@
 #include "Const.h"
 #include "fontmanager.h"
 #include "Countdown.h"
-// #include "stdafx.h"
 #include "microtime.h"
 
 #ifdef USE_QFILE
 #include <QMessageBox>
 #endif
 
-#define UNUSED(__x__) (void *)(__x__);
+#define UNUSED(expr)  \
+    do                \
+    {                 \
+        (void)(expr); \
+    } while (0)
 
 /////////////////////////////////////////////////////////////////////////////
 // static variables

@@ -605,7 +605,7 @@ void CProtoArray::debug()
     for (int i = 0; i < getSize(); ++i)
     {
         CObject &obj = getObject(i);
-        CProto &proto = obj.proto();
+       // CProto &proto = obj.proto();
         //  qDebug("Sprite #%d [%s] - eventcount %d", i, proto.getName(), obj.getEventCount());
         for (int j = 0; j < obj.getEventCount(); ++j)
         {

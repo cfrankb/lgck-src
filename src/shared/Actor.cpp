@@ -43,7 +43,7 @@
 
 CGame *CActor::m_game = nullptr;
 
-void CActor::read(IFile &file, int version)
+void CActor::read(IFile &file, int)
 {
     int size = sizeof(CLevelEntry);
     int oldSize;

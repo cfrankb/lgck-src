@@ -291,7 +291,7 @@ void CSnd::debug()
     }
 }
 
-bool CSnd::read(IFile &file)
+bool CSnd::read(IFile &)
 {
     return true;
 }

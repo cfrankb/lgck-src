@@ -31,7 +31,7 @@ CTask::CTask()
     m_script = "";
 }
 
-void CTask::read(IFile &file, int version)
+void CTask::read(IFile &file, int)
 {
     file.read(&m_ticks, sizeof(m_ticks));
     file.read(&m_task, sizeof(m_task));
@@ -122,7 +122,7 @@ void CTasks::createTask(CActor &actor)
     add(task);
 }
 
-void CTasks::read(IFile &file, int ver)
+void CTasks::read(IFile &file, int)
 {
     int version = 0;
     file.read(&version, sizeof(version));

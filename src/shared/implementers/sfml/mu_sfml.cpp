@@ -15,17 +15,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "stdafx.h"
 #include <cstdio>
 #include "mu_sfml.h"
 #include <SFML/Audio.hpp>
 
 CMusicSFML::CMusicSFML()
 {
-    qDebug("CMusicSFML");
     m_valid = true;
-    m_music =  NULL;
-    qDebug("CMusicSFML OUT");
+    m_music = NULL;
 }
 
 CMusicSFML::~CMusicSFML()
@@ -37,11 +34,13 @@ bool CMusicSFML::open(const char *file)
 {
     close();
     m_music = new sf::Music;
-    if (m_music) {
-        if (!m_music->openFromFile(file)) {
+    if (m_music)
+    {
+        if (!m_music->openFromFile(file))
+        {
             delete m_music;
             m_music = NULL;
-            qDebug("opening %s failed\n", file);
+            printf("opening %s failed\n", file);
             return false;
         }
     }
@@ -50,7 +49,8 @@ bool CMusicSFML::open(const char *file)
 
 bool CMusicSFML::play(int loop)
 {
-    if (m_music) {
+    if (m_music)
+    {
         m_music->play();
         m_music->setLoop((bool)loop);
         return true;
@@ -60,7 +60,8 @@ bool CMusicSFML::play(int loop)
 
 void CMusicSFML::stop()
 {
-    if (m_music) {
+    if (m_music)
+    {
         m_music->stop();
     }
 }
@@ -68,7 +69,8 @@ void CMusicSFML::stop()
 void CMusicSFML::close()
 {
     stop();
-    if (m_music) {
+    if (m_music)
+    {
         delete m_music;
         m_music = NULL;
     }

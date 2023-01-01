@@ -66,6 +66,8 @@ CDlgTestLevel::CDlgTestLevel(QWidget *parent) :
         ui->cbResolution->addItem(QString("%1 x %2").arg(m_rez[i].w).arg(m_rez[i].h));
     }
     ui->tabWidget->setCurrentIndex(0);
+    // remove external runtime options
+    ui->tabWidget->removeTab(1);
 
     QIcon iconBlank;
     iconBlank.addFile(":/images/blank.png");

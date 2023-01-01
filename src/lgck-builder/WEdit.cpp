@@ -160,8 +160,8 @@ QStringList CWEdit::fromFile(const char *fileName)
         tmp[size] = 0;
         file.read(tmp, size);
         file.close();
-        delete[] tmp;
         fct = tmp;
+        delete[] tmp;
     }
     return fct.split("\n");
 }

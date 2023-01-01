@@ -33,7 +33,7 @@ public:
     int m_task;
     std::string m_script;
     CActor m_actor;
-    void read(IFile &file, int version);
+    void read(IFile &file, int);
     void write(IFile & file);
 
     enum {
@@ -57,7 +57,7 @@ public:
     int getSize();
     void forget();    
     void createTask(CActor & actor);
-    void read(IFile & file, int version);
+    void read(IFile & file, int);
     void write(IFile & file);
 
 protected:

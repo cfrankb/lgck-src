@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// #include "../shared/stdafx.h"
 #include <cassert>
 #include "im_sdl.h"
 #include "../shared/Frame.h"

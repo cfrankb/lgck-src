@@ -193,7 +193,7 @@ void CGRSdl::queryDriver()
     for (int i = 0; i < count; ++i)
     {
         SDL_RendererInfo info;
-        int result = SDL_GetRenderDriverInfo(i, &info);
+        SDL_GetRenderDriverInfo(i, &info);
         // Q_UNUSED(result);
         std::string flags;
         if (info.flags & SDL_RENDERER_SOFTWARE)

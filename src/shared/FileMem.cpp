@@ -86,6 +86,7 @@ int CFileMem::write(const void *buf, int size)
 
 bool CFileMem::open(const char *fileName, const char *mode)
 {
+    m_mode = mode;
     m_filename = fileName;
     // TODO: fox that later
     return true;

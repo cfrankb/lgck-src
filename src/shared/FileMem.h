@@ -40,7 +40,7 @@ public:
     virtual CFileMem & operator << (bool b);
     virtual CFileMem & operator += (const char *);
 
-    virtual bool open(const char *filename ="", const char *mode= "rb");
+    virtual bool open(const char *filename ="", const char *mode="");
     virtual int read(void *buf, int size);
     virtual int write(const void *buf, int size);
 
@@ -60,6 +60,7 @@ protected:
     int m_size;
     int m_max;
     int m_ptr;
+    std::string m_mode;
 
     enum {
         GROWBY = 8192

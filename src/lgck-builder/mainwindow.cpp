@@ -1308,8 +1308,9 @@ void MainWindow::on_actionTest_Level_triggered()
                             );
                 m_doc.setSkill(O_INT(TESTLEVEL, SKILL));
                 m_doc.initLua();
-                m_runtimeExternal = dlg->isExternal();
-                if (dlg->isExternal()){
+                // disable external runtime
+                m_runtimeExternal = false;//dlg->isExternal();
+                if (m_runtimeExternal){
                     goExternalRuntime();
                 } else {
                     // set the start level
