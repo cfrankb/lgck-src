@@ -1,5 +1,7 @@
 # LGCK Builder 
 
+![alt text](src/lgck-builder/images/Frank2_scaled33.png)
+
 ## The source package 
 
 Contains just the code and build instructions. 
@@ -10,6 +12,7 @@ dependancies are met. This is explained in BUILD.txt
 
 ## The assets, demos and other resouces 
    https://github.com/cfrankb/lgck-data/
+   
    https://sourceforge.net/projects/lgck/files/Resources/
 
 ## The windows installer 
