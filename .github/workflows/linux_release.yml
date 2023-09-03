@@ -60,8 +60,8 @@ jobs:
       - name: Install build dependency
         working-directory: ${{ runner.temp }}
         run: |
-          apt-get update -y
-          apt-get install -y liblua5.2-dev liblua5.2-0 libsdl2-dev libsdl2-mixer-dev zlib1g-dev
+          sudo apt-get update -y
+          sudo apt-get install -y liblua5.2-dev liblua5.2-0 libsdl2-dev libsdl2-mixer-dev zlib1g-dev
 
       - name: Build Lgck builder
         working-directory: ${{ runner.temp }}/build/lgck-builder
