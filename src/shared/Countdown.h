@@ -22,6 +22,7 @@
 #include <string>
 #include "ISerial.h"
 #include "IFile.h"
+#include <inttypes.h>
 
 class CCountdownEntry{
 public:

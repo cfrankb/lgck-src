@@ -6,7 +6,7 @@ on:
       - 'master'
       - 'continuous-integration'
       - 'cross-platform'
-      - 'build-ci'
+    #  - 'build-ci'
     tags:
       - 'v*'
   pull_request:

@@ -20,7 +20,7 @@
 #include "Game.h"
 #include "Map.h"
 #include "Extra.h"
-#include <stdlib.h>
+#include <cstdlib>
 
 CMonster::CMonster():CActor()
 {    

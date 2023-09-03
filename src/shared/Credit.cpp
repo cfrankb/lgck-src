@@ -18,6 +18,7 @@
 #include <cstring>
 #include "Credit.h"
 #include "IFile.h"
+#include <cstdint>
 
 const lgck::License::LicenseDefinition licenses[] {
     {

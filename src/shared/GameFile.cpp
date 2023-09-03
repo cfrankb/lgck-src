@@ -19,11 +19,11 @@
 // Game.cpp : implementation file
 //
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <string.h>
 #include <algorithm>
-#include <ctype.h>
+#include <cstdint>
 #include "Folders.h"
 #include "ss_version.h"
 #include "GameFile.h"

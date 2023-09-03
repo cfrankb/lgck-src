@@ -3,17 +3,21 @@ LGCK Builder is an all-one Side-Scroller Contruction Kit
 Getting Started
 ---------------------------------------------------------------------
 
-LGCK Builder comes in three bundles.
+LGCK Builder comes in multiple bundles.
 
 1) The latest development snapshot can be found on github:
 
    https://github.com/cfrankb/lgck-src
 
-2) The Windows installer (lgck-setup.exe) and portable edition (lgck-portable.zip)
+2) The Windows installer (lgck-setup.exe) and portable edition (LgckBuilder_Win64.zip)
 	Latest official build
 	https://sourceforge.net/projects/lgck/files/Lgck_Builder/
 
-3) The game demos and tutorial material
+3) A universal Linux appImage
+    This edition should work on all modern linux distributions.
+    LgckBuilder-x86_64.AppImage.zip
+
+4) The game demos and tutorial material
 
    https://github.com/cfrankb/lgck-data
 

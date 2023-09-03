@@ -18,6 +18,7 @@
 #ifndef __CREDIT_H
 #define __CREDIT_H
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <list>

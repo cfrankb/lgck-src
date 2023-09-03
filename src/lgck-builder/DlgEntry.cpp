@@ -30,7 +30,7 @@
 #include "../shared/Path.h"
 #include "../shared/qtgui/cheat.h"
 #include "../shared/qtgui/qthelper.h"
-#include <stdio.h>
+#include <cstdio>
 
 CDlgEntry::CDlgEntry(QWidget *parent) :
     QDialog(parent),
