@@ -58,7 +58,7 @@ jobs:
           xcopy ${{ env.SOURCE_DIR }}\distro\setup ${{ runner.temp }}\setup /s /e
 
       - name: Download SDL2
-        uses: suisei-cn/actions-download-file@v1
+        uses: suisei-cn/actions-download-file@v1.4.0
         with:
           url: https://github.com/libsdl-org/SDL/releases/download/release-2.26.1/SDL2-devel-2.26.1-VC.zip
           target: ${{ runner.temp }}\
@@ -74,7 +74,7 @@ jobs:
           copy sdl2\SDL2-2.26.1\lib\x64\SDL2.dll  ${{ runner.temp }}\setup
 
       - name: Download SDL2-mixer
-        uses: suisei-cn/actions-download-file@v1
+        uses: suisei-cn/actions-download-file@v1.4.0
         with:
           url: https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.6.2/SDL2_mixer-devel-2.6.2-VC.zip
           target: ${{ runner.temp }}\
@@ -90,7 +90,7 @@ jobs:
           copy sdl2-mixer\SDL2_mixer-2.6.2\lib\x64\optional\libogg-0.dll ${{ runner.temp }}\setup
 
       - name: Download JOM
-        uses: suisei-cn/actions-download-file@v1
+        uses: suisei-cn/actions-download-file@v1.4.0
         with:
           url: http://download.qt.io/official_releases/jom/jom.zip
           target: ${{ runner.temp }}\
@@ -101,7 +101,7 @@ jobs:
           7z x jom.zip -ojom
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v3
         with:
           version: ${{ env.QT_VERSION }}
           host: ${{ env.HOST }}
@@ -118,7 +118,7 @@ jobs:
           arch: ${{ env.VSARCH }}
 
       - name: Download zlib
-        uses: suisei-cn/actions-download-file@v1
+        uses: suisei-cn/actions-download-file@v1.4.0
         with:
           url: https://cfrankb.com/files/libs/zlib13.zip
           target: ${{ runner.temp }}\
@@ -142,7 +142,7 @@ jobs:
           copy zconf.h ${{ runner.temp }}\build\headers
 
       - name: Download Lua5.4
-        uses: suisei-cn/actions-download-file@v1
+        uses: suisei-cn/actions-download-file@v1.4.0
         with:
           url: https://www.lua.org/ftp/lua-5.4.4.tar.gz
           target: ${{ runner.temp }}\
