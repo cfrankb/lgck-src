@@ -20,6 +20,7 @@
 #define PATH_H
 
 #include <string>
+#include <inttypes.h>
 
 class IFile;
 

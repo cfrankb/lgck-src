@@ -20,13 +20,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <ctime>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <string>
 #include <ctime>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
 #include <unistd.h>
 #include <sys/time.h>
 #include "Const.h"

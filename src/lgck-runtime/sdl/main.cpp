@@ -15,15 +15,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "stdafx.h"
-#undef INT8
+#ifdef EMS
+#include <emscripten.h>
+#endif
 #include <ctime>
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <SDL2/SDL.h>
-#include "Const.h"
+#include "../shared/Const.h"
 #include "../shared/Game.h"
 #include "../shared/FileWrap.h"
 #include "../shared/Level.h"
@@ -148,33 +147,40 @@ void notifyKeyCode(int keyCode, bool state)
     }
 }
 
-void runGame()
+void loop_handler(void *arg)
 {
     bool quit = false;
-    while (!quit)
+    SDL_Event e;
+    while (SDL_PollEvent(&e) != 0)
     {
-        SDL_Event e;
-        while (SDL_PollEvent(&e) != 0)
+        switch (e.type)
         {
-            switch (e.type)
+        case SDL_QUIT:
+            quit = true;
+            break;
+        case SDL_KEYDOWN:
+            if (e.key.keysym.sym == SDLK_ESCAPE)
             {
-            case SDL_QUIT:
                 quit = true;
-                break;
-            case SDL_KEYDOWN:
-                if (e.key.keysym.sym == SDLK_ESCAPE)
-                {
-                    quit = true;
-                }
-                notifyKeyCode(e.key.keysym.sym, true);
-                break;
-            case SDL_KEYUP:
-                notifyKeyCode(e.key.keysym.sym, false);
             }
+            notifyKeyCode(e.key.keysym.sym, true);
+            break;
+        case SDL_KEYUP:
+            notifyKeyCode(e.key.keysym.sym, false);
         }
-        unfoldEvents();
     }
-    exit(EXIT_SUCCESS);
+    if (quit) {
+        exit(EXIT_SUCCESS);
+    }
+    unfoldEvents();
+}
+
+void runGame()
+{
+    while (true)
+    {
+        loop_handler(nullptr);
+    }
 }
 
 int main(int argc, char *args[])
@@ -183,10 +189,20 @@ int main(int argc, char *args[])
     g_game = &game;
     add_lgck_res();
     ARGS out;
+#ifdef EMS
+    out = ARGS {
+        .skill=0,
+        .level=0,
+        .width=640,
+        .height=480,
+        .filename="data/vla3demo258.lgckdb"
+    };
+#else
     if (!parseCmdLine(argc, args, out))
     {
         return EXIT_FAILURE;
     }
+#endif    
     game.setFileName(out.filename.c_str());
     printf("reading data...\n");
     if (!game.read())
@@ -194,10 +210,13 @@ int main(int argc, char *args[])
         printf("failed to read gamedata:%s [%s]\n", game.getFileName(), game.getLastError());
         return EXIT_FAILURE;
     }
+    printf("attaching sound\n");
     CSndSDL *sn = new CSndSDL();
     game.attach((ISound *)sn);
+    printf("attaching music\n");
     CMusicSDL *mu = new CMusicSDL();
     game.attach((IMusic *)mu);
+    printf("attaching graphics\n");
     CGRSdl *gm = new CGRSdl();
     gm->init(&game, out.width, out.height, "LGCK / SDL runtime");
     game.attach(gm->cache());
@@ -214,7 +233,12 @@ int main(int argc, char *args[])
     g_game->setLevel(g_currLevel);
     g_game->setEngineState(CGame::ES_INTRO);
     g_game->callGameEvent(CGameEvents::EG_INIT_GAME);
+
+#ifdef EMS
+    emscripten_set_main_loop_arg(loop_handler, &game, -1, 1);
+#else    
     runGame();
+#endif    
     game.attach((IGraphics *)NULL);
     game.attach((IMusic *)NULL);
     game.attach((ISound *)NULL);

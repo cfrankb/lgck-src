@@ -30,8 +30,14 @@ int upperClean(int c);
 #endif
 char *realpath(const char *path, char resolved_path[PATH_MAX]);
 #else
-#include <stdlib.h>
+#include <cstdlib>
+#ifndef EMS
 #include <linux/limits.h>
+#else
+#ifndef PATH_MAX
+#define PATH_MAX 512
+#endif
+#endif
 #endif
 int compressData(unsigned char *in_data, unsigned long in_size, unsigned char **out_data, unsigned long &out_size);
 int istrcmp(const char *a, const char *b);

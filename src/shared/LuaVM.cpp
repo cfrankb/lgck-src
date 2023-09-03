@@ -19,7 +19,7 @@
 #include "compat/asprintf.h"
 #include <cstring>
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <cassert>
 #include "LuaVM.h"
 

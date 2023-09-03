@@ -19,14 +19,22 @@
 #ifndef _LUAVM_H__
 #define _LUAVM_H__
 
-#include <stdio.h>
+#include <cstdio>
 #include <functional>
 
+#ifdef EMS
+extern "C" {
+#include "extern/lua5.4/lauxlib.h"
+#include "extern/lua5.4/lua.h"
+#include "extern/lua5.4/lualib.h"
+}
+#else
 extern "C" {
 #include <lua5.2/lauxlib.h>
 #include <lua5.2/lua.h>
 #include <lua5.2/lualib.h>
 }
+#endif
 
 #include <unordered_map>
 

@@ -19,7 +19,7 @@
 // Level.cpp : implementation file
 //
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstdio>
 #include <stdint.h>
 #include <zlib.h>

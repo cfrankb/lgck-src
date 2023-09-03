@@ -19,8 +19,8 @@
 #include "stdafx.h"
 #undef INT8
 #include <ctime>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <sys/time.h>
 #ifdef _WIN32

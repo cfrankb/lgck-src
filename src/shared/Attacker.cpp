@@ -19,9 +19,9 @@
 #include "Attacker.h"
 #include "Frame.h"
 #include "Extra.h"
-#include  <stdlib.h>
-#include  <stdio.h>
-#include  <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <time.h>
 
 CAttacker::CAttacker():CMonster()
 {

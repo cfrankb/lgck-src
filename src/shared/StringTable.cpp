@@ -36,7 +36,7 @@ CStringTable::~CStringTable()
 
 bool CStringTable::read(IFile &file)
 {
-    file.read(&m_size, sizeof(uint32_t));
+    file.read(&m_size, sizeof(m_size));
     if (m_strings) {
         delete [] m_strings;
     }
@@ -50,7 +50,7 @@ bool CStringTable::read(IFile &file)
 
 bool CStringTable::write(IFile &file)
 {
-    file.write(&m_size, sizeof(uint32_t));
+    file.write(&m_size, sizeof(m_size));
     for (int i=0; i<m_size; ++i) {
         file << m_strings[i];
     }
