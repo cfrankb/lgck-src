@@ -25,7 +25,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout repo
@@ -41,7 +41,7 @@ jobs:
           target: desktop
           arch: gcc_64
           dir: ${{ runner.temp }}
-          modules: qtcore qtwidgets qtgui #qtcharts qt3d
+          #modules: qtcore qtwidgets qtgui #qtcharts qt3d
           setup-python: false
 
       - name: Create build directory
@@ -60,8 +60,8 @@ jobs:
       - name: Install build dependency
         working-directory: ${{ runner.temp }}
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y liblua5.2-dev liblua5.2-0 libsdl2-dev libsdl2-mixer-dev zlib1g-dev
+          apt-get update -y
+          apt-get install -y liblua5.2-dev liblua5.2-0 libsdl2-dev libsdl2-mixer-dev zlib1g-dev
 
       - name: Build Lgck builder
         working-directory: ${{ runner.temp }}/build/lgck-builder

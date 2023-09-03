@@ -120,17 +120,17 @@ jobs:
       - name: Download zlib
         uses: suisei-cn/actions-download-file@v1
         with:
-          url: https://zlib.net/zlib1213.zip
+          url: https://cfrankb.com/files/libs/zlib13.zip
           target: ${{ runner.temp }}\
 
       - name: Unzip zlib
         working-directory: ${{ runner.temp }}
         run: |
-          7z x zlib1213.zip -ozlib
+          7z x zlib13.zip -ozlib
           dir /w zlib
 
       - name: Build zlib / copy files
-        working-directory: ${{ runner.temp }}\zlib\zlib-1.2.13
+        working-directory: ${{ runner.temp }}\zlib\zlib-1.13
         run: |
           nmake /f win32/Makefile.msc
           dir /w
