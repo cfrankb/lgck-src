@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "testcase.h"
-#include "FileWrap.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CStep::CStep()
 {
@@ -28,11 +28,14 @@ CStep::~CStep()
 
 }
 
-void CStep::read(CFileWrap & file, int version)
+void CStep::read(QFileWrap & file, int version)
 {
     Q_UNUSED(version);
-    file >> m_name;
-    file >> m_code;
+    std::string tmp;
+    file >> tmp;
+    m_name = tmp.c_str();
+    file >> tmp;
+    m_code = tmp.c_str();
     file.read(&m_conditionCount, sizeof(m_conditionCount));
     for (int i=0; i < m_conditionCount; ++i) {
         m_conditions[i].op = 0;
@@ -40,20 +43,21 @@ void CStep::read(CFileWrap & file, int version)
         file.read(&m_conditions[i].argNum,4);
         file.read(&m_conditions[i].op,2);
         file.read(&m_conditions[i].type,2);
-        file >> m_conditions[i].value;
+        file >> tmp;
+        m_conditions[i].value = tmp.c_str();
     }
 }
 
-void CStep::write(CFileWrap & file)
+void CStep::write(QFileWrap & file)
 {
-    file << m_name;
-    file << m_code;
+    file << m_name.toStdString();
+    file << m_code.toStdString();
     file.write(&m_conditionCount, sizeof(m_conditionCount));
     for (int i=0; i < m_conditionCount; ++i) {
         file.write(&m_conditions[i].argNum,4);
         file.write(&m_conditions[i].op,2);
         file.write(&m_conditions[i].type,2);
-        file << m_conditions[i].value;
+        file << m_conditions[i].value.toStdString();
     }
 }
 
@@ -80,7 +84,7 @@ int CTestCase::getSize()
     return m_count;
 }
 
-void CTestCase::read(CFileWrap & file, int version)
+void CTestCase::read(QFileWrap & file, int version)
 {
     // step count
     file.read(&m_count, sizeof(m_count));
@@ -90,7 +94,7 @@ void CTestCase::read(CFileWrap & file, int version)
     }
 }
 
-void CTestCase::write(CFileWrap & file)
+void CTestCase::write(QFileWrap & file)
 {
     // step count
     file.write(&m_count, sizeof(m_count));

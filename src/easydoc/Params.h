@@ -19,7 +19,7 @@
 #define PARAMS_H
 
 #include <QString>
-#include "FileWrap.h"
+class QFileWrap;
 
 class Param
 {
@@ -54,8 +54,8 @@ public:
     void removeAt(int i);
     int getSize();
     void forget();
-    void read(CFileWrap &file, int version);
-    void write(CFileWrap &file);
+    void read(QFileWrap &file, int version);
+    void write(QFileWrap &file);
     void debug();
 
 protected:

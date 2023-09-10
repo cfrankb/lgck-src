@@ -18,6 +18,7 @@
 
 #include "Functions.h"
 #include "Sections.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CSections::CSections()
 {
@@ -46,7 +47,7 @@ int CSections::add(Section &section)
     return m_sCount - 1;
 }
 
-bool CSections::read(CFileWrap &file, int version)
+bool CSections::read(QFileWrap &file, int version)
 {
     m_sCount = 0;
     if (version >= 3)
@@ -56,8 +57,11 @@ bool CSections::read(CFileWrap &file, int version)
         for (int i = 0; i < count; ++i)
         {
             Section &s = m_sections[i];
-            file >> s.name;
-            file >> s.content;
+            std::string tmp;
+            file >> tmp;
+            s.name = tmp.c_str();
+            file >> tmp;
+            s.content = tmp.c_str();
             ++m_sCount;
         }
     }
@@ -65,28 +69,17 @@ bool CSections::read(CFileWrap &file, int version)
     return true;
 }
 
-bool CSections::write(CFileWrap &file)
+bool CSections::write(QFileWrap &file)
 {
     file << m_sCount;
     for (int i = 0; i < m_sCount; ++i)
     {
         Section &s = m_sections[i];
-        file << s.name;
-        file << s.content;
+        file << s.name.toStdString();
+        file << s.content.toStdString();
     }
 
     return true;
-}
-
-void CSections::dump(CFileWrap &file)
-{
-    for (int i = 0; i < m_sCount; ++i)
-    {
-
-        Section &s = m_sections[i];
-
-        file &= QString("*** %1\n\n%2\n\n\n\n").arg(s.name).arg(s.content);
-    }
 }
 
 void CSections::removeAt(int i)

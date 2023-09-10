@@ -17,6 +17,7 @@
 */
 #include "Params.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CParams::CParams()
 {
@@ -75,7 +76,7 @@ void CParams::forget()
     m_size = 0;
 }
 
-void CParams::read(CFileWrap &file, int version)
+void CParams::read(QFileWrap &file, int version)
 {
     m_size = 0;
     int size;
@@ -83,9 +84,13 @@ void CParams::read(CFileWrap &file, int version)
     for (int i = 0; i < size; ++i)
     {
         Param p;
-        file >> p.name;
-        file >> p.type;
-        file >> p.desc;
+        std::string tmp;
+        file >> tmp;
+        p.name = tmp.c_str() ;
+        file >> tmp;
+        p.type = tmp.c_str();
+        file >> tmp;
+        p.desc = tmp.c_str();
         if (version > 1)
         {
             file >> p.flags;
@@ -98,15 +103,15 @@ void CParams::read(CFileWrap &file, int version)
     }
 }
 
-void CParams::write(CFileWrap &file)
+void CParams::write(QFileWrap &file)
 {
     file << m_size;
     for (int i = 0; i < m_size; ++i)
     {
         Param &p = m_params[i];
-        file << p.name.trimmed();
-        file << p.type.trimmed();
-        file << p.desc.trimmed();
+        file << p.name.trimmed().toStdString();
+        file << p.type.trimmed().toStdString();
+        file << p.desc.trimmed().toStdString();
         file << p.flags;
     }
 }

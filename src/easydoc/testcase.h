@@ -19,7 +19,7 @@
 #define CTESTCASE_H
 
 #include <QString>
-class CFileWrap;
+class QFileWrap;
 
 enum ConditionType:int {
     argCount,
@@ -58,8 +58,8 @@ public:
     enum:int {
         MAX_CONDITIONS = 8
     };
-    void read(CFileWrap & file, int version);
-    void write(CFileWrap & file);
+    void read(QFileWrap & file, int version);
+    void write(QFileWrap &file);
 };
 
 class CTestCase
@@ -76,8 +76,8 @@ public:
     int m_count;
     void removeAt(int i);
     int getSize();
-    void read(CFileWrap & file, int version);
-    void write(CFileWrap & file);
+    void read(QFileWrap & file, int version);
+    void write(QFileWrap & file);
 };
 
 #endif // CTESTCASE_H

@@ -19,7 +19,8 @@
 #ifndef SECTIONS_H
 #define SECTIONS_H
 
-class CFileWrap;
+#include <QString>
+class QFileWrap;
 
 typedef struct
 {
@@ -39,9 +40,8 @@ public:
     }
 
     int add (Section & cl);
-    bool read(CFileWrap & file, int version);
-    bool write(CFileWrap & file);
-    void dump(CFileWrap & file);
+    bool read(QFileWrap & file, int version);
+    bool write(QFileWrap & file);
     void removeAt(int i);
     void removeAll();
 

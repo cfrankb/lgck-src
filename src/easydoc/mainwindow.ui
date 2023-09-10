@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>409</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Help">
@@ -54,7 +54,6 @@
      <property name="title">
       <string>&amp;Export...</string>
      </property>
-     <addaction name="actionHTML"/>
      <addaction name="actionFunctionList"/>
      <addaction name="actionWiki"/>
     </widget>
@@ -74,7 +73,6 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="actionSave_HTML"/>
     <addaction name="actionSave_Wiki"/>
     <addaction name="actionRemember_last_file"/>
     <addaction name="actionLarge_Font"/>

@@ -20,9 +20,9 @@
 #include "ui_DlgAbout.h"
 #include <QDesktopServices>
 #include <QUrl>
-#include "FileWrap.h"
 #include "../shared/Credits.h"
 #include "../shared/ss_version.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CDlgAbout::CDlgAbout(QWidget *parent) : QDialog(parent),
                                         m_ui(new Ui::CDlgAbout)
@@ -51,7 +51,7 @@ CDlgAbout::CDlgAbout(QWidget *parent) : QDialog(parent),
     m_ui->sVersion->setText(ver);
 
     // license GPL
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(":/res/gpl.txt"))
     {
         int size = file.getSize();

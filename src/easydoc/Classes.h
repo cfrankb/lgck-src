@@ -19,11 +19,8 @@
 #ifndef CLASSES_H
 #define CLASSES_H
 
-//#include "struct.h"
-//#include "class.h"
 #include "Class.h"
-//#include "FileWrap.h"
-class CFileWrap;
+class QFileWrap;
 class QStringList;
 
 class CClasses
@@ -40,12 +37,10 @@ public:
     int add (CClass * cl, bool sorted);
     int insertAt(int i, CClass *c);
     CClass * removeAt(int i);
-    bool read(CFileWrap & file, int version);
-    bool write(CFileWrap & file);
-    void dump(CFileWrap & file);
-    void exportList(CFileWrap & file);
+    bool read(QFileWrap & file, int version);
+    bool write(QFileWrap & file);
+    void exportList(QFileWrap & file);
     void exportWiki(const QString & path, CFunctions *fct, QStringList &fileList);
-    void debug(CFileWrap & file);
     void removeAll();
 
 protected:

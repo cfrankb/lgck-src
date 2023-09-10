@@ -20,6 +20,7 @@
 #include "Functions.h"
 #include "helper.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CFunctions::CFunctions()
 {
@@ -128,7 +129,7 @@ void CFunctions::removeAll()
     m_fnCount = 0;
 }
 
-bool CFunctions::write(CFileWrap &file)
+bool CFunctions::write(QFileWrap &file)
 {
     file << m_fnCount;
     for (int i = 0; i < m_fnCount; ++i)
@@ -139,7 +140,7 @@ bool CFunctions::write(CFileWrap &file)
     return true;
 }
 
-bool CFunctions::read(CFileWrap &file, int version)
+bool CFunctions::read(QFileWrap &file, int version)
 {
     removeAll();
     int count;
@@ -163,199 +164,23 @@ CFunctions &CFunctions::operator=(CFunctions &src)
     return *this;
 }
 
-void CFunctions::exportList(CFileWrap &file, QString prefix)
+void CFunctions::exportList(QFileWrap &file, QString prefix)
 {
     for (int i = 0; i < getSize(); ++i)
     {
-        file += prefix;
-        file += m_functions[i].name;
+        file += prefix.toStdString();
+        file += m_functions[i].name.toStdString();
         file += "\n";
     }
 }
 
-void CFunctions::dump(CFileWrap &file, QString prefix)
-{
-    for (int i = 0; i < getSize(); ++i)
-    {
-        CFunction &fn = m_functions[i];
-        char states[] = "?%@~";
-        QString ret;
-        switch (fn.Out().getSize())
-        {
-        case 0:
-            ret = "void";
-            break;
-
-        case 1:
-            ret = fn.Out()[0].type;
-            break;
-
-        default:
-            ret = "mixed";
-            break;
-        }
-
-        QString hdr = QString::asprintf("%c %s%s()\n", states[fn.state], q2c(prefix), q2c(fn.name));
-        QString paramsIn = "";
-        QString paramsInAll = "";
-        QString expIn;
-        bool hasExpIn = false;
-
-        for (int k = 0; k < fn.InSetCount(); ++k)
-        {
-            paramsIn = "";
-            for (int j = 0; j < fn.In(k).getSize(); ++j)
-            {
-                Param &param = fn.In(k)[j];
-                char o[2];
-                o[0] = 0;
-                o[1] = 0;
-                if (param.flags & CFunction::FLAG_OPTIONAL)
-                {
-                    o[0] = '*';
-                }
-
-                QString s;
-                if (param.name.isEmpty())
-                {
-                    s = param.type;
-                }
-                else
-                {
-                    s = QString("%1 %2").arg(param.type).arg(param.name);
-                }
-
-                if (param.flags & CFunction::FLAG_MORE)
-                {
-                    s += "...";
-                }
-
-                // IN
-
-                if (!param.type.isEmpty() || !param.name.isEmpty())
-                {
-                    if (paramsIn.isEmpty())
-                    {
-                        paramsIn = "  IN:  ";
-                    }
-                    else
-                    {
-                        paramsIn += "       ";
-                    }
-                    paramsIn += QString("<span class=\"typeany\">%1</span> %2%3\n").arg(param.type).arg(param.name).arg(o);
-                    QString s = QString::asprintf("   %-16s%s\n", q2c(param.name), q2c(param.desc));
-                    expIn += s;
-                    if (!param.desc.isEmpty())
-                    {
-                        hasExpIn = true;
-                    }
-                }
-            }
-            if (!paramsInAll.isEmpty())
-            {
-                paramsInAll += "\n";
-            }
-            paramsInAll += paramsIn;
-        }
-
-        if (paramsInAll.isEmpty())
-        {
-            paramsInAll = "  IN:  void\n";
-        }
-
-        QString paramsOut;
-        QString expOut;
-        bool hasExpOut = false;
-        for (int j = 0; j < fn.Out().getSize(); ++j)
-        {
-            Param &param = fn.Out()[j];
-            if (!param.type.isEmpty() || !param.name.isEmpty())
-            {
-                if (paramsOut.isEmpty())
-                {
-                    paramsOut = "  OUT: ";
-                }
-                else
-                {
-                    paramsOut += "       ";
-                }
-                paramsOut += QString("<span class=\"typeany\">%1</span> %2\n").arg(param.type).arg(param.name);
-                QString s = QString::asprintf("   %-16s%s\n", q2c(param.type), q2c(param.desc));
-                expOut += s;
-                if (!param.desc.isEmpty())
-                {
-                    hasExpOut = true;
-                }
-            }
-        }
-
-        if (paramsOut.isEmpty())
-        {
-            paramsOut = "  OUT: void\n";
-        }
-
-        file += QString("<a name=\"%1%2\"></a>").arg(prefix).arg(fn.name);
-        file &= hdr;
-        file &= paramsInAll;
-        file &= "\n";
-        file &= paramsOut;
-
-        if (hasExpIn)
-        {
-            file &= "\n\n";
-            file &= "+++paramIns:\n\n";
-            file &= expIn;
-            file &= "\n";
-        }
-
-        if (hasExpOut)
-        {
-            file &= "\n\n";
-            file &= "+++paramOuts:\n\n";
-            file &= expOut;
-            file &= "\n";
-        }
-
-        if (!fn.desc.isEmpty())
-        {
-            file &= "\n";
-            file &= "+++description:\n\n";
-            file &= fn.desc;
-        }
-
-        if (fn.m_alias.count())
-        {
-            file &= "\n+++alias:\n";
-            QListIterator<QString> itr(fn.m_alias);
-            while (itr.hasNext())
-            {
-                QString alias = itr.next();
-                if (find(alias) != -1)
-                {
-                    file += QString("&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"#%1%2\">%1%2</a><br>\n").arg(prefix).arg(alias);
-                }
-                else
-                {
-                    file += QString("&nbsp;&nbsp;&nbsp;&nbsp;%1<br>\n").arg(alias);
-                }
-            }
-            file &= "\n";
-        }
-
-        if (i != getSize() - 1)
-        {
-            file &= "\n\n\n\n";
-        }
-    }
-    file &= "\n";
-}
 
 void CFunction::copy(CFunction &s)
 {
     *this = s;
 }
 
-void CFunctions::exportWiki(CFileWrap &file, QString prefix)
+void CFunctions::exportWiki(QFileWrap &file, QString prefix)
 {
     for (int i = 0; i < getSize(); ++i)
     {
@@ -430,9 +255,9 @@ void CFunctions::exportWiki(CFileWrap &file, QString prefix)
         }
 
         hdr = QString::asprintf("===== %s%s =====\n", q2c(prefix), q2c(fn.name));
-        file += hdr;
-        file += paramsIn;
-        file += paramsOut;
+        file += hdr.toStdString();
+        file += paramsIn.toStdString();
+        file += paramsOut.toStdString();
         QString tmp = "";
         if (!fn.desc.isEmpty())
         {
@@ -450,7 +275,7 @@ void CFunctions::exportWiki(CFileWrap &file, QString prefix)
         }
         if (!tmp.isEmpty())
         {
-            file += tmp;
+            file += tmp.toStdString();
             file += "\n";
         }
 
@@ -471,7 +296,7 @@ void CFunctions::exportWiki(CFileWrap &file, QString prefix)
                 {
                     tmp = QString("lua_functions#%1").arg(text);
                 }
-                file += QString("%1 ").arg(text);
+                file += QString("%1 ").arg(text).toStdString();
             }
             file += "\n\n";
         }
@@ -485,7 +310,7 @@ void CFunctions::exportWiki(CFileWrap &file, QString prefix)
     file += "\n";
 }
 
-void CFunctions::exportListWiki(CFileWrap &file, QString prefix)
+void CFunctions::exportListWiki(QFileWrap &file, QString prefix)
 {
     for (int i = 0; i < getSize(); ++i)
     {
@@ -530,7 +355,7 @@ void CFunctions::exportListWiki(CFileWrap &file, QString prefix)
             }
         }
         hdr += "]]\n";
-        file += hdr;
+        file += hdr.toStdString();
         if (i != getSize() - 1)
         {
             // file += "\n\n";
@@ -565,11 +390,15 @@ int CFunctions::find(const QString &name)
     return -1;
 }
 
-void CFunction::read(CFileWrap &file, int version)
+void CFunction::read(QFileWrap &file, int version)
 {
-    file >> name;
-    file >> desc;
-    file >> example;
+    std::string tmp;
+    file >> tmp;
+    name = tmp.c_str();
+    file >> tmp;
+    desc = tmp.c_str();
+    file >> tmp;
+    example = tmp.c_str();
     if (version > 5)
     {
         m_inCount = 0;
@@ -597,7 +426,17 @@ void CFunction::read(CFileWrap &file, int version)
     }
     if (version > 4)
     {
-        file >> m_alias;
+        /////////////////////////////////
+        // write StringList
+        int size;
+        file.read(&size, sizeof(size));
+        for (int i = 0; i < size; ++i)
+        {
+            std::string tmp;
+            file >> tmp;
+            m_alias.append(tmp.c_str());
+        }
+        /////////////////// file >> m_alias;
     }
     else
     {
@@ -617,11 +456,11 @@ void CFunction::read(CFileWrap &file, int version)
     }
 }
 
-void CFunction::write(CFileWrap &file)
+void CFunction::write(QFileWrap &file)
 {
-    file << name.trimmed();
-    file << desc.trimmed();
-    file << example.trimmed();
+    file << name.trimmed().toStdString();
+    file << desc.trimmed().toStdString();
+    file << example.trimmed().toStdString();
     file.write(&m_inCount, 1);
     for (int i = 0; i < m_inCount; ++i)
     {
@@ -630,7 +469,18 @@ void CFunction::write(CFileWrap &file)
     Out().write(file);
     file << state;
     file << lang;
-    file << m_alias;
+    ////////////////////////////////
+    //file << m_alias;
+    int size = m_alias.size();
+    file.write(&size, sizeof(size));
+    QListIterator<QString> itr(m_alias);
+    while (itr.hasNext())
+    {
+        QString current = itr.next();
+        file << current.toStdString();
+    }
+    ///////////////////////////////
+
     bool go = true;
     if (go)
     {

@@ -26,12 +26,12 @@
 #include <QFileDialog>
 #include <QToolBar>
 #include "../shared/ss_version.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 char MainWindow::m_fileFilter[] = "easyDoc (*.edoc)";
 char MainWindow::m_appName[] = "easyDoc";
 char MainWindow::m_author[] = "cfrankb";
 
-static QString g_fileNameHTML;
 
 MainWindow::MainWindow(QWidget *parent)
     : MainWindowParent(parent), ui(new Ui::MainWindow)
@@ -152,31 +152,6 @@ bool MainWindow::save()
         return false;
     }
 
-    if (m_saveHTML)
-    {
-        CFileWrap file;
-        QString fileName = m_doc.getFileName();
-        const char EDOC[] = ".edoc";
-        if (fileName.toLower().endsWith(EDOC))
-        {
-            fileName = fileName.mid(0, fileName.length() - strlen(EDOC));
-        }
-        const char HTML[] = ".html";
-        if (!fileName.toLower().endsWith(HTML))
-        {
-            fileName += HTML;
-        }
-        if (file.open(fileName, QIODevice::WriteOnly))
-        {
-            m_doc.dump(file);
-            file.close();
-        }
-        else
-        {
-            // write error
-            warningMessage(QString(tr("can't write to %1")).arg(fileName));
-        }
-    }
 
     if (m_saveWiki)
     {
@@ -316,29 +291,6 @@ void MainWindow::on_actionSave_as_triggered()
     }
 }
 
-void MainWindow::on_actionHTML_triggered()
-{
-    QString fileFilter = tr("html documents (*.html)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export as HTML document..."), g_fileNameHTML, fileFilter);
-    if (!fileName.isEmpty())
-    {
-        CFileWrap file;
-        if (!fileName.toLower().endsWith(".html"))
-        {
-            fileName += ".html";
-        }
-        if (file.open(fileName, QIODevice::WriteOnly))
-        {
-            m_doc.dump(file);
-            file.close();
-        }
-        else
-        {
-            // write error
-            warningMessage(QString(tr("can't write to %1")).arg(fileName));
-        }
-    }
-}
 
 void MainWindow::on_action_About_triggered()
 {
@@ -370,8 +322,8 @@ void MainWindow::on_actionFunctionList_triggered()
         {
             fileName += ".txt";
         }
-        CFileWrap file;
-        if (file.open(fileName, QIODevice::WriteOnly))
+        QFileWrap file;
+        if (file.open(fileName, "w"))
         {
             m_doc.exportList(file);
             file.close();
@@ -381,7 +333,6 @@ void MainWindow::on_actionFunctionList_triggered()
             // write error
             warningMessage(QString(tr("can't write to %1")).arg(fileName));
         }
-        g_fileNameHTML = fileName;
     }
 }
 
@@ -420,8 +371,8 @@ void MainWindow::on_actionGameLua_triggered()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import..."), "", fileFilter);
     if (!fileName.isEmpty())
     {
-        CFileWrap file;
-        if (file.open(fileName, QIODevice::ReadOnly))
+        QFileWrap file;
+        if (file.open(fileName, "w"))
         {
             int size = file.getSize();
             char *buf = new char[size + 1];
@@ -440,18 +391,11 @@ void MainWindow::on_actionGameLua_triggered()
     }
 }
 
-void MainWindow::on_actionSave_HTML_triggered(bool checked)
-{
-    m_saveHTML = checked;
-    QSettings settings;
-    settings.setValue("saveHTML", m_saveHTML);
-}
+
 
 void MainWindow::restoreSettings()
 {
     QSettings settings;
-    m_saveHTML = settings.value("saveHTML", false).toBool();
-    ui->actionSave_HTML->setChecked(m_saveHTML);
     m_saveWiki = settings.value("saveWiki", false).toBool();
     ui->actionSave_Wiki->setChecked(m_saveWiki);
     m_remember = settings.value("remember", false).toBool();
@@ -470,7 +414,6 @@ void MainWindow::initToolbar()
     ui->toolBar->addAction(ui->action_save);
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->actionWiki);
-    ui->toolBar->addAction(ui->actionHTML);
 }
 
 void MainWindow::on_actionSave_Wiki_toggled(bool arg1)

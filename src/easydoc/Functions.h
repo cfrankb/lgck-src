@@ -20,9 +20,10 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-class CFileWrap;
+class QFileWrap;
 #include "Params.h"
 #include "testcase.h"
+#include <QStringList>
 
 class CFunction
 {
@@ -41,8 +42,8 @@ public:
     CTestCase & TestCase(int i) {
         return testcase[i];
     }
-    void read(CFileWrap & file, int version);
-    void write(CFileWrap & file);
+    void read(QFileWrap & file, int version);
+    void write(QFileWrap & file);
     void init();
 
     QString name;
@@ -96,13 +97,11 @@ public:
     void removeAt(int i);
     void removeAll();
 
-    bool write(CFileWrap & file);
-    bool read(CFileWrap & file, int version);
-    void dump(CFileWrap & file, QString prefix="");
-    void exportList(CFileWrap & file, QString prefix="");
-    //void exportText(CFileWrap & file, QString prefix="");
-    void exportWiki(CFileWrap & file, QString prefix="");
-    void exportListWiki(CFileWrap & file, QString prefix);
+    bool write(QFileWrap & file);
+    bool read(QFileWrap & file, int version);
+    void exportList(QFileWrap & file, QString prefix="");
+    void exportWiki(QFileWrap & file, QString prefix="");
+    void exportListWiki(QFileWrap & file, QString prefix);
 
 protected:
     enum {

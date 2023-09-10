@@ -75,7 +75,6 @@ private:
     Ui::MainWindow *ui;
     TabWidget *m_tabs;
     void closeEvent(QCloseEvent *event);
-    bool m_saveHTML;
     bool m_saveWiki;
     bool m_remember;
     bool m_largeFont;
@@ -83,7 +82,6 @@ private:
 
 private slots:
     void on_action_About_triggered();
-    void on_actionHTML_triggered();
     void on_actionSave_as_triggered();
     void on_action_save_triggered();
     void on_action_open_triggered();
@@ -93,7 +91,6 @@ private slots:
     void on_actionPlain_Text_triggered();
     void on_actionWiki_triggered();
     void on_actionGameLua_triggered();
-    void on_actionSave_HTML_triggered(bool checked);
     void on_actionSave_Wiki_toggled(bool arg1);
     void on_actionRemember_last_file_triggered(bool checked);
     void on_actionLarge_Font_toggled(bool arg1);

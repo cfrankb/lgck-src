@@ -22,8 +22,8 @@
 #include "DlgParam.h"
 #include "DlgSource.h"
 #include "../shared/qtgui/cheat.h"
-#include "const.h"
 #include <QSettings>
+#include "../shared/qtgui/qfilewrap.h"
 
 CDlgClass::CDlgClass(QWidget *parent) : QDialog(parent),
                                         m_ui(new Ui::CDlgClass)
@@ -80,7 +80,7 @@ void CDlgClass::load(CDatabase *db, CClass *cl)
 
     for (unsigned int i = 0; i < sizeof(images) / sizeof(QString); ++i)
     {
-        CFileWrap file;
+        QFileWrap file;
         unsigned char *png = NULL;
         int size = 0;
         if (file.open(images[i]))

@@ -18,7 +18,6 @@ TEMPLATE = app
 SOURCES += Class.cpp \
     Classes.cpp \
     Database.cpp \
-    FileWrap.cpp \
     Functions.cpp \
     DlgAbout.cpp \
     DlgClass.cpp \
@@ -34,7 +33,8 @@ SOURCES += Class.cpp \
     helper.cpp \
     testcase.cpp \
     DlgStep.cpp \
-    pagecond.cpp
+    pagecond.cpp \
+    ../shared/qtgui/qfilewrap.cpp
 
 HEADERS += Class.h \
     Classes.h \
@@ -44,7 +44,6 @@ HEADERS += Class.h \
     DlgFunction.h \
     DlgParam.h \
     DlgSection.h \
-    FileWrap.h \
     Functions.h \
     mainwindow.h \
     Params.h \
@@ -55,7 +54,8 @@ HEADERS += Class.h \
     const.h \
     testcase.h \
     DlgStep.h \
-    pagecond.h
+    pagecond.h \
+    ../shared/qtgui/qfilewrap.h
 
 FORMS += mainwindow.ui \
     DlgAbout.ui \

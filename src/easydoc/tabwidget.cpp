@@ -24,6 +24,7 @@
 #include "DlgClass.h"
 #include "DlgSection.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent),
                                         m_ui(new Ui::TabWidget)
@@ -54,7 +55,7 @@ TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent),
 
     for (unsigned int i = 0; i < sizeof(images) / sizeof(QString); ++i)
     {
-        CFileWrap file;
+        QFileWrap file;
         unsigned char *png = NULL;
         int size = 0;
         if (file.open(images[i]))

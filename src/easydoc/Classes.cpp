@@ -17,10 +17,12 @@
 */
 
 #include <memory>
+#include <cstring>
 #include "Functions.h"
 #include "Classes.h"
 #include "helper.h"
 #include "../shared/qtgui/cheat.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 CClasses::CClasses()
 {
@@ -139,16 +141,13 @@ CClass *CClasses::removeAt(int i)
         m_classes[i] = m_classes[i + 1];
     }
 
-    // qDebug("max: %d i=%d=\n", m_cCount, i);
-    // m_classes[i] = NULL;
-
     --m_cCount;
     m_classes[m_cCount] = NULL; // set extra record to null
 
     return t;
 }
 
-bool CClasses::read(CFileWrap &file, int version)
+bool CClasses::read(QFileWrap &file, int version)
 {
     m_cCount = 0;
     if (version >= 3)
@@ -159,8 +158,12 @@ bool CClasses::read(CFileWrap &file, int version)
         for (int i = 0; i < count; ++i)
         {
             CClass *cl = new CClass;
-            file >> cl->name();
-            file >> cl->desc();
+            std::string name;
+            file >> name;
+            cl->name() = name.c_str();
+            std::string desc;
+            file >> desc;
+            cl->desc() = desc.c_str();
             cl->methods().read(file, version);
             if (version >= 4)
             {
@@ -174,14 +177,14 @@ bool CClasses::read(CFileWrap &file, int version)
     return true;
 }
 
-bool CClasses::write(CFileWrap &file)
+bool CClasses::write(QFileWrap &file)
 {
     file << m_cCount;
     for (int i = 0; i < m_cCount; ++i)
     {
         CClass *cl = m_classes[i];
-        file << cl->name();
-        file << cl->desc();
+        file << cl->name().toStdString();
+        file << cl->desc().toStdString();
         cl->methods().write(file);
         // added v.0004
         cl->variables().write(file);
@@ -190,58 +193,15 @@ bool CClasses::write(CFileWrap &file)
     return true;
 }
 
-void CClasses::exportList(CFileWrap &file)
+void CClasses::exportList(QFileWrap &file)
 {
     for (int i = 0; i < m_cCount; ++i)
     {
         CClass *cl = m_classes[i];
-        file += cl->name();
+        file += cl->name().toStdString();
         file += "\n";
         cl->methods().exportList(file, cl->name() + ":");
     }
-}
-
-void CClasses::dump(CFileWrap &file)
-{
-    for (int i = 0; i < m_cCount; ++i)
-    {
-
-        CClass *cl = m_classes[i];
-
-        file &= QString("*** class %1\n\n").arg(cl->name());
-
-        if (!cl->desc().isEmpty())
-        {
-            file &= "+++description\n";
-            file &= cl->desc() + "\n\n";
-        }
-
-        if (cl->variables().getSize())
-        {
-            file &= "+++members\n";
-        }
-
-        for (int j = 0; j < cl->variables().getSize(); ++j)
-        {
-            Param &member = cl->variables()[j];
-            file &= "     " + member.type + " " + member.name + " " + member.desc + "\n";
-        }
-
-        file &= "\n";
-
-        cl->methods().dump(file, cl->name() + ":");
-        file &= "\n\n\n";
-    }
-}
-
-void CClasses::debug(CFileWrap &file)
-{
-    for (int i = 0; i < m_cCount; ++i)
-    {
-        CClass *cl = m_classes[i];
-        file &= QString("*** class %1 =  %2\n").arg(i).arg(cl->name());
-    }
-    file &= "\n\n";
 }
 
 void CClasses::removeAll()
@@ -251,8 +211,8 @@ void CClasses::removeAll()
 
 void CClasses::exportWiki(const QString &path, CFunctions *fct, QStringList &fileList)
 {
-    CFileWrap fileBin;
-    fileBin.open(path + "lua_binding.txt", QIODevice::WriteOnly);
+    QFileWrap fileBin;
+    fileBin.open(path + "lua_binding.txt", "w");
     fileList << "lua_binding.txt";
 
     fileBin += "===== Lua Binding =====\n";
@@ -261,18 +221,18 @@ void CClasses::exportWiki(const QString &path, CFunctions *fct, QStringList &fil
     for (int i = 0; i < m_cCount; ++i)
     {
         CClass *cl = m_classes[i];
-        CFileWrap file;
+        QFileWrap file;
         QString fname = "class_" + cl->name().toLower();
-        file.open(path + fname + ".txt", QIODevice::WriteOnly);
+        file.open(path + fname + ".txt", "w");
         fileList << fname + ".txt";
-        fileBin += QString("  * [[%1|Class %2]]\n").arg(fname, cl->name());
+        fileBin += QString("  * [[%1|Class %2]]\n").arg(fname, cl->name()).toStdString();
 
-        file += QString("===== Class %1 =====\n").arg(cl->name());
+        file += QString("===== Class %1 =====\n").arg(cl->name()).toStdString();
         if (!cl->desc().isEmpty())
         {
             file += "==== Description ====\n";
             auto t = new char[cl->desc().length() + 1024];
-            file += QString(txt2wiki(cl->desc(), t)) + "\n";
+            file += (QString(txt2wiki(cl->desc(), t)) + "\n").toStdString();
             delete[] t;
         }
 
@@ -280,7 +240,7 @@ void CClasses::exportWiki(const QString &path, CFunctions *fct, QStringList &fil
         for (int j = 0; j < cl->variables().getSize(); ++j)
         {
             Param &member = cl->variables()[j];
-            file += "  * **" + member.type + "** " + member.name + "\\\\\n";
+            file += QString("  * **" + member.type + "** " + member.name + "\\\\\n").toStdString();
         }
         if (cl->methods().getSize())
         {
