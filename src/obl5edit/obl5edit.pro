@@ -31,7 +31,7 @@ SOURCES += mainwindow.cpp \
     main.cpp\
     OBL5File.cpp \
     DlgAbout.cpp \
-    ../shared/FileWrap.cpp \
+    #../shared/FileWrap.cpp \
     ../shared/Frame.cpp \
     ../shared/FrameSet.cpp \
     PixelBoxDock.cpp \
@@ -63,7 +63,7 @@ SOURCES += mainwindow.cpp \
 HEADERS  += mainwindow.h \
     OBL5File.h \
     DlgAbout.h \
-    ../shared/FileWrap.h \
+    #../shared/FileWrap.h \
     ../shared/Frame.h \
     ../shared/FrameSet.h \
     PixelBoxDock.h \

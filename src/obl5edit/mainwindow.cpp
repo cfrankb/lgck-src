@@ -46,7 +46,7 @@
 #include "DlgAlpha.h"
 #include "../shared/Frame.h"
 #include "../shared/ss_version.h"
-#include "../shared/FileWrap.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 //http://stackoverflow.com/questions/3542718/installing-opengl-for-qt
 char MainWindow::m_appName[] = "Object Block Editor";
@@ -1867,7 +1867,7 @@ void MainWindow::setAlpha(int alpha)
 
 void MainWindow::setAlphaU(uchar alpha)
 {
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(":/images/pd/Rocket000_emblem-spades.png")) {
     //if (file.open(":/images/pd/pierig_four-leaf_clover_1.png")) {
         CFrameSet set;

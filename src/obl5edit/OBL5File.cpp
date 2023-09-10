@@ -19,7 +19,7 @@
 #include <QFile>
 #include "OBL5File.h"
 #include "../shared/Frame.h"
-#include "../shared/FileWrap.h"
+#include "../shared/qtgui/qfilewrap.h"
 
 //#define q2c(__qstring__) (const char*) __qstring__.toAscii().constData()
 #define q2c(__qstring__) (const char*) __qstring__.toLatin1().data()
@@ -51,7 +51,7 @@ void COBL5File::forget()
 bool COBL5File::read()
 {
     bool result = false;
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(q2c(m_fileName), "rb")) {
         CFrameSet set;
         char format[7];
@@ -82,7 +82,7 @@ bool COBL5File::read()
 bool COBL5File::write()
 {
     bool result = false;
-    CFileWrap file;
+    QFileWrap file;
     if (file.open(q2c(m_fileName), "wb")) {
         result = true;        
         if (strcmp(m_format, "OBL5")==0) {

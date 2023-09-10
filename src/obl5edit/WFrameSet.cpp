@@ -27,7 +27,7 @@
 #include "../shared/FrameSet.h"
 #include "../shared/Frame.h"
 #include "DlgGoto.h"
-#include "../shared/FileWrap.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "../shared/qtgui/cheat.h"
 
 CWFrameSet::CWFrameSet(QWidget *parent)
@@ -201,7 +201,7 @@ void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
 
 void CWFrameSet::addFile( QString fileName )
 {
-    CFileWrap file;
+    QFileWrap file;
     if (file.open( q2c(fileName) )) {
         CFrameSet images;
         char format[5];

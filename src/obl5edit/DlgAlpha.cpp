@@ -17,7 +17,7 @@
 */
 #include "DlgAlpha.h"
 #include "ui_DlgAlpha.h"
-#include "../shared/FileWrap.h"
+#include "../shared/qtgui/qfilewrap.h"
 #include "../shared/Frame.h"
 #include "../shared/FrameSet.h"
 #include <QImage>
@@ -67,8 +67,9 @@ void CDlgAlpha::on_sldAlpha_sliderMoved(int position)
 
 void CDlgAlpha::updateAlpha()
 {
-    CFileWrap file;
-    if (file.open(":/images/pd/Rocket000_emblem-spades.png")) {
+    QFileWrap file;
+    const char *filename = ":/images/pd/Rocket000_emblem-spades.png";
+    if (file.open(filename)) {
     //if (file.open(":/images/pd/pierig_four-leaf_clover_1.png")) {
         CFrameSet set;
         if (set.extract(file)) {
@@ -87,6 +88,8 @@ void CDlgAlpha::updateAlpha()
             //m_actionAlpha->setIcon(QIcon(pm));
         }
         file.close();
+    } else {
+        qDebug("can't open %s", filename);
     }
 }
 
