@@ -1,14 +1,16 @@
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 #include <sys/time.h>
 #include <unistd.h>
 #include <string.h>
-#include "zlib.h"
-#include "../shared/stdafx.h"
-#include "../shared/FileWrap.h"
-#include "../shared/FrameSet.h"
-#include "../shared/Frame.h"
-#include "../shared/ss_version.h"
+#include <stdint.h>
+#include <zlib.h>
+#include "../../shared/stdafx.h"
+#include "../../shared/FileWrap.h"
+#include "../../shared/FrameSet.h"
+#include "../../shared/Frame.h"
+#include "../../shared/ss_version.h"
 
 #define qDebug printf
 
@@ -48,11 +50,11 @@ void makeTest()
 
     CFrame *images = new CFrame[1];
     images[0].m_nLen = images[0].m_nHei = 16 * 8;
-    images[0].setRGB(new UINT32[images[0].m_nLen * images[0].m_nHei]);
+    images[0].setRGB(new uint32_t[images[0].m_nLen * images[0].m_nHei]);
     char *bitmap = CFrameSet::ima2bitmap(ima, 16, 16);
 
     CFrameSet::bitmap2rgb(bitmap, images[0].getRGB(), images[0].m_nLen, images[0].m_nHei, 0);
-    UINT8 *png;
+    uint8_t *png;
     int totalSize;
     images[0].toPng(png, totalSize);
 
@@ -95,7 +97,7 @@ int findCmd(char *cmd)
         "-o",
         "-x",
         "-tp",
-        NULL};
+        nullptr};
 
     for (int i = 0; list[i]; i++)
     {
@@ -405,7 +407,7 @@ int main(int argc, char *argv[], char *envp[])
                             sprintf(tmp + strlen(tmp), "~~%.4x.png", i);
                         }
 
-                        UINT8 *png;
+                        uint8_t *png;
                         int totalSize;
                         images[i]->toPng(png, totalSize);
 

@@ -166,6 +166,7 @@ void CFrameWidget::drawTapestry()
     // Bind texture to name
     glBindTexture(GL_TEXTURE_2D, texName);
 
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_frame->m_nLen, m_frame->m_nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );

@@ -1047,8 +1047,30 @@ void CFrame::inverse()
     {
         for (int x = 0; x < m_nLen; ++x)
         {
-            unsigned int &rgb = at(x, y);
-            rgb = (~rgb & 0xffffff) + (rgb & 0xff000000);
+            uint32_t &rgb = at(x, y);
+            rgb = (~rgb & COLOR_MASK) + (rgb & ALPHA_MASK);
+            if (!(rgb & ALPHA_MASK)) {
+                rgb = 0;
+            }
+        }
+    }
+}
+
+void CFrame::toGrayScale()
+{
+    for (int y = 0; y < m_nHei; ++y)
+    {
+        for (int x = 0; x < m_nLen; ++x)
+        {
+            uint32_t &rgb = at(x, y);
+            if (!(rgb & ALPHA_MASK)) {
+                rgb = 0;
+            } else {
+                uint16_t grey = 0xff &
+                    (((rgb & 0xff) +
+                    ((rgb & 0xff00) >> 8) + ((rgb & 0xff0000) >> 16))/3);
+                rgb = (grey + (grey << 8) + (grey << 16)) | (rgb & ALPHA_MASK);
+            }
         }
     }
 }

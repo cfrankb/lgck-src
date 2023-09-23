@@ -226,7 +226,7 @@ void CFrameScroll::wheelEvent(QWheelEvent *)
   //  qDebug("wheelEvent");
 }
 
-void CFrameScroll::mouseDoubleClickEvent(QMouseEvent * event)
+void CFrameScroll::mouseDoubleClickEvent(QMouseEvent * )
 {
 //    qDebug("mouseDoubleClickEvent");
 }

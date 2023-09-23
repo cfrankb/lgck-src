@@ -125,6 +125,7 @@ public:
     void shiftLEFT();
     void shiftRIGHT();
     void inverse();
+    void toGrayScale();
     void shadow(int factor);
     static const char* getChunkType();
     void abgr2argb();

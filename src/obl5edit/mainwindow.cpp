@@ -2353,3 +2353,16 @@ void MainWindow::on_actionTapestry_triggered()
     emit viewModeChanged(CFrameWidget::MODE_TILED_VIEW);
     emit frameChanged(m_doc.getCurrent());
 }
+
+void MainWindow::on_actionGrayscale_triggered()
+{
+    if (m_doc.getCurrent()) {
+        m_doc.getCurrent()->push();
+        m_doc.getCurrent()->toGrayScale();
+        m_doc.setDirty( true );
+        updateStatus();
+        updateMenus();
+        emit frameChanged(m_doc.getCurrent());
+    }
+}
+

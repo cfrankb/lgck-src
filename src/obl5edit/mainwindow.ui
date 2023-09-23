@@ -36,7 +36,7 @@
      <x>0</x>
      <y>0</y>
      <width>558</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -119,6 +119,7 @@
      <addaction name="actionSwap_Red_Blue"/>
      <addaction name="actionInverse"/>
      <addaction name="actionFade"/>
+     <addaction name="actionGrayscale"/>
     </widget>
     <addaction name="actionPrevious"/>
     <addaction name="actionNext"/>
@@ -1364,6 +1365,11 @@
    </property>
    <property name="statusTip">
     <string>Make this image translucent.</string>
+   </property>
+  </action>
+  <action name="actionGrayscale">
+   <property name="text">
+    <string>Grayscale</string>
    </property>
   </action>
  </widget>

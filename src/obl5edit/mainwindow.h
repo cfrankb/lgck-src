@@ -227,6 +227,7 @@ private slots:
     void on_actionEdit_Mode_toggled(bool arg1);
     void on_actionFade_triggered();
     void loadFile(const QString & filename);
+    void on_actionGrayscale_triggered();
 
 signals:
     void penColorChanged(uint penColor);
