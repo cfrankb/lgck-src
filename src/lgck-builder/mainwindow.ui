@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>541</height>
+    <height>543</height>
    </rect>
   </property>
   <property name="sizeIncrement">
@@ -61,7 +61,7 @@
      <x>0</x>
      <y>0</y>
      <width>640</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuObjects">
@@ -173,6 +173,7 @@
      <addaction name="actionExport_Sprite"/>
      <addaction name="actionExport_Game"/>
      <addaction name="actionJoyState_Mapping"/>
+     <addaction name="actionExport_sounds"/>
     </widget>
     <widget class="QMenu" name="menuImport">
      <property name="title">
@@ -1177,6 +1178,11 @@
    </property>
    <property name="statusTip">
     <string>Show all sprites</string>
+   </property>
+  </action>
+  <action name="actionExport_sounds">
+   <property name="text">
+    <string>Export sounds</string>
    </property>
   </action>
  </widget>

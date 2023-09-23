@@ -83,6 +83,7 @@
 #include "launcher.h"
 #include "options.h"
 #include "../shared/qtgui/qfilewrap.h"
+#include "dlgexportsounds.h"
 
 #ifdef LGCK_GAMEPAD
 #include <QtGamepad/QGamepad>
@@ -3446,3 +3447,11 @@ void MainWindow::updateSkillFiltersCheckbox(int skillval)
         skills[i]->setChecked(skillval & flag);
     }
 }
+
+void MainWindow::on_actionExport_sounds_triggered()
+{
+    CDlgExportSounds dlg(this, &m_doc);
+    dlg.setWindowTitle(tr("Export Sounds"));
+    dlg.exec();
+}
+

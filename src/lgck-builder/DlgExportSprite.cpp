@@ -24,8 +24,9 @@
 #include "../shared/qtgui/qfilewrap.h"
 #include "OBL5File.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
-static QString outDir;
+QString CDlgExportSprite::m_outDir;
 
 CDlgExportSprite::CDlgExportSprite(QWidget *parent, CGameFile *gf) :
     QDialog(parent),
@@ -101,21 +102,31 @@ void CDlgExportSprite::updateIcon(QTreeWidgetItem * item, int protoId)
     } else {
         className = gf.m_className[proto.m_nClass].c_str();
     }
-    QString label = QString("%1\n%2").arg(proto.m_szName).arg(className);
+    QString label = QString("%1\n%2").arg(proto.m_szName, className);
     item->setIcon(0, icon);
     item->setText(1, label);
+}
+
+int CDlgExportSprite::askQuestion(QString filename)
+{
+    QMessageBox::StandardButton ret = QMessageBox::warning(
+        this, "",
+        tr("File already exists: %1.\nReplace?").arg(filename),
+        QMessageBox::Yes | QMessageBox::YesAll | QMessageBox::No |
+            QMessageBox::NoAll | QMessageBox::Cancel);
+    return ret;
 }
 
 void CDlgExportSprite::on_btnExport_clicked()
 {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Destination"),
-         outDir,
+         m_outDir,
          QFileDialog::ShowDirsOnly
          | QFileDialog::DontResolveSymlinks);
     QString suffix;
     std::string outFormat;
     if (!dir.isEmpty()) {
-        outDir = dir;
+        m_outDir = dir;
         typedef struct {
             char format[5];
             char suffix[6];
@@ -134,11 +145,30 @@ void CDlgExportSprite::on_btnExport_clicked()
 
         QList<QTreeWidgetItem *> itemList;
         itemList = ui->treeObjects->selectedItems();
+
+        bool noAll = false;
+        bool yesAll = false;
         foreach(QTreeWidgetItem *item, itemList) {
            CGameFile & gf = *m_gameFile;
            ITEM_DATA * data = (*item).data(0, Qt::UserRole).value<ITEM_DATA*>();
            CProto & proto = gf.toProto(data->protoId);
            QString fileName = QDir(dir).filePath(QString(proto.m_szName) + "." + suffix);
+
+           if (QFile::exists(fileName) && !yesAll) {
+               if (noAll) {
+                   continue;
+               }
+               int ret = askQuestion(fileName);
+               if (ret == QMessageBox::No || ret == QMessageBox::NoAll) {
+                   noAll = ret == QMessageBox::NoAll;
+                   continue;
+               } else if (ret == QMessageBox::Cancel) {
+                   break;
+               } else if (ret == QMessageBox::YesAll){
+                   yesAll = ret == QMessageBox::YesAll;
+               }
+           }
+
            if (formats[formatId].isObl) {
                CFrameSet & frameSet = gf.toFrameSet(proto.m_nFrameSet);
                COBL5File oblDoc;

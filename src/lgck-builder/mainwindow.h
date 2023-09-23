@@ -293,6 +293,7 @@ private slots:
     void on_actionNightmare_toggled(bool arg1);
     void on_actionInsane_toggled(bool arg1);
     void on_actionAll_Skills_triggered();
+    void on_actionExport_sounds_triggered();
 
 signals:
     void levelDeleted(int index);

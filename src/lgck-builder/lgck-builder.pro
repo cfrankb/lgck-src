@@ -118,6 +118,7 @@ SOURCES += \
     DlgFrameSet.cpp \
     DlgGame.cpp \
     DlgGotoLevel.cpp \
+    dlgexportsounds.cpp \
     dlgindicator.cpp \
     DlgLayer.cpp \
     DlgObject.cpp \
@@ -244,6 +245,7 @@ HEADERS += \
     DlgFrameSet.h \
     DlgGame.h \
     DlgGotoLevel.h \
+    dlgexportsounds.h \
     dlgindicator.h \
     DlgLayer.h \
     DlgObject.h \
@@ -298,6 +300,7 @@ FORMS += \
     DlgFrameSet.ui \
     DlgGame.ui \
     DlgGotoLevel.ui \
+    dlgexportsounds.ui \
     dlgindicator.ui \
     DlgLayer.ui \
     DlgObject.ui \

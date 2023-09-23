@@ -42,8 +42,10 @@ private slots:
 private:
     Ui::CDlgExportSprite *ui;
     CGameFile *m_gameFile;
+    static QString m_outDir;
     void reloadSprites();
     void updateIcon(QTreeWidgetItem * item, int protoId);
+    int askQuestion(QString filename);
 };
 
 #endif // DLGEXPORTSPRITE_H
