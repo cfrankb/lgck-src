@@ -56,9 +56,9 @@ void IGraphics::drawSurface(ISurface * surface, int mx, int my)
         int x = entry.m_nX - mx;
         int y = entry.m_nY - my;
         if (!((entry.m_nTriggerKey & TRIGGER_HIDDEN) ||
-            (x + frame.m_nLen <= 0) ||
+            (x + frame.len() <= 0) ||
             (x >= screenLen) ||
-            (y + frame.m_nHei <= 0) ||
+            (y + frame.hei() <= 0) ||
             (y >= screenHei) ||
             (entry.m_nFrameNo & 0x8000))) {
             x += offsetX;

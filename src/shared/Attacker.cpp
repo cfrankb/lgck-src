@@ -53,7 +53,7 @@ void CAttacker::doManage()
 
                 switch ( m_nAim ) {
                 case CGame::UP:
-                    m_nY = game.BUFFERHEI - monsterFrame.m_nHei;
+                    m_nY = game.BUFFERHEI - monsterFrame.hei();
                     m_nX = (::rand () % game.BUFFERLEN) & 0x7ff0;
                     break;
 
@@ -63,7 +63,7 @@ void CAttacker::doManage()
                     break;
 
                 case CGame::LEFT:
-                    m_nX = game.BUFFERLEN - monsterFrame.m_nLen;
+                    m_nX = game.BUFFERLEN - monsterFrame.len();
                     m_nY = (::rand () % game.BUFFERHEI) & 0x7ff0;
                     break;
 
@@ -97,8 +97,8 @@ void CAttacker::doManage()
 
                     if (m_propi[lgck::EXTRA_ACTIVE] == 2
                             && (m_nAim == CGame::LEFT || m_nAim == CGame::RIGHT)) {
-                        if ( ((player.m_nX <= m_nX) && (player.m_nX + playerFrame.m_nLen > m_nX))
-                             || ((player.m_nX > m_nX) && (player.m_nX < m_nX + monsterFrame.m_nLen))) {
+                        if ( ((player.m_nX <= m_nX) && (player.m_nX + playerFrame.len() > m_nX))
+                             || ((player.m_nX > m_nX) && (player.m_nX < m_nX + monsterFrame.len()))) {
 
                             ++m_propi[lgck::EXTRA_ACTIVE];
 
@@ -114,8 +114,8 @@ void CAttacker::doManage()
                     if (m_propi[lgck::EXTRA_ACTIVE] == 2
                             && (m_nAim == CGame::UP || m_nAim == CGame::DOWN)) {
 
-                        if ( ((player.m_nY <= m_nY) && (player.m_nY + playerFrame.m_nHei > m_nY))
-                             || ((player.m_nY > m_nY) && (player.m_nY < m_nY + monsterFrame.m_nHei))) {
+                        if ( ((player.m_nY <= m_nY) && (player.m_nY + playerFrame.hei() > m_nY))
+                             || ((player.m_nY > m_nY) && (player.m_nY < m_nY + monsterFrame.hei()))) {
 
                             ++m_propi[lgck::EXTRA_ACTIVE];
 
@@ -137,7 +137,7 @@ void CAttacker::doManage()
 
                     case CGame::DOWN:
                         m_nY += 8;
-                        if (m_nY + frame.m_nHei > game.BUFFERHEI) {
+                        if (m_nY + frame.hei() > game.BUFFERHEI) {
                             m_propi[lgck::EXTRA_ACTIVE] = 0;
                         }
                         break;
@@ -151,7 +151,7 @@ void CAttacker::doManage()
 
                     case CGame::RIGHT:
                         m_nX += 8;
-                        if (m_nX + frame.m_nLen > game.BUFFERLEN) {
+                        if (m_nX + frame.len() > game.BUFFERLEN) {
                             m_propi[lgck::EXTRA_ACTIVE] = 0;
                         }
                         break;

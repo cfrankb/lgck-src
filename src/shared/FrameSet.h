@@ -21,8 +21,8 @@
 
 #include <string>
 #include <unordered_map>
+#include <stdint.h>
 #include "ISerial.h"
-#include <inttypes.h>
 
 class CFrame;
 class IFile;

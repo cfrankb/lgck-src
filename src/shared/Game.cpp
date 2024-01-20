@@ -615,14 +615,14 @@ bool CGame::calculateWorldSize(CLevel *s, int &width, int &height)
         CFrameSet &frameSet = *m_arrFrames[entry.m_nFrameSet];
         CFrame &frame = *frameSet[entry.m_nFrameNo];
 
-        if (entry.m_nX + frame.m_nLen > largerX)
+        if (entry.m_nX + frame.len() > largerX)
         {
-            largerX = entry.m_nX + frame.m_nLen;
+            largerX = entry.m_nX + frame.len();
         }
 
-        if (entry.m_nY + frame.m_nHei > largerY)
+        if (entry.m_nY + frame.hei() > largerY)
         {
-            largerY = entry.m_nY + frame.m_nHei;
+            largerY = entry.m_nY + frame.hei();
         }
     }
     width = largerX;
@@ -1221,7 +1221,7 @@ void CGame::managePlayerMovements(CActor &player)
                 if (getLookUp() && gravity() && !getWrap() && !(joyState & (JOY_JUMP | JOY_FIRE)))
                 {
                     lookup = true;
-                    if ((my - 8 > 0) && (player.m_nY + frame.m_nHei <= my + m_screenHei))
+                    if ((my - 8 > 0) && (player.m_nY + frame.hei() <= my + m_screenHei))
                     {
                         my -= 8;
                     }
@@ -1638,7 +1638,7 @@ bool CGame::isEndLevelMeet()
             break;
 
         case CLevel::GOAL_DOWN:
-            result = (BUFFERHEI - player.m_nY) <= frame.m_nHei;
+            result = (BUFFERHEI - player.m_nY) <= frame.hei();
             break;
 
         case CLevel::GOAL_LEFT:
@@ -1646,7 +1646,7 @@ bool CGame::isEndLevelMeet()
             break;
 
         case CLevel::GOAL_RIGHT:
-            result = (BUFFERLEN - player.m_nX) <= frame.m_nLen;
+            result = (BUFFERLEN - player.m_nX) <= frame.len();
             break;
 
         case CLevel::GOAL_NO_COMPLETE:

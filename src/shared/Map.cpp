@@ -139,8 +139,8 @@ const Size CMap::size() const
 const Size CMap::size(const CFrame & frame)
 {
     Size s;
-    s.len = frame.m_nLen / GRID;
-    s.hei = frame.m_nHei / GRID;
+    s.len = frame.len() / GRID;
+    s.hei = frame.hei() / GRID;
     return s;
 }
 

@@ -21,6 +21,7 @@
 
 #ifndef _SS3FRAME_H
 #define _SS3FRAME_H
+#include <stdint.h>
 
 class CFrameSet;
 class CDotArray;
@@ -28,7 +29,6 @@ class CSS3Map;
 class CUndo;
 class IFile;
 
-#include <stdint.h>
 
 // Frame.h : header file
 //
@@ -158,8 +158,8 @@ public:
     bool canUndo();
     bool canRedo();
 
-    int m_nLen;
-    int m_nHei;
+    inline int len() const { return m_nLen; }
+    inline int hei() const { return m_nHei; }
 
     enum {
         ALPHA_MASK = 0xff000000,
@@ -217,6 +217,8 @@ protected:
     int m_undoPtr;
     int m_undoSize;
     void init();
+    int m_nLen;
+    int m_nHei;
 };
 
 /////////////////////////////////////////////////////////////////////////////

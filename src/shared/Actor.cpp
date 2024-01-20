@@ -424,9 +424,9 @@ bool CActor::isVisible()
     int x = m_nX - m_game->_mx();
     int y = m_nY - m_game->_my();
     return !((m_nTriggerKey & TRIGGER_HIDDEN) ||
-             (x + pFrame->m_nLen <= 0) ||
+             (x + pFrame->len() <= 0) ||
              (x >= m_game->m_screenLen) ||
-             (y + pFrame->m_nHei <= 0) ||
+             (y + pFrame->len() <= 0) ||
              (y >= m_game->m_screenHei));
 }
 
@@ -485,7 +485,7 @@ bool CActor::canMove(int nAim, bool bActor)
 
     case CGame::DOWN:
     case CGame::FALL:
-        if (m_nY >= m_game->BUFFERHEI - frame.m_nHei)
+        if (m_nY >= m_game->BUFFERHEI - frame.hei())
         {
             if (m_game->getWrap() & CLevel::WRAP_DOWN)
             {
@@ -522,7 +522,7 @@ bool CActor::canMove(int nAim, bool bActor)
         break;
 
     case CGame::RIGHT:
-        if (m_nX >= m_game->BUFFERLEN - frame.m_nLen)
+        if (m_nX >= m_game->BUFFERLEN - frame.len())
         {
             CActor t;
             t.copyFrom(*this);
@@ -858,7 +858,7 @@ bool CActor::isPlayerThere(int nAim)
 
     case CGame::DOWN:
         p.y += sx.hei;
-        if (m_nY >= m_game->BUFFERHEI - frame.m_nHei)
+        if (m_nY >= m_game->BUFFERHEI - frame.hei())
             return false;
         break;
 
@@ -870,7 +870,7 @@ bool CActor::isPlayerThere(int nAim)
 
     case CGame::RIGHT:
         p.x += sx.len;
-        if (m_nX >= m_game->BUFFERLEN - frame.m_nLen)
+        if (m_nX >= m_game->BUFFERLEN - frame.len())
             return false;
         break;
 
@@ -920,7 +920,7 @@ bool CActor::hitTest(int aim, CHitData &hitData)
 
     case CGame::DOWN:
         p.y += sx.hei;
-        if (m_nY >= m_game->BUFFERHEI - frame.m_nHei)
+        if (m_nY >= m_game->BUFFERHEI - frame.hei())
             return false;
         break;
 
@@ -932,7 +932,7 @@ bool CActor::hitTest(int aim, CHitData &hitData)
 
     case CGame::RIGHT:
         p.x += sx.len;
-        if (m_nX >= m_game->BUFFERLEN - frame.m_nLen)
+        if (m_nX >= m_game->BUFFERLEN - frame.len())
             return false;
         break;
     }
@@ -1111,7 +1111,7 @@ void CActor::managePath()
         break;
 
     case CGame::DOWN:
-        bcanWalk = (m_nY + frame.m_nHei < m_game->BUFFERHEI) && bcanWalk;
+        bcanWalk = (m_nY + frame.hei() < m_game->BUFFERHEI) && bcanWalk;
         break;
 
     case CGame::LEFT:
@@ -1119,7 +1119,7 @@ void CActor::managePath()
         break;
 
     case CGame::RIGHT:
-        bcanWalk = (m_nX + frame.m_nLen < m_game->BUFFERLEN) && bcanWalk;
+        bcanWalk = (m_nX + frame.len() < m_game->BUFFERLEN) && bcanWalk;
         break;
 
     case CGame::PAUSE:
@@ -1490,7 +1490,7 @@ void CActor::crash()
     const CProto &protoPlayer = proto();
     CFrame &frame = m_game->toFrame(*this);
     if ((m_nY >= 0) &&
-        (m_game->BUFFERHEI - m_nY > frame.m_nHei))
+        (m_game->BUFFERHEI - m_nY > frame.hei()))
     {
         Size sx = CMap::size(frame);
         CMap &m = m_game->map();
@@ -1820,7 +1820,7 @@ int CActor::checkHit()
                     {
                         CFrame &frame = m_game->toFrame(*this);
                         unMap();
-                        moveTo(temp.m_nX + 8, temp.m_nY - frame.m_nHei);
+                        moveTo(temp.m_nX + 8, temp.m_nY - frame.hei());
                         map();
                         data.flags |= CHitData::FLAG_TELEPORT;
                     }

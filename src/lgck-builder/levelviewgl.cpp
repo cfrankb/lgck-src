@@ -301,9 +301,9 @@ void CLevelViewGL::drawScreen()
         CFrame & frame = m_game->toFrame(entry);
         int x = entry.m_nX - mx;
         int y = entry.m_nY - my;
-        if (!( (x + frame.m_nLen <= 0) ||
+        if (!( (x + frame.len() <= 0) ||
             (x >= w) ||
-            (y + frame.m_nHei <= 0) ||
+            (y + frame.hei() <= 0) ||
             (y >= h)) && (entry.m_nActionMask & m_skillFilters)) {
             unsigned int texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo);
             if (entry.m_nTriggerKey & TRIGGER_HIDDEN){
@@ -313,8 +313,8 @@ void CLevelViewGL::drawScreen()
                 texture = im->getImage(entry.m_nFrameSet, entry.m_nFrameNo, true);
             }
             glBindTexture(GL_TEXTURE_2D, texture);
-            int ix = pow2roundup(frame.m_nLen);
-            int iy = pow2roundup(frame.m_nHei);
+            int ix = pow2roundup(frame.len());
+            int iy = pow2roundup(frame.hei());
             int x1 = x;
             int x2 = x + ix;
             int y1 = sz.height() - y;
@@ -395,9 +395,9 @@ void CLevelViewGL::drawItemRect()
                 (x < sz.width()) &&
                 (y < sz.height())) {
                 int x1 = x;
-                int x2 = x + frame.m_nLen;
+                int x2 = x + frame.len();
                 int y1 = sz.height() - y;
-                int y2 = sz.height() - y -frame.m_nHei;
+                int y2 = sz.height() - y -frame.hei();
                 glBegin(GL_LINE_LOOP);
                     glColor3f(red, green, blue);
                     glVertex3f(x1, y2, 0.0);

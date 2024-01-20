@@ -90,16 +90,16 @@ void CIMSdl::cacheInverse(int i, CFrameSet *filter)
         CFrame frame;
         frame.copy((*filter)[x]);
         uint32_t *t = frame.getRGB();
-        for (int j = 0; j < frame.m_nLen * frame.m_nHei; ++j)
+        for (int j = 0; j < frame.len() * frame.hei(); ++j)
         {
             t[j] = (t[j] & 0x00ffffff) + (t[j] & 0xff000000) / 2;
         }
         SDL_Surface *surface =
             SDL_CreateRGBSurfaceFrom(t,
-                                     frame.m_nLen,
-                                     frame.m_nHei,
+                                     frame.len(),
+                                     frame.hei(),
                                      PIXEL_DEPTH,
-                                     frame.m_nLen * sizeof(unsigned int),
+                                     frame.len() * sizeof(unsigned int),
                                      0xff, 0xff00, 0xff0000, 0xff000000);
         SDL_Texture *texture = SDL_CreateTextureFromSurface(
             m_renderer, surface);
@@ -185,10 +185,10 @@ int CIMSdl::insertAt(int i, CFrameSet *filter)
         unsigned int *pixels = frame.getRGB();
         SDL_Surface *surface =
             SDL_CreateRGBSurfaceFrom(pixels,
-                                     frame.m_nLen,
-                                     frame.m_nHei,
+                                     frame.len(),
+                                     frame.hei(),
                                      PIXEL_DEPTH,
-                                     frame.m_nLen * sizeof(unsigned int),
+                                     frame.len() * sizeof(unsigned int),
                                      0xff, 0xff00, 0xff0000, 0xff000000);
         SDL_Texture *texture = SDL_CreateTextureFromSurface(
             m_renderer, surface);

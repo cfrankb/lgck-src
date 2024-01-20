@@ -167,8 +167,8 @@ void CPreviewWidget::drawImage()
     int mx = m_mx;//horizontalScrollBar()->value();
     int my = m_my;//verticalScrollBar()->value();
 
-    int cx = std::min(m_frame->m_nLen - mx, sz.width()/m_zoom) ;
-    int cy = std::min(m_frame->m_nHei - my, sz.height()/m_zoom);
+    int cx = std::min(m_frame->len() - mx, sz.width()/m_zoom) ;
+    int cy = std::min(m_frame->hei() - my, sz.height()/m_zoom);
     CFrame *tmp = m_frame->clip(mx, my, cx, cy);
     tmp->flipV();
 

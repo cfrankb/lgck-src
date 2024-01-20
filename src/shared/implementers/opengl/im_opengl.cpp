@@ -95,13 +95,13 @@ void CIMOpengl::cacheInverse(int i, CFrameSet *filter)
         CFrame frame;
         frame.copy((*filter)[i]);
         uint32_t *t = frame.getRGB();
-        for (int j=0; j < frame.m_nLen * frame.m_nHei; ++j) {
+        for (int j=0; j < frame.len() * frame.hei(); ++j) {
             t[j] = (t[j] & 0x00ffffff) + (t[j] & 0xff000000) / 2;
         }
         // TODO: quickfix for quirky textures
-        int ix = pow2roundup(frame.m_nLen);
-        int iy = pow2roundup(frame.m_nHei);
-        if (ix != frame.m_nLen || iy != frame.m_nHei) {
+        int ix = pow2roundup(frame.len());
+        int iy = pow2roundup(frame.hei());
+        if (ix != frame.len() || iy != frame.hei()) {
             frame.resize(ix,iy);
         }
         frame.flipV();
@@ -109,7 +109,7 @@ void CIMOpengl::cacheInverse(int i, CFrameSet *filter)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
         glBindTexture(GL_TEXTURE_2D, is->inverse[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frame.m_nLen, frame.m_nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, frame.getRGB() );
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frame.len(), frame.hei(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frame.getRGB() );
     }
 }
 
@@ -179,15 +179,15 @@ int CIMOpengl::insertAt(int i, CFrameSet *filter)
         CFrame frame;
         frame.copy((*filter)[j]);
         // TODO: quickfix for quirky textures
-        int ix = pow2roundup(frame.m_nLen);
-        int iy = pow2roundup(frame.m_nHei);
-        if (ix != frame.m_nLen || iy != frame.m_nHei) {
+        int ix = pow2roundup(frame.len());
+        int iy = pow2roundup(frame.hei());
+        if (ix != frame.len() || iy != frame.hei()) {
             frame.resize(ix,iy);
         }
         frame.flipV();
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
         glBindTexture(GL_TEXTURE_2D, is->images[j]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frame.m_nLen, frame.m_nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, frame.getRGB() );
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frame.len(), frame.hei(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frame.getRGB() );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
@@ -224,15 +224,15 @@ int CIMOpengl::add(const char *uuid, CFont *font)
     CLuaVM::debugv("texture: %.8x", textureId);
     CFrame frame(font->width(), font->height());
     memcpy(frame.getRGB(), font->pixels(), font->width() * font->height() * sizeof(unsigned int));
-    int ix = pow2roundup(frame.m_nLen);
-    int iy = pow2roundup(frame.m_nHei);
-    if (ix != frame.m_nLen || iy != frame.m_nHei) {
+    int ix = pow2roundup(frame.len());
+    int iy = pow2roundup(frame.hei());
+    if (ix != frame.len() || iy != frame.hei()) {
         frame.resize(ix,iy);
     }
     frame.flipV();
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4); GLDEBUG();
     glBindTexture(GL_TEXTURE_2D, textureId); GLDEBUG();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frame.m_nLen, frame.m_nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, frame.getRGB() ); GLDEBUG();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frame.len(), frame.hei(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frame.getRGB() ); GLDEBUG();
     glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST); GLDEBUG();
     glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST); GLDEBUG();
     //glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE); GLDEBUG();

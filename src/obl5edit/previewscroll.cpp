@@ -58,16 +58,16 @@ void CPreviewScroll::updateScrollbars()
     CFrame *frame = widget->m_frame;
     int zoom = widget->m_zoom;
 
-    if (!frame || sz.width() >= frame->m_nLen * zoom) {
+    if (!frame || sz.width() >= frame->len() * zoom) {
         horizontalScrollBar()->setRange(0, 0);
     } else {
-        horizontalScrollBar()->setRange(0, (frame->m_nLen*zoom - sz.width())/ zoom + 1);
+        horizontalScrollBar()->setRange(0, (frame->len()*zoom - sz.width())/ zoom + 1);
     }
 
-    if (!frame || sz.height() >= frame->m_nHei *zoom) {
+    if (!frame || sz.height() >= frame->hei() *zoom) {
         verticalScrollBar()->setRange(0, 0);
     } else {
-        verticalScrollBar()->setRange(0, (frame->m_nHei*zoom - sz.height()) / zoom + 1);
+        verticalScrollBar()->setRange(0, (frame->hei()*zoom - sz.height()) / zoom + 1);
     }
 
     horizontalScrollBar()->setPageStep(zoom);

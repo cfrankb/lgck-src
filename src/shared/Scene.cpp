@@ -224,8 +224,8 @@ int CScene::whoIs(int x, int y)
         CActor &entry = *(m_actors[n]);
         CFrame &frame = game.toFrame(entry);
         if (entry.m_nProto && (entry.m_nX <= x) && (entry.m_nY <= y) &&
-            (entry.m_nX + frame.m_nLen) > x &&
-            (entry.m_nY + frame.m_nHei) > y)
+            (entry.m_nX + frame.len()) > x &&
+            (entry.m_nY + frame.hei()) > y)
         {
             target = n;
         }
@@ -353,12 +353,12 @@ void CScene::manageAuto()
                         break;
 
                     case CGame::RIGHT:
-                        bullet.m_nX += frame.m_nLen;
+                        bullet.m_nX += frame.len();
                         bullet.move();
                         break;
 
                     case CGame::DOWN:
-                        bullet.m_nY += frame.m_nHei;
+                        bullet.m_nY += frame.hei();
                         bullet.move();
                         break;
                     }

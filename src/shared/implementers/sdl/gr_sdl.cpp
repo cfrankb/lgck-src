@@ -138,13 +138,13 @@ void CGRSdl::paintImage(int x1, int y1, int frameSet, int frameNo)
     unsigned int id_texture = m_imageManager->getImage(frameSet, frameNo);
     SDL_Rect sRect;
     sRect.x = sRect.y = 0;
-    sRect.w = frame.m_nLen;
-    sRect.h = frame.m_nHei;
+    sRect.w = frame.len();
+    sRect.h = frame.hei();
     SDL_Rect dRect;
     dRect.x = x1;
     dRect.y = hei - y1;
-    dRect.w = frame.m_nLen;
-    dRect.h = frame.m_nHei;
+    dRect.w = frame.len();
+    dRect.h = frame.hei();
     SDL_Texture *texture = m_imageManager->texture(id_texture);
     SDL_SetTextureColorMod(
         texture,

@@ -422,8 +422,8 @@ int CGameFile::whoIs(CLevel &level, int x, int y, int skillFilters)
             CFrameSet &frameSet = *m_arrFrames[entry.m_nFrameSet];
             CFrame *pFrame = frameSet[entry.m_nFrameNo];
             if ((entry.m_nX <= x) && (entry.m_nY <= y) &&
-                (entry.m_nX + pFrame->m_nLen) > x &&
-                (entry.m_nY + pFrame->m_nHei) > y &&
+                (entry.m_nX + pFrame->len()) > x &&
+                (entry.m_nY + pFrame->hei()) > y &&
                 (entry.m_nActionMask & skillFilters))
                 nTarget = n;
         }

@@ -2733,8 +2733,8 @@ int getImageSize(lua_State *L)
         int imageSet = (int)lua_tonumber(L, 1);
         int imageNo = (int)lua_tonumber(L, 2);
         CFrame &frame = game.toFrame(imageSet, imageNo);
-        lua_pushnumber(L, frame.m_nLen);
-        lua_pushnumber(L, frame.m_nHei);
+        lua_pushnumber(L, frame.len());
+        lua_pushnumber(L, frame.hei());
         return 2;
     }
 }
@@ -3076,7 +3076,7 @@ int sprite_getHeight(lua_State *L)
         int objId = (int)lua_tonumber(L, 1);
         CActor &sprite = game.scene()[objId];
         CFrame &frame = game.toFrame(sprite);
-        lua_pushinteger(L, frame.m_nHei);
+        lua_pushinteger(L, frame.hei());
         return 1;
     }
 }
@@ -3095,7 +3095,7 @@ int sprite_getWidth(lua_State *L)
         int objId = (int)lua_tonumber(L, 1);
         CActor &sprite = game.scene()[objId];
         CFrame &frame = game.toFrame(sprite);
-        lua_pushinteger(L, frame.m_nLen);
+        lua_pushinteger(L, frame.len());
         return 1;
     }
 }

@@ -22,7 +22,6 @@
 class CFrame;
 class CFrameSet;
 class IFile;
-//typedef struct CFrame png_IHDR;
 
 class CPngMagic
 {
@@ -31,6 +30,13 @@ public:
     bool parsePNG(CFrameSet & set, IFile &file);
 
 protected:
+
+    enum {
+        GRANULAR = 8,
+        GRANULAR_MASK = GRANULAR -1,
+        BITWIDTH_4 = 4,
+        BITWIDTH_8 = 8,
+    };
 
     typedef struct {
         uint32_t Lenght;      // 4 UINT8s
@@ -45,7 +51,7 @@ protected:
     } png_IHDR;
 
     static uint8_t PaethPredictor(uint8_t a, uint8_t b, uint8_t c);
-    bool _8bpp(
+    bool filtering8bpp(
             CFrame *& frame,
             uint8_t* cData,
             int cDataSize,
@@ -54,7 +60,7 @@ protected:
             const bool trns_found,
             const uint8_t trns[],
             int offsetY);
-    bool _4bpp(
+    bool filtering4bpp(
             CFrame *& frame,
             uint8_t* cData,
             int cDataSize,

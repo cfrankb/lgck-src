@@ -397,7 +397,7 @@ void CLevelScroll::editPath()
                 gf.setDirty(true);
                 path.add(CGame::DOWN);
             }
-            if (entry.m_nY + frame.m_nHei > level.m_my + sz.height() - scroll) {
+            if (entry.m_nY + frame.hei() > level.m_my + sz.height() - scroll) {
                 level.m_my += scroll;
             }
 
@@ -441,7 +441,7 @@ void CLevelScroll::editPath()
                 gf.setDirty(true);
             }
 
-            if (entry.m_nX + frame.m_nLen > level.m_mx + sz.width()) {
+            if (entry.m_nX + frame.len() > level.m_mx + sz.width()) {
                 level.m_mx += scroll;
             }
 
@@ -673,7 +673,7 @@ void CLevelScroll::slowPrecisionPlacement(int & mx, int & my, CLevelEntry & entr
         gf.setDirty(true);
     }
 
-    if (entry.m_nY + frame.m_nHei > my + sz.height() - scroll) {
+    if (entry.m_nY + frame.hei() > my + sz.height() - scroll) {
         my += scroll;
     }
 
@@ -696,7 +696,7 @@ void CLevelScroll::slowPrecisionPlacement(int & mx, int & my, CLevelEntry & entr
         gf.setDirty(true);
     }
 
-    if (entry.m_nX + frame.m_nLen > mx + sz.width()) {
+    if (entry.m_nX + frame.len() > mx + sz.width()) {
         mx += scroll;
     }
 }
@@ -841,12 +841,12 @@ void CLevelScroll::select(int x1, int y1, int x2, int y2, CSelection & selection
         CFrame & frame = m_game->toFrame(entry);
         if ( (entry.m_nActionMask & m_skillFilters)
              && ((entry.m_nX >= x1 && entry.m_nX <= x2)
-              || (entry.m_nX <= x1 && entry.m_nX + frame.m_nLen >= x1)
-              || (entry.m_nX <= x2 && entry.m_nX + frame.m_nLen >= x2))
+              || (entry.m_nX <= x1 && entry.m_nX + frame.len() >= x1)
+              || (entry.m_nX <= x2 && entry.m_nX + frame.len() >= x2))
                 &&
                 ((entry.m_nY >= y1 && entry.m_nY <= y2)
-                 || (entry.m_nY <= y1 && entry.m_nY + frame.m_nHei >= y1)
-                 || (entry.m_nY <= y2 && entry.m_nY + frame.m_nHei >= y2))
+                 || (entry.m_nY <= y1 && entry.m_nY + frame.hei() >= y1)
+                 || (entry.m_nY <= y2 && entry.m_nY + frame.hei() >= y2))
                 ) {
             selection.addEntry(entry, i);
         }

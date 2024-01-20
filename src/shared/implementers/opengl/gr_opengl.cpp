@@ -121,8 +121,8 @@ void CGROpenGL::paintImage(int x1, int y1, int frameSet, int frameNo)
     unsigned int texture = m_imageManager->getImage(frameSet, frameNo);
     CFrame &frame = m_game->toFrame(frameSet, frameNo);
     glBindTexture(GL_TEXTURE_2D, texture);
-    int ix = pow2roundup(frame.m_nLen);
-    int iy = pow2roundup(frame.m_nHei);
+    int ix = pow2roundup(frame.len());
+    int iy = pow2roundup(frame.hei());
     int x2 = x1 + ix;
     int y2 = y1 - iy;
     glBegin(GL_QUADS);

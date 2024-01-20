@@ -69,7 +69,7 @@ void CWFrameSet::contextMenuEvent(QContextMenuEvent* event)
         QAction *actionEnlarge = new QAction(tr("Enlarge x2"), &menu);
         menu.addAction(actionEnlarge);
 
-        if (frame->m_nLen > 16 || frame->m_nHei > 16) {
+        if (frame->len() > 16 || frame->hei() > 16) {
             QAction *actionSlice = new QAction(tr("Slice Image"), &menu);
             menu.addAction(actionSlice);
             connect(actionSlice, SIGNAL(triggered()),
@@ -179,7 +179,7 @@ void CWFrameSet::updateIcon(QTreeWidgetItem *item,  int j)
     QIcon icon = frame2icon(*(*m_frameSet)[j]);
     icon.actualSize(QSize(32,32));
 
-    QString s = QString(tr("%1 x %2")) .arg( (*m_frameSet)[j]->m_nLen) . arg((*m_frameSet)[j]->m_nHei);
+    QString s = QString(tr("%1 x %2")) .arg( (*m_frameSet)[j]->len()) . arg((*m_frameSet)[j]->hei());
     item->setIcon(0, icon);
     item->setText(1, s);
 }
@@ -310,7 +310,7 @@ void CWFrameSet::sliceImage()
         dlg->setWindowTitle(tr("Split into pieces..."));
         int j = index;
         CFrame *frame = (*m_frameSet)[j];
-        dlg->initSizes(std::max(frame->m_nLen, frame->m_nHei));
+        dlg->initSizes(std::max(frame->len(), frame->hei()));
         dlg->setLevelId( 0 );
         if (dlg->exec() == QDialog::Accepted) {
             int sizes[] = {

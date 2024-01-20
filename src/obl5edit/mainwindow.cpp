@@ -1374,7 +1374,7 @@ void MainWindow::on_actionResize_triggered()
 {
     CDlgImageSize *dlg = new CDlgImageSize();
     CFrame *frame = m_doc.getCurrent();
-    dlg->setSize(frame->m_nLen, frame->m_nHei);
+    dlg->setSize(frame->len(), frame->hei());
     dlg->setWindowTitle(tr("Resize Image"));
     if (dlg->exec()== QDialog::Accepted) {
         frame->push();
@@ -1757,7 +1757,7 @@ void MainWindow::on_actionSplit_triggered()
     CDlgGoto *dlg = new CDlgGoto(this);
     dlg->setWindowTitle(tr("Split into pieces..."));
     CFrame *frame = m_doc.getCurrent();
-    dlg->initSizes(std::max(frame->m_nLen, frame->m_nHei));
+    dlg->initSizes(std::max(frame->len(), frame->hei()));
     dlg->select( 0 );
     if (dlg->exec() == QDialog::Accepted) {
         int sizes[] = {
@@ -1994,7 +1994,7 @@ void MainWindow::on_actionResize_All_triggered()
 {
     CDlgImageSize *dlg = new CDlgImageSize();
     CFrame *frame = m_doc.getCurrent();
-    dlg->setSize(frame->m_nLen, frame->m_nHei);
+    dlg->setSize(frame->len(), frame->hei());
     dlg->setWindowTitle(tr("Resize All Images"));
     if (dlg->exec()== QDialog::Accepted) {
         CFrameSet & set = m_doc.getImageSet();

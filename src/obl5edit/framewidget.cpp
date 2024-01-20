@@ -169,8 +169,8 @@ void CFrameWidget::drawTapestry()
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_frame->m_nLen, m_frame->m_nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , m_frame->m_nLen, m_frame->m_nHei, GL_RGBA, GL_UNSIGNED_BYTE, m_frame->getRGB() );
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_frame->len(), m_frame->hei(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , m_frame->len(), m_frame->hei(), GL_RGBA, GL_UNSIGNED_BYTE, m_frame->getRGB() );
 
     //QRectF r = frameRect();
     QSize sz = size();
@@ -178,8 +178,8 @@ void CFrameWidget::drawTapestry()
     int x2 = sz.width();//r.right();
     int y1 = 0;
     int y2 = sz.height();//r.bottom();
-    float xx = x2 / m_frame->m_nLen;
-    float yy = y2 / m_frame->m_nHei;
+    float xx = x2 / m_frame->len();
+    float yy = y2 / m_frame->hei();
 
     glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0); glVertex3f(x1, y2, 0.0);
@@ -200,8 +200,8 @@ void CFrameWidget::drawImage()
 
     QSize sz = size();
     int gridSize = m_zoom;
-    int w = std::min(sz.width(), (m_frame->m_nLen - mx) * gridSize);
-    int h = std::min(sz.height(), (m_frame->m_nHei - my) * gridSize);
+    int w = std::min(sz.width(), (m_frame->len() - mx) * gridSize);
+    int h = std::min(sz.height(), (m_frame->hei() - my) * gridSize);
 
     // draw background
     if (w > 0 && h > 0) {
@@ -235,8 +235,8 @@ void CFrameWidget::drawImage()
         float br_green = ((m_borderColor >> 8) & 0xff ) / 255.0f;
         float br_blue = ((m_borderColor >> 16) & 0xff) / 255.0f;
         uint rgb;
-        for (int y=0; y * gridSize < sz.height() && (my + y) < m_frame->m_nHei; ++y) {
-            for (int x=0; x * gridSize < sz.width() && (mx + x) < m_frame->m_nLen; ++x) {
+        for (int y=0; y * gridSize < sz.height() && (my + y) < m_frame->hei(); ++y) {
+            for (int x=0; x * gridSize < sz.width() && (mx + x) < m_frame->len(); ++x) {
                 int x1 = x * gridSize;
                 int x2 = (x + 1) * gridSize;
                 int y1 = sz.height() - y * gridSize;
@@ -261,8 +261,8 @@ void CFrameWidget::drawImage()
 
                 // draw shadow if applicable
                 if ((m_mode != MODE_ALPHA_ONLY) &&m_shadow
-                        && (x + mx) < m_shadow->m_nLen
-                        && (y + my) < m_shadow->m_nHei) {
+                        && (x + mx) < m_shadow->len()
+                        && (y + my) < m_shadow->hei()) {
                     rgb = m_shadow->at(mx + x, my + y);
                     if (rgb & 0xff000000) {
                         // if not transparent
@@ -331,8 +331,8 @@ void CFrameWidget::drawImage()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        int cx = m_frame->m_nLen - mx;
-        int cy = m_frame->m_nHei - my;
+        int cx = m_frame->len() - mx;
+        int cy = m_frame->hei() - my;
         CFrame *tmp;
         if (m_mode == MODE_ALPHA_ONLY) {
             tmp = m_frame->toAlphaGray(mx, my, cx, cy);
@@ -340,9 +340,9 @@ void CFrameWidget::drawImage()
             tmp = m_frame->clip(mx, my, cx, cy);
         }
         // TODO: quickfix for quirky textures
-        int ix = pow2roundup(tmp->m_nLen);
-        int iy = pow2roundup(tmp->m_nHei);
-        if (ix != tmp->m_nLen|| iy != tmp->m_nHei) {
+        int ix = pow2roundup(tmp->len());
+        int iy = pow2roundup(tmp->hei());
+        if (ix != tmp->len()|| iy != tmp->hei()) {
             tmp->resize(ix,iy);
         }
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmp->getRGB() );
@@ -527,11 +527,11 @@ void CFrameWidget::handleTool(int x, int y, bool lButton, bool rButton)
     // disallow negative coordonates
     // and other out of bound value
 
-    m_dots->setLimit(m_frame->m_nLen, m_frame->m_nHei);
-    m_dotsOrg->setLimit(m_frame->m_nLen, m_frame->m_nHei);
+    m_dots->setLimit(m_frame->len(), m_frame->hei());
+    m_dotsOrg->setLimit(m_frame->len(), m_frame->hei());
 
     bool changed = false;
-    if (m_frame && x < m_frame->m_nLen && y < m_frame->m_nHei) {
+    if (m_frame && x < m_frame->len() && y < m_frame->hei()) {
         // TODO: set doc Dirty
         uint32_t oldColor = m_frame->at(x,y);
         uchar oldAlpha = (uchar) (m_frame->at(x,y) >> 24);
