@@ -19,15 +19,25 @@
 #define __HELPER_H__LGCK
 #include <string>
 #include <list>
-const char *toUpper(char *s); 
+const char *toUpper(char *s);
 char *getUUID();
-bool copyFile(const std::string in, const std::string out, std::string & errMsg);
-bool concat(const std::list<std::string> files, std::string out, std::string & msg);
+bool copyFile(const std::string in, const std::string out, std::string &errMsg);
+bool concat(const std::list<std::string> files, std::string out, std::string &msg);
 int upperClean(int c);
 int istrcmp(const char *a, const char *b);
+int compressData(unsigned char *in_data, unsigned long in_size, unsigned char **out_data, unsigned long &out_size);
+
+// if win32
 #ifdef _WIN32
-#else
-    #include <linux/limits.h>
+#ifndef PATH_MAX
+#define PATH_MAX 512
 #endif
-int compressData(unsigned char *in_data, unsigned long in_size, unsigned char **out_data, unsigned long & out_size);
+char *realpath(const char *path, char resolved_path[PATH_MAX]);
+#else
+// if linux/unix
+#include <cstdlib>
+#ifndef EMS
+#include <linux/limits.h>
+#endif
+#endif
 #endif

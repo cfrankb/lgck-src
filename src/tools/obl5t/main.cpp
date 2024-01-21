@@ -5,30 +5,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdint.h>
-#include <zlib.h>
-#include "../../shared/stdafx.h"
 #include "../../shared/FileWrap.h"
 #include "../../shared/FrameSet.h"
 #include "../../shared/Frame.h"
 #include "../../shared/ss_version.h"
-
-#define qDebug printf
-
-/* These describe the color_type field in png_info. */
-/* color type masks */
-#define PNG_COLOR_MASK_PALETTE 1
-#define PNG_COLOR_MASK_COLOR 2
-#define PNG_COLOR_MASK_ALPHA 4
-
-/* color types.  Note that not all combinations are legal */
-#define PNG_COLOR_TYPE_GRAY 0
-#define PNG_COLOR_TYPE_PALETTE (PNG_COLOR_MASK_COLOR | PNG_COLOR_MASK_PALETTE)
-#define PNG_COLOR_TYPE_RGB (PNG_COLOR_MASK_COLOR)
-#define PNG_COLOR_TYPE_RGB_ALPHA (PNG_COLOR_MASK_COLOR | PNG_COLOR_MASK_ALPHA)
-#define PNG_COLOR_TYPE_GRAY_ALPHA (PNG_COLOR_MASK_ALPHA)
-/* aliases */
-#define PNG_COLOR_TYPE_RGBA PNG_COLOR_TYPE_RGB_ALPHA
-#define PNG_COLOR_TYPE_GA PNG_COLOR_TYPE_GRAY_ALPHA
 
 enum
 {
@@ -48,15 +28,14 @@ void makeTest()
         ima[i] = i / 64;
     }
 
-    CFrame *images = new CFrame[1];
-    images[0].m_nLen = images[0].m_nHei = 16 * 8;
-    images[0].setRGB(new uint32_t[images[0].m_nLen * images[0].m_nHei]);
+    CFrame *image = new CFrame(16 * 8, 16 * 8);
+    image->setRGB(new uint32_t[image->len() * image->hei()]);
     char *bitmap = CFrameSet::ima2bitmap(ima, 16, 16);
 
-    CFrameSet::bitmap2rgb(bitmap, images[0].getRGB(), images[0].m_nLen, images[0].m_nHei, 0);
+    CFrameSet::bitmap2rgb(bitmap, image->getRGB(), image->len(), image->hei(), 0);
     uint8_t *png;
     int totalSize;
-    images[0].toPng(png, totalSize);
+    image->toPng(png, totalSize);
 
     CFileWrap tfile;
     if (tfile.open("test.png", "wb"))
@@ -67,7 +46,7 @@ void makeTest()
 
     delete[] png;
     delete[] ima;
-    delete[] images;
+    delete image;
 }
 
 enum
@@ -177,7 +156,7 @@ int main(int argc, char *argv[], char *envp[])
 
     char *outPath = new char[3];
     strcpy(outPath, "./");
-    char *mergeName = new char[10];
+    char *mergeName = new char[16];
     strcpy(mergeName, "merge~%.4x");
 
     for (int i = 1; i < argc; i++)
