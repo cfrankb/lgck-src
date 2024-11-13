@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Display.h"
-#include <cstdlib>
 #include <cstring>
 #include "LuaVM.h"
 #include "../shared/IFile.h"

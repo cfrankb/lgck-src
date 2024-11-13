@@ -84,7 +84,7 @@ void CActor::write(IFile &file)
     file.write(&m_seed, sizeof(int));
     size = m_props.size();
     file.write(&size, sizeof(int));
-    for (auto kv : m_props)
+    for (const auto & kv : m_props)
     {
         std::string key = kv.first;
         int val = kv.second;
@@ -120,7 +120,7 @@ CActor &CActor::operator=(const CActor &s)
     m_id = s.m_id;
     m_seed = s.m_seed;
     m_props.clear();
-    for (auto kv : s.m_props)
+    for (const auto & kv : s.m_props)
     {
         std::string key = kv.first;
         m_props[key] = kv.second;

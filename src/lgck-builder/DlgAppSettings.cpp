@@ -25,7 +25,6 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QDebug>
-#include <cstring>
 #include "WHotKey.h"
 #include "WGetKey.h"
 #include "DlgAppSettings.h"

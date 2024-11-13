@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "wslider.h"
-#include <string>
 #include <QLineEdit>
 
 CWSlider::CWSlider(QWidget *parent):

@@ -19,7 +19,6 @@
 #include "IFile.h"
 #include "Game.h"
 #include <vector>
-// #include "stdafx.h"
 #include "microtime.h"
 
 CCountdown::CCountdown()
@@ -51,7 +50,7 @@ bool CCountdown::write(IFile &file)
 {
     int32_t count = m_countdown.size();
     file.write(&count, sizeof(int32_t));
-    for (auto kv : m_countdown)
+    for (auto & kv : m_countdown)
     {
         std::string key = kv.first;
         CCountdownEntry &entry = kv.second;
@@ -75,7 +74,7 @@ void CCountdown::cycle()
     }
     std::vector<std::string> d;
     uint64_t now = microtime();
-    for (auto kv : m_countdown)
+    for (auto & kv : m_countdown)
     {
         std::string key = kv.first;
         // CLuaVM::debugv("countdown key: %s", key.c_str());
@@ -101,7 +100,7 @@ void CCountdown::cycle()
             }
         }
     }
-    for (std::string i : d)
+    for (const std::string & i : d)
     {
         m_countdown.erase(i);
         CGame::getGame().m_counters.erase(i);

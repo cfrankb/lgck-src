@@ -2330,7 +2330,7 @@ void CGame::saveGame(IFile &file)
     // Write Counters
     size = m_counters.size();
     file.write(&size, sizeof(unsigned int));
-    for (auto kv : m_counters)
+    for (const auto & kv : m_counters)
     {
         std::string key = kv.first;
         int val = kv.second;
@@ -2343,7 +2343,7 @@ void CGame::saveGame(IFile &file)
     var("__my") = m_my;
     size = m_vars.size();
     file.write(&size, sizeof(unsigned int));
-    for (auto kv : m_vars)
+    for (const auto & kv : m_vars)
     {
         const std::string key = kv.first;
         unsigned long long val = kv.second;
@@ -2369,7 +2369,7 @@ void CGame::saveGame(IFile &file)
     // save strv
     size = m_strings.size();
     file.write(&size, sizeof(unsigned int));
-    for (auto kv : m_strings)
+    for (const auto & kv : m_strings)
     {
         const std::string key = kv.first;
         const std::string val = kv.second;

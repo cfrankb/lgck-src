@@ -97,7 +97,7 @@ bool CFont::write(IFile &file)
     // glyphs
     int size = m_glyphs.size();
     file.write(&size, 2);
-    for (auto kv : m_glyphs)
+    for (auto & kv : m_glyphs)
     {
         char key = kv.first;
         Glyph &glyph = kv.second;
@@ -110,7 +110,7 @@ bool CFont::write(IFile &file)
     // props
     size = m_props.size();
     file.write(&size, 2);
-    for (auto kv : m_props)
+    for (auto & kv : m_props)
     {
         file << kv.first;
         file << kv.second;

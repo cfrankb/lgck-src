@@ -41,7 +41,7 @@ def get_deps_blocks():
     objs = ' '.join(f'$(BPATH)/{x}$(EXT)' for x in deps)
     lines = []
     lines.append(f'$(TARGET): $(DEPS)')
-    lines.append(f'\t$(CXX) $(CXXFLAGS) $(DEPS) $(LIBS) $(PARGS) -o $@')
+    lines.append(f'\t$(CXX) $(CXXFLAGS) $(DEPS) $(LIBS) $(PARGS) -o $@ $(TEMPLATE)')
     deps_blocks.append('\n'.join(lines))
     lines = []
     lines.append('clean:')
@@ -55,8 +55,9 @@ def main():
         'INC=-I../shared',
         'LIBS=-L../shared/extern/lua5.4 -llua',
         'CXXFLAGS=-sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sUSE_ZLIB=1 -DEMS',
-        'PARGS=--preload-file data --emrun -DWASM -O2 -s WASM=1 -sASSERTIONS -sALLOW_MEMORY_GROWTH',
-        'BPATH=build/emsdl', 'BNAME=lgck.html', 'TARGET=$(BPATH)/$(BNAME)'
+        'PARGS=--preload-file data --emrun -DWASM -O2 -sWASM=1 -sALLOW_MEMORY_GROWTH',
+        'BPATH=build/emsdl', 'BNAME=lgck.html', 'TARGET=$(BPATH)/$(BNAME)',
+        'TEMPLATE=--shell-file template/body.html'
         ]
     print("type `emmake make` to generare binary.")
     ext = '.o'

@@ -36,6 +36,8 @@ protected:
         GRANULAR_MASK = GRANULAR -1,
         BITWIDTH_4 = 4,
         BITWIDTH_8 = 8,
+        PALETTE_SIZE = 256,
+        ALPHA_MAX = 255
     };
 
     typedef struct {

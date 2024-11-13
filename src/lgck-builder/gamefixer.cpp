@@ -294,7 +294,7 @@ void CGameFixer::troubleshoot()
         });
     }
 
-    for(auto error: m_errors){
+    for(const auto & error: m_errors){
         m_severity = m_severity > error.severity ? m_severity : error.severity;
     }
 }
@@ -327,7 +327,7 @@ QString CGameFixer::getTooltip()
     int errors = 0;
     int info = 0;
 
-    for(auto error: m_errors){
+    for(const auto & error: m_errors){
         if (error.severity == Warning) {
             ++ warnings;
         } else if (error.severity == Error) {
@@ -354,7 +354,7 @@ QString CGameFixer::getStatus()
     int warnings = 0;
     int errors = 0;
 
-    for(auto error: m_errors){
+    for(const auto & error: m_errors){
         if (error.severity == Warning) {
             ++ warnings;
         } else if (error.severity == Error) {
@@ -375,7 +375,7 @@ QString CGameFixer::getStatus()
 QString CGameFixer::getText()
 {
     QStringList list;
-    for(auto error: m_errors){
+    for(const auto & error: m_errors){
         QString sError = tr("Info");
         QString img = tr("<img src='%1' width=%2 height=%2>").arg(getIcon(error.severity, false)).arg(ICON_SIZE);
         if (error.severity == Warning) {

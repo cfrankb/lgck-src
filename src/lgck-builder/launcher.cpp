@@ -42,7 +42,7 @@ bool getCmd(const QString & appName, Path & outPath)
         paths.push_back(Path { appDir, appName });
     }
 
-    for(auto path: paths){
+    for(const auto & path: paths){
         const QString t = path.path + "/" + path.cmd;
         qDebug() << "trying path: " + t;
         if (fileExists(t)) {
