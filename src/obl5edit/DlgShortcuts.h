@@ -20,7 +20,6 @@
 #define DLGSHORTCUTS_H
 
 #include <QDialog>
-class QStringList;
 class QSignalMapper;
 class QTableWidgetItem;
 class CWHotKey;

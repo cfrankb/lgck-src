@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 #win32:CONFIG += static
-QT       += core gui opengl
+QT       += core gui opengl widgets openglwidgets
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.

@@ -162,8 +162,8 @@ void CFrameScroll::mouseReleaseEvent(QMouseEvent * event)
 
 void CFrameScroll::mouseMoveEvent(QMouseEvent * event)
 {
-
     // MouseMove isn't called unless a button is pressed
+    const auto pos = event->pos();
     CFrameWidget *widget = static_cast<CFrameWidget *>(viewport());
     int gridSize = widget->m_zoom;
     QSize sz = size();
@@ -175,9 +175,9 @@ void CFrameScroll::mouseMoveEvent(QMouseEvent * event)
     if (frame){
         int width = frame->len() * gridSize;
         int height = frame->hei() * gridSize;
-        if (event->x()>=0 && event->y()>=0) {
-            xx = (event->x() + gridSize * horizontalScrollBar()->value()) ;
-            yy = (event->y() + gridSize * verticalScrollBar()->value());
+        if (pos.x()>=0 && pos.y()>=0) {
+            xx = (pos.x() + gridSize * horizontalScrollBar()->value()) ;
+            yy = (pos.y() + gridSize * verticalScrollBar()->value());
             if (xx < width && yy < height) {
                 x = xx / gridSize;
                 y = yy / gridSize;
@@ -185,8 +185,8 @@ void CFrameScroll::mouseMoveEvent(QMouseEvent * event)
         }
 
         // Test if mouse in within valid coordonates
-        if (event->x() >= sz.width()
-                 ||event->y() >= sz.height() ) {
+        if (pos.x() >= sz.width()
+                 ||pos.y() >= sz.height() ) {
             setCursor(Qt::ArrowCursor);
             return;
         }

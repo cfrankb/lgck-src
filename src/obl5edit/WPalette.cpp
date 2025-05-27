@@ -108,8 +108,9 @@ void CWPalette::mousePressEvent ( QMouseEvent * event )
         break;
     }
 
-    int x = event->x() / GRID_SIZE;
-    int y = event->y() / GRID_SIZE;
+    const auto pos = event->pos();
+    int x = pos.x() / GRID_SIZE;
+    int y = pos.y() / GRID_SIZE;
     if (m_mouse.lButton
             && x < ROW_SIZE
             && y < ROW_SIZE) {
@@ -175,8 +176,9 @@ void CWPalette::addColor(const uint color)
 
 void CWPalette::mouseMoveEvent ( QMouseEvent * event )
 {
-    int x = event->x() / GRID_SIZE;
-    int y = event->y() / GRID_SIZE;
+    const auto pos = event->pos();
+    int x = pos.x() / GRID_SIZE;
+    int y = pos.y() / GRID_SIZE;
     if (m_mouse.lButton
             && x < ROW_SIZE
             && y < ROW_SIZE) {

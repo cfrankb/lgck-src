@@ -20,6 +20,7 @@
 #include "ui_DlgAbout.h"
 #include <QDesktopServices>
 #include <QUrl>
+#include <QRegularExpression>
 #include "../shared/qtgui/qfilewrap.h"
 #include "../shared/Credits.h"
 #include "../shared/ss_version.h"
@@ -114,7 +115,7 @@ void CDlgAbout::setGLInfo(const QString & vendor,
     m_ui->sOpenGLRenderer->setText(renderer);
     m_ui->sOpenGLVendor->setText(vendor);
     m_ui->sOpenGLVersion->setText(version);
-    QRegExp rx("(\\ )");
+     QRegularExpression rx("(\\ )");
     QStringList extList = extensions.split(rx);
     for (QStringList::iterator it = extList.begin();
         it != extList.end(); ++it) {

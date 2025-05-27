@@ -19,6 +19,7 @@
 #ifndef PIXELBOXDOCK_H
 #define PIXELBOXDOCK_H
 
+#include "QtWidgets/qmainwindow.h"
 #include <QDockWidget>
 
 namespace Ui {

@@ -85,10 +85,11 @@ void CPreviewScroll::mouseReleaseEvent(QMouseEvent * event)
 
 void CPreviewScroll::mousePressEvent(QMouseEvent * event)
 {
+    const auto pos = event->pos();
     m_mouse.oldX = m_mouse.x;
     m_mouse.oldY = m_mouse.y;
-    m_mouse.x = event->x();
-    m_mouse.y = event->y();
+    m_mouse.x = pos.x();
+    m_mouse.y = pos.y();
     m_mouse.lButton = false;
     m_mouse.rButton = false;
     switch (event->button())

@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include <QApplication>
 #include <string.h>
 #include <QMessageBox>
@@ -27,8 +29,8 @@
 #include <QToolBar>
 #include <QtOpenGL>
 #include <QFileDialog>
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include <QColorDialog>
+#include <QToolButton>
 #include "../shared/Tools.h"
 #include "../shared/qtgui/ColorPicker/colorpickerwidget.h"
 #include "PixelBoxDock.h"
@@ -49,11 +51,11 @@
 #include "../shared/qtgui/qfilewrap.h"
 
 //http://stackoverflow.com/questions/3542718/installing-opengl-for-qt
-char MainWindow::m_appName[] = "Object Block Editor";
-char MainWindow::m_author[] = "cfrankb";
-char MainWindow::m_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
-char MainWindow::m_oblFilter[] = "Object Blocks (*.obl *.obl5)";
-char MainWindow::m_pngFilter[] = "PNG Images (*.png)";
+const char MainWindow::m_appName[] = "Object Block Editor";
+const char MainWindow::m_author[] = "cfrankb";
+const char MainWindow::m_allFilter[]= "All Supported Formats (*.obl *.obl5 *.png)";
+const char MainWindow::m_oblFilter[] = "Object Blocks (*.obl *.obl5)";
+const char MainWindow::m_pngFilter[] = "PNG Images (*.png)";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -344,7 +346,7 @@ void MainWindow::reloadSettings()
     emit borderColorSet(borderColor.toUInt(&ok,16));
     QString penColor = settings.value("penColor", "ffc0d0").toString();
     emit penColorChanged(penColor.toUInt(&ok,16));
-    m_lastOpenFilter = settings.value("lastOpenFilter", m_pngFilter).toString();
+    m_lastOpenFilter = settings.value("lastOpenFilter", m_pngFilter ).toString();
     uchar alpha = settings.value("alpha", 0xff).toUInt();
     setAlpha(alpha);
     emit alphaChanged(alpha);
@@ -1095,9 +1097,12 @@ void MainWindow::setStatus(int i, const QString message)
 
 void MainWindow::updateStatus()
 {
+    char t[10];
+    sprintf(t, "%.4X",m_doc.getCurrentIndex());
+
     QString s;
     if (m_doc.getSize()) {
-        s = QString(tr("%1 of %2")).arg(m_doc.getCurrentIndex()+1).arg(m_doc.getSize());
+        s = QString(tr("[0x%1] %2 of %3")).arg(t).arg(m_doc.getCurrentIndex()+1).arg(m_doc.getSize());
     }
     setStatus(1, s);
 }
@@ -2365,4 +2370,3 @@ void MainWindow::on_actionGrayscale_triggered()
         emit frameChanged(m_doc.getCurrent());
     }
 }
-

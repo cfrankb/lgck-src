@@ -20,7 +20,6 @@ This file is part of colorPickerWidget.
 
 #include <QtGui>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QScreen>
 #include "screen.h"
 
@@ -28,11 +27,10 @@ CScreen::CScreen()
 {
     QScreen* screen = QGuiApplication::primaryScreen();
     label = new QLabel(this);
-    label->setPixmap( screen->grabWindow(QApplication::desktop()->winId()));
+    label->setPixmap(screen->grabWindow());
     label->move(0,0);
     showFullScreen();
 }
-
 
 void CScreen::mousePressEvent(QMouseEvent *event)
 {

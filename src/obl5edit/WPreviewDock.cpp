@@ -20,7 +20,7 @@
 #include "ui_WPreviewDock.h"
 #include <QResizeEvent>
 #include <QSize>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include "previewwidget.h"
 #include "previewscroll.h"
 

@@ -85,11 +85,11 @@ private:
         MaxRecentFiles = 4
     };
 
-    static char m_appName[];
-    static char m_author[];
-    static char m_allFilter[];
-    static char m_oblFilter[];
-    static char m_pngFilter[];    
+    const static char m_appName[];
+    const static char m_author[];
+    const static char m_allFilter[];
+    const static char m_oblFilter[];
+    const static char m_pngFilter[];
     QString m_lastOpenFilter;
 
     QAction *m_recentFileActs[MaxRecentFiles];
