@@ -2725,7 +2725,7 @@ void MainWindow::reloadSettings()
     m_updateURL = settings.value("updater_url", UPDATER_URL).toString();
     QString savedVersion = settings.value("version", "").toString();
     char *uuid = getUUID();
-    m_uuid = settings.value("uuid", uuid).toString();
+    m_uuid = settings.value("uuid", const_cast<const char*>(uuid)).toString();
     delete []uuid;
     QString currVersion = formatVersion(false);
     if (currVersion != savedVersion) {

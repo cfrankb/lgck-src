@@ -419,7 +419,7 @@ void CDlgEntry::on_btnRawPath_clicked()
             s += " ";
         }
         QString tmp = QString::asprintf("%2.2x", path[i]);
-        s += tmp.midRef(0,2);
+        s += tmp.mid(0,2);
     }
 
     bool ok = false;

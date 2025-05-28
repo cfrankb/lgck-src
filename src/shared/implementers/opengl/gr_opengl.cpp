@@ -21,7 +21,7 @@
 #include <cassert>
 
 #ifdef LGCK_QT
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #endif
 #ifdef __APPLE__
 #include <OpenGL/gl.h>

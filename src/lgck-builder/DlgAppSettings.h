@@ -21,7 +21,6 @@
 
 #include <QDialog>
 #include "Game.h"
-class QStringList;
 class QSignalMapper;
 class QTableWidgetItem;
 class CWHotKey;

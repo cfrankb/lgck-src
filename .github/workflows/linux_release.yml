@@ -5,8 +5,6 @@ on:
     branches:
       - 'master'
       - 'continuous-integration'
-      - 'cross-platform'
-    #  - 'build-ci'
     tags:
       - 'v*'
   pull_request:
@@ -20,7 +18,7 @@ defaults:
 
 env:
   SOURCE_DIR: ${{ github.workspace }}
-  QT_VERSION: 5.15.2
+  QT_VERSION: 6.8.3
   ARTIFACT: 'LgckBuilder-x86_64.AppImage'
 
 jobs:

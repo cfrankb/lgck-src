@@ -16,8 +16,8 @@ unix:DEFINES        += MAKE_LINUX=1
 win32:DEFINES       += MAKE_WIN32
 DEFINES             += USE_QFILE=1
 DEFINES             += LGCK_QT=1
-DEFINES            += LGCK_GAMEPAD=1
-QT                  += core gui opengl network gamepad
+#DEFINES            += LGCK_GAMEPAD=0
+QT                  += core gui opengl network openglwidgets widgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET              = lgck-builder
 TEMPLATE            = app
@@ -36,7 +36,7 @@ CONFIG( debug, debug|release ) {
 }
 
 unix:LIBS += \
-    -llua5.2 \
+    -llua \
     -lSDL2_mixer \
     -lSDL2-2.0 \
     -lz

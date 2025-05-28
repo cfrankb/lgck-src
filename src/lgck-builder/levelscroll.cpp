@@ -167,16 +167,13 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
             m_mouse.rButton = true;
         break;
 
-        case Qt::MidButton:
-            m_mouse.rButton = true;
-        break;
-
         default:
         break;
     }
 
-    m_mouse.x = event->x() & MOUSE_POS_MASK;
-    m_mouse.y = event->y() & MOUSE_POS_MASK;
+    auto const pos = event->pos();
+    m_mouse.x = pos.x() & MOUSE_POS_MASK;
+    m_mouse.y = pos.y() & MOUSE_POS_MASK;
     const bool validLevel = m_game && m_game->getSize();
     if (this->isGameMode()) {
         if (m_game) {
@@ -217,8 +214,9 @@ void CLevelScroll::mousePressEvent(QMouseEvent * event)
 
         // if no selection
         if (!layer.getSelectionSize()) {
-            m_mouse.destX = m_mouse.orgX = event->x() ;
-            m_mouse.destY = m_mouse.orgY = event->y() ;
+            const auto pos = event->pos();
+            m_mouse.destX = m_mouse.orgX = pos.x() ;
+            m_mouse.destY = m_mouse.orgY = pos.y() ;
             return;
         }
         m_mouse.orgX = m_mouse.orgY = -1;
@@ -244,9 +242,6 @@ void CLevelScroll::mouseReleaseEvent(QMouseEvent * event)
         break;
     case Qt::RightButton:
         m_mouse.rButton = false;
-        break;
-    case Qt::MidButton:
-        m_mouse.mButton = false;
         break;
     default:
         break;
@@ -294,8 +289,9 @@ void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
     QSize sz = size();
     m_mouse.oldX = m_mouse.x;
     m_mouse.oldY = m_mouse.y;
-    m_mouse.x = event->x() & MOUSE_POS_MASK;
-    m_mouse.y = event->y() & MOUSE_POS_MASK;
+    const auto pos = event->pos();
+    m_mouse.x = pos.x() & MOUSE_POS_MASK;
+    m_mouse.y = pos.y() & MOUSE_POS_MASK;
     if (!this->isGameMode() && !m_editPath && m_paintSprite) {
         if (m_mouse.lButton &&
                 ((m_mouse.oldX != m_mouse.x) || (m_mouse.oldY != m_mouse.y))) {
@@ -352,8 +348,9 @@ void CLevelScroll::mouseMoveEvent(QMouseEvent *event)
                         && m_mouse.lButton
                         && m_mouse.orgX != -1
                         && m_mouse.orgY != -1) {
-                    m_mouse.destX = event->x();
-                    m_mouse.destY = event->y();
+                    const auto pos = event->pos();
+                    m_mouse.destX = pos.x();
+                    m_mouse.destY = pos.y();
                 }
             }
         }
@@ -499,7 +496,7 @@ void CLevelScroll::entryFromProto(const int protoId, CLevelEntry &entry)
 void CLevelScroll::dropEvent(QDropEvent *event)
 {
     QString t = event->mimeData()->text();
-    QPoint pos = event->pos();
+    QPoint pos = event->position().toPoint();
     if (event->source() && m_game->getSize()
             && t.mid(0, 5) == "LGCK:") {
 

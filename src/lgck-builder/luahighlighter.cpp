@@ -133,7 +133,7 @@ void CLuaHighlighter::applyRule(const QStringList &words, const QTextCharFormat 
 
 void CLuaHighlighter::highlightBlock(const QString &text)
 {
-    for (const HighlightingRule &rule : qAsConst(highlightingRules))
+    for (const HighlightingRule &rule : std::as_const(highlightingRules))
     {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext())

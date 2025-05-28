@@ -100,7 +100,7 @@ void CDlgAbout::setGLInfo(const QString & vendor,
     m_ui->sOpenGLRenderer->setText(renderer);
     m_ui->sOpenGLVendor->setText(vendor);
     m_ui->sOpenGLVersion->setText(version);
-    QRegExp rx("(\\ )");
+    QRegularExpression rx("(\\ )");
     QStringList extList = extensions.split(rx);
     for (QStringList::iterator it = extList.begin();
         it != extList.end(); ++it) {

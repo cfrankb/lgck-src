@@ -21,12 +21,11 @@
 #include "mainwindow.h"
 #include "DlgSelect.h"
 #include <QFileDialog>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QSettings>
 #include "WizGame.h"
 #include <ctime>
 #include <QMessageBox>
-#include <QDesktopWidget>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QSurfaceFormat>

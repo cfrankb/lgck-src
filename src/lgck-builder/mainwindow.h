@@ -43,7 +43,7 @@ class QSettings;
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QMainWindow>
-#include <QGLFunctions>
+#include <QOpenGLFunctions>
 #include "../shared/Game.h"
 
 namespace Ui

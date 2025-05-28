@@ -19,7 +19,7 @@
 #include <qdebug.h>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QtNetwork/QtNetwork>
+#include <QtNetwork>
 #include <QUrl>
 #include <QUrlQuery>
 #include "../shared/qtgui/cheat.h"
@@ -76,18 +76,26 @@ void CThreadUpdater::sendRequest()
     }
     delete reply;
 
+    QRegularExpressionMatch match;
     if (result.indexOf("result: all okay\n") != -1) {
-        QRegExp exp = QRegExp("download: [a-zA-z0-9:\\._/]+");
+        QRegularExpression exp = QRegularExpression("download: [a-zA-z0-9:\\._/]+");
         QString dwUrl = "";
-        if (exp.indexIn(result)!=-1) {
-            QStringList list = exp.capturedTexts();
-            dwUrl = list[0].mid(strlen("download: "));
+
+        match = exp.match(result);
+        if (match.hasMatch()) {
+        //if (exp.indexIn(result)!=-1) {
+          //  QStringList list = exp.capturedTexts();
+            dwUrl = match.captured(0).mid(strlen("download: "));
+            //dwUrl = list[0].mid(strlen("download: "));
         }
-        exp = QRegExp("version: [0-9a-z\\.]+");
+        exp = QRegularExpression("version: [0-9a-z\\.]+");
+        match = exp.match(result);
         QString dwVersion = "";
-        if (exp.indexIn(result)!=-1) {
-            QStringList list = exp.capturedTexts();
-            dwVersion = list[0].mid(strlen("version: "));
+        if (match.hasMatch()) {
+        //if (exp.indexIn(result)!=-1) {
+            //QStringList list = exp.capturedTexts();
+            dwVersion = match.captured(0).mid(strlen("version: "));
+            //dwVersion = list[0].mid(strlen("version: "));
         }
         qDebug() << "dwUrl: " << dwUrl;
         qDebug() << "dwVersion: " << dwVersion;
@@ -97,5 +105,6 @@ void CThreadUpdater::sendRequest()
     } else {
         qWarning("Incomplete version information returned.");
     }
+
     eventLoop.quit();
 }
